@@ -2,6 +2,9 @@ import React from 'react';
 
 import {BodyTwoText, StrongText} from '@cdo/apps/componentLibrary/typography';
 
+import ResourceIcon from './ResourceIcon';
+import ResourceViewOptionsDropdown from './ResourceViewOptionsDropdown';
+
 import styles from './lesson-materials.module.scss';
 
 type ResourceRowProps = {
@@ -25,12 +28,20 @@ const ResourceRow: React.FC<ResourceRowProps> = ({
   const resourcePositionLabel = (
     <strong>{unitNumber + '.' + lessonNumber + ' '}</strong>
   );
+
+  const resourceDisplayText = () =>
+    resource.type ? `${resource.type}: ${resource.name}` : resource.name;
+
   return (
     <div className={styles.rowContainer}>
-      <BodyTwoText>
-        <StrongText>{resourcePositionLabel}</StrongText>
-        {resource?.name}
-      </BodyTwoText>
+      <div className={styles.iconAndName}>
+        <ResourceIcon resourceType={resource.type} resourceUrl={resource.url} />
+        <BodyTwoText className={styles.resourceLabel}>
+          <StrongText>{resourcePositionLabel}</StrongText>
+          {resourceDisplayText()}
+        </BodyTwoText>
+      </div>
+      <ResourceViewOptionsDropdown resource={resource} />
     </div>
   );
 };
