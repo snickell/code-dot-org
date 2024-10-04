@@ -2,6 +2,7 @@
 // if it wants to make progress without reloading the page.
 
 import {Condition, Validation} from '@cdo/apps/lab2/types';
+import HttpClient from '@cdo/apps/util/HttpClient';
 
 // Abstract class that validates a set of conditions. How
 // the validation works is up to the implementor.
@@ -46,6 +47,10 @@ export const getInitialValidationState: () => ValidationState = () => ({
   index: 0,
 });
 
+let hasRun = false;
+
+const CHAT_COMPLETION_URL = '/openai/chat_completion';
+
 export default class ProgressManager {
   private currentValidations: Validation[] | undefined;
   private validator: Validator | undefined;
@@ -75,7 +80,67 @@ export default class ProgressManager {
     return this.currentValidationState;
   }
 
-  updateProgress(): void {
+  async doAi(input: string) {
+    const systemPrompt = 'You can evaluate javascript progarms.';
+
+    const messages = [
+      {
+        role: 'system',
+        content: systemPrompt,
+      },
+      {
+        role: 'user',
+        content: input,
+      },
+    ];
+
+    const payload = {
+      messages,
+      levelId: 3,
+      scriptId: 'music-intro-2024',
+      systemPrompt,
+    };
+
+    const response = await HttpClient.post(
+      CHAT_COMPLETION_URL,
+      JSON.stringify(payload),
+      true,
+      {
+        'Content-Type': 'application/json; charset=UTF-8',
+      }
+    );
+
+    if (response.status === 200) {
+      const res = await response.json();
+      return res.content;
+    } else {
+      return null;
+    }
+  }
+
+  updateProgress(code?: string): void {
+    if (hasRun) {
+      return;
+    }
+
+    console.log("Let's check progress!");
+
+    this.doAi(
+      `Examine the program below, and return the first of the following values if the given conditions are met:
+        success: if it plays two different sounds together, and then another different two sounds together after that.
+        kinda: if it plays two sounds together.
+        maybe: if it plays one sound.
+        nah: if it plays no sounds.
+
+        Keep in mind that only the first parameter of Sequencer.playSound identifies the sound.  Ignore its second parameter.
+        now, here's the code:
+      ` + code
+    ).then(ret => {
+      console.log(ret);
+    });
+
+    hasRun = true;
+
     if (!this.currentValidations || !this.validator) {
       return;
     }
@@ -123,6 +188,8 @@ export default class ProgressManager {
   }
 
   resetValidation() {
+    hasRun = false;
+
     if (this.validator) {
       // Give the lab the chance to clear accumulated satisfied conditions.
       this.validator.clear();

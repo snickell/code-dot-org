@@ -148,16 +148,19 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
     installFunctionBlocks(blockMode);
   }, [blockMode]);
 
+  const runCode = blocklyWorkspace.getRunCode();
+
   // Update loop that runs while playback is in progress.
   const doPlaybackUpdate = useCallback(() => {
     dispatch(setCurrentPlayheadPosition(getCurrentPlayheadPosition()));
     updateHighlightedBlocks();
-    progressManager?.updateProgress();
+    progressManager?.updateProgress(runCode);
   }, [
     dispatch,
     getCurrentPlayheadPosition,
     updateHighlightedBlocks,
     progressManager,
+    runCode,
   ]);
 
   const resetValidation = useCallback(
