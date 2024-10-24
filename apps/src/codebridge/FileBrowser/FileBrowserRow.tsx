@@ -3,28 +3,21 @@ import OverflowTooltip from '@codebridge/components/OverflowTooltip';
 import {PopUpButton} from '@codebridge/PopUpButton/PopUpButton';
 import {PopUpButtonOption} from '@codebridge/PopUpButton/PopUpButtonOption';
 import {ProjectFile} from '@codebridge/types';
-import {
-  getFileIconNameAndStyle,
-  getPossibleDestinationFoldersForFile,
-  sendCodebridgeAnalyticsEvent,
-} from '@codebridge/utils';
+import {getFileIconNameAndStyle} from '@codebridge/utils';
 import classNames from 'classnames';
-import fileDownload from 'js-file-download';
 import React from 'react';
 
-import codebridgeI18n from '@cdo/apps/codebridge/locale';
 import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon';
-import {ProjectFileType} from '@cdo/apps/lab2/types';
-import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 
 import {usePrompts} from './hooks';
 import StartModeFileDropdownOptions from './StartModeFileDropdownOptions';
 import {setFileType} from './types';
+import {getFileRowOptions} from './utils';
 
 import moduleStyles from './styles/filebrowser.module.scss';
 import darkModeStyles from '@cdo/apps/lab2/styles/dark-mode.module.scss';
 
-interface FileRowProps {
+interface FileBrowserRowProps {
   file: ProjectFile;
   isReadOnly: boolean;
   // If the pop-up menu is enabled, we will show the 3-dot menu button on hover.
@@ -36,16 +29,11 @@ interface FileRowProps {
   setFileType: setFileType;
 }
 
-const handleFileDownload = (file: ProjectFile, appName: string | undefined) => {
-  fileDownload(file.contents, file.name);
-  sendCodebridgeAnalyticsEvent(EVENTS.CODEBRIDGE_DOWNLOAD_FILE, appName);
-};
-
 /**
  * A single file row in the file browser. This component does not handle
  * drag and drop, that is handled by the parent component.
  */
-const FileRow: React.FunctionComponent<FileRowProps> = ({
+const FileBrowserRow: React.FunctionComponent<FileBrowserRowProps> = ({
   file,
   isReadOnly,
   enableMenu,
@@ -61,48 +49,23 @@ const FileRow: React.FunctionComponent<FileRowProps> = ({
     config: {editableFileTypes},
   } = useCodebridgeContext();
   const {openMoveFilePrompt, openRenameFilePrompt} = usePrompts();
+
   const {iconName, iconStyle, isBrand} = getFileIconNameAndStyle(file);
   const iconClassName = isBrand
     ? classNames('fa-brands', moduleStyles.rowIcon)
     : moduleStyles.rowIcon;
-  const isLocked = !isStartMode && file.type === ProjectFileType.LOCKED_STARTER;
 
-  const dropdownOptions = [
-    {
-      condition:
-        !isLocked &&
-        Boolean(
-          getPossibleDestinationFoldersForFile({
-            file,
-            projectFiles: files,
-            projectFolders: folders,
-            isStartMode,
-            validationFile: undefined,
-          }).length
-        ),
-      iconName: 'arrow-right',
-      labelText: codebridgeI18n.moveFile(),
-      clickHandler: () => openMoveFilePrompt({fileId: file.id}),
-    },
-    {
-      condition: !isLocked,
-      iconName: 'pencil',
-      labelText: codebridgeI18n.renameFile(),
-      clickHandler: () => openRenameFilePrompt({fileId: file.id}),
-    },
-    {
-      condition: editableFileTypes.includes(file.language),
-      iconName: 'download',
-      labelText: codebridgeI18n.downloadFile(),
-      clickHandler: () => handleFileDownload(file, appName),
-    },
-    {
-      condition: !isLocked,
-      iconName: 'trash',
-      labelText: codebridgeI18n.deleteFile(),
-      clickHandler: () => handleDeleteFile(file.id),
-    },
-  ];
+  const dropdownOptions = getFileRowOptions({
+    file,
+    isStartMode,
+    appName,
+    handleDeleteFile,
+    projectFiles: files,
+    projectFolders: folders,
+    editableFileTypes,
+    openMoveFilePrompt,
+    openRenameFilePrompt,
+  });
 
   return (
     <div className={moduleStyles.row}>
@@ -158,4 +121,4 @@ const FileRow: React.FunctionComponent<FileRowProps> = ({
   );
 };
 
-export default FileRow;
+export default FileBrowserRow;

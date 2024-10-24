@@ -17,11 +17,22 @@ type DraggableProps = {
   Component?: keyof JSX.IntrinsicElements;
 };
 
-export const Draggable = ({
+/**
+ * A React component that makes its children draggable using the `useDraggable` hook. Should wrap around a FileBrowserRow.
+ * If you -don't- want a row to be draggable, but still want a wrapper, you can wrap it in NotDraggable, below.
+ *
+ * @param props - The props for the `Draggable` component.
+ * @param props.children - The content to be made draggable.
+ * @param props.data - An object containing data associated with the draggable element. data must be of type DragDataType.
+ * @param props.Component - (Optional) The underlying HTML element to use as the draggable container.
+ *                         - Defaults to `'div'`.
+ * @returns A React element with the provided children, styled for dragging and handling drag events.
+ */
+export const Draggable: React.FunctionComponent<DraggableProps> = ({
   children,
   data,
   Component = 'div',
-}: DraggableProps) => {
+}) => {
   const {attributes, listeners, setNodeRef, transform} = useDraggable({
     id: `${data.type}-${data.id}`,
     data,
@@ -43,3 +54,7 @@ export const Draggable = ({
     children
   );
 };
+
+export const NotDraggable: React.FunctionComponent<
+  Partial<Omit<DraggableProps, 'children'>> & {children: React.ReactNode}
+> = ({children}) => <>{children}</>;

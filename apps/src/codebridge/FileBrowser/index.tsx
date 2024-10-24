@@ -46,10 +46,10 @@ import {
   DndDataContextProvider,
   useDndDataContext,
 } from './DnDDataContextProvider';
-import {Draggable} from './Draggable';
+import {Draggable, NotDraggable} from './Draggable';
 import {Droppable} from './Droppable';
 import {FileBrowserHeaderPopUpButton} from './FileBrowserHeaderPopUpButton';
-import FileRow from './FileRow';
+import FileBrowserRow from './FileBrowserRow';
 import {
   useFileUploader,
   useFileUploadErrorCallback,
@@ -300,7 +300,8 @@ const InnerFileBrowser = React.memo(
           .sort((a, b) => a.name.localeCompare(b.name))
           .map(f => {
             const isDraggingLocked =
-              !isStartMode && f.type === ProjectFileType.LOCKED_STARTER;
+              (!isStartMode && f.type === ProjectFileType.LOCKED_STARTER) ||
+              f.name === 'nodrag.txt';
             const fileRowProps = {
               key: f.id,
               file: f,
@@ -312,16 +313,17 @@ const InnerFileBrowser = React.memo(
               handleDeleteFile,
               enableMenu: !dragData?.id || isDraggingLocked,
             };
-            return isDraggingLocked ? (
-              <FileRow {...fileRowProps} />
-            ) : (
-              <Draggable
+            const DraggableWrapper = isDraggingLocked
+              ? NotDraggable
+              : Draggable;
+            return (
+              <DraggableWrapper
                 data={{id: f.id, type: DragType.FILE, parentId: f.folderId}}
                 key={f.id}
                 Component="li"
               >
-                <FileRow {...fileRowProps} />
-              </Draggable>
+                <FileBrowserRow {...fileRowProps} />
+              </DraggableWrapper>
             );
           })}
       </>
