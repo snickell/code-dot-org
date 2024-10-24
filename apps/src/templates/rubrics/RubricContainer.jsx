@@ -113,25 +113,43 @@ function RubricContainer({
     fetchAiEvaluations();
   }, [fetchAiEvaluations]);
 
-  const fetchTeacherEvaluationAll = (rubricId, sectionId) => {
-    return fetch(
-      `/rubrics/${rubricId}/get_teacher_evaluations_for_all?section_id=${sectionId}`
-    );
-  };
+  const loadAllTeacherEvaluationData = useCallback(() => {
+    const fetchTeacherEvaluationAll = (rubricId, sectionId) => {
+      return fetch(
+        `/rubrics/${rubricId}/get_teacher_evaluations_for_all?section_id=${sectionId}`
+      );
+    };
+
+    const initializeHasTeacherFeedbackMap = allTeacherEvaluationData => {
+      const hasFeedbackMap = {};
+      allTeacherEvaluationData.forEach(userEvalData => {
+        if (userEvalData?.user_id) {
+          hasFeedbackMap[userEvalData.user_id] = userEvalData.eval.length > 0;
+        }
+      });
+      setHasTeacherFeedbackMap(hasFeedbackMap);
+    };
+
+    fetchTeacherEvaluationAll(rubricId, sectionId).then(response => {
+      if (response.ok) {
+        response.json().then(data => {
+          initializeHasTeacherFeedbackMap(data);
+          setAllTeacherEvaluationData(data);
+        });
+      }
+    });
+  }, [
+    rubricId,
+    sectionId,
+    setAllTeacherEvaluationData,
+    setHasTeacherFeedbackMap,
+  ]);
 
   useEffect(() => {
     if (!!rubricId && !!sectionId) {
-      fetchTeacherEvaluationAll(rubricId, sectionId).then(response => {
-        if (response.ok) {
-          response.json().then(data => {
-            initializeHasTeacherFeedbackMap(data);
-            setAllTeacherEvaluationData(data);
-          });
-        }
-      });
+      loadAllTeacherEvaluationData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rubricId, sectionId]);
+  }, [rubricId, sectionId, loadAllTeacherEvaluationData]);
 
   const [aiEvalStatusCounters, setAiEvalStatusCounters] = useState(null);
   const [aiEvalStatusMap, setAiEvalStatusMap] = useState(null);
@@ -161,16 +179,6 @@ function RubricContainer({
       ...aiEvalStatusMap,
       [userId]: status,
     });
-  };
-
-  const initializeHasTeacherFeedbackMap = allTeacherEvaluationData => {
-    const hasFeedbackMap = {};
-    allTeacherEvaluationData.forEach(userEvalData => {
-      if (userEvalData?.user_id) {
-        hasFeedbackMap[userEvalData.user_id] = userEvalData.eval.length > 0;
-      }
-    });
-    setHasTeacherFeedbackMap(hasFeedbackMap);
   };
 
   const onSubmitTeacherFeedback = userId => {
