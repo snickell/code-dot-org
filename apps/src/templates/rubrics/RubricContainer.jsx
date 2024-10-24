@@ -2,6 +2,7 @@ import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useState, useRef} from 'react';
 import Draggable from 'react-draggable';
+import {connect} from 'react-redux';
 
 import {Heading6} from '@cdo/apps/componentLibrary/typography';
 import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
@@ -22,6 +23,7 @@ import {
 } from './rubricShapes';
 import RubricSubmitFooter from './RubricSubmitFooter';
 import RubricTabButtons from './RubricTabButtons';
+import {setAllTeacherEvaluationData} from './teacherRubricRedux';
 
 import style from './rubrics.module.scss';
 
@@ -33,7 +35,7 @@ import {Steps} from 'intro.js-react';
 import {INITIAL_STEP, STEPS, DUMMY_PROPS} from './productTourHelpers';
 /* eslint-enable import/order */
 
-export default function RubricContainer({
+function RubricContainer({
   rubric,
   studentLevelInfo,
   teacherHasEnabledAi,
@@ -42,6 +44,8 @@ export default function RubricContainer({
   open,
   closeRubric,
   sectionId,
+  allTeacherEvaluationData,
+  setAllTeacherEvaluationData,
 }) {
   const onLevelForEvaluation = currentLevelName === rubric.level.name;
   const canProvideFeedback = !!studentLevelInfo && onLevelForEvaluation;
@@ -103,8 +107,6 @@ export default function RubricContainer({
   useEffect(() => {
     fetchAiEvaluations();
   }, [fetchAiEvaluations]);
-
-  const [allTeacherEvaluationData, setAllTeacherEvaluationData] = useState([]);
 
   const fetchTeacherEvaluationAll = (rubricId, sectionId) => {
     return fetch(
@@ -460,7 +462,22 @@ RubricContainer.propTypes = {
   closeRubric: PropTypes.func,
   open: PropTypes.bool,
   sectionId: PropTypes.number,
+
+  // Redux provided
+  allTeacherEvaluationData: PropTypes.array,
+  setAllTeacherEvaluationData: PropTypes.func,
 };
+
+export default connect(
+  state => ({
+    allTeacherEvaluationData: state.teacherRubric.allTeacherEvaluationData,
+  }),
+  dispatch => ({
+    setAllTeacherEvaluationData(data) {
+      dispatch(setAllTeacherEvaluationData(data));
+    },
+  })
+)(RubricContainer);
 
 const HeaderTab = ({text, isSelected, onClick}) => {
   return (
