@@ -24,8 +24,8 @@ import {
 import RubricSubmitFooter from './RubricSubmitFooter';
 import RubricTabButtons from './RubricTabButtons';
 import {
-  setAllTeacherEvaluationData,
   setHasTeacherFeedbackMap,
+  loadAllTeacherEvaluationData,
 } from './teacherRubricRedux';
 
 import style from './rubrics.module.scss';
@@ -48,9 +48,9 @@ function RubricContainer({
   closeRubric,
   sectionId,
   allTeacherEvaluationData,
-  setAllTeacherEvaluationData,
   hasTeacherFeedbackMap,
   setHasTeacherFeedbackMap,
+  loadAllTeacherEvaluationData,
 }) {
   const onLevelForEvaluation = currentLevelName === rubric.level.name;
   const canProvideFeedback = !!studentLevelInfo && onLevelForEvaluation;
@@ -113,41 +113,9 @@ function RubricContainer({
     fetchAiEvaluations();
   }, [fetchAiEvaluations]);
 
-  const loadAllTeacherEvaluationData = useCallback(() => {
-    const fetchTeacherEvaluationAll = (rubricId, sectionId) => {
-      return fetch(
-        `/rubrics/${rubricId}/get_teacher_evaluations_for_all?section_id=${sectionId}`
-      );
-    };
-
-    const initializeHasTeacherFeedbackMap = allTeacherEvaluationData => {
-      const hasFeedbackMap = {};
-      allTeacherEvaluationData.forEach(userEvalData => {
-        if (userEvalData?.user_id) {
-          hasFeedbackMap[userEvalData.user_id] = userEvalData.eval.length > 0;
-        }
-      });
-      setHasTeacherFeedbackMap(hasFeedbackMap);
-    };
-
-    fetchTeacherEvaluationAll(rubricId, sectionId).then(response => {
-      if (response.ok) {
-        response.json().then(data => {
-          initializeHasTeacherFeedbackMap(data);
-          setAllTeacherEvaluationData(data);
-        });
-      }
-    });
-  }, [
-    rubricId,
-    sectionId,
-    setAllTeacherEvaluationData,
-    setHasTeacherFeedbackMap,
-  ]);
-
   useEffect(() => {
     if (!!rubricId && !!sectionId) {
-      loadAllTeacherEvaluationData();
+      loadAllTeacherEvaluationData(rubricId, sectionId);
     }
   }, [rubricId, sectionId, loadAllTeacherEvaluationData]);
 
@@ -476,7 +444,7 @@ RubricContainer.propTypes = {
 
   // Redux provided
   allTeacherEvaluationData: PropTypes.array,
-  setAllTeacherEvaluationData: PropTypes.func,
+  loadAllTeacherEvaluationData: PropTypes.func,
   hasTeacherFeedbackMap: PropTypes.object,
   setHasTeacherFeedbackMap: PropTypes.func,
 };
@@ -487,11 +455,11 @@ export default connect(
     hasTeacherFeedbackMap: state.teacherRubric.hasTeacherFeedbackMap,
   }),
   dispatch => ({
-    setAllTeacherEvaluationData(data) {
-      dispatch(setAllTeacherEvaluationData(data));
-    },
     setHasTeacherFeedbackMap(map) {
       dispatch(setHasTeacherFeedbackMap(map));
+    },
+    loadAllTeacherEvaluationData(rubricId, sectionId) {
+      dispatch(loadAllTeacherEvaluationData(rubricId, sectionId));
     },
   })
 )(RubricContainer);
