@@ -84,10 +84,12 @@ export const loadAllTeacherEvaluationData = createAsyncThunk(
   }
 );
 
+// For internal use only
+const {setHasTeacherFeedbackMap} = teacherRubricReduxSlice.actions;
+
 // Exported for testing only
 export const {setAllTeacherEvaluationData} = teacherRubricReduxSlice.actions;
 
 // Standard exports
-export const {setHasTeacherFeedbackMap, setUserHasTeacherFeedback} =
-  teacherRubricReduxSlice.actions;
+export const {setUserHasTeacherFeedback} = teacherRubricReduxSlice.actions;
 export default teacherRubricReduxSlice.reducer;

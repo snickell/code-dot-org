@@ -23,10 +23,7 @@ import {
 } from './rubricShapes';
 import RubricSubmitFooter from './RubricSubmitFooter';
 import RubricTabButtons from './RubricTabButtons';
-import {
-  setHasTeacherFeedbackMap,
-  loadAllTeacherEvaluationData,
-} from './teacherRubricRedux';
+import {loadAllTeacherEvaluationData} from './teacherRubricRedux';
 
 import style from './rubrics.module.scss';
 
@@ -48,7 +45,6 @@ function RubricContainer({
   closeRubric,
   sectionId,
   hasTeacherFeedbackMap,
-  setHasTeacherFeedbackMap,
   loadAllTeacherEvaluationData,
 }) {
   const onLevelForEvaluation = currentLevelName === rubric.level.name;
@@ -435,7 +431,6 @@ RubricContainer.propTypes = {
   // Redux provided
   loadAllTeacherEvaluationData: PropTypes.func,
   hasTeacherFeedbackMap: PropTypes.object,
-  setHasTeacherFeedbackMap: PropTypes.func,
 };
 
 export default connect(
@@ -443,9 +438,6 @@ export default connect(
     hasTeacherFeedbackMap: state.teacherRubric.hasTeacherFeedbackMap,
   }),
   dispatch => ({
-    setHasTeacherFeedbackMap(map) {
-      dispatch(setHasTeacherFeedbackMap(map));
-    },
     loadAllTeacherEvaluationData(rubricId, sectionId) {
       dispatch(loadAllTeacherEvaluationData(rubricId, sectionId));
     },
