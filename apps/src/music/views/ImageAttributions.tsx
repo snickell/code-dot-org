@@ -55,6 +55,8 @@ const ImageAttributions: React.FunctionComponent<ImageAttributionsProps> = ({
         author: attribution.author,
       });
     }
+
+    return '';
   };
 
   return (
