@@ -195,13 +195,7 @@ def test_eyes?
 end
 
 def start_sauce_connect
-  # Use latest sauce connect client for each run so we don't have to keep up with updates and end-of-lifes.
-  # If a newly-released version breaks the build, a quick fix to unblock the issue is to temporarily
-  # pin the version we use to the last working version, while we schedule the task to get the upgraded version
-  # working. You can do this by replacing `sc_download_url` with a hard-coded download url.
-
-  sc_version_info = JSON.parse(Net::HTTP.get(URI('https://saucelabs.com/versions.json')))
-  sc_download_url = sc_version_info['Sauce Connect']['linux']['download_url']
+  sc_download_url = 'https://saucelabs.com/downloads/sauce-connect/5.2.1/sauce-connect-5.2.1_linux.x86_64.tar.gz'
   tar_name = sc_download_url.split('/')[-1]
   dir_name = tar_name.chomp('.tar.gz')
 
