@@ -47,7 +47,6 @@ function RubricContainer({
   open,
   closeRubric,
   sectionId,
-  allTeacherEvaluationData,
   hasTeacherFeedbackMap,
   setHasTeacherFeedbackMap,
   loadAllTeacherEvaluationData,
@@ -410,7 +409,6 @@ function RubricContainer({
               sectionId={sectionId}
               tabSelectCallback={tabSelectCallback}
               reportingData={reportingData}
-              allTeacherEvaluationData={allTeacherEvaluationData}
               aiEvalStatusCounters={aiEvalStatusCounters}
               setAiEvalStatusMap={setAiEvalStatusMap}
             />
@@ -443,7 +441,6 @@ RubricContainer.propTypes = {
   sectionId: PropTypes.number,
 
   // Redux provided
-  allTeacherEvaluationData: PropTypes.array,
   loadAllTeacherEvaluationData: PropTypes.func,
   hasTeacherFeedbackMap: PropTypes.object,
   setHasTeacherFeedbackMap: PropTypes.func,
@@ -451,7 +448,6 @@ RubricContainer.propTypes = {
 
 export default connect(
   state => ({
-    allTeacherEvaluationData: state.teacherRubric.allTeacherEvaluationData,
     hasTeacherFeedbackMap: state.teacherRubric.hasTeacherFeedbackMap,
   }),
   dispatch => ({
