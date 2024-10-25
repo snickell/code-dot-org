@@ -46,9 +46,10 @@ module ActiveJobMetrics
   end
 
   protected def report_job_count
+    
     Cdo::Metrics.push(METRICS_NAMESPACE,
-      # Same metrics as "bin/cron/report_activejob_metrics"
-      [
+    [
+        # Same metrics as "bin/cron/report_activejob_metrics"
         {
           metric_name: 'PendingJobCount',
           value: get_pending_job_count,
@@ -75,7 +76,35 @@ module ActiveJobMetrics
           dimensions: [
             {name: 'Environment', value: CDO.rack_env},
           ],
-        }
+        },
+        # Per Job Class metrics
+        {
+          metric_name: 'PendingJobCount',
+          value: get_my_pending_job_count,
+          unit: 'Count',
+          timestamp: Time.now,
+          dimensions: [
+            common_dimensions,
+          ],
+        },
+        {
+          metric_name: 'FailedJobCount',
+          value: get_my_failed_job_count,
+          unit: 'Count',
+          timestamp: Time.now,
+          dimensions: [
+            common_dimensions,
+          ],
+        },
+        {
+          metric_name: 'WorkableJobCount',
+          value: get_my_workable_job_count,
+          unit: 'Count',
+          timestamp: Time.now,
+          dimensions: [
+            common_dimensions,
+          ],
+        },
       ]
     )
   rescue => exception
