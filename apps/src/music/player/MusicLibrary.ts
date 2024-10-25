@@ -450,12 +450,15 @@ export interface ImageAttributionCopyright extends ImageAttribution {
   artist: string;
 }
 
+// A Creative Commons (2, 3, or 4) or regular copyright license.
+export type ImageAttributionLicenseVersion = 'CC2' | 'CC3' | 'CC4' | 'C';
+
 export interface ImageAttribution {
   author: string;
   color?: string;
   position?: 'left' | 'right';
   src?: string;
-  licenseVersion: 'CC2' | 'CC3' | 'CC4' | 'C';
+  licenseVersion: ImageAttributionLicenseVersion;
   year?: string;
 }
 

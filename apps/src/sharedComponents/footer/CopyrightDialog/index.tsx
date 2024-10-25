@@ -11,6 +11,7 @@ import './style.scss';
 import defaultStyle from '@cdo/apps/sharedComponents/accessible-dialogue.module.scss';
 
 // External code can specify additional content to be shown, or clear it again.
+// Currently used by Music Lab to show image attributions.
 let extraCopyrightContent: React.ReactNode | undefined = undefined;
 export const setExtraCopyrightContent = (content?: React.ReactNode) => {
   extraCopyrightContent = content;

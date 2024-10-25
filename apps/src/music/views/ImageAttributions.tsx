@@ -3,7 +3,10 @@ import React from 'react';
 import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
 
 import musicI18n from '../locale';
-import {ImageAttributionCopyright} from '../player/MusicLibrary';
+import {
+  ImageAttributionCopyright,
+  ImageAttributionLicenseVersion,
+} from '../player/MusicLibrary';
 
 import moduleStyles from './ImageAttributions.module.scss';
 
@@ -12,7 +15,7 @@ interface ImageAttributionsProps {
 }
 
 const creativeCommonsLicenseLinks: {
-  [version: string]: {name: string; url: string};
+  [version in ImageAttributionLicenseVersion]?: {name: string; url: string};
 } = {
   CC2: {
     name: 'CC BY 2.0',
@@ -44,9 +47,8 @@ const ImageAttributions: React.FunctionComponent<ImageAttributionsProps> = ({
         srcUrl: attribution.src || '',
         author: attribution.author,
         licenseName:
-          creativeCommonsLicenseLinks[attribution.licenseVersion]?.name,
-        licenseUrl:
-          creativeCommonsLicenseLinks[attribution.licenseVersion]?.url,
+          creativeCommonsLicenseLinks[attribution.licenseVersion].name,
+        licenseUrl: creativeCommonsLicenseLinks[attribution.licenseVersion].url,
       });
     } else if (attribution.licenseVersion === 'C') {
       return musicI18n.imageAttributionBodyCopyright({
