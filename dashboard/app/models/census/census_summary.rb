@@ -2,17 +2,17 @@
 #
 # Table name: census_summaries
 #
-#  id          :integer          not null, primary key
-#  school_id   :string(12)       not null
-#  school_year :integer          not null
-#  teaches_cs  :string(2)
-#  audit_data  :text(65535)
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
+#  id                 :integer          not null, primary key
+#  school_id          :string(12)       not null
+#  access_report_year :integer          not null
+#  teaches_cs         :string(2)
+#  audit_data         :text(65535)
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
 #
 # Indexes
 #
-#  index_census_summaries_on_school_id_and_school_year  (school_id,school_year) UNIQUE
+#  index_census_summaries_on_school_id_and_access_report_year  (school_id,access_report_year) UNIQUE
 #
 
 class Census::CensusSummary < ApplicationRecord

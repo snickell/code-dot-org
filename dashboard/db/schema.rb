@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_10_22_150616) do
+ActiveRecord::Schema.define(version: 2024_10_25_182954) do
 
   create_table "activities", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
     t.integer "user_id"
@@ -270,12 +270,12 @@ ActiveRecord::Schema.define(version: 2024_10_22_150616) do
 
   create_table "census_summaries", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
     t.string "school_id", limit: 12, null: false
-    t.integer "school_year", limit: 2, null: false
+    t.integer "access_report_year", limit: 2, null: false
     t.string "teaches_cs", limit: 2
     t.text "audit_data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["school_id", "school_year"], name: "index_census_summaries_on_school_id_and_school_year", unique: true
+    t.index ["school_id", "access_report_year"], name: "index_census_summaries_on_school_id_and_access_report_year", unique: true
   end
 
   create_table "channel_tokens", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
