@@ -1,21 +1,6 @@
 require 'active_support/core_ext/hash/indifferent_access'
 require 'cdo/firehose'
 
-class ZendeskError < StandardError
-  attr_reader :error_details
-
-  def initialize(code, error_details)
-    @error_details = error_details
-    super("Zendesk failed with response code: #{code}")
-  end
-
-  def to_honeybadger_context
-    {
-      details: JSON.parse(@error_details)
-    }
-  end
-end
-
 class ProjectsController < ApplicationController
   before_action :authenticate_user!, except: [:load, :create_new, :show, :edit, :readonly, :redirect_legacy, :public, :index, :export_config, :weblab_footer, :get_or_create_for_level, :can_publish_age_status]
   before_action :redirect_admin_from_labs, only: [:load, :create_new, :show, :edit, :remix]
@@ -789,5 +774,20 @@ class ProjectsController < ApplicationController
       basic_auth: {username: 'dev@code.org/token', password: Dashboard::Application.config.zendesk_dev_token}
     )
     raise ZendeskError.new(response.code, response.body) unless response.success?
+  end
+end
+
+class ZendeskError < StandardError
+  attr_reader :error_details
+
+  def initialize(code, error_details)
+    @error_details = error_details
+    super("Zendesk failed with response code: #{code}")
+  end
+
+  def to_honeybadger_context
+    {
+      details: JSON.parse(@error_details)
+    }
   end
 end
