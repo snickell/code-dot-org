@@ -535,6 +535,14 @@ roles.each do |name, config| %>
       PolicyDocument:
         Version: 2012-10-17
         Statement:
+          - Sid: DataAnalystConsole
+            Effect: Allow
+            Action:
+              - redshift-serverless:ListSnapshots
+              - redshift-serverless:ListRecoveryPoints
+            Resource:
+              - arn:aws:redshift-serverless:*:475661607190:namespace/*
+              - arn:aws:redshift-serverless:*:475661607190:snapshot/*
           - Sid: DataAnalystTools
             Effect: Allow
             Action:
