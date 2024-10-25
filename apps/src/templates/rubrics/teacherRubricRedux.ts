@@ -65,9 +65,7 @@ export const loadAllTeacherEvaluationData = createAsyncThunk(
     ) => {
       const hasFeedbackMap: HasTeacherFeedbackMap = {};
       allTeacherEvaluationData.forEach(userEvalData => {
-        if (userEvalData?.user_id) {
-          hasFeedbackMap[userEvalData.user_id] = userEvalData.eval.length > 0;
-        }
+        hasFeedbackMap[userEvalData.user_id] = userEvalData.eval.length > 0;
       });
       thunkAPI.dispatch(setHasTeacherFeedbackMap(hasFeedbackMap));
     };
