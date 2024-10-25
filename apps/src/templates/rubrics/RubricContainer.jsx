@@ -431,8 +431,8 @@ RubricContainer.propTypes = {
 };
 
 export default connect(null, dispatch => ({
-  loadAllTeacherEvaluationData(rubricId, sectionId) {
-    dispatch(loadAllTeacherEvaluationData(rubricId, sectionId));
+  loadAllTeacherEvaluationData(params) {
+    dispatch(loadAllTeacherEvaluationData(params));
   },
 }))(RubricContainer);
 
