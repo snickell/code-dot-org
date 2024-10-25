@@ -17,7 +17,7 @@ import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
 import {getAppOptionsEditBlocks} from '@cdo/apps/lab2/projects/utils';
 import {LifecycleEvent} from '@cdo/apps/lab2/utils/LifecycleNotifier';
 import AnalyticsReporter from '@cdo/apps/music/analytics/AnalyticsReporter';
-import {setExtraCopyrightText} from '@cdo/apps/sharedComponents/footer/CopyrightDialog/index';
+import {setExtraCopyrightContent} from '@cdo/apps/sharedComponents/footer/CopyrightDialog/index';
 import {SignInState} from '@cdo/apps/templates/currentUserRedux';
 
 import AppConfig from '../appConfig';
@@ -185,7 +185,7 @@ class UnconnectedMusicView extends React.Component {
           this.musicBlocklyWorkspace.dispose();
 
           // Clear any coypright information in the footer.
-          setExtraCopyrightText(undefined);
+          setExtraCopyrightContent(undefined);
         }
       });
   }
@@ -381,7 +381,7 @@ class UnconnectedMusicView extends React.Component {
     this.props.setIsLoading(false);
 
     // Share copyright information with the component in the footer.
-    setExtraCopyrightText(
+    setExtraCopyrightContent(
       <ImageAttributions attributions={this.library.getImageAttributions()} />
     );
   };

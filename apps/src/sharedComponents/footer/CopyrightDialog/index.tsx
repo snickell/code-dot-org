@@ -10,10 +10,10 @@ import i18n from '@cdo/locale';
 import './style.scss';
 import defaultStyle from '@cdo/apps/sharedComponents/accessible-dialogue.module.scss';
 
-// External code can specify additional text to be shown, or clear it again.
-let extraCopyrightText: React.ReactNode | undefined = undefined;
-export const setExtraCopyrightText = (text?: React.ReactNode) => {
-  extraCopyrightText = text;
+// External code can specify additional content to be shown, or clear it again.
+let extraCopyrightContent: React.ReactNode | undefined = undefined;
+export const setExtraCopyrightContent = (content?: React.ReactNode) => {
+  extraCopyrightContent = content;
 };
 
 export interface CopyrightDialogProps {
@@ -58,7 +58,7 @@ const CopyrightDialog: React.FC<CopyrightDialogProps> = ({
                 'https://www.gnu.org/licenses/old-licenses/lgpl-2.1-standalone.html',
             })}
           />
-          {extraCopyrightText && <p>{extraCopyrightText}</p>}
+          {extraCopyrightContent && <p>{extraCopyrightContent}</p>}
           <BodyThreeText>{i18n.copyright_builtOnGithub()}</BodyThreeText>
           <Link
             href="https://aws.amazon.com/what-is-cloud-computing"
