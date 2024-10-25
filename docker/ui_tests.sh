@@ -29,7 +29,7 @@ mkdir $CIRCLE_ARTIFACTS
 echo "
 127.0.0.1  studio.code.org.localhost
 127.0.0.1  code.org.localhost
-" | sudo tee -a /etc/hosts
+" | sudo tee -a /etc/hosts > /dev/null
 
 # set up locals.yml
 # Need to actually write all the commented out lines also
