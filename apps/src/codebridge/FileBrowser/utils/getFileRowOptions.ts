@@ -18,10 +18,10 @@ type GetFileRowOptionsArgs = {
   file: ProjectFile;
   isStartMode: boolean;
   appName?: string;
-  handleDeleteFile: (fileId: string) => void;
   projectFiles: ProjectType['files'];
   projectFolders: ProjectType['folders'];
   editableFileTypes: string[];
+  openConfirmDeleteFile: (args: {file: ProjectFile}) => void;
   openMoveFilePrompt: (args: {fileId: FileId}) => void;
   openRenameFilePrompt: (args: {fileId: FileId}) => void;
 };
@@ -30,10 +30,10 @@ export const getFileRowOptions = ({
   file,
   isStartMode,
   appName,
-  handleDeleteFile,
   projectFiles,
   projectFolders,
   editableFileTypes,
+  openConfirmDeleteFile,
   openMoveFilePrompt,
   openRenameFilePrompt,
 }: GetFileRowOptionsArgs) => {
@@ -72,7 +72,7 @@ export const getFileRowOptions = ({
       condition: !isLocked,
       iconName: 'trash',
       labelText: codebridgeI18n.deleteFile(),
-      clickHandler: () => handleDeleteFile(file.id),
+      clickHandler: () => openConfirmDeleteFile({file}),
     },
   ];
   return dropdownOptions;

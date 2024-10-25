@@ -25,7 +25,6 @@ interface FileBrowserRowProps {
   appName?: string;
   hasValidationFile: boolean; // If the project has a validation file already.
   isStartMode: boolean;
-  handleDeleteFile: (fileId: string) => void;
   setFileType: setFileType;
 }
 
@@ -40,7 +39,6 @@ const FileBrowserRow: React.FunctionComponent<FileBrowserRowProps> = ({
   appName,
   hasValidationFile,
   isStartMode,
-  handleDeleteFile,
   setFileType,
 }) => {
   const {
@@ -48,7 +46,9 @@ const FileBrowserRow: React.FunctionComponent<FileBrowserRowProps> = ({
     openFile,
     config: {editableFileTypes},
   } = useCodebridgeContext();
-  const {openMoveFilePrompt, openRenameFilePrompt} = usePrompts();
+
+  const {openConfirmDeleteFile, openMoveFilePrompt, openRenameFilePrompt} =
+    usePrompts();
 
   const {iconName, iconStyle, isBrand} = getFileIconNameAndStyle(file);
   const iconClassName = isBrand
@@ -59,7 +59,7 @@ const FileBrowserRow: React.FunctionComponent<FileBrowserRowProps> = ({
     file,
     isStartMode,
     appName,
-    handleDeleteFile,
+    openConfirmDeleteFile,
     projectFiles: files,
     projectFolders: folders,
     editableFileTypes,
