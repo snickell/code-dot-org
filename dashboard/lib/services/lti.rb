@@ -192,6 +192,16 @@ module Services
           nrps_member: nrps_member
         )
         user_was_new = user.new_record?
+        # Update name if different from the NRPS response
+        unless user_was_new
+          nrps_member_message = Policies::Lti.issuer_accepts_resource_link?(issuer) ? nrps_member[:message].first : nrps_member
+          if user.user_type == ::User::TYPE_TEACHER
+            user.name = Services::Lti.get_claim_from_list(nrps_member_message, Policies::Lti::TEACHER_NAME_KEYS)
+          else
+            user.name = Services::Lti.get_claim_from_list(nrps_member_message, Policies::Lti::STUDENT_NAME_KEYS)
+            user.family_name = Services::Lti.get_claim(nrps_member_message, :family_name)
+          end
+        end
         had_changes ||= (user_was_new || user.changed?)
         user.save!
         if user_was_new
