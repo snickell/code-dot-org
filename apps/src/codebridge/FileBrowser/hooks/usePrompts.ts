@@ -1,6 +1,7 @@
 import {useCodebridgeContext} from '@codebridge/codebridgeContext';
 import {
   openConfirmDeleteFile as globalOpenConfirmDeleteFile,
+  openConfirmDeleteFolder as globalOpenConfirmDeleteFolder,
   openNewFolderPrompt as globalOpenNewFolderPrompt,
   openNewFilePrompt as globalOpenNewFilePrompt,
   openMoveFilePrompt as globalOpenMoveFilePrompt,
@@ -41,6 +42,7 @@ export const usePrompts = () => {
   const {
     project,
     deleteFile,
+    deleteFolder,
     moveFile,
     moveFolder,
     newFolder,
@@ -63,9 +65,19 @@ export const usePrompts = () => {
     dialogControl,
     deleteFile,
     sendCodebridgeAnalyticsEvent,
-    dispatch,
     cleanupValidationFile,
   } satisfies PAFunctionArgs<typeof globalOpenConfirmDeleteFile>);
+
+  const openConfirmDeleteFolder = usePartialApply(
+    globalOpenConfirmDeleteFolder,
+    {
+      dialogControl,
+      deleteFolder,
+      sendCodebridgeAnalyticsEvent,
+      projectFiles: project.files,
+      projectFolders: project.folders,
+    } satisfies PAFunctionArgs<typeof globalOpenConfirmDeleteFolder>
+  );
 
   const openNewFolderPrompt = usePartialApply(globalOpenNewFolderPrompt, {
     dialogControl,
@@ -119,6 +131,7 @@ export const usePrompts = () => {
   return useMemo(
     () => ({
       openConfirmDeleteFile,
+      openConfirmDeleteFolder,
       openNewFilePrompt,
       openNewFolderPrompt,
       openMoveFilePrompt,
@@ -128,6 +141,7 @@ export const usePrompts = () => {
     }),
     [
       openConfirmDeleteFile,
+      openConfirmDeleteFolder,
       openNewFilePrompt,
       openNewFolderPrompt,
       openMoveFilePrompt,
