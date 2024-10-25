@@ -46,6 +46,9 @@ const teacherRubricReduxSlice = createSlice({
     ) {
       state.hasTeacherFeedbackMap = action.payload;
     },
+    setUserHasTeacherFeedback(state, action: PayloadAction<number>) {
+      state.hasTeacherFeedbackMap[action.payload] = true;
+    },
   },
 });
 
@@ -85,5 +88,6 @@ export const loadAllTeacherEvaluationData = createAsyncThunk(
 export const {setAllTeacherEvaluationData} = teacherRubricReduxSlice.actions;
 
 // Standard exports
-export const {setHasTeacherFeedbackMap} = teacherRubricReduxSlice.actions;
+export const {setHasTeacherFeedbackMap, setUserHasTeacherFeedback} =
+  teacherRubricReduxSlice.actions;
 export default teacherRubricReduxSlice.reducer;

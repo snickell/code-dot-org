@@ -25,6 +25,7 @@ import RubricSubmitFooter from './RubricSubmitFooter';
 import RubricTabButtons from './RubricTabButtons';
 import {
   setHasTeacherFeedbackMap,
+  setUserHasTeacherFeedback,
   loadAllTeacherEvaluationData,
 } from './teacherRubricRedux';
 
@@ -148,12 +149,7 @@ function RubricContainer({
     });
   };
 
-  const onSubmitTeacherFeedback = userId => {
-    setHasTeacherFeedbackMap({
-      ...hasTeacherFeedbackMap,
-      [userId]: true,
-    });
-  };
+  const onSubmitTeacherFeedback = setUserHasTeacherFeedback;
 
   useEffect(() => {
     trySetSessionStorage(rubricTabSessionKey, selectedTab);
@@ -444,6 +440,7 @@ RubricContainer.propTypes = {
   loadAllTeacherEvaluationData: PropTypes.func,
   hasTeacherFeedbackMap: PropTypes.object,
   setHasTeacherFeedbackMap: PropTypes.func,
+  setUserHasTeacherFeedback: PropTypes.func,
 };
 
 export default connect(
@@ -453,6 +450,9 @@ export default connect(
   dispatch => ({
     setHasTeacherFeedbackMap(map) {
       dispatch(setHasTeacherFeedbackMap(map));
+    },
+    setUserHasTeacherFeedback(userId) {
+      dispatch(setUserHasTeacherFeedback(userId));
     },
     loadAllTeacherEvaluationData(rubricId, sectionId) {
       dispatch(loadAllTeacherEvaluationData(rubricId, sectionId));
