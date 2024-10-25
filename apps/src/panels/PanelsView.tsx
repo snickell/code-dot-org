@@ -165,34 +165,36 @@ const PanelsView: React.FunctionComponent<PanelsProps> = ({
             backgroundImage: `url("${panel.imageUrl}")`,
           }}
         />
-        <div
-          className={classNames(
-            styles.text,
-            panel.dark && styles.textDark,
-            textLayoutClass
-          )}
-        >
-          {offerBrowserTts && <TextToSpeech text={panel.text} />}
-          {panel.typing ? (
-            <div>
-              <div className={styles.invisiblePlaceholder}>{plainText}</div>
-              <Typist
-                startDelay={1500}
-                avgTypingDelay={35}
-                stdTypingDelay={15}
-                cursor={{show: false}}
-                onTypingDone={() => {
-                  setTypingDone(true);
-                }}
-                className={styles.typist}
-              >
-                {plainText}
-              </Typist>
-            </div>
-          ) : (
-            <EnhancedSafeMarkdown markdown={panel.text} />
-          )}
-        </div>
+        {panel.text && (
+          <div
+            className={classNames(
+              styles.text,
+              panel.dark && styles.textDark,
+              textLayoutClass
+            )}
+          >
+            {offerBrowserTts && <TextToSpeech text={panel.text} />}
+            {panel.typing ? (
+              <div>
+                <div className={styles.invisiblePlaceholder}>{plainText}</div>
+                <Typist
+                  startDelay={1500}
+                  avgTypingDelay={35}
+                  stdTypingDelay={15}
+                  cursor={{show: false}}
+                  onTypingDone={() => {
+                    setTypingDone(true);
+                  }}
+                  className={styles.typist}
+                >
+                  {plainText}
+                </Typist>
+              </div>
+            ) : (
+              <EnhancedSafeMarkdown markdown={panel.text} />
+            )}
+          </div>
+        )}
       </div>
       <div
         className={styles.childrenArea}
