@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import {useSelector} from 'react-redux';
 import {generatePath, useNavigate, useParams} from 'react-router-dom';
 
 import {initializeHiddenScripts} from '@cdo/apps/code-studio/hiddenLessonRedux';
@@ -18,6 +17,7 @@ import {
   setPageType,
   pageTypes,
 } from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
+import {selectedSectionSelector} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
 import {TEACHER_NAVIGATION_PATHS} from '@cdo/apps/templates/teacherNavigation/TeacherNavigationPaths';
 import {PeerReviewLessonInfo} from '@cdo/apps/types/progressTypes';
 import {getAuthenticityToken} from '@cdo/apps/util/AuthenticityTokenStore';
@@ -28,22 +28,15 @@ import {
   useAppSelector,
 } from '@cdo/apps/util/reduxHooks';
 
-import {addAnnouncement, VisibilityType} from '../../announcementsRedux';
-import {setStudentDefaultsSummaryView} from '../../progressRedux';
+import {
+  addAnnouncement,
+  clearAnnouncements,
+  VisibilityType,
+} from '../../announcementsRedux';
+import {setCalendarData} from '../../calendarRedux';
 import {setVerified, setVerifiedResources} from '../../verifiedInstructorRedux';
 
 import UnitOverview from './UnitOverview';
-
-interface Section {
-  id: number;
-  courseId: number | null;
-  courseVersionId: number;
-  courseVersionName: string | null;
-  courseOfferingId: number | null;
-  unitId: number | null;
-  unitName: string | null;
-  courseDisplayName: string | null;
-}
 
 interface Resource {
   id: number;
@@ -198,7 +191,7 @@ interface TeacherUnitOverviewProps {
   // Define any props you need here
 }
 
-const initializeRedux = (
+export const initializeRedux = (
   unitSummaryResponse: UnitSummaryResponse,
   dispatch: AppDispatch,
   userType: string,
@@ -221,9 +214,7 @@ const initializeRedux = (
     );
   }
 
-  if (unitData.has_verified_resources) {
-    dispatch(setVerifiedResources(true));
-  }
+  dispatch(setVerifiedResources(!!unitData.has_verified_resources));
 
   if (unitData.is_verified_instructor) {
     dispatch(setVerified());
@@ -233,11 +224,16 @@ const initializeRedux = (
     unitData.announcements.forEach(announcement =>
       dispatch(addAnnouncement(announcement))
     );
+  } else {
+    dispatch(clearAnnouncements());
   }
 
-  if (unitData.student_detail_progress_view) {
-    dispatch(setStudentDefaultsSummaryView(false));
-  }
+  dispatch(
+    setCalendarData({
+      showCalendar: !!unitData.showCalendar,
+      calendarLessons: unitData.calendarLessons,
+    })
+  );
 
   progress.initViewAsWithoutStore(
     dispatch,
@@ -267,12 +263,7 @@ const TeacherUnitOverview: React.FC<TeacherUnitOverviewProps> = props => {
   const [unitSummaryResponse, setUnitSummaryResponse] =
     useState<UnitSummaryResponse | null>(null);
 
-  const selectedSection = useSelector(
-    (state: {
-      teacherSections: {sections: Section[]; selectedSectionId: number};
-    }) =>
-      state.teacherSections.sections[state.teacherSections.selectedSectionId]
-  );
+  const selectedSection = useAppSelector(selectedSectionSelector);
 
   const {userId, userType} = useAppSelector(state => ({
     userId: state.currentUser.userId,
@@ -285,7 +276,7 @@ const TeacherUnitOverview: React.FC<TeacherUnitOverviewProps> = props => {
   const {unitName} = useParams();
 
   React.useEffect(() => {
-    if (!unitName && selectedSection.unitName) {
+    if (!unitName && selectedSection?.unitName) {
       navigate(selectedSection.unitName, {replace: true});
     }
   });
@@ -313,7 +304,7 @@ const TeacherUnitOverview: React.FC<TeacherUnitOverviewProps> = props => {
       });
   }, [unitName, userType, userId, dispatch]);
 
-  if (!unitSummaryResponse) {
+  if (!unitSummaryResponse || !selectedSection) {
     return <Spinner size={'large'} />;
   }
 
