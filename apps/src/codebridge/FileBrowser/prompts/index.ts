@@ -1,3 +1,4 @@
+export * from './openConfirmDeleteFile';
 export * from './openMoveFilePrompt';
 export * from './openMoveFolderPrompt';
 export * from './openNewFilePrompt';
