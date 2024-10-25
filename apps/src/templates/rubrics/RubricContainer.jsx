@@ -115,7 +115,7 @@ function RubricContainer({
 
   useEffect(() => {
     if (!!rubricId && !!sectionId) {
-      loadAllTeacherEvaluationData(rubricId, sectionId);
+      loadAllTeacherEvaluationData({rubricId, sectionId});
     }
   }, [rubricId, sectionId, loadAllTeacherEvaluationData]);
 
