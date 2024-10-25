@@ -11,8 +11,8 @@ import './style.scss';
 import defaultStyle from '@cdo/apps/sharedComponents/accessible-dialogue.module.scss';
 
 // External code can specify additional text to be shown, or clear it again.
-let extraCopyrightText: string | undefined = undefined;
-export const setExtraCopyrightText = (text?: string) => {
+let extraCopyrightText: React.ReactNode | undefined = undefined;
+export const setExtraCopyrightText = (text?: React.ReactNode) => {
   extraCopyrightText = text;
 };
 

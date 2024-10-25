@@ -61,6 +61,7 @@ import {Key} from '../utils/Notes';
 import SoundUploader from '../utils/SoundUploader';
 
 import Callouts from './Callouts';
+import ImageAttributions from './ImageAttributions';
 import KeyHandler from './KeyHandler';
 import MusicLabView from './MusicLabView';
 
@@ -380,7 +381,9 @@ class UnconnectedMusicView extends React.Component {
     this.props.setIsLoading(false);
 
     // Share copyright information with the component in the footer.
-    setExtraCopyrightText(this.library.getCopyrightInformation());
+    setExtraCopyrightText(
+      <ImageAttributions attributions={this.library.getImageAttributions()} />
+    );
   };
 
   getIsPlaying = () => {

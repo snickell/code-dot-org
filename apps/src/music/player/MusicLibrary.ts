@@ -282,16 +282,17 @@ export default class MusicLibrary {
     );
   }
 
-  getCopyrightInformation() {
-    const authors: string[] = [];
+  getImageAttributions(): ImageAttributionCopyright[] {
+    const attributions: ImageAttributionCopyright[] = [];
 
     this.getRestrictedPacks().map(pack => {
-      if (pack.imageAttribution?.author) {
-        authors.push(pack.imageAttribution?.author);
+      const attribution = pack.imageAttribution;
+      if (pack.artist && attribution?.author) {
+        attributions.push({artist: pack.artist, ...attribution});
       }
     });
 
-    return authors.join(', ') + '.';
+    return attributions;
   }
 
   // Return a deep copy of the packs folders only containing folders
@@ -445,10 +446,16 @@ export interface SoundData {
   skipLocalization?: boolean;
 }
 
+export interface ImageAttributionCopyright extends ImageAttribution {
+  artist: string;
+}
+
 export interface ImageAttribution {
   author: string;
   color?: string;
   position?: 'left' | 'right';
+  src?: string;
+  licenseVersion: number;
 }
 
 export type SoundFolderType = 'sound' | 'kit' | 'instrument';
