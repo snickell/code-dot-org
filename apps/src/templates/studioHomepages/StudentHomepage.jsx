@@ -7,6 +7,7 @@ import Notification, {
   NotificationType,
 } from '@cdo/apps/sharedComponents/Notification';
 import ParticipantFeedbackNotification from '@cdo/apps/templates/feedback/ParticipantFeedbackNotification';
+import GlobalRegionWrapper from '@cdo/apps/templates/GlobalRegionWrapper';
 import ProjectWidgetWithData from '@cdo/apps/templates/projects/ProjectWidgetWithData';
 import JoinSectionArea from '@cdo/apps/templates/studioHomepages/JoinSectionArea';
 import i18n from '@cdo/locale';
@@ -62,9 +63,13 @@ export default class StudentHomepage extends Component {
 
           <ProtectedStatefulDiv ref="flashes" />
           {specialAnnouncement && (
-            <MarketingAnnouncementBanner
-              announcement={specialAnnouncement}
-              marginBottom="30px"
+            <GlobalRegionWrapper
+              component={MarketingAnnouncementBanner}
+              componentId="MarketingAnnouncementBanner"
+              props={{
+                announcement: specialAnnouncement,
+                marginBottom: '30px',
+              }}
             />
           )}
           {showVerifiedTeacherWarning && (
