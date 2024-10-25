@@ -44,7 +44,6 @@ function RubricContainer({
   open,
   closeRubric,
   sectionId,
-  hasTeacherFeedbackMap,
   loadAllTeacherEvaluationData,
 }) {
   const onLevelForEvaluation = currentLevelName === rubric.level.name;
@@ -387,7 +386,6 @@ function RubricContainer({
             feedbackAdded={feedbackAdded}
             setFeedbackAdded={setFeedbackAdded}
             sectionId={sectionId}
-            hasTeacherFeedbackMap={hasTeacherFeedbackMap}
             aiEvalStatusMap={aiEvalStatusMap}
           />
           {showSettings && (
@@ -430,19 +428,13 @@ RubricContainer.propTypes = {
 
   // Redux provided
   loadAllTeacherEvaluationData: PropTypes.func,
-  hasTeacherFeedbackMap: PropTypes.object,
 };
 
-export default connect(
-  state => ({
-    hasTeacherFeedbackMap: state.teacherRubric.hasTeacherFeedbackMap,
-  }),
-  dispatch => ({
-    loadAllTeacherEvaluationData(rubricId, sectionId) {
-      dispatch(loadAllTeacherEvaluationData(rubricId, sectionId));
-    },
-  })
-)(RubricContainer);
+export default connect(null, dispatch => ({
+  loadAllTeacherEvaluationData(rubricId, sectionId) {
+    dispatch(loadAllTeacherEvaluationData(rubricId, sectionId));
+  },
+}))(RubricContainer);
 
 const HeaderTab = ({text, isSelected, onClick}) => {
   return (
