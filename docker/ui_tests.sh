@@ -26,7 +26,7 @@ mkdir $CIRCLE_ARTIFACTS
 
 # Most docker images don't resolve *.localhost domains by default. We hardcode
 # our domains in /etc/hosts so sc (the sauce connect proxy tunnel) can find them
-echo "
+sudo echo "
 127.0.0.1  studio.code.org.localhost
 127.0.0.1  code.org.localhost
 " >> /etc/hosts
