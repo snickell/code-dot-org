@@ -5,6 +5,7 @@ import Typist from 'react-typist';
 
 import {Button} from '@cdo/apps/componentLibrary/button';
 import TextToSpeech from '@cdo/apps/lab2/views/components/TextToSpeech';
+import usePrevious from '@cdo/apps/util/usePrevious';
 
 import FontAwesome from '../legacySharedComponents/FontAwesome';
 import EnhancedSafeMarkdown from '../templates/EnhancedSafeMarkdown';
@@ -51,6 +52,8 @@ const PanelsView: React.FunctionComponent<PanelsProps> = ({
 }) => {
   const [currentPanelIndex, setCurrentPanelIndex] = useState(0);
   const [typingDone, setTypingDone] = useState(false);
+
+  const previousPanelIndex = usePrevious(currentPanelIndex);
 
   targetWidth -= horizontalMargin * 2;
   targetHeight -= verticalMargin * 2 + childrenAreaHeight;
@@ -116,10 +119,8 @@ const PanelsView: React.FunctionComponent<PanelsProps> = ({
 
   const previousPanel =
     panel.fadeInOverPrevious &&
-    currentPanelIndex > 0 &&
-    panels[currentPanelIndex - 1]
-      ? panels[currentPanelIndex - 1]
-      : null;
+    previousPanelIndex !== undefined &&
+    panels[previousPanelIndex];
 
   const layoutClassMap = {
     'text-top-left': styles.textTopLeft,
