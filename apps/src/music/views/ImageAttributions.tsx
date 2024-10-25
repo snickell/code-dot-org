@@ -1,6 +1,11 @@
 import React from 'react';
 
+import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
+
+import musicI18n from '../locale';
 import {ImageAttributionCopyright} from '../player/MusicLibrary';
+
+import moduleStyles from './ImageAttributions.module.scss';
 
 interface ImageAttributionsProps {
   attributions: ImageAttributionCopyright[];
@@ -26,23 +31,26 @@ const licenseLinks: {[version: number]: {name: string; url: string}} = {
 const ImageAttributions: React.FunctionComponent<ImageAttributionsProps> = ({
   attributions,
 }) => {
+  if (attributions.length === 0) {
+    return null;
+  }
+
   return (
     <div>
-      <b>Music Lab thumbnail photos</b>
+      <b>{musicI18n.imageAttributionHeading()}</b>
       {attributions.map((attribution, index) => (
         <div key={index}>
-          {attribution.artist}{' '}
-          <a href={attribution.src} target="_blank" rel="noreferrer">
-            photo
-          </a>{' '}
-          by {attribution.author} is licensed under{' '}
-          <a
-            href={licenseLinks[attribution.licenseVersion]?.url}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {licenseLinks[attribution.licenseVersion]?.name}.
-          </a>
+          <SafeMarkdown
+            openExternalLinksInNewTab
+            markdown={musicI18n.imageAttributionBody({
+              artist: attribution.artist,
+              srcUrl: attribution.src || '',
+              author: attribution.author,
+              licenseName: licenseLinks[attribution.licenseVersion]?.name,
+              licenseUrl: licenseLinks[attribution.licenseVersion]?.url,
+            })}
+            className={moduleStyles.markdown}
+          />
         </div>
       ))}
     </div>

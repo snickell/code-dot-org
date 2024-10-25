@@ -381,9 +381,12 @@ class UnconnectedMusicView extends React.Component {
     this.props.setIsLoading(false);
 
     // Share copyright information with the component in the footer.
-    setExtraCopyrightContent(
-      <ImageAttributions attributions={this.library.getImageAttributions()} />
-    );
+    const imageAttributions = this.library.getImageAttributions();
+    if (imageAttributions.length > 0) {
+      setExtraCopyrightContent(
+        <ImageAttributions attributions={this.library.getImageAttributions()} />
+      );
+    }
   };
 
   getIsPlaying = () => {

@@ -58,7 +58,9 @@ const CopyrightDialog: React.FC<CopyrightDialogProps> = ({
                 'https://www.gnu.org/licenses/old-licenses/lgpl-2.1-standalone.html',
             })}
           />
-          {extraCopyrightContent && <p>{extraCopyrightContent}</p>}
+          {extraCopyrightContent && (
+            <div className="extraCopyrightContent">{extraCopyrightContent}</div>
+          )}
           <BodyThreeText>{i18n.copyright_builtOnGithub()}</BodyThreeText>
           <Link
             href="https://aws.amazon.com/what-is-cloud-computing"
