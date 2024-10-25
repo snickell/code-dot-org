@@ -520,7 +520,7 @@ class ProjectsController < ApplicationController
   end
 
   def get_status(channel_id, project_type, project)
-    return SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED] if JSON.parse(project.value)["submissionDescription"]
+    return SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED] if project.published_at
     return SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED] unless SharedConstants::ALL_PUBLISHABLE_PROJECT_TYPES.include?(project_type)
     return SharedConstants::PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER] unless current_user
     return SharedConstants::PROJECT_SUBMISSION_STATUS[:SHARING_DISABLED] if current_user.sharing_disabled? && SharedConstants::CONDITIONALLY_PUBLISHABLE_PROJECT_TYPES.include?(project_type)
@@ -557,16 +557,9 @@ class ProjectsController < ApplicationController
     rescue Projects::PublishError => exception
       return render(status: :forbidden, json: {error: exception.message})
     end
-    # Update the submission_description and submission_declined.
-    rails_project = Project.find_by(id: project_id)
-    project_value = JSON.parse(rails_project.value)
-    project_value.merge!(
-      submissionDescription: submission_description,
-      submissionDeclined: false,
-      updatedAt: DateTime.now.to_s,
-      publishedAt: rails_project[:published_at],
-    )
-    rails_project.update! value: project_value.to_json
+    # TODO: Store submission_description in our database.
+    # Send ZenDesk ticket with user/project info and submission description.
+    send_project_submission(current_user&.name || '', current_user&.username || '', project_type, channel_id, submission_description)
   end
 
   def can_publish_age_status
@@ -755,5 +748,45 @@ class ProjectsController < ApplicationController
     if sharing == true
       view_options(responsive_content: true)
     end
+  end
+
+  private def send_project_submission(name, username, project_type, channel_id, description)
+    subject = 'TESTING: Featured project gallery submission'
+    response = HTTParty.post(
+      'https://codeorg.zendesk.com/api/v2/tickets.json',
+      headers: {"Content-Type" => "application/json", "Accept" => "application/json"},
+      body: {
+        ticket: {
+          requester: {
+            name: username
+          },
+          subject: subject,
+          comment: {
+            body: [
+              "project type: #{project_type}",
+              "channel id: #{channel_id}",
+              "project description: #{description}"
+            ].join("\n")
+          }
+        }
+      }.to_json,
+      basic_auth: {username: 'dev@code.org/token', password: Dashboard::Application.config.zendesk_dev_token}
+    )
+    raise ZendeskError.new(response.code, response.body) unless response.success?
+  end
+end
+
+class ZendeskError < StandardError
+  attr_reader :error_details
+
+  def initialize(code, error_details)
+    @error_details = error_details
+    super("Zendesk failed with response code: #{code}")
+  end
+
+  def to_honeybadger_context
+    {
+      details: JSON.parse(@error_details)
+    }
   end
 end
