@@ -455,7 +455,8 @@ export interface ImageAttribution {
   color?: string;
   position?: 'left' | 'right';
   src?: string;
-  licenseVersion: number;
+  licenseVersion: 'CC2' | 'CC3' | 'CC4' | 'C';
+  year?: string;
 }
 
 export type SoundFolderType = 'sound' | 'kit' | 'instrument';

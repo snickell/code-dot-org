@@ -111,5 +111,6 @@
   "effectsLabelsFilter": "Filter",
   "generate": "Generate",
   "imageAttributionHeading": "Music Lab photos",
-  "imageAttributionBody": "{artist} [photo]({srcUrl}) by {author} is licensed under [{licenseName}]({licenseUrl})."
+  "imageAttributionBodyCreativeCommons": "{artist} [photo]({srcUrl}) by {author} is licensed under [{licenseName}]({licenseUrl}).",
+  "imageAttributionBodyCopyright": "{artist} photo &copy; {year} {author}.  All rights reserved."
 }
