@@ -47,8 +47,9 @@ const ImageAttributions: React.FunctionComponent<ImageAttributionsProps> = ({
         srcUrl: attribution.src || '',
         author: attribution.author,
         licenseName:
-          creativeCommonsLicenseLinks[attribution.licenseVersion].name,
-        licenseUrl: creativeCommonsLicenseLinks[attribution.licenseVersion].url,
+          creativeCommonsLicenseLinks[attribution.licenseVersion]?.name || '',
+        licenseUrl:
+          creativeCommonsLicenseLinks[attribution.licenseVersion]?.url || '',
       });
     } else if (attribution.licenseVersion === 'C') {
       return musicI18n.imageAttributionBodyCopyright({
