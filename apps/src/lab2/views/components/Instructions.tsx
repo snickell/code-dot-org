@@ -237,6 +237,7 @@ const InstructionsPanel: React.FunctionComponent<InstructionsPanelProps> = ({
                   onClick={onContinueOrFinish}
                   className={moduleStyles.buttonInstruction}
                   type={showSecondaryFinishButton ? 'secondary' : 'primary'}
+                  color={showSecondaryFinishButton ? 'black' : 'purple'}
                 />
               )}
             </div>
