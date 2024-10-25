@@ -3,11 +3,6 @@
   user_type = request.cookies[cookie_key]
   user_type = "student" if user_type == "student_y"
 
-  # Forcibly set the 'ge_region' parameter to Farsi
-  require 'cdo/rack/global_edition'
-  request.cookies[Rack::GlobalEdition::REGION_KEY] = 'fa'
-  params[Rack::GlobalEdition::REGION_KEY] = request.cookies[Rack::GlobalEdition::REGION_KEY]
-
   hamburger_options = {}
   hamburger_options[:level] = nil
   hamburger_options[:script_level] = nil

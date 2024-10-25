@@ -17,15 +17,26 @@ Feature: Global Edition - Region Select
     And element "#locale option:checked" contains text "فارسی (global)"
     And element ".main h2" contains text "دارای حساب کاربری هستید؟ وارد سیستم شوید"
 
-    When I select the "English" option in dropdown "locale"
-    And I get redirected away from "http://studio.code.org/global/fa/users/sign_in?lang=fa-IR"
-    Then check that I am on "http://studio.code.org/users/sign_in?lang=en-US"
+    When I am on "http://code.org"
+    Then I get redirected away from "http://code.org"
+    And check that I am on "http://code.org/global/fa"
+    And element "main h1" contains text "منابع بنیادی رایگان برای علوم رایانه"
+
+    When I am on "http://studio.code.org/users/sign_in"
+    And I select the "English" option in dropdown "locale"
+    Then I get redirected away from "http://studio.code.org/global/fa/users/sign_in"
+    And check that I am on "http://studio.code.org/users/sign_in?lang=en-US"
     And element "#locale option:checked" contains text "English"
     And element ".main h2" contains text "Have an account already? Sign in"
 
-    When I select the "فارسی" option in dropdown "locale"
-    And I get redirected away from "http://studio.code.org/users/sign_in?lang=en-US"
-    Then check that I am on "http://studio.code.org/users/sign_in?lang=fa-IR"
+    When I am on "http://code.org"
+    And check that I am on "http://code.org/"
+    And element ".every-student" contains text "Every student in every school should have the opportunity to learn computer science"
+
+    When I am on "http://studio.code.org/users/sign_in"
+    And I select the "فارسی" option in dropdown "locale"
+    Then I get redirected away from "http://studio.code.org/users/sign_in"
+    And check that I am on "http://studio.code.org/users/sign_in?lang=fa-IR"
     And element "#locale option:checked" contains text "فارسی"
     And element ".main h2" contains text "دارای حساب کاربری هستید؟ وارد سیستم شوید"
 

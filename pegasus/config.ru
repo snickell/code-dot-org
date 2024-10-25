@@ -56,6 +56,9 @@ if CDO.use_cookie_dcdo
   use Rack::CookieDCDO
 end
 
+require 'cdo/rack/global_edition'
+use Rack::GlobalEdition
+
 # Disable Sinatra auto-initialization.
 # Add Honeybadger::Rack::ErrorNotifier to Rack middleware directly.
 use Honeybadger::Rack::ErrorNotifier

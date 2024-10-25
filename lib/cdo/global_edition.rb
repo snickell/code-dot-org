@@ -12,6 +12,7 @@ module Cdo
 
     TARGET_HOSTNAMES = Set[
       CDO.dashboard_hostname,
+      CDO.pegasus_hostname,
     ].freeze
 
     # @see +Rack::GlobalEdition::RouteHandler#response+
