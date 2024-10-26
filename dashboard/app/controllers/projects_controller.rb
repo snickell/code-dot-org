@@ -520,7 +520,7 @@ class ProjectsController < ApplicationController
   end
 
   def get_status(channel_id, project_type, project)
-    return SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED] if project.published_at
+    return SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED] if project[:published_at]
     return SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED] unless SharedConstants::ALL_PUBLISHABLE_PROJECT_TYPES.include?(project_type)
     return SharedConstants::PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER] unless current_user
     return SharedConstants::PROJECT_SUBMISSION_STATUS[:SHARING_DISABLED] if current_user.sharing_disabled? && SharedConstants::CONDITIONALLY_PUBLISHABLE_PROJECT_TYPES.include?(project_type)
@@ -751,28 +751,30 @@ class ProjectsController < ApplicationController
   end
 
   private def send_project_submission(name, username, project_type, channel_id, description)
-    subject = 'TESTING: Featured project gallery submission'
-    response = HTTParty.post(
-      'https://codeorg.zendesk.com/api/v2/tickets.json',
-      headers: {"Content-Type" => "application/json", "Accept" => "application/json"},
-      body: {
-        ticket: {
-          requester: {
-            name: username
-          },
-          subject: subject,
-          comment: {
-            body: [
-              "project type: #{project_type}",
-              "channel id: #{channel_id}",
-              "project description: #{description}"
-            ].join("\n")
+    unless Rails.env.development? || Rails.env.test?
+      subject = 'TESTING: Featured project gallery submission'
+      response = HTTParty.post(
+        'https://codeorg.zendesk.com/api/v2/tickets.json',
+        headers: {"Content-Type" => "application/json", "Accept" => "application/json"},
+        body: {
+          ticket: {
+            requester: {
+              name: username
+            },
+            subject: subject,
+            comment: {
+              body: [
+                "project type: #{project_type}",
+                "channel id: #{channel_id}",
+                "project description: #{description}"
+              ].join("\n")
+            }
           }
-        }
-      }.to_json,
-      basic_auth: {username: 'dev@code.org/token', password: Dashboard::Application.config.zendesk_dev_token}
-    )
-    raise ZendeskError.new(response.code, response.body) unless response.success?
+        }.to_json,
+        basic_auth: {username: 'dev@code.org/token', password: Dashboard::Application.config.zendesk_dev_token}
+      )
+      raise ZendeskError.new(response.code, response.body) unless response.success?
+    end
   end
 end
 
