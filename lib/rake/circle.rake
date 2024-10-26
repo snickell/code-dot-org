@@ -204,13 +204,13 @@ def start_sauce_connect
   # Run sauce connect a second time on failure, known periodic "Error bringing up tunnel VM." disconnection-after-connect issue, e.g. https://circleci.com/gh/code-dot-org/code-dot-org/20930
   RakeUtils.exec_in_background <<-BASH
     for i in 1 2; do
-      ./sc -P 4445 \
-          -l $CIRCLE_ARTIFACTS/sc.log \
+      ./sc \
+          --log-file $CIRCLE_ARTIFACTS/sc.log \
           -u $SAUCE_USERNAME \
           -k $SAUCE_ACCESS_KEY \
-          -i #{CDO.circle_run_identifier} \
           --tunnel-domains .*\\.code.org,.*\\.csedweek.org,.*\\.hourofcode.com,.*\\.codeprojects.org \
-          --tunnel-name cdo-tunnel && break
+          --tunnel-name #{CDO.circle_run_identifier} \
+      && break
     done
   BASH
 end
