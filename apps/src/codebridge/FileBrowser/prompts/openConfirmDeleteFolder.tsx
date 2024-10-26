@@ -6,7 +6,7 @@ import codebridgeI18n from '@cdo/apps/codebridge/locale';
 import {DialogType, DialogControlInterface} from '@cdo/apps/lab2/views/dialogs';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 
-type OpenConfirmDeleteFileArgsType = {
+type OpenConfirmDeleteFolderArgsType = {
   folder: ProjectFolder;
   dialogControl: Pick<DialogControlInterface, 'showDialog'>;
   deleteFolder: DeleteFolderFunction;
@@ -24,7 +24,7 @@ export const openConfirmDeleteFolder = async ({
   sendCodebridgeAnalyticsEvent,
   projectFiles,
   projectFolders,
-}: OpenConfirmDeleteFileArgsType) => {
+}: OpenConfirmDeleteFolderArgsType) => {
   const folderName = folder.name;
   const folderCount = findSubFolders(
     folder.id,
