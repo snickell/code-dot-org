@@ -205,9 +205,8 @@ def start_sauce_connect
   RakeUtils.exec_in_background <<-BASH
     for i in 1 2; do
       ./sc run \
-          -u $SAUCE_USERNAME \
-          -k $SAUCE_ACCESS_KEY \
-          --log-file $CIRCLE_ARTIFACTS/sc.log \
+          -u #{CDO.saucelabs_username} \
+          -k #{CDO.saucelabs_authkey} \
           --region us-west-1 \
           --tunnel-domains .*\\.code.org,.*\\.csedweek.org,.*\\.hourofcode.com,.*\\.codeprojects.org \
           --tunnel-name #{CDO.saucelabs_tunnel_name} \
