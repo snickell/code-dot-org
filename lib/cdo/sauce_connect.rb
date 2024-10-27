@@ -16,23 +16,19 @@ module Cdo
       #
       # @param [Boolean] daemonize - if true, sc will continue running in the bg even when ruby exits
       def start_sauce_connect(daemonize: false)
-        # Start watching for "you may start your tests" at the end of log/sc.log
-        log_file = File.open(log_file_path, 'a+')
+        log_file = File.open(log_file_path, 'a+') # open log file at the end, watch for "you may start your tests"
 
         cmd = [
           "sc", "run",
-          "-u", CDO.saucelabs_username,
-          "-k", CDO.saucelabs_authkey,
           "--region", "us-west-1",
           "--tunnel-domains", ".*\\.code.org,.*\\.csedweek.org,.*\\.hourofcode.com,.*\\.codeprojects.org",
           "--tunnel-name", CDO.saucelabs_tunnel_name,
         ]
-        pid = Process.spawn(
-          *cmd,
-          out: log_file_path,
-          err: log_file_path,
-        )
-
+        env = {
+          "SAUCE_USERNAME" => CDO.saucelabs_username,
+          "SAUCE_ACCESS_KEY" => CDO.saucelabs_authkey
+        }
+        pid = Process.spawn(env, *cmd, out: log_file_path, err: log_file_path)
         log "starting sc, pid = #{pid}, see log at #{log_file_path}"
 
         # Block waiting for `sc` to print "you may start your tests"
