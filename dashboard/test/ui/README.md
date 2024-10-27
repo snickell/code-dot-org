@@ -33,7 +33,7 @@ Running tests remotely on [Sauce Labs](https://saucelabs.com) lets you review re
 If you want to run tests on Sauce Labs against localhost you need to run the sauce connect proxy. This
 creates a tunnel which allows sauce labs to access your localhost server.
 
-1. Follow [installation directions](https://docs.saucelabs.com/secure-connections/sauce-connect-5/installation/) for sauce connect proxy
+1. Follow [installation directions](https://docs.saucelabs.com/secure-connections/sauce-connect-5/installation/) for sauce connect proxy. `sc --version` should be >= 5.2
 
 2. Setup saucelabs credentials in locals.yml:
 ```
