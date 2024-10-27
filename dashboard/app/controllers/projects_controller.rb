@@ -543,13 +543,13 @@ class ProjectsController < ApplicationController
     when SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED]
       return render status: :bad_request, json: {error: "Once submitted, a project cannot be submitted again."}
     when SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED]
-      return render status: :bad_request, json: {error: "This project type is not able to be submitted to the featured project gallery."}
+      return render status: :forbidden, json: {error: "Submission disabled because project type is not allowed in the featured project gallery."}
     when SharedConstants::PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER]
       return render status: :forbidden, json: {error: "Submission disabled for user account because non-owner."}
     when SharedConstants::PROJECT_SUBMISSION_STATUS[:SHARING_DISABLED]
       return render status: :forbidden, json: {error: "Submission disabled for user account because sharing disabled."}
     when SharedConstants::PROJECT_SUBMISSION_STATUS[:RESTRICTED_SHARE_MODE]
-      return render status: :forbidden, json: {error: "Submission disabled beause project in restricted share mode."}
+      return render status: :forbidden, json: {error: "Submission disabled because project is in restricted share mode."}
     end
     # Publish the project, i.e., make it public.
     begin
@@ -750,6 +750,7 @@ class ProjectsController < ApplicationController
     end
   end
 
+  # Temporary - will be replaced with storing in database.
   private def send_project_submission(name, username, project_type, channel_id, description)
     unless Rails.env.development? || Rails.env.test?
       subject = 'TESTING: Featured project gallery submission'
@@ -778,6 +779,7 @@ class ProjectsController < ApplicationController
   end
 end
 
+# Temporary - will be removed once project submission is stored in database.
 class ZendeskError < StandardError
   attr_reader :error_details
 
