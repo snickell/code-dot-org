@@ -5,4 +5,4 @@ require 'cdo/sc'
 
 # Start `sc`, the Sauce Connect Proxy, and keep it running in the background.
 
-Cdo::SC.start_sc
+Cdo::SC.start_sc(daemonize: true)

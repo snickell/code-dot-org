@@ -14,8 +14,8 @@ module Cdo
       # Starts the Sauce Connect Proxy, which allows tunneling connections from our local server to Sauce Labs
       # This method blocks until sc prints the "you may start your tests" message to log/sc.log
       #
-      # @param [Boolean] detatch - if true, sc will continue running in the bg when this process exits
-      def start_sc(verbose: false)
+      # @param [Boolean] daemonize - if true, sc will continue running in the bg even when ruby exits
+      def start_sc(daemonize: false)
         # Start watching for "you may start your tests" at the end of log/sc.log
         log_file = File.open(log_file_path, 'a+')
 
@@ -40,6 +40,12 @@ module Cdo
 
         if tests_started
           log "success, sc is running"
+          unless daemonize
+            at_exit do
+              Process.kill("TERM", pid)
+            rescue Errno::ESRCH
+            end
+          end
           return pid
         else
           puts
@@ -84,8 +90,7 @@ module Cdo
         log "ERROR: timed out waiting #{SC_START_TIMEOUT_S} seconds for '#{SC_START_MESSAGE}', stopping sc"
         begin
           Process.kill("TERM", pid) # stop sc
-        rescue
-          Errno::ESRCH
+        rescue Errno::ESRCH
         end
         return false, lines
       end
