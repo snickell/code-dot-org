@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {pegasus} from '@cdo/apps/lib/util/urlHelpers';
 import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
 
 import musicI18n from '../locale';
@@ -44,7 +45,7 @@ const ImageAttributions: React.FunctionComponent<ImageAttributionsProps> = ({
     if (creativeCommonsLicenseLinks[attribution.licenseVersion]) {
       return musicI18n.imageAttributionBodyCreativeCommons({
         artist: attribution.artist,
-        srcUrl: attribution.src || '',
+        srcUrl: attribution.src || pegasus('/music'),
         author: attribution.author,
         licenseName:
           creativeCommonsLicenseLinks[attribution.licenseVersion]?.name || '',
