@@ -158,6 +158,17 @@ const optionsList = [
     ],
   },
   {
+    name: 'show-secondary-finish-button-question',
+    type: 'radio',
+    values: [
+      {
+        value: 'false',
+        description: "Don't show secondary finish button question (default).",
+      },
+      {value: 'true', description: 'Show secondary finish button question.'},
+    ],
+  },
+  {
     name: 'advanced-controls-enabled',
     type: 'radio',
     values: [

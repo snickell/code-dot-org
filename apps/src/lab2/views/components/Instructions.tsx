@@ -160,6 +160,12 @@ const InstructionsPanel: React.FunctionComponent<InstructionsPanelProps> = ({
 
   const showSecondaryFinishButton = useSecondaryFinishButton && !hasNextLevel;
 
+  const useMessage =
+    showSecondaryFinishButton &&
+    queryParams('show-secondary-finish-button-question') === 'true'
+      ? commonI18n.finishMessage()
+      : message;
+
   // The secondary finish button avoids a reappearance animation by not using
   // the unique index.
   const useMessageIndex = useSecondaryFinishButton ? undefined : messageIndex;
@@ -207,9 +213,9 @@ const InstructionsPanel: React.FunctionComponent<InstructionsPanelProps> = ({
             </div>
           </div>
         )}
-        {(message || canShowNextButton) && (
+        {(useMessage || canShowNextButton) && (
           <div
-            key={useMessageIndex + ' - ' + message}
+            key={useMessageIndex + ' - ' + useMessage}
             id="instructions-feedback"
             className={classNames(
               moduleStyles.feedback,
@@ -220,10 +226,12 @@ const InstructionsPanel: React.FunctionComponent<InstructionsPanelProps> = ({
               id="instructions-feedback-message"
               className={moduleStyles['message-' + theme]}
             >
-              {offerBrowserTts && message && <TextToSpeech text={message} />}
-              {message && (
+              {offerBrowserTts && useMessage && (
+                <TextToSpeech text={useMessage} />
+              )}
+              {useMessage && (
                 <EnhancedSafeMarkdown
-                  markdown={message}
+                  markdown={useMessage}
                   className={moduleStyles.markdownText}
                   handleInstructionsTextClick={handleInstructionsTextClick}
                 />
