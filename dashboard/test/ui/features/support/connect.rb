@@ -36,7 +36,7 @@ def saucelabs_browser(test_run_name)
   # CDO.saucelabs_tunnel_name is only intended to be used by developers doing
   # local testing. This alternative name was chosen to make the developer's
   # locals.yml easier to understand.
-  tunnel_name = CDO.circle_run_identifier || CDO.saucelabs_tunnel_name
+  tunnel_name = CDO.saucelabs_tunnel_name
   sauce_options[:tunnelIdentifier] = tunnel_name if tunnel_name
   sauce_options[:priority] = ENV['PRIORITY'].to_i if ENV['PRIORITY']
   capabilities["sauce:options"] ||= {}
