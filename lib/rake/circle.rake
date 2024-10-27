@@ -3,6 +3,7 @@ require 'cdo/chat_client'
 require 'cdo/rake_utils'
 require 'cdo/circle_utils'
 require 'cdo/git_utils'
+require 'cdo/sc'
 require 'open-uri'
 require 'json'
 require 'net/http'
@@ -200,19 +201,9 @@ def start_sauce_connect
 
   RakeUtils.system_stream_output "wget --quiet #{sc_download_url}"
   RakeUtils.system_stream_output "tar -xzf #{tar_name}"
+  RakeUtils.system_stream_output 'cp sc /usr/local/bin'
 
-  # Run sauce connect a second time on failure, known periodic "Error bringing up tunnel VM." disconnection-after-connect issue, e.g. https://circleci.com/gh/code-dot-org/code-dot-org/20930
-  RakeUtils.exec_in_background <<-BASH
-    for i in 1 2; do
-      ./sc run \
-          -u #{CDO.saucelabs_username} \
-          -k #{CDO.saucelabs_authkey} \
-          --region us-west-1 \
-          --tunnel-domains .*\\.code.org,.*\\.csedweek.org,.*\\.hourofcode.com,.*\\.codeprojects.org \
-          --tunnel-name #{CDO.saucelabs_tunnel_name} \
-      && break
-    done
-  BASH
+  Cdo::Sc.start_sc(daemonize: true)
 end
 
 def close_sauce_connect
