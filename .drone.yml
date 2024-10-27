@@ -71,7 +71,7 @@ steps:
   - name: unit-tests
     # see: docker/continuous-integration/Dockerfile
     # TODO: switch to codedotorg/cdo-ci
-    image: codedotorg/code-dot-org:1.10.0
+    image: codedotorg/code-dot-org:sauce_connect
     pull: always
     volumes:
       - name: rbenv
@@ -191,7 +191,7 @@ steps:
   - name: ui-tests
     # see: docker/continuous-integration/Dockerfile
     # TODO: switch to codedotorg/cdo-ci
-    image: codedotorg/code-dot-org:1.10.0
+    image: codedotorg/code-dot-org:sauce_connect
     pull: always
     volumes:
       - name: rbenv
@@ -289,6 +289,6 @@ trigger:
     - push
 ---
 kind: signature
-hmac: 8551f3e768d263e92bb0c8060de2b6bfd8cf939aa31c52047621485746726d16
+hmac: 4fa3129b2c1a97fa2e1b575dda5756a8f1029ae9b536bbcd98f86e9ede47781f
 
 ...

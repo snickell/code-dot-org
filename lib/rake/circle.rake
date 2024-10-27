@@ -104,7 +104,7 @@ namespace :circle do
     ui_test_browsers = browsers_to_run
     use_saucelabs = !ui_test_browsers.empty?
     if use_saucelabs || test_eyes?
-      start_sauce_connect
+      CDO::SauceConnect.start_sc(daemonize: true)
     end
     RakeUtils.wait_for_url('http://localhost-studio.code.org:3000')
     Dir.chdir('dashboard/test/ui') do
