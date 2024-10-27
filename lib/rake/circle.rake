@@ -195,13 +195,6 @@ def test_eyes?
 end
 
 def start_sauce_connect
-  sc_download_url = 'https://saucelabs.com/downloads/sauce-connect/5.2.1/sauce-connect-5.2.1_linux.x86_64.tar.gz'
-  tar_name = sc_download_url.split('/')[-1]
-
-  RakeUtils.system_stream_output "wget --quiet #{sc_download_url}"
-  RakeUtils.system_stream_output "tar -xzf #{tar_name}"
-  RakeUtils.system_stream_output 'cp sc /usr/local/bin'
-
   Cdo::SauceConnect.start_sauce_connect(daemonize: true)
 end
 
