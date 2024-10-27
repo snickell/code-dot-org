@@ -3,7 +3,7 @@ require 'cdo/chat_client'
 require 'cdo/rake_utils'
 require 'cdo/circle_utils'
 require 'cdo/git_utils'
-require 'cdo/sc'
+require 'cdo/sauce_connect'
 require 'open-uri'
 require 'json'
 require 'net/http'
@@ -202,7 +202,7 @@ def start_sauce_connect
   RakeUtils.system_stream_output "tar -xzf #{tar_name}"
   RakeUtils.system_stream_output 'cp sc /usr/local/bin'
 
-  Cdo::Sc.start_sc(daemonize: true)
+  Cdo::SauceConnect.start_sauce_connect(daemonize: true)
 end
 
 def close_sauce_connect

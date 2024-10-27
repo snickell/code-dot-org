@@ -4,7 +4,7 @@ require 'timeout'
 # Starts the Sauce Connect Proxy
 
 module Cdo
-  module SC
+  module SauceConnect
     # How many seconds to wait for the "you may start your tests" message
     SC_START_TIMEOUT_S = 120
     SC_START_MESSAGE = "you may start your tests"
@@ -15,7 +15,7 @@ module Cdo
       # This method blocks until sc prints the "you may start your tests" message to log/sc.log
       #
       # @param [Boolean] daemonize - if true, sc will continue running in the bg even when ruby exits
-      def start_sc(daemonize: false)
+      def start_sauce_connect(daemonize: false)
         # Start watching for "you may start your tests" at the end of log/sc.log
         log_file = File.open(log_file_path, 'a+')
 
