@@ -105,7 +105,6 @@ namespace :circle do
     use_saucelabs = !ui_test_browsers.empty?
     if use_saucelabs || test_eyes?
       start_sauce_connect
-      RakeUtils.wait_for_url('http://localhost:4445')
     end
     RakeUtils.wait_for_url('http://localhost-studio.code.org:3000')
     Dir.chdir('dashboard/test/ui') do
