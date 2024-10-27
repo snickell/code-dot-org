@@ -5,9 +5,4 @@ require 'cdo/sc'
 
 # Start `sc`, the Sauce Connect Proxy, and keep it running in the background.
 
-sc_process = Cdo::SC.start_sc
-Process.daemon
-
-exit_status = sc_process.value
-puts "Exited with status #{exit_status}"
-sleep(5000)
+Cdo::SC.start_sc
