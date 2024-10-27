@@ -3,15 +3,54 @@
 Feature: Global Edition - Region Select
 
   Background:
-    Given I am on "http://studio.code.org"
+    Given I am on "http://code.org"
     And I use a cookie to mock the DCDO key "global_edition_region_selection_enabled" as "true"
+
+  Scenario: User can switch between the international and regional versions using the language selector on a Pegasus page
+    When I am on "http://code.org"
+    And element "#selectLanguage option:checked" contains text "English"
+    And element ".language-dropdown option:checked" contains text "English"
+    And element "#gallerycolumn .headingbox" contains text "Over 35 million Code.org projects created"
+
+    When I select the "فارسی (global)" option in dropdown with class "language-dropdown select" to load a new page
+    And I get redirected away from "http://code.org"
+    Then check that I am on "http://code.org/global/fa"
+    And element "#selectLanguage option:checked" contains text "فارسی (global)"
+    And element ".language-dropdown option:checked" contains text "فارسی (global)"
+    And element "main h1" contains text "منابع بنیادی رایگان برای علوم رایانه"
+
+    When I am on "http://studio.code.org/users/sign_in"
+    Then I get redirected away from "http://studio.code.org/users/sign_in"
+    And check that I am on "http://studio.code.org/global/fa/users/sign_in"
+    And element "#locale option:checked" contains text "فارسی (global)"
+    And element ".main h2" contains text "دارای حساب کاربری هستید؟ وارد سیستم شوید"
+
+    When I am on "http://code.org"
+    And I select the "English" option in dropdown with class "language-dropdown select" to load a new page
+    Then I get redirected away from "http://code.org/global/fa"
+    And check that I am on "http://code.org/"
+    And element "#selectLanguage option:checked" contains text "English"
+    And element ".language-dropdown option:checked" contains text "English"
+    And element "#gallerycolumn .headingbox" contains text "Over 35 million Code.org projects created"
+
+    When I am on "http://studio.code.org/users/sign_in"
+    And check that I am on "http://studio.code.org/users/sign_in"
+    And element "#locale option:checked" contains text "English"
+    And element ".main h2" contains text "Have an account already? Sign in"
+
+    When I am on "http://code.org"
+    And I select the "فارسی" option in dropdown with class "language-dropdown select" to load a new page
+    And check that I am on "http://code.org/"
+    And element "#selectLanguage option:checked" contains text "فارسی"
+    And element ".language-dropdown option:checked" contains text "فارسی"
+    And element "#gallerycolumn .headingbox" contains text "بیش از  35 میلیون پروژه ایجاد شده در Code.org"
 
   Scenario: User can switch between the international and regional versions using the language selector on a Studio page
     Given I am on "http://studio.code.org/users/sign_in"
     And element "#locale option:checked" contains text "English"
     And element ".main h2" contains text "Have an account already? Sign in"
 
-    When I select the "فارسی (global)" option in dropdown "locale"
+    When I select the "فارسی (global)" option in dropdown "locale" to load a new page
     And I get redirected away from "http://studio.code.org/users/sign_in"
     Then check that I am on "http://studio.code.org/global/fa/users/sign_in?lang=fa-IR"
     And element "#locale option:checked" contains text "فارسی (global)"
@@ -20,10 +59,12 @@ Feature: Global Edition - Region Select
     When I am on "http://code.org"
     Then I get redirected away from "http://code.org"
     And check that I am on "http://code.org/global/fa"
+    And element "#selectLanguage option:checked" contains text "فارسی (global)"
+    And element ".language-dropdown option:checked" contains text "فارسی (global)"
     And element "main h1" contains text "منابع بنیادی رایگان برای علوم رایانه"
 
     When I am on "http://studio.code.org/users/sign_in"
-    And I select the "English" option in dropdown "locale"
+    And I select the "English" option in dropdown "locale" to load a new page
     Then I get redirected away from "http://studio.code.org/global/fa/users/sign_in"
     And check that I am on "http://studio.code.org/users/sign_in?lang=en-US"
     And element "#locale option:checked" contains text "English"
@@ -31,10 +72,12 @@ Feature: Global Edition - Region Select
 
     When I am on "http://code.org"
     And check that I am on "http://code.org/"
-    And element ".every-student" contains text "Every student in every school should have the opportunity to learn computer science"
+    And element "#selectLanguage option:checked" contains text "English"
+    And element ".language-dropdown option:checked" contains text "English"
+    And element "#gallerycolumn .headingbox" contains text "Over 35 million Code.org projects created"
 
     When I am on "http://studio.code.org/users/sign_in"
-    And I select the "فارسی" option in dropdown "locale"
+    And I select the "فارسی" option in dropdown "locale" to load a new page
     Then I get redirected away from "http://studio.code.org/users/sign_in"
     And check that I am on "http://studio.code.org/users/sign_in?lang=fa-IR"
     And element "#locale option:checked" contains text "فارسی"

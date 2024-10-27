@@ -1,17 +1,17 @@
-%select{:onchange=>"setLanguageCookie(this.value); location.reload(true);", :style=>'color: black'}
-  -DB[:cdo_languages].where(supported_codeorg_b: 1).each do |i|
-    -selected = I18n.locale.to_s == i[:locale_s]
-    %option{value:i[:locale_s], selected:selected}= i[:native_name_s]
+- require 'cdo/i18n'
+
+%select{onchange: 'setLocale(this.value);', style: 'color: black; max-width: 162.5px;'}
+  - Cdo::I18n.locale_options_with_ge_regions.each do |name, value|
+    %option{value: value, selected: value == Cdo::I18n.current_locale_option(I18n.locale, request.ge_region)}= name
 
 :javascript
-  function setLanguageCookie(value)
+  function setLocale(locale)
   {
-    var c_name = 'language_';
-    var exdays = 5000;
-    var date = new Date();
-    date.setTime(date.getTime()+(exdays*60*60*24*1000));
-    var c_value=escape(value) + ((exdays==null) ? "" : "; expires=" + date.toGMTString());
-    var domainName = "#{request.site}";
-    c_value += "; domain=." + escape(domainName) + "; path=/";
-    document.cookie=c_name + "=" + c_value;
+    var url = new URL(window.location.href);
+
+    var params = new URLSearchParams(url.search);
+    params.set("#{VarnishEnvironment::LOCALE_PARAM_KEY}", locale);
+    url.search = params.toString();
+
+    window.location.replace(url);
   }

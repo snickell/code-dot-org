@@ -14,6 +14,7 @@ require_relative '../legacy/middleware/animation_library_api'
 require 'bootstrap-sass'
 require 'cdo/global_edition'
 require 'cdo/hash'
+require 'cdo/i18n'
 require 'cdo/i18n_backend'
 require 'cdo/shared_constants'
 
@@ -130,16 +131,13 @@ module Dashboard
     config.i18n.available_locales = [SharedConstants::DEFAULT_LOCALE]
     config.i18n.fallbacks[:defaults] = [SharedConstants::DEFAULT_LOCALE]
     config.i18n.default_locale = SharedConstants::DEFAULT_LOCALE
-    LOCALES = YAML.load_file("#{Rails.root}/config/locales.yml")
-    LOCALES.each do |locale, data|
-      next unless data.is_a? Hash
-      data.symbolize_keys!
-      unless data[:debug] && Rails.env.production?
-        config.i18n.available_locales << locale
-      end
-      if data[:fallback]
-        config.i18n.fallbacks[locale] = data[:fallback]
-      end
+    LOCALES = Cdo::I18n::LOCALE_CONFIGS
+    Cdo::I18n.available_languages.each do |language|
+      locale = language[:locale_s]
+      fallback_locale = Cdo::I18n::LOCALE_CONFIGS.dig(locale, :fallback)
+
+      config.i18n.available_locales << locale
+      config.i18n.fallbacks[locale] = fallback_locale if fallback_locale
     end
 
     config.after_initialize do

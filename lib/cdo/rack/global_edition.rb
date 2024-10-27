@@ -1,14 +1,20 @@
 # frozen_string_literal: true
 
+require 'active_support/all'
 require 'request_store'
+
 require 'cdo/global_edition'
+require 'helpers/cookies'
+
+require_relative '../../../dashboard/lib/metrics/events' # rubocop:disable CustomCops/DashboardRequires
 
 module Rack
   class GlobalEdition
     REGION_KEY = Cdo::GlobalEdition::REGION_KEY
-    LANGUAGE_COOKIE_KEY = 'language_'
 
     class RouteHandler
+      include Middleware::Helpers::Cookies
+
       ROOT_PATH = '/global'
       # @example Matches paths like `/global/fa/home`, capturing:
       # - ge_prefix: "/global/fa"
@@ -32,9 +38,9 @@ module Rack
       # @note Changes to the `request` should be made before the `response` is initialized to apply the changes.
       def call
         if request.params.key?(REGION_KEY)
-          new_region = request.params[REGION_KEY]
+          new_region = request.params[REGION_KEY].presence
 
-          redirect_path = request_path_vars(:main_path).first || request.path
+          redirect_path = ::File.join('/', request_path_vars(:main_path).first || request.path)
           redirect_path = regional_path_for(new_region, redirect_path) if Cdo::GlobalEdition.region_available?(new_region)
           # Pegasus requires a predefined template for each path, unlike Dashboard, which manages paths dynamically.
           redirect_path = '/' if pegasus_route? && !pegasus_route?(redirect_path)
@@ -60,9 +66,9 @@ module Rack
           end
 
           setup_region(ge_region) if region_changed?(ge_region)
-        elsif Cdo::GlobalEdition.region_available?(request.cookies[REGION_KEY])
+        elsif Cdo::GlobalEdition.region_available?(region)
           # Redirects to the regional version of the path if it's available.
-          redirect_path = regional_path_for(request.cookies[REGION_KEY], request.fullpath)
+          redirect_path = regional_path_for(region, request.fullpath)
           response.redirect(redirect_path) if redirectable?(redirect_path)
         end
 
@@ -72,7 +78,7 @@ module Rack
       end
 
       private def region
-        request.cookies[REGION_KEY]
+        request.cookies[REGION_KEY].presence
       end
 
       # @note Once the `response` instance is initialized, any changes to the `request` made afterward will not be applied.
@@ -91,35 +97,27 @@ module Rack
         PATH_PATTERN.match(request.path_info)&.values_at(*keys) || []
       end
 
-      private def set_global_cookie(key, value)
-        cookie_data = {
-          domain: ".#{PublicSuffix.parse(request.hostname).domain}", # the root domain (e.g., ".code.org")
-          path: '/',
-          same_site: :lax,
-        }
-
-        if value
-          response.set_cookie(key, cookie_data.merge(value: value, max_age: 10.years))
-        else
-          response.delete_cookie(key, cookie_data)
-        end
-
-        # Prevents the cookie from being discarded under resource constraints.
-        response.set_cookie_header = "#{response.set_cookie_header}; priority=high"
-      end
-
       private def setup_region(region)
         # Resets the region if it's `nil` or sets it only if it's available.
         return unless region.nil? || Cdo::GlobalEdition.region_available?(region)
 
         # Sets the request cookies to apply changes immediately without needing to reload the page.
         request.cookies[REGION_KEY] = region
-        request.cookies[LANGUAGE_COOKIE_KEY] = Cdo::GlobalEdition.region_locale(region) if region
+        request.cookies[LOCALE_KEY] = Cdo::GlobalEdition.region_locale(region) if region
 
         # Updates the global `ge_region` cookie to lock the platform to the regional version.
-        set_global_cookie(REGION_KEY, region)
+        set_global_cookie(REGION_KEY, region, high_priority: true)
         # Updates the global `language` cookie to enforce the switch to the regional language.
-        set_global_cookie(LANGUAGE_COOKIE_KEY, request.cookies[LANGUAGE_COOKIE_KEY])
+        set_locale_cookie(request.cookies[LOCALE_KEY])
+
+        Metrics::Events.log_event(
+          event_name: 'Global Edition Region Changed',
+          metadata: {
+            country: request.country_code,
+            locale: request.cookies[LOCALE_KEY],
+            region: region,
+          }
+        )
       end
 
       private def dashboard_route?(path = request.path)

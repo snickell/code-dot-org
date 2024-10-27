@@ -27,6 +27,9 @@ use Rack::SslEnforcer,
   # Only HTTPS-redirect in development when `https_development` is true.
   ignore: ->(request) {!request.ssl? && !CDO.https_development}
 
+require 'cdo/rack/global_edition'
+use Rack::GlobalEdition
+
 require 'varnish_environment'
 use VarnishEnvironment
 
@@ -55,9 +58,6 @@ if CDO.use_cookie_dcdo
   require 'cdo/rack/cookie_dcdo'
   use Rack::CookieDCDO
 end
-
-require 'cdo/rack/global_edition'
-use Rack::GlobalEdition
 
 # Disable Sinatra auto-initialization.
 # Add Honeybadger::Rack::ErrorNotifier to Rack middleware directly.
