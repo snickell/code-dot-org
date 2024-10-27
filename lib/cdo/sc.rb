@@ -8,9 +8,9 @@ module Cdo
     # How many seconds to wait for the "you may start your tests" message
     SC_START_TIMEOUT_S = 120
     SC_START_MESSAGE = "you may start your tests"
-    SC_LOG_PREFIX = "Sauce Connect Proxy"
+    SC_STDOUT_PREFIX = "Sauce Connect Proxy"
 
-    @sc_thread = nil
+    @log_file = nil
 
     class << self
       # Starts the Sauce Connect Proxy, which allows tunneling connections from our local server to Sauce Labs
@@ -18,16 +18,19 @@ module Cdo
       # then streams output in the background
       #
       # @param [Boolean] detatch - if true, sc will continue running in the bg when this process exits
-      def start_sc(detatch: false)
-        cmd = [
+      def start_sc(verbose: false)
+        log_file_path = deploy_dir('log/sc.log')
+        @log_file ||= File.open(log_file_path, 'a')
+
+        stdin, stdout_and_stderr, process = Open3.popen2e(
           "sc", "run",
           "-u", CDO.saucelabs_username,
           "-k", CDO.saucelabs_authkey,
           "--region", "us-west-1",
           "--tunnel-domains", ".*\\.code.org,.*\\.csedweek.org,.*\\.hourofcode.com,.*\\.codeprojects.org",
           "--tunnel-name", CDO.saucelabs_tunnel_name
-        ]
-        stdin, stdout_and_stderr, @sc_thread = Open3.popen2e(*cmd)
+        )
+
         # stdin, stdout_and_stderr, @sc_thread = Open3.popen2e <<-SH
         #   sc run \
         #     -u #{CDO.saucelabs_username} \
@@ -37,35 +40,29 @@ module Cdo
         #     --tunnel-name #{CDO.saucelabs_tunnel_name} \
         #     > /dev/null 2>&1
         # SH
+
         stdin.close
 
-        puts "#{SC_LOG_PREFIX}: starting sc, pid=#{@sc_thread.pid}"
+        log "starting sc, pid=#{process.pid}, log_file=#{log_file_path}", stdout: true
 
         # Block waiting for `sc` to print "you may start your tests"
-        if tests_started?(stdout_and_stderr)
-          puts "#{SC_LOG_PREFIX} SUCCESS: started sc: 'you may start your tests'"
-          if detatch
-            # Detatch from the process so it keeps running when this process exits
-            puts "detatching"
-            stdout_and_stderr.close
-            Process.detach(@sc_thread.pid)
-            puts "detatched"
-          else
-            # output stdout_and_stderr in the background:
-            Thread.new {stdout_and_stderr.each_line {|line| puts "#{SC_LOG_PREFIX}: #{line}"}}
-          end
+        if tests_started?(stdout_and_stderr, process)
+          log "success, sc is running", stdout: true
+          # output stdout_and_stderr in the background:
+          Thread.new {stdout_and_stderr.each_line {|line| log line}}
+          return process
         else
-          @sc_thread.join
+          process.join
           # output any remaining stdout_and_stderr:
-          stdout_and_stderr.each_line {|line| puts "#{SC_LOG_PREFIX}: #{line}"}
-          puts "#{SC_LOG_PREFIX} ERROR: couldn't start sc"
+          stdout_and_stderr.each_line {|line| log line}
+          log "ERROR: couldn't start sc", stdout: true
         end
       end
 
-      private def tests_started?(stdout)
+      private def tests_started?(stdout, process)
         Timeout.timeout(SC_START_TIMEOUT_S) do
           stdout.each_line do |line|
-            puts "#{SC_LOG_PREFIX}: #{line}"
+            log line
             if line.strip.end_with?(SC_START_MESSAGE)
               return true
             end
@@ -73,9 +70,14 @@ module Cdo
         end
         return false
       rescue Timeout::Error
-        puts "#{SC_LOG_PREFIX} ERROR: timed out waiting #{SC_START_TIMEOUT_S} seconds for '#{SC_START_MESSAGE}', stopping sc"
-        Process.kill("TERM", @sc_thread&.pid)
+        log "ERROR: timed out waiting #{SC_START_TIMEOUT_S} seconds for '#{SC_START_MESSAGE}', stopping sc", stdout: true
+        Process.kill("TERM", process.pid)
         return false
+      end
+
+      private def log(message, stdout: false)
+        puts "#{SC_STDOUT_PREFIX}: #{message}" if stdout
+        @log_file.puts message
       end
     end
   end
