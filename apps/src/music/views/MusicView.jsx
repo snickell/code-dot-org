@@ -40,6 +40,7 @@ import {
   setPackId,
   setIsPlaying,
   setCurrentPlayheadPosition,
+  setStartingPlayheadPosition,
   clearSelectedBlockId,
   selectBlockId,
   setShowInstructions,
@@ -85,6 +86,8 @@ class UnconnectedMusicView extends React.Component {
     isPlaying: PropTypes.bool,
     setIsPlaying: PropTypes.func,
     setCurrentPlayheadPosition: PropTypes.func,
+    startingPlayheadPosition: PropTypes.number,
+    setStartingPlayheadPosition: PropTypes.func,
     selectedBlockId: PropTypes.string,
     selectBlockId: PropTypes.func,
     setSelectedTriggerId: PropTypes.func,
@@ -103,7 +106,7 @@ class UnconnectedMusicView extends React.Component {
     initialSources: PropTypes.object,
     levelProperties: PropTypes.object,
     longInstructions: PropTypes.string,
-    startingPlayheadPosition: PropTypes.number,
+
     isProjectLevel: PropTypes.bool,
     isReadOnlyWorkspace: PropTypes.bool,
     updateLoadProgress: PropTypes.func,
@@ -334,6 +337,8 @@ class UnconnectedMusicView extends React.Component {
     MusicRegistry.showAiTemperatureExplanation =
       levelData?.showAiTemperatureExplanation ||
       AppConfig.getValue('show-ai-temperature-explanation') === 'true';
+
+    this.props.setStartingPlayheadPosition(1);
 
     Lab2Registry.getInstance()
       .getMetricsReporter()
@@ -782,6 +787,8 @@ const MusicView = connect(
     setIsPlaying: isPlaying => dispatch(setIsPlaying(isPlaying)),
     setCurrentPlayheadPosition: currentPlayheadPosition =>
       dispatch(setCurrentPlayheadPosition(currentPlayheadPosition)),
+    setStartingPlayheadPosition: startingPlayheadPosition =>
+      dispatch(setStartingPlayheadPosition(startingPlayheadPosition)),
     selectBlockId: blockId => dispatch(selectBlockId(blockId)),
     setSelectedTriggerId: id => dispatch(setSelectedTriggerId(id)),
     clearSelectedTriggerId: () => dispatch(clearSelectedTriggerId()),
