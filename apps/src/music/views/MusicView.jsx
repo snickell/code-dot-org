@@ -183,14 +183,14 @@ class UnconnectedMusicView extends React.Component {
           this.musicBlocklyWorkspace.dispose();
         }
       })
-      .addListener(LifecycleEvent.LevelLoadCompleted, () => {
-        if (this.props.levelProperties?.appName === 'music') {
-          this.onLevelLoad(
-            this.props.levelProperties?.levelData,
-            this.props.initialSources
-          );
+      .addListener(
+        LifecycleEvent.LevelLoadCompleted,
+        ({appName, levelData}, _channel, initialSources) => {
+          if (appName === 'music') {
+            this.onLevelLoad(levelData, initialSources);
+          }
         }
-      });
+      );
   }
 
   async componentDidUpdate(prevProps) {
