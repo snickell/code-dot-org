@@ -669,7 +669,9 @@ class ProjectsControllerTest < ActionController::TestCase
       SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED],
       SharedConstants::PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER],
       SharedConstants::PROJECT_SUBMISSION_STATUS[:SHARING_DISABLED],
-      SharedConstants::PROJECT_SUBMISSION_STATUS[:RESTRICTED_SHARE_MODE]
+      SharedConstants::PROJECT_SUBMISSION_STATUS[:RESTRICTED_SHARE_MODE],
+      SharedConstants::PROJECT_SUBMISSION_STATUS[:OWNER_TOO_NEW],
+      SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TOO_NEW]
     ]
     forbidden_status_types.each do |type|
       test_project =

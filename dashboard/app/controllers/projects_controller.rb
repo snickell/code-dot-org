@@ -550,6 +550,10 @@ class ProjectsController < ApplicationController
       return render status: :forbidden, json: {error: "Submission disabled for user account because sharing disabled."}
     when SharedConstants::PROJECT_SUBMISSION_STATUS[:RESTRICTED_SHARE_MODE]
       return render status: :forbidden, json: {error: "Submission disabled because project is in restricted share mode."}
+    when SharedConstants::PROJECT_SUBMISSION_STATUS[:OWNER_TOO_NEW]
+      return render status: :forbidden, json: {error: "Submission disabled because user's account has not existed for required time period."}
+    when SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TOO_NEW]
+      return render status: :forbidden, json: {error: "Submission disabled because project has not existed for required time period."}
     end
     # Publish the project, i.e., make it public.
     begin
