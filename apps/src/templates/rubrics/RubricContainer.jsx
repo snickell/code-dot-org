@@ -116,25 +116,29 @@ function RubricContainer({
   const [aiEvalStatusCounters, setAiEvalStatusCounters] = useState(null);
   const [aiEvalStatusMap, setAiEvalStatusMap] = useState(null);
 
-  const fetchAiEvaluationStatusAll = (rubricId, sectionId) => {
-    return fetch(
-      `/rubrics/${rubricId}/ai_evaluation_status_for_all?section_id=${sectionId}`
-    );
-  };
+  const loadAiEvalStatusForAll = useCallback((rubricId, sectionId) => {
+    const fetchAiEvaluationStatusAll = (rubricId, sectionId) => {
+      return fetch(
+        `/rubrics/${rubricId}/ai_evaluation_status_for_all?section_id=${sectionId}`
+      );
+    };
+
+    fetchAiEvaluationStatusAll(rubricId, sectionId).then(response => {
+      if (response.ok) {
+        response.json().then(data => {
+          setAiEvalStatusMap(data?.aiEvalStatusMap);
+          delete data.aiEvalStatusMap;
+          setAiEvalStatusCounters(data);
+        });
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (!!rubricId && !!sectionId) {
-      fetchAiEvaluationStatusAll(rubricId, sectionId).then(response => {
-        if (response.ok) {
-          response.json().then(data => {
-            setAiEvalStatusMap(data?.aiEvalStatusMap);
-            delete data.aiEvalStatusMap;
-            setAiEvalStatusCounters(data);
-          });
-        }
-      });
+      loadAiEvalStatusForAll(rubricId, sectionId);
     }
-  }, [rubricId, sectionId]);
+  }, [rubricId, sectionId, loadAiEvalStatusForAll]);
 
   const updateAiEvalStatusForUser = (userId, status) => {
     setAiEvalStatusMap({
