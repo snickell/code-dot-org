@@ -485,7 +485,7 @@ class Services::LtiTest < ActiveSupport::TestCase
     section_one_less_user = parsed_response[@lms_section_ids.first.to_s].clone
     section_one_less_user[:members] = section_one_less_user[:members][0...-1]
     Services::Lti.sync_section_roster(@lti_integration, lti_section, section_one_less_user)
-    assert_equal lti_section.reload.followers.length, 2
+    assert_equal lti_section.reload.followers.length, 1
 
     # Find an existing user add them back in
     Services::Lti.sync_section_roster(@lti_integration, lti_section, nrps_section)
