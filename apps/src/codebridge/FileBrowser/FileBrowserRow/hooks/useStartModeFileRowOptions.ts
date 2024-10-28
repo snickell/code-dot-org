@@ -65,6 +65,7 @@ export const useStartModeFileRowOptions = (
               iconName: 'flask',
               labelText: codebridgeI18n.makeValidation(),
               clickHandler: () => handleSetFileType(ProjectFileType.VALIDATION),
+              id: 'uitest-make-validation',
             },
             {
               condition:
@@ -72,12 +73,14 @@ export const useStartModeFileRowOptions = (
               iconName: 'eye',
               labelText: codebridgeI18n.makeStarter(),
               clickHandler: () => handleSetFileType(ProjectFileType.STARTER),
+              id: 'uitest-make-starter',
             },
             {
               condition: file.type !== ProjectFileType.SUPPORT,
               iconName: 'eye-slash',
               labelText: codebridgeI18n.makeSupport(),
               clickHandler: () => handleSetFileType(ProjectFileType.SUPPORT),
+              id: 'uitest-make-support',
             },
             {
               condition: file.type !== ProjectFileType.LOCKED_STARTER,
@@ -85,6 +88,7 @@ export const useStartModeFileRowOptions = (
               labelText: codebridgeI18n.makeLockedStarter(),
               clickHandler: () =>
                 handleSetFileType(ProjectFileType.LOCKED_STARTER),
+              id: 'uitest-make-locked-starter',
             },
           ],
     [file.type, isStartMode, handleSetFileType, projectHasValidationFile]
