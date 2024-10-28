@@ -1,5 +1,4 @@
 import React from 'react';
-import {useSelector} from 'react-redux';
 import {useNavigate, NavLink} from 'react-router-dom';
 
 import {LinkButton} from '@cdo/apps/componentLibrary/button';
@@ -7,6 +6,7 @@ import Button from '@cdo/apps/componentLibrary/button/Button';
 import emptyDesk from '@cdo/apps/templates/teacherDashboard/images/empty_desk.svg';
 import blankScreen from '@cdo/apps/templates/teacherDashboard/images/no_curriculum_assigned.svg';
 import TeacherDashboardEmptyState from '@cdo/apps/templates/teacherNavigation/images/TeacherDashboardEmptyState.svg';
+import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 import i18n from '@cdo/locale';
 
 import EmptyState from './EmptyState';
@@ -24,7 +24,7 @@ interface ElementOrEmptyPageProps {
   showNoCalendarForThisUnit?: boolean;
   showNoUnitAssignedOnCalendar?: boolean;
   showNoUnitAssignedOnLessonMaterials?: boolean;
-  courseName?: string;
+  courseName?: string | null;
   element: React.ReactElement;
 }
 
@@ -41,9 +41,8 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
   courseName,
   element,
 }) => {
-  const isLoadingSectionData = useSelector(
-    (state: {teacherSections: {isLoadingSectionData: boolean}}) =>
-      state.teacherSections.isLoadingSectionData
+  const isLoadingSectionData = useAppSelector(
+    state => state.teacherSections.isLoadingSectionData
   );
 
   const lessonMaterialsOrCalendarPage = showNoUnitAssignedOnCalendar

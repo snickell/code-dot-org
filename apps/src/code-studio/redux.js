@@ -1,5 +1,6 @@
 /* eslint no-unused-vars: "error" */
 import codebridgeConsole from '@codebridge/redux/consoleRedux';
+import codebridgeWorkspace from '@codebridge/redux/workspaceRedux';
 
 import teacherPanel from '@cdo/apps/code-studio/teacherPanelRedux';
 import javalabEditor from '@cdo/apps/javalab/redux/editorRedux';
@@ -11,6 +12,7 @@ import lab2System from '@cdo/apps/lab2/redux/systemRedux';
 import {getStore, registerReducers} from '@cdo/apps/redux';
 import arrowDisplay from '@cdo/apps/templates/arrowDisplayRedux';
 import currentUser from '@cdo/apps/templates/currentUserRedux';
+import teacherRubric from '@cdo/apps/templates/rubrics/teacherRubricRedux';
 import teacherSections from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
 
 import microBit from '../maker/microBitRedux';
@@ -58,7 +60,9 @@ registerReducers({
   codebridgeConsole,
   predictLevel,
   lab2System,
+  codebridgeWorkspace,
   calendar,
+  teacherRubric,
 });
 
 export {getStore};
