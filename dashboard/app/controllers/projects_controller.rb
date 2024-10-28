@@ -541,7 +541,7 @@ class ProjectsController < ApplicationController
     status = get_status(channel_id, project_type, project)
     case status
     when SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED]
-      return render status: :bad_request, json: {error: "Once submitted, a project cannot be submitted again."}
+      return render status: :forbidden, json: {error: "Once submitted, a project cannot be submitted again."}
     when SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED]
       return render status: :forbidden, json: {error: "Submission disabled because project type is not allowed in the featured project gallery."}
     when SharedConstants::PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER]
@@ -765,8 +765,7 @@ class ProjectsController < ApplicationController
             subject: subject,
             comment: {
               body: [
-                "project type: #{project_type}",
-                "channel id: #{channel_id}",
+                "project url: https://studio.code.org/projects/#{project_type}/#{channel_id}",
                 "project description: #{description}"
               ].join("\n")
             }

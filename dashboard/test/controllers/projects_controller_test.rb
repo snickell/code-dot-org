@@ -660,29 +660,22 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :bad_request
   end
 
-  test 'submit project returns bad_request if project is already submitted' do
-    channel_id = '123456'
-    @controller.stubs(:storage_decrypt_channel_id).returns([123, 456])
-    submission_description = 'this project rocks'
-    Projects.any_instance.stubs(:get).returns({})
-    @controller.stubs(:get_status).returns(SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED])
-    post :submit, params: {project_type: 'music', channel_id: channel_id, submissionDescription: submission_description}
-    assert_response :bad_request
-  end
-
   test 'submit project returns forbidden if submission status denotes submission is forbidden' do
     channel_id = '123456'
     @controller.stubs(:storage_decrypt_channel_id).returns([123, 456])
     submission_description = 'this project rocks'
-    Projects.any_instance.stubs(:get).returns({})
     forbidden_status_types = [
+      SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED],
       SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED],
       SharedConstants::PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER],
       SharedConstants::PROJECT_SUBMISSION_STATUS[:SHARING_DISABLED],
       SharedConstants::PROJECT_SUBMISSION_STATUS[:RESTRICTED_SHARE_MODE]
     ]
-
     forbidden_status_types.each do |type|
+      test_project =
+        type == SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED] ?
+          {published_at: Time.now} : {}
+      Projects.any_instance.stubs(:get).returns(test_project)
       @controller.stubs(:get_status).returns(type)
       post :submit, params: {project_type: 'project-type', channel_id: channel_id, submissionDescription: submission_description}
       assert_response :forbidden
