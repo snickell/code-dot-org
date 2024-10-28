@@ -65,6 +65,13 @@ function StudentSelector({
     return levelsWithProgress.find(level => level.userId === userId);
   };
 
+  const getStudentProgressStatusForUser = userId => {
+    const level = getLevelWithProgressForUser(userId);
+    const aiEvalStatus = aiEvalStatusMap[userId];
+    const hasTeacherFeedback = hasTeacherFeedbackMap[userId];
+    return computeBubbleStatus(level, aiEvalStatus, hasTeacherFeedback);
+  };
+
   return (
     <Select
       className={styleName ? styleName : 'uitest-studentselect'}
@@ -106,7 +113,7 @@ function StudentSelector({
                   <StudentProgressStatus
                     aiEvalStatus={aiEvalStatusMap[student.id]}
                     hasTeacherFeedback={hasTeacherFeedbackMap[student.id]}
-                    level={getLevelWithProgressForUser(student.id)}
+                    status={getStudentProgressStatusForUser(student.id)}
                   />
                 )}
               </div>
@@ -203,8 +210,7 @@ function computeBubbleStatus(level, aiEvalStatus, hasTeacherFeedback) {
   return aiEvalStatus;
 }
 
-function StudentProgressStatus({level, aiEvalStatus, hasTeacherFeedback}) {
-  const status = computeBubbleStatus(level, aiEvalStatus, hasTeacherFeedback);
+function StudentProgressStatus({status}) {
   const bubbleColor = STATUS_BUBBLE_COLOR[status];
   const bubbleText = STATUS_BUBBLE_TEXT[status];
 
@@ -219,7 +225,5 @@ function StudentProgressStatus({level, aiEvalStatus, hasTeacherFeedback}) {
 }
 
 StudentProgressStatus.propTypes = {
-  level: levelWithProgress,
-  aiEvalStatus: PropTypes.string,
-  hasTeacherFeedback: PropTypes.bool,
+  status: PropTypes.string,
 };
