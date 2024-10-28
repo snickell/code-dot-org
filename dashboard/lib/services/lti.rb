@@ -17,7 +17,7 @@ module Services
         user.age = '21+'
         user.lti_roster_sync_enabled = true
       end
-      update_user_name(user, id_token)
+      assign_user_name(user, id_token)
 
       ao = AuthenticationOption.new(
         authentication_id: Services::Lti::AuthIdGenerator.new(id_token).call,
@@ -194,7 +194,7 @@ module Services
         # Update name if different from the NRPS response
         unless user_was_new
           nrps_member_message = Policies::Lti.issuer_accepts_resource_link?(issuer) ? nrps_member[:message].first : nrps_member
-          update_user_name(user, nrps_member_message)
+          assign_user_name(user, nrps_member_message)
         end
 
         had_changes ||= (user_was_new || user.changed?)
