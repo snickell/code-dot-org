@@ -16,7 +16,7 @@ module Cdo
       #
       # @param [Boolean] daemonize - if true, sc will continue running in the bg even when ruby exits
       def start_sauce_connect(daemonize: false)
-        log_file = File.open(log_file_path, 'a+') # open log file at the end, watch for "you may start your tests"
+        log_file = open_log_file
 
         # Regexes defining the localhost domains we want to tunnel:
         tunnel_domains = [
@@ -38,8 +38,8 @@ module Cdo
           "SAUCE_ACCESS_KEY" => CDO.saucelabs_authkey
         }
 
-        pid = Process.spawn(env, *cmd, out: log_file_path, err: log_file_path)
-        log "starting sc, pid = #{pid}, see log at #{log_file_path}"
+        pid = Process.spawn(env, *cmd, out: log_file.path, err: log_file.path)
+        log "starting sc, pid = #{pid}, see log at #{log_file.path}"
 
         # Block waiting for `sc` to print "you may start your tests"
         tests_started, log_lines = tests_started?(log_file, pid)
@@ -63,11 +63,10 @@ module Cdo
         log_file.close
       end
 
-      private def sc_cmd(shell_escape: false)
-      end
-
-      private def log_file_path
-        deploy_dir('log/sc.log')
+      private def open_log_file
+        log_file_path = deploy_dir('log/sc.log')
+        FileUtils.mkdir_p File.dirname(log_file_path) # create log dir if it doesn't exist
+        File.open(log_file_path, 'a+') # open log file, create if it doesn't exist, seek to the end
       end
 
       private def process_exited?(pid)
