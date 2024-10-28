@@ -333,7 +333,7 @@ module Services
       }
     end
 
-    def self.update_user_name(user, nrps_member)
+    def self.assign_user_name(user, nrps_member)
       if user.teacher?
         user.name = get_claim_from_list(nrps_member, Policies::Lti::TEACHER_NAME_KEYS)
       else
