@@ -49,6 +49,11 @@ type GenerateStateType = 'none' | 'generating' | 'error';
 
 const defaultAiTemperature = 8;
 
+// When generating, generatingScanStep goes from 1 to this value.  The first
+// PATTERN_AI_NUM_SEED_EVENTS of these values lights up a seed column, and the
+// remainder give a little delay before the generating help text is shown.
+const numberScanSteps = 18;
+
 interface HelpProps {
   userCompletedTask: UserCompletedTaskType;
   generateState: GenerateStateType;
@@ -137,7 +142,7 @@ const Help: React.FunctionComponent<HelpProps> = ({
         </div>
       )}
       {generateState === 'generating' &&
-        generatingScanStep > PATTERN_AI_NUM_SEED_EVENTS && (
+        generatingScanStep >= numberScanSteps && (
           <div className={styles.helpContainer}>
             <div className={classNames(styles.help, styles.helpGenerating)}>
               {musicI18n.patternAiGenerating()}
@@ -389,14 +394,14 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
       onError
     );
     setGenerateState('generating');
-    setGeneratingScanStep(0);
+    setGeneratingScanStep(1);
   }, [currentValue, onChange, aiTemperature, stopPreview, playPreview]);
 
   const [generatingScanStep, setGeneratingScanStep] = useState(0);
   useInterval(() => {
     if (
       generateState === 'generating' &&
-      generatingScanStep <= PATTERN_AI_NUM_SEED_EVENTS
+      generatingScanStep < numberScanSteps
     ) {
       setGeneratingScanStep(generatingScanStep + 1);
     }
