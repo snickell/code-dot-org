@@ -18,16 +18,26 @@ module Cdo
       def start_sauce_connect(daemonize: false)
         log_file = File.open(log_file_path, 'a+') # open log file at the end, watch for "you may start your tests"
 
+        # Regexes defining the localhost domains we want to tunnel:
+        tunnel_domains = [
+          %q(.*\.code.org),
+          %q(.*\.csedweek.org),
+          %q(*\.hourofcode.com),
+          %q(.*\.codeprojects.org),
+        ].join(',')
+
         cmd = [
           "sc", "run",
           "--region", "us-west-1",
-          "--tunnel-domains", ".*\\.code.org,.*\\.csedweek.org,.*\\.hourofcode.com,.*\\.codeprojects.org",
+          "--tunnel-domains", tunnel_domains,
           "--tunnel-name", CDO.saucelabs_tunnel_name,
         ]
+
         env = {
           "SAUCE_USERNAME" => CDO.saucelabs_username,
           "SAUCE_ACCESS_KEY" => CDO.saucelabs_authkey
         }
+
         pid = Process.spawn(env, *cmd, out: log_file_path, err: log_file_path)
         log "starting sc, pid = #{pid}, see log at #{log_file_path}"
 
