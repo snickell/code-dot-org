@@ -1,4 +1,5 @@
 import {useCodebridgeContext} from '@codebridge/codebridgeContext';
+import {usePrompts} from '@codebridge/FileBrowser/hooks';
 import {ProjectFile} from '@codebridge/types';
 import {
   getPossibleDestinationFoldersForFile,
@@ -14,7 +15,6 @@ import {ProjectFileType} from '@cdo/apps/lab2/types';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
-import {usePrompts} from './usePrompts';
 import {useStartModeFileRowOptions} from './useStartModeFileRowOptions';
 
 const handleFileDownload = (file: ProjectFile, appName: string | undefined) => {

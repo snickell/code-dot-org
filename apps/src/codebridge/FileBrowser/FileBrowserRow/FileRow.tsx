@@ -2,10 +2,9 @@ import {useCodebridgeContext} from '@codebridge/codebridgeContext';
 import {ProjectFile} from '@codebridge/types';
 import React from 'react';
 
-import {useFileRowOptions} from '../hooks';
-
 import {FileRowIcon} from './FileRowIcon';
 import {FileRowName} from './FileRowName';
+import {useFileRowOptions} from './hooks';
 import {ItemRow} from './ItemRow';
 
 export type FileRowProps = {

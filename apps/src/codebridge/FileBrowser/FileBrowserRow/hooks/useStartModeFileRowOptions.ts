@@ -10,7 +10,7 @@ import {getAppOptionsEditBlocks} from '@cdo/apps/lab2/projects/utils';
 import {ProjectFileType} from '@cdo/apps/lab2/types';
 import {useAppDispatch} from '@cdo/apps/util/reduxHooks';
 
-import {setShowLockedFilesBanner} from '../../redux/workspaceRedux';
+import {setShowLockedFilesBanner} from '../../../redux/workspaceRedux';
 
 /**
  * Dropdown options for the file dropdown in start mode.
