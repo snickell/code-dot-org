@@ -55,6 +55,6 @@ export const Draggable: React.FunctionComponent<DraggableProps> = ({
   );
 };
 
-export const NotDraggable: React.FunctionComponent<
-  Partial<Omit<DraggableProps, 'children'>> & {children: React.ReactNode}
-> = ({children}) => <>{children}</>;
+export const NotDraggable: React.FunctionComponent<DraggableProps> = ({
+  children,
+}) => <>{children}</>;
