@@ -9,10 +9,9 @@ import React from 'react';
 
 import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon';
 
-import {usePrompts} from './hooks';
+import {useFileRowOptions} from './hooks';
 import StartModeFileDropdownOptions from './StartModeFileDropdownOptions';
 import {setFileType} from './types';
-import {getFileRowOptions} from './utils';
 
 import moduleStyles from './styles/filebrowser.module.scss';
 import darkModeStyles from '@cdo/apps/lab2/styles/dark-mode.module.scss';
@@ -22,7 +21,6 @@ interface FileBrowserRowProps {
   isReadOnly: boolean;
   // If the pop-up menu is enabled, we will show the 3-dot menu button on hover.
   enableMenu: boolean;
-  appName?: string;
   hasValidationFile: boolean; // If the project has a validation file already.
   isStartMode: boolean;
   setFileType: setFileType;
@@ -36,36 +34,18 @@ const FileBrowserRow: React.FunctionComponent<FileBrowserRowProps> = ({
   file,
   isReadOnly,
   enableMenu,
-  appName,
   hasValidationFile,
   isStartMode,
   setFileType,
 }) => {
-  const {
-    project: {files, folders},
-    openFile,
-    config: {editableFileTypes},
-  } = useCodebridgeContext();
-
-  const {openConfirmDeleteFile, openMoveFilePrompt, openRenameFilePrompt} =
-    usePrompts();
+  const {openFile} = useCodebridgeContext();
 
   const {iconName, iconStyle, isBrand} = getFileIconNameAndStyle(file);
   const iconClassName = isBrand
     ? classNames('fa-brands', moduleStyles.rowIcon)
     : moduleStyles.rowIcon;
 
-  const dropdownOptions = getFileRowOptions({
-    file,
-    isStartMode,
-    appName,
-    openConfirmDeleteFile,
-    projectFiles: files,
-    projectFolders: folders,
-    editableFileTypes,
-    openMoveFilePrompt,
-    openRenameFilePrompt,
-  });
+  const dropdownOptions = useFileRowOptions(file);
 
   return (
     <div className={moduleStyles.row}>
@@ -97,10 +77,10 @@ const FileBrowserRow: React.FunctionComponent<FileBrowserRowProps> = ({
         >
           <span className={moduleStyles['button-bar']}>
             {dropdownOptions.map(
-              ({condition, iconName, labelText, clickHandler}, index) =>
+              ({condition, iconName, labelText, clickHandler}) =>
                 condition && (
                   <PopUpButtonOption
-                    key={index}
+                    key={labelText}
                     iconName={iconName}
                     labelText={labelText}
                     clickHandler={clickHandler}
