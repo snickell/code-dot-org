@@ -52,7 +52,7 @@ const defaultAiTemperature = 8;
 // When generating, generatingScanStep goes from 1 to this value.  The first
 // PATTERN_AI_NUM_SEED_EVENTS of these values lights up a seed column, and the
 // remainder give a little delay before the generating help text is shown.
-const numberScanSteps = 18;
+const numberScanSteps = PATTERN_AI_NUM_SEED_EVENTS + 10;
 
 interface HelpProps {
   userCompletedTask: UserCompletedTaskType;
