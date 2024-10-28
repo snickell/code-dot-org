@@ -18402,6 +18402,64 @@ en:
           title: AI 101 Self Paced Professional Learning for Districts
           description_audience: ''
           description_short: ''
+          description: |-
+            **You will:**
+
+            -   Get an introduction to teaching both units in the Exploring Generative AI course
+            -   Define and identify different uses and purposes of Generative AI
+            -   Understand the ethical impact of Generative AI
+            -   Sample lessons from the Exploring Generative AI course
+
+            **Suggested time:** 120 minutes
+          student_description: |-
+            **You will:**
+
+            -   Get an introduction to teaching both units in the Exploring Generative AI course
+            -   Define and identify different uses and purposes of Generative AI
+            -   Understand the ethical impact of Generative AI
+            -   Sample lessons from the Exploring Generative AI course
+
+            **Suggested time:** 120 minutes
+        self-paced-pl-ai-districts-2024:
+          lessons:
+            lesson-1:
+              name: Introducing AI
+            lesson-2:
+              name: Understanding AI
+            lesson-3:
+              name: Transforming Teaching with AI
+            lesson-4:
+              name: Bringing AI to the Classroom
+            lesson-5:
+              name: Ensuring a Responsible Approach to AI
+          lesson_groups: {}
+          name: self-paced-pl-ai-districts-2024
+          title: AI 101 Self Paced Professional Learning for Districts
+          description_audience: ''
+          description_short: ''
+          description: ''
+          student_description: ''
+        music-jam-2024:
+          lessons: {}
+          lesson_groups: {}
+          name: music-jam-2024
+          title: 'Music Lab: Jam Session'
+          description_audience: ''
+          description_short: ''
+          description: ''
+          student_description: ''
+        music-keyboard-navigation-onboarding:
+          lessons: {}
+          lesson_groups: {}
+        music-keyboard-accessibility:
+          lessons:
+            lesson-1:
+              name: Keyboard Onboarding Accessibility
+          lesson_groups: {}
+          name: music-keyboard-accessibility
+          title: Keyboard Navigation for Music Lab
+          description_audience: ''
+          description_short: Learn how to create a song using only your computer keyboard in Music Lab
           description: ''
           student_description: ''
         music-jam-2024:
