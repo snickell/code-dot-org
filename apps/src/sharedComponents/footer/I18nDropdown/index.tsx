@@ -10,13 +10,11 @@ import './style.scss';
 
 interface I18nDropdownProps {
   localeUrl: string;
-  selectedLocale?: string;
   optionsForLocaleSelect: SimpleDropdownProps['items'];
 }
 
 const I18nDropdown: React.FC<I18nDropdownProps> = ({
   localeUrl,
-  selectedLocale = '',
   optionsForLocaleSelect,
 }) => {
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -32,10 +30,9 @@ const I18nDropdown: React.FC<I18nDropdownProps> = ({
     >
       <input type="hidden" name="user_return_to" value={window.location.href} />
       <SimpleDropdown
-        id="locale"
         className="languageSelect"
         name="locale"
-        selectedValue={selectedLocale || currentLocale()}
+        selectedValue={currentLocale()}
         onChange={handleChange}
         items={optionsForLocaleSelect}
         labelText="Select Language"
