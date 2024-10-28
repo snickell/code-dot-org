@@ -143,11 +143,7 @@ const Help: React.FunctionComponent<HelpProps> = ({
               {musicI18n.patternAiGenerating()}
             </div>
             <div className={styles.generatingSpinner}>
-              <FontAwesomeV6Icon
-                iconName="spinner"
-                animationType="spin"
-                className={styles.generatingSpinnerIcon}
-              />
+              <FontAwesomeV6Icon iconName="spinner" animationType="spin" />
             </div>
           </div>
         )}
