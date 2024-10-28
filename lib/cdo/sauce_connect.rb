@@ -18,6 +18,11 @@ module Cdo
       def start_sauce_connect(daemonize: false)
         log_file = open_log_file
 
+        # Verify that required parameters are set in locals.yml
+        raise "saucelabs_username must be set in locals.yml" unless CDO.saucelabs_username
+        raise "saucelabs_authkey must be set in locals.yml, use 'Access Key' from https://app.saucelabs.com/user-settings" unless CDO.saucelabs_authkey
+        raise "saucelabs_tunnel_name must be set in locals.yml, 'cdo-tunnel' is a good default choice" unless CDO.saucelabs_tunnel_name
+
         # Regexes defining the localhost domains we want to tunnel:
         tunnel_domains = [
           %q(.*\.code.org),
