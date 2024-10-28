@@ -765,6 +765,8 @@ class ProjectsController < ApplicationController
             subject: subject,
             comment: {
               body: [
+                "name: #{name}",
+                "user name: #{username}",
                 "project url: https://studio.code.org/projects/#{project_type}/#{channel_id}",
                 "project description: #{description}"
               ].join("\n")
