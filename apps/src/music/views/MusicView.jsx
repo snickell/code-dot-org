@@ -190,7 +190,15 @@ class UnconnectedMusicView extends React.Component {
           // Clear any coypright information in the footer.
           setExtraCopyrightContent(undefined);
         }
-      });
+      })
+      .addListener(
+        LifecycleEvent.LevelLoadCompleted,
+        ({appName, levelData}, _channel, initialSources) => {
+          if (appName === 'music') {
+            this.onLevelLoad(levelData, initialSources);
+          }
+        }
+      );
   }
 
   async componentDidUpdate(prevProps) {
@@ -218,22 +226,6 @@ class UnconnectedMusicView extends React.Component {
 
     if (prevProps.updateLoadProgress !== this.props.updateLoadProgress) {
       this.player.setUpdateLoadProgress(this.props.updateLoadProgress);
-    }
-
-    // Update components with new level data and new initial sources when
-    // the level changes.
-    if (
-      (!isEqual(prevProps.levelProperties, this.props.levelProperties) ||
-        !isEqual(prevProps.initialSources, this.props.initialSources) ||
-        prevProps.isReadOnlyWorkspace !== this.props.isReadOnlyWorkspace) &&
-      this.props.levelProperties?.appName === 'music'
-    ) {
-      if (this.props.levelProperties?.appName === 'music') {
-        this.onLevelLoad(
-          this.props.levelProperties?.levelData,
-          this.props.initialSources
-        );
-      }
     }
   }
 
