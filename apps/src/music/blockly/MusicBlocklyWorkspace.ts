@@ -8,7 +8,6 @@ import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
 import {getAppOptionsEditBlocks} from '@cdo/apps/lab2/projects/utils';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import {ValueOf} from '@cdo/apps/types/utils';
-import {nameComparator} from '@cdo/apps/util/sort';
 
 import CustomMarshalingInterpreter from '../../lib/tools/jsinterpreter/CustomMarshalingInterpreter';
 import {BlockMode, Triggers} from '../constants';
@@ -493,7 +492,7 @@ export default class MusicBlocklyWorkspace {
 
     const allFunctions: GoogleBlockly.serialization.procedures.State[] = [];
 
-    (this.workspace?.getTopBlocks() as ProcedureBlock[])
+    (this.workspace?.getTopBlocks(true) as ProcedureBlock[])
       .filter(
         // When a block is dragged from the toolbox, an insertion marker is
         // created with the same type. Insertion markers just provide a
@@ -511,7 +510,7 @@ export default class MusicBlocklyWorkspace {
         );
       });
 
-    allFunctions.sort(nameComparator).forEach(({name, id, parameters}) => {
+    allFunctions.forEach(({name, id, parameters}) => {
       blockList.push({
         kind: 'block',
         type: BLOCK_TYPES.procedureCall,
