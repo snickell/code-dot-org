@@ -22,7 +22,7 @@ module Cdo
         tunnel_domains = [
           %q(.*\.code.org),
           %q(.*\.csedweek.org),
-          %q(*\.hourofcode.com),
+          %q(.*\.hourofcode.com),
           %q(.*\.codeprojects.org),
         ].join(',')
 
