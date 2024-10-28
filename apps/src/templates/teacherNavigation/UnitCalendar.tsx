@@ -5,6 +5,7 @@ import {useSelector} from 'react-redux';
 import UnitCalendarGrid from '@cdo/apps//code-studio/components/progress/UnitCalendarGrid';
 import {initializeRedux} from '@cdo/apps/code-studio/components/progress/TeacherUnitOverview';
 import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
+import {Heading1} from '@cdo/apps/componentLibrary/typography';
 import {getAuthenticityToken} from '@cdo/apps/util/AuthenticityTokenStore';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 import i18n from '@cdo/locale';
@@ -35,6 +36,8 @@ const UnitCalendar: React.FC = () => {
   const calendarLessons = useAppSelector(
     state => state.calendar?.calendarLessons
   );
+
+  const versionYear = useAppSelector(state => state.calendar?.versionYear);
 
   const {userId, userType} = useAppSelector(state => state.currentUser);
 
@@ -89,32 +92,70 @@ const UnitCalendar: React.FC = () => {
     setWeeklyInstructionalMinutes(value);
   };
 
-  return (
-    <div className={styles.calendarContentContainer}>
-      <div className={styles.minutesPerWeekWrapper}>
-        <div className={styles.minutesPerWeekDescription}>
-          {i18n.instructionalMinutesPerWeek()}
+  const renderOldUnitGraphic = () => {
+    return <div>Old unit</div>;
+  };
+
+  const renderUnitAssignmentNeededGraphic = () => {
+    return <div>Unit assignment needed</div>;
+  };
+
+  const renderCalendarUnavailableGraphic = () => {
+    return <div>Calendar unavailable</div>;
+  };
+
+  const renderCalendar = () => {
+    return (
+      <div className={styles.calendarContentContainer}>
+        <div className={styles.minutesPerWeekWrapper}>
+          <div className={styles.minutesPerWeekDescription}>
+            {i18n.instructionalMinutesPerWeek()}
+          </div>
+          <SimpleDropdown
+            name="minutesPerWeek"
+            onChange={event => handleDropdownChange(event.target.value)}
+            items={weeklyMinutesOptions}
+            selectedValue={weeklyInstructionalMinutes}
+            size="s"
+            dropdownTextThickness="thin"
+            labelText="minutes per week dropdown"
+            isLabelVisible={false}
+          />
         </div>
-        <SimpleDropdown
-          name="minutesPerWeek"
-          onChange={event => handleDropdownChange(event.target.value)}
-          items={weeklyMinutesOptions}
-          selectedValue={weeklyInstructionalMinutes}
-          size="s"
-          dropdownTextThickness="thin"
-          labelText="minutes per week dropdown"
-          isLabelVisible={false}
-        />
-      </div>
-      {!isLoading && hasCalendar && (
+        {!isLoading && (
+          <div>
+            <Heading1>{versionYear}</Heading1>
+          </div>
+        )}
         <UnitCalendarGrid
           lessons={calendarLessons}
           weeklyInstructionalMinutes={weeklyInstructionalMinutes}
           weekWidth={WEEK_WIDTH}
         />
-      )}
-    </div>
-  );
+      </div>
+    );
+  };
+
+  const renderContent = () => {
+    let content = null;
+
+    if (!isLoading) {
+      if (!unitName && versionYear && parseInt(versionYear) < 202) {
+        content = renderOldUnitGraphic();
+      } else if (versionYear && parseInt(versionYear) < 2020) {
+        content = renderOldUnitGraphic();
+      } else if (!unitName) {
+        content = renderUnitAssignmentNeededGraphic();
+      } else if (hasCalendar) {
+        content = renderCalendar();
+      } else {
+        content = renderCalendarUnavailableGraphic();
+      }
+    }
+
+    return content;
+  };
+  return <div>{renderContent()}</div>;
 };
 
 export default UnitCalendar;

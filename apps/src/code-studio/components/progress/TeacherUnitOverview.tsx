@@ -239,10 +239,13 @@ export const initializeRedux = (
     dispatch(clearAnnouncements());
   }
 
+  console.log('unitData', unitData);
+
   dispatch(
     setCalendarData({
       showCalendar: !!unitData.showCalendar,
       calendarLessons: unitData.calendarLessons,
+      versionYear: unitData.version_year || '0',
     })
   );
 
