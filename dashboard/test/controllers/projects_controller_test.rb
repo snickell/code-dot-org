@@ -670,7 +670,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :bad_request
   end
 
-  test 'submit project returns forbidden if defined status types' do
+  test 'submit project returns forbidden if submission status denotes submission is forbidden' do
     channel_id = '123456'
     @controller.stubs(:storage_decrypt_channel_id).returns([123, 456])
     submission_description = 'this project rocks'
