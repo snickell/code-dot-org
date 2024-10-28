@@ -520,7 +520,7 @@ class ProjectsController < ApplicationController
   end
 
   def get_status(channel_id, project_type, project)
-    return SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED] if project[:published_at]
+    # return SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED] if project[:published_at]
     return SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED] unless SharedConstants::ALL_PUBLISHABLE_PROJECT_TYPES.include?(project_type)
     return SharedConstants::PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER] unless current_user
     return SharedConstants::PROJECT_SUBMISSION_STATUS[:SHARING_DISABLED] if current_user.sharing_disabled? && SharedConstants::CONDITIONALLY_PUBLISHABLE_PROJECT_TYPES.include?(project_type)
@@ -540,8 +540,8 @@ class ProjectsController < ApplicationController
     project = Project.find_by(id: project_id)
     status = get_status(channel_id, project_type, project)
     case status
-    when SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED]
-      return render status: :forbidden, json: {error: "Once submitted, a project cannot be submitted again."}
+    # when SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED]
+    #   return render status: :forbidden, json: {error: "Once submitted, a project cannot be submitted again."}
     when SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED]
       return render status: :forbidden, json: {error: "Submission disabled because project type is not allowed in the featured project gallery."}
     when SharedConstants::PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER]
@@ -764,6 +764,8 @@ class ProjectsController < ApplicationController
           subject: subject,
           comment: {
             body: [
+              "name: #{name}",
+              "user name: #{username}",
               "project url: https://studio.code.org/projects/#{project_type}/#{channel_id}",
               "project description: #{description}"
             ].join("\n")
