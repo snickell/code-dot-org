@@ -31,13 +31,13 @@ function StudentSelector({
   reloadOnChange,
   reportingData,
   sectionId,
-  aiEvalStatusMap,
 
   //from redux
   students,
   selectUser,
   levelsWithProgress,
   hasTeacherFeedbackMap,
+  aiEvalStatusMap,
 }) {
   const handleSelectStudentChange = event => {
     const newUserId = event.value;
@@ -143,6 +143,7 @@ export default connect(
     students: state.teacherSections.selectedStudents,
     levelsWithProgress: state.teacherPanel.levelsWithProgress,
     hasTeacherFeedbackMap: state.teacherRubric.hasTeacherFeedbackMap,
+    aiEvalStatusMap: state.teacherRubric.aiEvalStatusMap,
   }),
   dispatch => ({
     selectUser(userId) {
