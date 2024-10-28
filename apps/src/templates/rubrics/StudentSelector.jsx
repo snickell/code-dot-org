@@ -61,6 +61,10 @@ function StudentSelector({
     return null;
   }
 
+  const getLevelWithProgressForUser = userId => {
+    return levelsWithProgress.find(level => level.userId === userId);
+  };
+
   return (
     <Select
       className={styleName ? styleName : 'uitest-studentselect'}
@@ -102,9 +106,7 @@ function StudentSelector({
                   <StudentProgressStatus
                     aiEvalStatus={aiEvalStatusMap[student.id]}
                     hasTeacherFeedback={hasTeacherFeedbackMap[student.id]}
-                    level={levelsWithProgress.find(
-                      userLevel => student.id === userLevel.userId
-                    )}
+                    level={getLevelWithProgressForUser(student.id)}
                   />
                 )}
               </div>
