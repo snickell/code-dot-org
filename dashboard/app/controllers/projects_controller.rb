@@ -272,60 +272,6 @@ class ProjectsController < ApplicationController
     end
   end
 
-  # GET /projects/:project_type/:channel_id/submission_status
-  def submission_status
-    project_type = params[:project_type]
-    channel_id = params[:channel_id]
-    _, project_id = storage_decrypt_channel_id(params[:channel_id])
-    project = Project.find_by(id: project_id)
-    status = get_status(channel_id, project_type, project)
-    render(status: :ok, json: {status: status})
-  end
-
-  def get_status(channel_id, project_type, project)
-    return SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED] if project.published_at
-    return SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED] unless SharedConstants::ALL_PUBLISHABLE_PROJECT_TYPES.include?(project_type)
-    return SharedConstants::PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER] unless current_user
-    return SharedConstants::PROJECT_SUBMISSION_STATUS[:SHARING_DISABLED] if current_user.sharing_disabled? && SharedConstants::CONDITIONALLY_PUBLISHABLE_PROJECT_TYPES.include?(project_type)
-    return SharedConstants::PROJECT_SUBMISSION_STATUS[:RESTRICTED_SHARE_MODE] if Projects.in_restricted_share_mode(channel_id, project_type)
-    return SharedConstants::PROJECT_SUBMISSION_STATUS[:OWNER_TOO_NEW] unless project.owner_existed_long_enough_to_publish?
-    return SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TOO_NEW] unless project.existed_long_enough_to_publish?
-    SharedConstants::PROJECT_SUBMISSION_STATUS[:CAN_SUBMIT]
-  end
-
-  # POST /projects/:project_type/:channel_id/submit
-  def submit
-    project_type = params[:project_type]
-    channel_id = params[:channel_id]
-    submission_description = params[:submissionDescription]
-    return render status: :bad_request, json: {error: "Project description is required for submission."} if submission_description.empty?
-    _, project_id = storage_decrypt_channel_id(params[:channel_id])
-    project = Project.find_by(id: project_id)
-    status = get_status(channel_id, project_type, project)
-    case status
-    when SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED]
-      return render status: :bad_request, json: {error: "Once submitted, a project cannot be submitted again."}
-    when SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED]
-      return render status: :bad_request, json: {error: "This project type is not able to be submitted to the featured project gallery."}
-    when SharedConstants::PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER]
-      return render status: :forbidden, json: {error: "Submission disabled for user account because non-owner."}
-    when SharedConstants::PROJECT_SUBMISSION_STATUS[:SHARING_DISABLED]
-      return render status: :forbidden, json: {error: "Submission disabled for user account because sharing disabled."}
-    when SharedConstants::PROJECT_SUBMISSION_STATUS[:RESTRICTED_SHARE_MODE]
-      return render status: :forbidden, json: {error: "Submission disabled beause project in restricted share mode."}
-    end
-    # Publish the project, i.e., make it public. This gives Code.org permission to feature project
-    # in public featured project gallery.
-    begin
-      Projects.new(get_storage_id).publish(channel_id, project_type, current_user)
-    rescue Projects::PublishError => exception
-      return render(status: :forbidden, json: {error: exception.message})
-    end
-    # TODO: Store submission_description
-    # TODO: Send ZenDesk ticket with submission description and user info.
-    send_project_submission(current_user&.name || '', current_user&.username || '', project_type, channel_id, submission_description)
-  end
-
   # GET /projects/featured
   # Access is restricted to those with project_validator permission
   def featured
@@ -563,6 +509,59 @@ class ProjectsController < ApplicationController
     redirect_to action: 'edit', channel_id: new_channel_id
   end
 
+  # GET /projects/:project_type/:channel_id/submission_status
+  def submission_status
+    project_type = params[:project_type]
+    channel_id = params[:channel_id]
+    _, project_id = storage_decrypt_channel_id(params[:channel_id])
+    project = Project.find_by(id: project_id)
+    status = get_status(channel_id, project_type, project)
+    render(status: :ok, json: {status: status})
+  end
+
+  def get_status(channel_id, project_type, project)
+    return SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED] if project[:published_at]
+    return SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED] unless SharedConstants::ALL_PUBLISHABLE_PROJECT_TYPES.include?(project_type)
+    return SharedConstants::PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER] unless current_user
+    return SharedConstants::PROJECT_SUBMISSION_STATUS[:SHARING_DISABLED] if current_user.sharing_disabled? && SharedConstants::CONDITIONALLY_PUBLISHABLE_PROJECT_TYPES.include?(project_type)
+    return SharedConstants::PROJECT_SUBMISSION_STATUS[:RESTRICTED_SHARE_MODE] if Projects.in_restricted_share_mode(channel_id, project_type)
+    return SharedConstants::PROJECT_SUBMISSION_STATUS[:OWNER_TOO_NEW] unless project.owner_existed_long_enough_to_publish?
+    return SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TOO_NEW] unless project.existed_long_enough_to_publish?
+    SharedConstants::PROJECT_SUBMISSION_STATUS[:CAN_SUBMIT]
+  end
+
+  # POST /projects/:project_type/:channel_id/submit
+  def submit
+    project_type = params[:project_type]
+    channel_id = params[:channel_id]
+    submission_description = params[:submissionDescription]
+    return render status: :bad_request, json: {error: "Project description is required for submission."} if submission_description.empty?
+    _, project_id = storage_decrypt_channel_id(params[:channel_id])
+    project = Project.find_by(id: project_id)
+    status = get_status(channel_id, project_type, project)
+    case status
+    when SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED]
+      return render status: :forbidden, json: {error: "Once submitted, a project cannot be submitted again."}
+    when SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED]
+      return render status: :forbidden, json: {error: "Submission disabled because project type is not allowed in the featured project gallery."}
+    when SharedConstants::PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER]
+      return render status: :forbidden, json: {error: "Submission disabled for user account because non-owner."}
+    when SharedConstants::PROJECT_SUBMISSION_STATUS[:SHARING_DISABLED]
+      return render status: :forbidden, json: {error: "Submission disabled for user account because sharing disabled."}
+    when SharedConstants::PROJECT_SUBMISSION_STATUS[:RESTRICTED_SHARE_MODE]
+      return render status: :forbidden, json: {error: "Submission disabled because project is in restricted share mode."}
+    end
+    # Publish the project, i.e., make it public.
+    begin
+      Projects.new(get_storage_id).publish(channel_id, project_type, current_user)
+    rescue Projects::PublishError => exception
+      return render(status: :forbidden, json: {error: exception.message})
+    end
+    # TODO: Store submission_description in our database.
+    # Send ZenDesk ticket with user/project info and submission description.
+    send_project_submission(current_user&.name || '', current_user&.username || '', project_type, channel_id, submission_description)
+  end
+
   def can_publish_age_status
     project = Project.find_by_channel_id(params[:channel_id])
     unless project.apply_project_age_publish_limits?
@@ -751,6 +750,7 @@ class ProjectsController < ApplicationController
     end
   end
 
+  # Temporary - will be replaced with storing in database.
   private def send_project_submission(name, username, project_type, channel_id, description)
     subject = 'TESTING: Featured project gallery submission'
     response = HTTParty.post(
@@ -764,19 +764,19 @@ class ProjectsController < ApplicationController
           subject: subject,
           comment: {
             body: [
-              "project type: #{project_type}",
-              "channel id: #{channel_id}",
+              "project url: https://studio.code.org/projects/#{project_type}/#{channel_id}",
               "project description: #{description}"
             ].join("\n")
           }
         }
       }.to_json,
-      basic_auth: {username: 'dev@code.org/token', password: Dashboard::Application.config.zendesk_dev_token}
+      basic_auth: {username: 'dev@code.org/token', password: 'rCTQZEJQzi5qVhbNuhp9nQBLZJBPtCOY58B9GF27'}
     )
     raise ZendeskError.new(response.code, response.body) unless response.success?
   end
 end
 
+# Temporary - will be removed once project submission is stored in database.
 class ZendeskError < StandardError
   attr_reader :error_details
 
