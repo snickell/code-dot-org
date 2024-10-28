@@ -147,6 +147,10 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
     ? EMPTY_STATE.noStudents
     : showNoCurriculumAssigned
     ? EMPTY_STATE.noCurriculumAssigned
+    : showNoCalendarForLegacyCourses
+    ? EMPTY_STATE.noCalendarForLegacyCourses
+    : showNoCalendarForThisUnit
+    ? EMPTY_STATE.noCalendarForThisUnit
     : EMPTY_STATE.noUnitAssigned;
 
   const {imageComponent, headline, descriptionText, button} = currentEmptyState;
@@ -154,7 +158,11 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
   // Don't show the empty state if we're still loading data
   if (
     isLoadingSectionData ||
-    (!showNoStudents && !showNoCurriculumAssigned && !showNoUnitAssigned)
+    (!showNoStudents &&
+      !showNoCurriculumAssigned &&
+      !showNoUnitAssigned &&
+      !showNoCalendarForLegacyCourses &&
+      !showNoCalendarForThisUnit)
   ) {
     return element;
   } else {

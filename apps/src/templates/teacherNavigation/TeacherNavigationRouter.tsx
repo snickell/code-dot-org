@@ -70,6 +70,17 @@ const TeacherNavigationRouter: React.FC<TeacherNavigationRouterProps> = ({
   const studentCount = useAppSelector(
     state => state.teacherSections.selectedStudents.length
   );
+
+  const versionYear = React.useMemo(
+    () => (selectedSection ? selectedSection.versionYear : null),
+    [selectedSection]
+  );
+
+  const hasCalendar = React.useMemo(
+    () => (selectedSection ? selectedSection.hasCalendar : null),
+    [selectedSection]
+  );
+
   const providerName = useAppSelector(state =>
     sectionProviderName(state, state.teacherSections.selectedSectionId)
   );
@@ -215,6 +226,8 @@ const TeacherNavigationRouter: React.FC<TeacherNavigationRouterProps> = ({
               <ElementOrEmptyPage
                 showNoStudents={studentCount === 0}
                 showNoCurriculumAssigned={!anyStudentHasProgress}
+                showNoCalendarForLegacyCourses={parseInt(versionYear) < 2021}
+                showNoCalendarForThisUnit={!hasCalendar}
                 element={applyV1TeacherDashboardWidth(<UnitCalendar />)}
               />
             }
@@ -283,6 +296,8 @@ const TeacherNavigationRouter: React.FC<TeacherNavigationRouterProps> = ({
       showAITutorTab,
       selectedSection,
       studioUrlPrefix,
+      versionYear,
+      hasCalendar,
     ]
   );
 

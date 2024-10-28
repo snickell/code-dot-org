@@ -5,7 +5,6 @@ import {useSelector} from 'react-redux';
 import UnitCalendarGrid from '@cdo/apps//code-studio/components/progress/UnitCalendarGrid';
 import {initializeRedux} from '@cdo/apps/code-studio/components/progress/TeacherUnitOverview';
 import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
-import {Heading1} from '@cdo/apps/componentLibrary/typography';
 import Spinner from '@cdo/apps/sharedComponents/Spinner';
 import {getAuthenticityToken} from '@cdo/apps/util/AuthenticityTokenStore';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
@@ -38,7 +37,7 @@ const UnitCalendar: React.FC = () => {
     state => state.calendar?.calendarLessons
   );
 
-  const versionYear = useAppSelector(state => state.calendar?.versionYear);
+  // const versionYear = useAppSelector(state => state.calendar?.versionYear);
 
   const {userId, userType} = useAppSelector(state => state.currentUser);
 

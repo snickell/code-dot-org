@@ -416,6 +416,8 @@ class Section < ApplicationRecord
         sectionInstructors: serialized_section_instructors,
         sync_enabled: Policies::Lti.roster_sync_enabled?(teacher),
         ai_tutor_enabled: ai_tutor_enabled,
+        version_year: unit_group ? unit_group&.version_year : script&.version_year,
+        has_calendar: script ? script&.show_calendar : null,
       }
     end
   end
