@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import Button from '@cdo/apps/legacySharedComponents/Button';
 import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
-import {updateAiEvalStatusForUser} from '@cdo/apps/templates/rubrics/teacherRubricRedux';
+import {setUserAiEvalStatus} from '@cdo/apps/templates/rubrics/teacherRubricRedux';
 import {RubricAiEvaluationStatus} from '@cdo/generated-scripts/sharedConstants';
 import i18n from '@cdo/locale';
 
@@ -53,7 +53,7 @@ function RunAIAssessmentButton({
   status,
   setStatus,
   reportingData,
-  updateAiEvalStatusForUser,
+  setUserAiEvalStatus,
 }) {
   const rubricId = rubric.id;
   const [csrfToken, setCsrfToken] = useState('');
@@ -126,7 +126,7 @@ function RunAIAssessmentButton({
                 data.status === RubricAiEvaluationStatus.SUCCESS
               ) {
                 setStatus(STATUS.SUCCESS);
-                updateAiEvalStatusForUser({
+                setUserAiEvalStatus({
                   userId: studentUserId,
                   status: 'READY_TO_REVIEW',
                 });
@@ -166,7 +166,7 @@ function RunAIAssessmentButton({
     polling,
     refreshAiEvaluations,
     setStatus,
-    updateAiEvalStatusForUser,
+    setUserAiEvalStatus,
   ]);
 
   const handleRunAiAssessment = () => {
@@ -230,11 +230,11 @@ RunAIAssessmentButton.propTypes = {
   reportingData: reportingDataShape,
 
   // from redux
-  updateAiEvalStatusForUser: PropTypes.func,
+  setUserAiEvalStatus: PropTypes.func,
 };
 
 export default connect(null, dispatch => ({
-  updateAiEvalStatusForUser(params) {
-    dispatch(updateAiEvalStatusForUser(params));
+  setUserAiEvalStatus(params) {
+    dispatch(setUserAiEvalStatus(params));
   },
 }))(RunAIAssessmentButton);

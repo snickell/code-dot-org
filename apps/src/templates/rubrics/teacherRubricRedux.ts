@@ -72,7 +72,7 @@ const teacherRubricReduxSlice = createSlice({
     setAiEvalStatusMap(state, action: PayloadAction<AiEvalStatusMap>) {
       state.aiEvalStatusMap = action.payload;
     },
-    updateAiEvalStatusForUser: (
+    setUserAiEvalStatus: (
       state,
       action: PayloadAction<{userId: number; status: string}>
     ) => {
@@ -150,6 +150,6 @@ export const {setAllTeacherEvaluationData, setAiEvalStatusCounters} =
 export const {
   setUserHasTeacherFeedback,
   setAiEvalStatusMap,
-  updateAiEvalStatusForUser,
+  setUserAiEvalStatus,
 } = teacherRubricReduxSlice.actions;
 export default teacherRubricReduxSlice.reducer;
