@@ -40,7 +40,7 @@ import {
 import {Draggable, NotDraggable} from './Draggable';
 import {Droppable} from './Droppable';
 import {FileBrowserHeaderPopUpButton} from './FileBrowserHeaderPopUpButton';
-import FileBrowserRow, {FileBrowserRowProps} from './FileBrowserRow';
+import {FileRow, FileRowProps} from './FileBrowserRow';
 import {
   useFileUploader,
   useFileUploadErrorCallback,
@@ -219,13 +219,11 @@ const InnerFileBrowser = React.memo(
           .sort((a, b) => a.name.localeCompare(b.name))
           .map(f => {
             const isDraggingLocked =
-              (!isStartMode && f.type === ProjectFileType.LOCKED_STARTER) ||
-              f.name === 'nodrag.txt';
-            const fileRowProps: FileBrowserRowProps = {
-              file: f,
-              isReadOnly,
+              !isStartMode && f.type === ProjectFileType.LOCKED_STARTER;
+            const fileRowProps: FileRowProps = {
+              item: f,
               hasValidationFile,
-              enableMenu: !dragData?.id || isDraggingLocked,
+              enableMenu: (!dragData?.id || isDraggingLocked) && !isReadOnly,
             };
             const DraggableWrapper = isDraggingLocked
               ? NotDraggable
@@ -236,7 +234,7 @@ const InnerFileBrowser = React.memo(
                 key={f.id}
                 Component="li"
               >
-                <FileBrowserRow {...fileRowProps} />
+                <FileRow {...fileRowProps} />
               </DraggableWrapper>
             );
           })}

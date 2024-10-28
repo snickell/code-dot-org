@@ -67,7 +67,8 @@ export const useStartModeFileRowOptions = (
               clickHandler: () => handleSetFileType(ProjectFileType.VALIDATION),
             },
             {
-              condition: file.type !== ProjectFileType.STARTER && file.type,
+              condition:
+                file.type !== ProjectFileType.STARTER && Boolean(file.type),
               iconName: 'eye',
               labelText: codebridgeI18n.makeStarter(),
               clickHandler: () => handleSetFileType(ProjectFileType.STARTER),
