@@ -62,9 +62,11 @@ const Instructions: React.FunctionComponent<InstructionsProps> = ({
   );
   const predictResponse = useAppSelector(state => state.predictLevel.response);
   const predictAnswerLocked = useAppSelector(isPredictAnswerLocked);
-  const offerBrowserTts = useAppSelector(
-    state => state.lab.levelProperties?.offerBrowserTts
-  );
+
+  const offerBrowserTts =
+    useAppSelector(state => state.lab.levelProperties?.offerBrowserTts) ||
+    queryParams('show-tts') === 'true';
+
   const useSecondaryFinishButton =
     useAppSelector(
       state => state.lab.levelProperties?.useSecondaryFinishButton
