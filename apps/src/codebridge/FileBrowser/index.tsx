@@ -1,11 +1,7 @@
 import {useCodebridgeContext} from '@codebridge/codebridgeContext';
 import {DEFAULT_FOLDER_ID} from '@codebridge/constants';
 import {ProjectType, FolderId} from '@codebridge/types';
-import {
-  validateFileName as globalValidateFileName,
-  validateFolderName,
-  shouldShowFile,
-} from '@codebridge/utils';
+import {shouldShowFile} from '@codebridge/utils';
 import {
   DndContext,
   DragStartEvent,
@@ -19,12 +15,10 @@ import classNames from 'classnames';
 import React, {useMemo, useState} from 'react';
 
 import {START_SOURCES} from '@cdo/apps/lab2/constants';
-import {usePartialApply, PAFunctionArgs} from '@cdo/apps/lab2/hooks';
 import {isReadOnlyWorkspace} from '@cdo/apps/lab2/lab2Redux';
 import {getAppOptionsEditBlocks} from '@cdo/apps/lab2/projects/utils';
 import {ProjectFileType} from '@cdo/apps/lab2/types';
 import PanelContainer from '@cdo/apps/lab2/views/components/PanelContainer';
-import {useDialogControl, DialogType} from '@cdo/apps/lab2/views/dialogs';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 import {
@@ -35,7 +29,8 @@ import {Draggable, NotDraggable} from './Draggable';
 import {Droppable} from './Droppable';
 import {FileBrowserHeaderPopUpButton} from './FileBrowserHeaderPopUpButton';
 import {FileRow, FileRowProps, FolderRow} from './FileBrowserRow';
-import {DragType, DragDataType, DropDataType, setFileType} from './types';
+import {useHandleDragEnd} from './hooks';
+import {DragType, DragDataType, DropDataType} from './types';
 
 import moduleStyles from './styles/filebrowser.module.scss';
 
@@ -43,12 +38,11 @@ type FilesComponentProps = {
   files: ProjectType['files'];
   folders: ProjectType['folders'];
   parentId?: FolderId;
-  setFileType: setFileType;
   appName?: string;
 };
 
 const InnerFileBrowser = React.memo(
-  ({parentId, folders, files, setFileType, appName}: FilesComponentProps) => {
+  ({parentId, folders, files, appName}: FilesComponentProps) => {
     const {dragData, dropData} = useDndDataContext();
     const isStartMode = getAppOptionsEditBlocks() === START_SOURCES;
 
@@ -82,7 +76,6 @@ const InnerFileBrowser = React.memo(
                       folders={folders}
                       parentId={f.id}
                       files={files}
-                      setFileType={setFileType}
                       appName={appName}
                     />
                   </ul>
@@ -120,20 +113,9 @@ const InnerFileBrowser = React.memo(
 );
 
 export const FileBrowser = React.memo(() => {
-  const {project, moveFile, moveFolder, setFileType} = useCodebridgeContext();
+  const {project} = useCodebridgeContext();
   const isReadOnly = useAppSelector(isReadOnlyWorkspace);
-  const dialogControl = useDialogControl();
   const appName = useAppSelector(state => state.lab.levelProperties?.appName);
-  const validationFile = useAppSelector(
-    state => state.lab.levelProperties?.validationFile
-  );
-  const isStartMode = getAppOptionsEditBlocks() === START_SOURCES;
-
-  const validateFileName = usePartialApply(globalValidateFileName, {
-    isStartMode,
-    validationFile,
-    projectFiles: project.files,
-  } satisfies PAFunctionArgs<typeof globalValidateFileName>);
 
   const [dragData, setDragData] = useState<DragDataType | undefined>(undefined);
   const [dropData, setDropData] = useState<DropDataType | undefined>(undefined);
@@ -152,52 +134,7 @@ export const FileBrowser = React.memo(() => {
     [setDragData, setDropData]
   );
 
-  const handleDragEnd = useMemo(
-    () => (e: DragOverEvent) => {
-      if (e?.over && e?.active) {
-        // first, if we're dragging something into the folder which currently contains it, just bow out.
-        if (e.active.data.current?.parentId === e.over.id) {
-          return;
-        }
-        if (e.active.data.current?.type === DragType.FOLDER) {
-          const validationError = validateFolderName({
-            folderName: project.folders[e.active.data.current.id].name,
-            parentId: e.over.id as string,
-            projectFolders: project.folders,
-          });
-          if (validationError) {
-            dialogControl?.showDialog({
-              type: DialogType.GenericAlert,
-              title: validationError,
-            });
-          } else {
-            moveFolder(e.active.data.current.id as string, e.over.id as string);
-          }
-        } else if (e.active.data.current?.type === DragType.FILE) {
-          const validationError = validateFileName({
-            fileName: project.files[e.active.data.current.id].name,
-            folderId: e.over.id as string,
-          });
-          if (validationError) {
-            dialogControl?.showDialog({
-              type: DialogType.GenericAlert,
-              title: validationError,
-            });
-          } else {
-            moveFile(e.active.data.current.id as string, e.over.id as string);
-          }
-        }
-      }
-    },
-    [
-      dialogControl,
-      moveFile,
-      moveFolder,
-      project.files,
-      project.folders,
-      validateFileName,
-    ]
-  );
+  const handleDragEnd = useHandleDragEnd();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -236,7 +173,6 @@ export const FileBrowser = React.memo(() => {
                 parentId={DEFAULT_FOLDER_ID}
                 folders={project.folders}
                 files={project.files}
-                setFileType={setFileType}
                 appName={appName}
               />
             </ul>
