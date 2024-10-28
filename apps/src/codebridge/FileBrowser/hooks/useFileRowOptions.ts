@@ -15,13 +15,17 @@ import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 import {usePrompts} from './usePrompts';
+import {useStartModeFileRowOptions} from './useStartModeFileRowOptions';
 
 const handleFileDownload = (file: ProjectFile, appName: string | undefined) => {
   fileDownload(file.contents, file.name);
   sendCodebridgeAnalyticsEvent(EVENTS.CODEBRIDGE_DOWNLOAD_FILE, appName);
 };
 
-export const useFileRowOptions = (file: ProjectFile) => {
+export const useFileRowOptions = (
+  file: ProjectFile,
+  hasValidationFile: boolean
+) => {
   const {
     project: {files: projectFiles, folders: projectFolders},
     config: {editableFileTypes},
@@ -86,5 +90,15 @@ export const useFileRowOptions = (file: ProjectFile) => {
     ]
   );
 
-  return dropdownOptions;
+  const startModeFileOptions = useStartModeFileRowOptions(
+    file,
+    hasValidationFile
+  );
+
+  const allFileDropdownOptions = useMemo(
+    () => [...dropdownOptions, ...startModeFileOptions],
+    [dropdownOptions, startModeFileOptions]
+  );
+
+  return allFileDropdownOptions;
 };

@@ -10,21 +10,17 @@ import React from 'react';
 import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon';
 
 import {useFileRowOptions} from './hooks';
-import StartModeFileDropdownOptions from './StartModeFileDropdownOptions';
-import {setFileType} from './types';
 
 import moduleStyles from './styles/filebrowser.module.scss';
 import darkModeStyles from '@cdo/apps/lab2/styles/dark-mode.module.scss';
 
-interface FileBrowserRowProps {
+export type FileBrowserRowProps = {
   file: ProjectFile;
   isReadOnly: boolean;
   // If the pop-up menu is enabled, we will show the 3-dot menu button on hover.
   enableMenu: boolean;
   hasValidationFile: boolean; // If the project has a validation file already.
-  isStartMode: boolean;
-  setFileType: setFileType;
-}
+};
 
 /**
  * A single file row in the file browser. This component does not handle
@@ -35,8 +31,6 @@ const FileBrowserRow: React.FunctionComponent<FileBrowserRowProps> = ({
   isReadOnly,
   enableMenu,
   hasValidationFile,
-  isStartMode,
-  setFileType,
 }) => {
   const {openFile} = useCodebridgeContext();
 
@@ -45,7 +39,7 @@ const FileBrowserRow: React.FunctionComponent<FileBrowserRowProps> = ({
     ? classNames('fa-brands', moduleStyles.rowIcon)
     : moduleStyles.rowIcon;
 
-  const dropdownOptions = useFileRowOptions(file);
+  const dropdownOptions = useFileRowOptions(file, hasValidationFile);
 
   return (
     <div className={moduleStyles.row}>
@@ -86,13 +80,6 @@ const FileBrowserRow: React.FunctionComponent<FileBrowserRowProps> = ({
                     clickHandler={clickHandler}
                   />
                 )
-            )}
-            {isStartMode && (
-              <StartModeFileDropdownOptions
-                file={file}
-                projectHasValidationFile={hasValidationFile}
-                setFileType={setFileType}
-              />
             )}
           </span>
         </PopUpButton>

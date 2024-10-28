@@ -1,22 +1,16 @@
-import {PopUpButtonOption} from '@codebridge/PopUpButton/PopUpButtonOption';
+import {useCodebridgeContext} from '@codebridge/codebridgeContext';
 import {ProjectFile} from '@codebridge/types';
-import React, {useMemo} from 'react';
+import {useMemo} from 'react';
 
 import codebridgeI18n from '@cdo/apps/codebridge/locale';
+import {START_SOURCES} from '@cdo/apps/lab2/constants';
 import {setOverrideValidations} from '@cdo/apps/lab2/lab2Redux';
 import {PASSED_ALL_TESTS_VALIDATION} from '@cdo/apps/lab2/progress/constants';
+import {getAppOptionsEditBlocks} from '@cdo/apps/lab2/projects/utils';
 import {ProjectFileType} from '@cdo/apps/lab2/types';
 import {useAppDispatch} from '@cdo/apps/util/reduxHooks';
 
-import {setShowLockedFilesBanner} from '../redux/workspaceRedux';
-
-import {setFileType} from './types';
-
-interface StartModeFileDropdownOptionsProps {
-  file: ProjectFile;
-  projectHasValidationFile: boolean;
-  setFileType: setFileType;
-}
+import {setShowLockedFilesBanner} from '../../redux/workspaceRedux';
 
 /**
  * Dropdown options for the file dropdown in start mode.
@@ -25,10 +19,13 @@ interface StartModeFileDropdownOptionsProps {
  * There can only be one validation file in a project; the option to set a file
  * as validation will only be shown if there is no validation file in the project.
  */
-const StartModeFileDropdownOptions: React.FunctionComponent<
-  StartModeFileDropdownOptionsProps
-> = ({file, projectHasValidationFile, setFileType}) => {
+export const useStartModeFileRowOptions = (
+  file: ProjectFile,
+  projectHasValidationFile: boolean
+) => {
   const dispatch = useAppDispatch();
+  const {setFileType} = useCodebridgeContext();
+  const isStartMode = getAppOptionsEditBlocks() === START_SOURCES;
   // setFileType only gets called in start mode. If we are setting a file to
   // validation or changing a validation file to a non-validation file, also
   // set the override validation to a passed all tests condition.
@@ -58,48 +55,39 @@ const StartModeFileDropdownOptions: React.FunctionComponent<
     [dispatch, setFileType, file]
   );
 
-  const dropdownOptions = [
-    {
-      condition: !projectHasValidationFile,
-      iconName: 'flask',
-      labelText: codebridgeI18n.makeValidation(),
-      clickHandler: () => handleSetFileType(ProjectFileType.VALIDATION),
-    },
-    {
-      condition: file.type !== ProjectFileType.STARTER && file.type,
-      iconName: 'eye',
-      labelText: codebridgeI18n.makeStarter(),
-      clickHandler: () => handleSetFileType(ProjectFileType.STARTER),
-    },
-    {
-      condition: file.type !== ProjectFileType.SUPPORT,
-      iconName: 'eye-slash',
-      labelText: codebridgeI18n.makeSupport(),
-      clickHandler: () => handleSetFileType(ProjectFileType.SUPPORT),
-    },
-    {
-      condition: file.type !== ProjectFileType.LOCKED_STARTER,
-      iconName: 'lock',
-      labelText: codebridgeI18n.makeLockedStarter(),
-      clickHandler: () => handleSetFileType(ProjectFileType.LOCKED_STARTER),
-    },
-  ];
-
-  return (
-    <>
-      {dropdownOptions.map(
-        ({condition, iconName, labelText, clickHandler}, index) =>
-          condition && (
-            <PopUpButtonOption
-              key={index}
-              iconName={iconName}
-              labelText={labelText}
-              clickHandler={clickHandler}
-            />
-          )
-      )}
-    </>
+  const dropdownOptions = useMemo(
+    () =>
+      !isStartMode
+        ? []
+        : [
+            {
+              condition: !projectHasValidationFile,
+              iconName: 'flask',
+              labelText: codebridgeI18n.makeValidation(),
+              clickHandler: () => handleSetFileType(ProjectFileType.VALIDATION),
+            },
+            {
+              condition: file.type !== ProjectFileType.STARTER && file.type,
+              iconName: 'eye',
+              labelText: codebridgeI18n.makeStarter(),
+              clickHandler: () => handleSetFileType(ProjectFileType.STARTER),
+            },
+            {
+              condition: file.type !== ProjectFileType.SUPPORT,
+              iconName: 'eye-slash',
+              labelText: codebridgeI18n.makeSupport(),
+              clickHandler: () => handleSetFileType(ProjectFileType.SUPPORT),
+            },
+            {
+              condition: file.type !== ProjectFileType.LOCKED_STARTER,
+              iconName: 'lock',
+              labelText: codebridgeI18n.makeLockedStarter(),
+              clickHandler: () =>
+                handleSetFileType(ProjectFileType.LOCKED_STARTER),
+            },
+          ],
+    [file.type, isStartMode, handleSetFileType, projectHasValidationFile]
   );
-};
 
-export default StartModeFileDropdownOptions;
+  return dropdownOptions;
+};
