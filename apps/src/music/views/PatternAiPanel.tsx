@@ -52,12 +52,14 @@ const defaultAiTemperature = 8;
 interface HelpProps {
   userCompletedTask: UserCompletedTaskType;
   generateState: GenerateStateType;
+  generatingScanStep: number;
   eventsLength: number;
 }
 
 const Help: React.FunctionComponent<HelpProps> = ({
   userCompletedTask,
   generateState,
+  generatingScanStep,
   eventsLength,
 }) => {
   const clickDrumsText = [
@@ -134,13 +136,21 @@ const Help: React.FunctionComponent<HelpProps> = ({
           </div>
         </div>
       )}
-      {generateState === 'generating' && (
-        <div className={styles.helpContainer}>
-          <div className={classNames(styles.help, styles.helpGenerating)}>
-            {musicI18n.patternAiGenerating()}
+      {generateState === 'generating' &&
+        generatingScanStep > PATTERN_AI_NUM_SEED_EVENTS && (
+          <div className={styles.helpContainer}>
+            <div className={classNames(styles.help, styles.helpGenerating)}>
+              {musicI18n.patternAiGenerating()}
+            </div>
+            <div className={styles.generatingSpinner}>
+              <FontAwesomeV6Icon
+                iconName="spinner"
+                animationType="spin"
+                className={styles.generatingSpinnerIcon}
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )}
       {generateState === 'error' && (
         <div className={styles.helpContainer}>
           <div
@@ -371,7 +381,7 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
       aiTemperature / 10,
       newEvents => {
         const elapsedTime = Date.now() - startTime;
-        const delayDuration = Number(appConfig.getValue('ai-delay')) || 2500;
+        const delayDuration = Number(appConfig.getValue('ai-delay')) || 3500;
         const remainingDelayDuration = Math.max(delayDuration - elapsedTime, 0);
         delay(remainingDelayDuration).then(() => {
           currentValue.events = newEvents;
@@ -388,7 +398,10 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
 
   const [generatingScanStep, setGeneratingScanStep] = useState(0);
   useInterval(() => {
-    if (generateState === 'generating' && generatingScanStep <= 8) {
+    if (
+      generateState === 'generating' &&
+      generatingScanStep <= PATTERN_AI_NUM_SEED_EVENTS
+    ) {
       setGeneratingScanStep(generatingScanStep + 1);
     }
   }, 100);
@@ -408,15 +421,18 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
 
   return (
     <div className={styles.patternPanel}>
-      <LoadingOverlay
-        show={isLoading || generateState === 'generating'}
-        delayAppearance={generateState === 'generating'}
-      />
+      <LoadingOverlay show={isLoading} />
 
-      <div className={styles.body}>
+      <div
+        className={classNames(
+          styles.body,
+          generateState === 'generating' && styles.bodyGenerating
+        )}
+      >
         <Help
           userCompletedTask={userCompletedTask}
           generateState={generateState}
+          generatingScanStep={generatingScanStep}
           eventsLength={currentValue.events.length}
         />
 
