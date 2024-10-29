@@ -514,7 +514,6 @@ class ProjectsController < ApplicationController
     _, project_id = storage_decrypt_channel_id(params[:channel_id])
     project = Project.find_by(id: project_id)
     status = project.status
-    puts "status in submission_status #{status}"
     render(status: :ok, json: {status: status})
   end
 
@@ -525,10 +524,9 @@ class ProjectsController < ApplicationController
     _, project_id = storage_decrypt_channel_id(params[:channel_id])
     project = Project.find_by(id: project_id)
     status = project.status
-    puts "status in submit #{status}"
     case status
-    # when SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED]
-    #   return render status: :forbidden, json: {error: "Once submitted, a project cannot be submitted again."}
+    when SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED]
+      return render status: :forbidden, json: {error: "Once submitted, a project cannot be submitted again."}
     when SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED]
       return render status: :forbidden, json: {error: "Submission disabled because project type is not allowed in the featured project gallery."}
     when SharedConstants::PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER]
@@ -539,6 +537,8 @@ class ProjectsController < ApplicationController
       return render status: :forbidden, json: {error: "Submission disabled because project is in restricted share mode."}
     end
     # Publish the project, i.e., make it public.
+    channel_id = params[:channel_id]
+    project_type = params[:project_type]
     begin
       Projects.new(get_storage_id).publish(channel_id, project_type, current_user)
     rescue Projects::PublishError => exception
