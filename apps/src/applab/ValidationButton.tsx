@@ -1,12 +1,10 @@
-import React, {useCallback, useState} from 'react';
-import {Provider} from 'react-redux';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import Button from '@cdo/apps/componentLibrary/button/Button';
 import ValidationResultsModal from './ValidationResultsModal';
 import {useAppDispatch, useAppSelector} from '../util/reduxHooks';
 import {askAITutor} from '../aiTutor/redux/aiTutorRedux';
 import {AITutorTypes as ActionType} from '@cdo/apps/aiTutor/types';
-import consoleRedux from '../codebridge/redux/consoleRedux';
 
 /**
  * Renders a button in App Lab that when clicked makes a call to AI to
@@ -17,17 +15,26 @@ import consoleRedux from '../codebridge/redux/consoleRedux';
 
 const ValidationButton: React.FunctionComponent = () => {
   const [modalOpen, setModalOpen] = useState(false);
+  const [studentCode, setStudentCode] = useState('');
   const storedMessages = useAppSelector(state => state.aiTutor.chatMessages);
-  console.log('storedMessages', storedMessages);
-  const studentCode =
-    'TODO 1: Make a variable called x. TODO 2: Make a variable called y. TODO 3: Set x to dogs. TODO 4: Set y to cats.';
+
+  const codeDOMElement = document.getElementsByClassName('ace_content');
+
+  useEffect(() => {
+    if (codeDOMElement.length > 0) {
+      const studentCode = codeDOMElement[0] as HTMLElement;
+      setStudentCode(studentCode.innerText);
+    }
+  }, [codeDOMElement]);
+
   const dispatch = useAppDispatch();
 
   const handleSubmit = useCallback(() => {
+    const systemPrompt =
+      'For each TODO say only "yes", "no" or "partial" to indicate whether the TODO is complete, incomplete or partially complete. For "partial" explain why in one sentence. Do not write any code.';
     const chatContext = {
-      systemPrompt:
-        'For each TODO say yes, no or partial to indicate whether the TODO is complete, incomplete or partially complete.',
-      studentInput: '',
+      systemPrompt,
+      studentInput: `${systemPrompt} ${studentCode}`,
       studentCode,
       actionType: ActionType.COMPLETION,
     };
@@ -42,7 +49,10 @@ const ValidationButton: React.FunctionComponent = () => {
   const onClose = () => {
     setModalOpen(false);
   };
-  const results = storedMessages.at(-1)?.chatMessageText;
+  const results =
+    storedMessages.length > 2
+      ? storedMessages.at(-1)?.chatMessageText
+      : undefined;
   return (
     <>
       <Button

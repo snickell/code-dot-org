@@ -9,7 +9,6 @@ import * as dom from '../dom';
 import BelowVisualization from '../templates/BelowVisualization';
 import CompletionButton from '../templates/CompletionButton';
 import GameButtons, {ResetButton} from '../templates/GameButtons';
-import ValidationButton from '@cdo/apps/applab/ValidationButton';
 import IFrameEmbedOverlay from '../templates/IFrameEmbedOverlay';
 import {isResponsiveFromState} from '../templates/ProtectedVisualizationDiv';
 import * as color from '../util/color';
@@ -144,7 +143,6 @@ class ApplabVisualizationColumn extends React.Component {
           {/* This div is used to control whether or not our finish button is centered*/}
           <div style={this.getCompletionButtonSyle()}>
             <CompletionButton />
-            <ValidationButton />
           </div>
         </GameButtons>
         {awaitingContainedResponse && (
