@@ -511,34 +511,21 @@ class ProjectsController < ApplicationController
 
   # GET /projects/:project_type/:channel_id/submission_status
   def submission_status
-    project_type = params[:project_type]
-    channel_id = params[:channel_id]
     _, project_id = storage_decrypt_channel_id(params[:channel_id])
     project = Project.find_by(id: project_id)
-    status = get_status(channel_id, project_type, project)
+    status = project.status
+    puts "status in submission_status #{status}"
     render(status: :ok, json: {status: status})
-  end
-
-  def get_status(channel_id, project_type, project)
-    # return SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED] if project[:published_at]
-    return SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED] unless SharedConstants::ALL_PUBLISHABLE_PROJECT_TYPES.include?(project_type)
-    return SharedConstants::PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER] unless current_user
-    return SharedConstants::PROJECT_SUBMISSION_STATUS[:SHARING_DISABLED] if current_user.sharing_disabled? && SharedConstants::CONDITIONALLY_PUBLISHABLE_PROJECT_TYPES.include?(project_type)
-    return SharedConstants::PROJECT_SUBMISSION_STATUS[:RESTRICTED_SHARE_MODE] if Projects.in_restricted_share_mode(channel_id, project_type)
-    return SharedConstants::PROJECT_SUBMISSION_STATUS[:OWNER_TOO_NEW] unless project.owner_existed_long_enough_to_publish?
-    return SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TOO_NEW] unless project.existed_long_enough_to_publish?
-    SharedConstants::PROJECT_SUBMISSION_STATUS[:CAN_SUBMIT]
   end
 
   # POST /projects/:project_type/:channel_id/submit
   def submit
-    project_type = params[:project_type]
-    channel_id = params[:channel_id]
     submission_description = params[:submissionDescription]
     return render status: :bad_request, json: {error: "Project description is required for submission."} if submission_description.empty?
     _, project_id = storage_decrypt_channel_id(params[:channel_id])
     project = Project.find_by(id: project_id)
-    status = get_status(channel_id, project_type, project)
+    status = project.status
+    puts "status in submit #{status}"
     case status
     # when SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED]
     #   return render status: :forbidden, json: {error: "Once submitted, a project cannot be submitted again."}
