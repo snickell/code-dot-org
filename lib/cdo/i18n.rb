@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
+require 'csv'
 require 'yaml'
 
-require 'cdo/db'
 require 'cdo/global_edition'
 
 module Cdo
   module I18n
+    # @see https://docs.google.com/spreadsheets/d/10dS5PJKRt846ol9f9L3pKh03JfZkN7UIEcwMmiGS4i0
+    CDO_LANGUAGES = CSV.read(CDO.dir('pegasus/data/cdo-languages.csv'), headers: true, header_converters: :symbol).freeze
+
     LOCALE_CONFIGS = YAML.load_file(CDO.dir('config/i18n/locales.yml')).each do |_locale, data|
       data.symbolize_keys! if data.is_a?(Hash)
     end.freeze
@@ -17,15 +20,8 @@ module Cdo
     ].freeze
 
     class << self
-      # @see https://docs.google.com/spreadsheets/d/10dS5PJKRt846ol9f9L3pKh03JfZkN7UIEcwMmiGS4i0
-      # @return [Array<CdoLanguage>] CDO language records for the Google doc
-      def cdo_languages
-        @cdo_languages ||= ::PEGASUS_DB[:cdo_languages]
-      end
-
-      # @return [Array<CdoLanguage>] available CDO language records
       def available_languages
-        @available_languages ||= cdo_languages.all.filter_map do |cdo_language|
+        @available_languages ||= CDO_LANGUAGES.filter_map do |cdo_language|
           next cdo_language if cdo_language[:supported_codeorg_b]
           # Enables languages available for debugging in all non-production environments
           cdo_language if debug_language?(cdo_language) && !CDO.rack_env?(:production)

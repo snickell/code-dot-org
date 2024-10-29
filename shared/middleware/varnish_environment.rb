@@ -9,7 +9,7 @@ class VarnishEnvironment < Sinatra::Base
   LOCALE_PARAM_KEY = 'set_locale'.freeze
 
   def self.load_supported_locales
-    ::Cdo::I18n.available_languages.map(&:locale_s).map(&:downcase).sort
+    ::Cdo::I18n.available_languages.map {|cdo_language| cdo_language[:locale_s].downcase}.sort
   end
 
   configure do
