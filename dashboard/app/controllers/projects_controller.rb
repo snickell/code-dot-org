@@ -530,8 +530,10 @@ class ProjectsController < ApplicationController
   # POST /projects/:project_type/:channel_id/submit
   def submit
     submission_description = params[:submissionDescription]
+    channel_id = params[:channel_id]
+    project_type = params[:project_type]
     return render status: :bad_request, json: {error: "Project description is required for submission."} if submission_description.empty?
-    _, project_id = storage_decrypt_channel_id(params[:channel_id])
+    _, project_id = storage_decrypt_channel_id(channel_id)
     project = Project.find_by(id: project_id)
     begin
       authorize! :submit, project

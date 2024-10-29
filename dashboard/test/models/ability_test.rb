@@ -990,6 +990,20 @@ class AbilityTest < ActiveSupport::TestCase
     end
   end
 
+  test 'User can submit a given project with status can_submit' do
+    project_owner = create :student
+    project = create :project, owner: project_owner
+    project.stubs(:submission_status).returns(SharedConstants::PROJECT_SUBMISSION_STATUS[:CAN_SUBMIT])
+    assert Ability.new(project_owner).can? :submit, project
+  end
+
+  test 'User cannot submit a given project already submitted' do
+    project_owner = create :student
+    project = create :project, owner: project_owner
+    project.stubs(:submission_status).returns(SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED])
+    refute Ability.new(project_owner).can? :submit, project
+  end
+
   private def put_students_in_section_and_code_review_group(students, section)
     code_review_group = create :code_review_group, section: section
     students.each do |student|

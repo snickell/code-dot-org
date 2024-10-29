@@ -544,113 +544,18 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_redirected_to "/projects/music/#{channel_id}/view"
   end
 
-  test 'submission status returns PROJECT_SUBMISSION_STATUS[:CAN_SUBMIT] if passes all publish restrictions' do
+  test 'submission status returns appropriate status' do
     channel_id = '123456'
     @controller.stubs(:storage_decrypt_channel_id).returns([123, 456])
     test_project = {}
     Project.stubs(:find_by).returns(test_project)
-    test_project.stubs(:owner_existed_long_enough_to_publish?).returns(true)
-    test_project.stubs(:existed_long_enough_to_publish?).returns(true)
-
-    get :submission_status, params: {project_type: 'music', channel_id: channel_id}
-    assert_response :success
-    status = JSON.parse(@response.body)["status"]
-    assert_equal status, SharedConstants::PROJECT_SUBMISSION_STATUS[:CAN_SUBMIT]
-  end
-
-  test 'submission status returns PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED] if already published' do
-    channel_id = '123456'
-    @controller.stubs(:storage_decrypt_channel_id).returns([123, 456])
-    test_project = {published_at: Time.now}
-    Project.stubs(:find_by).returns(test_project)
-
-    get :submission_status, params: {project_type: 'music', channel_id: channel_id}
-    assert_response :success
-    status = JSON.parse(@response.body)["status"]
-    assert_equal status, SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED]
-  end
-
-  test 'submission status returns PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED] if project type not allowed' do
-    channel_id = '123456'
-    @controller.stubs(:storage_decrypt_channel_id).returns([123, 456])
-    test_project = {}
-    Project.stubs(:find_by).returns(test_project)
-
-    get :submission_status, params: {project_type: 'weblab', channel_id: channel_id}
-    assert_response :success
-    status = JSON.parse(@response.body)["status"]
-    assert_equal status, SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED]
-  end
-
-  test 'submission status returns PROJECT_SUBMISSION_STATUS[:SHARING_DISABLED] if user sharing disabled and project type conditionally publishable' do
-    channel_id = '123456'
-    @controller.stubs(:storage_decrypt_channel_id).returns([123, 456])
-    test_project = {}
-    test_project.stubs(:owner_existed_long_enough_to_publish?).returns(true)
-    test_project.stubs(:existed_long_enough_to_publish?).returns(true)
-    Project.stubs(:find_by).returns(test_project)
-    @user = {}
-    @user.stubs(sharing_disabled?: true)
-    @controller.stubs(current_user: @user)
-
-    get :submission_status, params: {project_type: 'applab', channel_id: channel_id}
-    assert_response :success
-    status = JSON.parse(@response.body)["status"]
-    assert_equal status, SharedConstants::PROJECT_SUBMISSION_STATUS[:SHARING_DISABLED]
-  end
-
-  test 'submission status returns PROJECT_SUBMISSION_STATUS[:RESTRICTED_SHARE_MODE] if project in restricted share mode' do
-    channel_id = '123456'
-    @controller.stubs(:storage_decrypt_channel_id).returns([123, 456])
-    test_project = {}
-    test_project.stubs(:owner_existed_long_enough_to_publish?).returns(true)
-    test_project.stubs(:existed_long_enough_to_publish?).returns(true)
-    Project.stubs(:find_by).returns(test_project)
-    Projects.stubs(:in_restricted_share_mode).returns(true)
-
-    get :submission_status, params: {project_type: 'spritelab', channel_id: channel_id}
-    assert_response :success
-    status = JSON.parse(@response.body)["status"]
-    assert_equal status, SharedConstants::PROJECT_SUBMISSION_STATUS[:RESTRICTED_SHARE_MODE]
-  end
-
-  test 'submission status returns PROJECT_SUBMISSION_STATUS[:OWNER_TOO_NEW] if user account not existed required time length' do
-    channel_id = '123456'
-    @controller.stubs(:storage_decrypt_channel_id).returns([123, 456])
-    test_project = {}
-    Project.stubs(:find_by).returns(test_project)
-    test_project.stubs(:owner_existed_long_enough_to_publish?).returns(false)
-
-    get :submission_status, params: {project_type: 'music', channel_id: channel_id}
-    assert_response :success
-    status = JSON.parse(@response.body)["status"]
-    assert_equal status, SharedConstants::PROJECT_SUBMISSION_STATUS[:OWNER_TOO_NEW]
-  end
-
-  test 'submission status returns PROJECT_SUBMISSION_STATUS[:PROJECT_TOO_NEW] if project not existed required time length' do
-    channel_id = '123456'
-    @controller.stubs(:storage_decrypt_channel_id).returns([123, 456])
-    test_project = {}
-    Project.stubs(:find_by).returns(test_project)
-    test_project.stubs(:owner_existed_long_enough_to_publish?).returns(true)
-    test_project.stubs(:existed_long_enough_to_publish?).returns(false)
-
-    get :submission_status, params: {project_type: 'music', channel_id: channel_id}
-    assert_response :success
-    status = JSON.parse(@response.body)["status"]
-    assert_equal status, SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TOO_NEW]
-  end
-
-  test 'submit project returns success if all criteria are met' do
-    channel_id = '123456'
-    @controller.stubs(:storage_decrypt_channel_id).returns([123, 456])
-    submission_description = 'this project rocks'
-    Projects.any_instance.stubs(:get).returns({})
-    @controller.stubs(:get_status).returns(SharedConstants::PROJECT_SUBMISSION_STATUS[:CAN_SUBMIT])
-    Projects.any_instance.stubs(:publish).returns({})
-
-    post :submit, params: {project_type: 'music', channel_id: channel_id, submissionDescription: submission_description}
-    assert_response :success
+    SharedConstants::PROJECT_SUBMISSION_STATUS.each_value do |status|
+      test_project.stubs(:submission_status).returns(status)
+      get :submission_status, params: {project_type: 'music', channel_id: channel_id}
+      assert_response :success
+      response_status = JSON.parse(@response.body)["status"]
+      assert_equal response_status, status
+    end
   end
 
   test 'submit project returns bad_request if no submission description' do
@@ -660,27 +565,27 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :bad_request
   end
 
-  test 'submit project returns forbidden if submission status denotes submission is forbidden' do
+  test 'submit project returns success if all criteria are met' do
     channel_id = '123456'
     @controller.stubs(:storage_decrypt_channel_id).returns([123, 456])
     submission_description = 'this project rocks'
-    forbidden_status_types = [
-      SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED],
-      SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED],
-      SharedConstants::PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER],
-      SharedConstants::PROJECT_SUBMISSION_STATUS[:SHARING_DISABLED],
-      SharedConstants::PROJECT_SUBMISSION_STATUS[:RESTRICTED_SHARE_MODE],
-      SharedConstants::PROJECT_SUBMISSION_STATUS[:OWNER_TOO_NEW],
-      SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TOO_NEW]
-    ]
-    forbidden_status_types.each do |type|
-      test_project =
-        type == SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED] ?
-          {published_at: Time.now} : {}
-      Projects.any_instance.stubs(:get).returns(test_project)
-      @controller.stubs(:get_status).returns(type)
-      post :submit, params: {project_type: 'project-type', channel_id: channel_id, submissionDescription: submission_description}
-      assert_response :forbidden
-    end
+    test_project = create :project
+    test_project.stubs(:submission_status).returns(SharedConstants::PROJECT_SUBMISSION_STATUS[:CAN_SUBMIT])
+    Project.stubs(:find_by).returns(test_project)
+    Projects.any_instance.stubs(:publish).returns({})
+    post :submit, params: {project_type: 'music', channel_id: channel_id, submissionDescription: submission_description}
+    assert_response :success
+  end
+
+  test 'submit project returns forbidden if criteria not met' do
+    channel_id = '123456'
+    @controller.stubs(:storage_decrypt_channel_id).returns([123, 456])
+    submission_description = 'this project rocks'
+    test_project = create :project
+    test_project.stubs(:submission_status).returns(SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED])
+    Project.stubs(:find_by).returns(test_project)
+    Projects.any_instance.stubs(:publish).returns({})
+    post :submit, params: {project_type: 'music', channel_id: channel_id, submissionDescription: submission_description}
+    assert_response :forbidden
   end
 end
