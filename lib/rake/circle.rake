@@ -194,10 +194,6 @@ def test_eyes?
   !CircleUtils.tagged?(SKIP_EYES)
 end
 
-def start_sauce_connect
-  Cdo::SauceConnect.start_sauce_connect(daemonize: true)
-end
-
 def close_sauce_connect
   RakeUtils.system_stream_output 'killall sc'
 end
