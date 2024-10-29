@@ -140,19 +140,25 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
     },
   };
 
-  // This will be updated to show the correct empty state based on the props passed in
+  // separate out logic for the calendar page
+  const calendarState = showNoCalendarForLegacyCourses
+    ? EMPTY_STATE.noCalendarForLegacyCourses
+    : showNoUnitAssigned
+    ? EMPTY_STATE.noUnitAssignedForCalendarOrLessonMaterials
+    : EMPTY_STATE.noCalendarForThisUnit;
+
   let currentEmptyState;
 
   if (showNoStudents) {
     currentEmptyState = EMPTY_STATE.noStudents;
-  } else if (isOnCalendarPage && showNoCurriculumAssigned) {
-    currentEmptyState = EMPTY_STATE.noUnitAssignedForCalendarOrLessonMaterials;
-  } else if (showNoCalendarForLegacyCourses) {
-    currentEmptyState = EMPTY_STATE.noCalendarForLegacyCourses;
-  } else if (showNoCalendarForThisUnit) {
-    currentEmptyState = EMPTY_STATE.noCalendarForThisUnit;
   } else if (showNoCurriculumAssigned) {
     currentEmptyState = EMPTY_STATE.noCurriculumAssigned;
+  } else if (isOnCalendarPage) {
+    currentEmptyState = calendarState;
+  } else if (showNoLessonMaterialsForLegacyCourses) {
+    currentEmptyState = EMPTY_STATE.noLessonMaterialsForLegacyCourses;
+  } else if (showNoLessonMaterialsForLesson) {
+    currentEmptyState = EMPTY_STATE.noLessonMaterialsForThisLesson;
   } else {
     currentEmptyState = EMPTY_STATE.noUnitAssigned;
   }
@@ -165,7 +171,9 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
       !showNoCurriculumAssigned &&
       !showNoUnitAssigned &&
       !showNoCalendarForLegacyCourses &&
-      !showNoCalendarForThisUnit)
+      !showNoCalendarForThisUnit &&
+      !showNoLessonMaterialsForLegacyCourses &&
+      !showNoLessonMaterialsForLesson)
   ) {
     return element;
   } else {
