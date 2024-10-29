@@ -3,13 +3,13 @@
 
 # String to append to AMI logical resources that get replaced on every build.
 # Typically a portion of the commit hash.
-commit ||= raise('ami commit is required')
+commit_hash ||= raise('ami commit hash is required')
 
 # Shell script to run when building/updating the AMI-creating instance.
 build_ami ||= <<SH
 INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
 STACK=${AWS::StackName}
-RESOURCE_ID=AMICreate#{commit}
+RESOURCE_ID=AMICreate#{commit_hash}
 STATUS=SUCCESS
 REGION=${AWS::Region}
 SH
@@ -51,8 +51,8 @@ frontend_device_name ||= '/dev/sda1'
   FrontendInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties: {Roles: [!Ref FrontendRole]}
-# The WebServerAMI UserData shell script sends a signal when it completes successfully to this Resource.
-  AMICreate<%=commit%>:
+  # The WebServerAMI UserData shell script sends a signal when it completes successfully to this Resource.
+  AMICreate<%=commit_hash%>:
     Type: AWS::CloudFormation::WaitCondition
     CreationPolicy:
       ResourceSignal:
@@ -97,11 +97,11 @@ frontend_device_name ||= '/dev/sda1'
             || true
 
           shutdown -h now
-  AMI<%=commit%>: <%= lambda_fn 'AMIManager',
-    DependsOn: "AMICreate#{commit}", # Don't invoke the AMIManage Lambda until the WaitCondition has received a signal from WebServerAMI.
+  AMI<%=commit_hash%>: <%= lambda_fn 'AMIManager',
+    DependsOn: "AMICreate#{commit_hash}",  # Don't invoke the AMIManage Lambda until the WaitCondition has received a signal from WebServerAMI.
     InstanceId: {Ref: "WebServerAMI" } %>
   FastSnapshotRestore: <%= lambda_fn 'FastSnapshotRestore',
-    ImageIds: [{Ref: "AMI#{commit}" }],
+    ImageIds: [{Ref: "AMI#{commit_hash}" }],
     AvailabilityZones: AVAILABILITY_ZONES
   %>
   ASGCount: <%= lambda_fn 'CountASG',
@@ -158,18 +158,18 @@ frontend_device_name ||= '/dev/sda1'
     DependsOn: FastSnapshotRestore
     Properties:
       LaunchTemplateName: !Sub ${AWS::StackName}-frontend
-      VersionDescription: !Sub "AMI: ${AMI<%=commit%>.ImageId}, Commit: <%=commit%>"
+      VersionDescription: !Sub "AMI: ${AMI<%=commit_hash%>.ImageId}, Commit: <%=commit_hash%>"
       TagSpecifications:
         - ResourceType: launch-template
           Tags:
             - Key: "git-commit"
-              Value: <%=commit%>
+              Value: <%=commit_hash%>
             - Key: "ami-id"
-              Value: !GetAtt AMI<%=commit%>.ImageId
+              Value: !GetAtt AMI<%=commit_hash%>.ImageId
             - Key: "environment"
               Value: <%=environment%>
       LaunchTemplateData:
-        ImageId: !GetAtt [AMI<%=commit%>, ImageId]
+        ImageId: !GetAtt [AMI<%=commit_hash%>, ImageId]
         InstanceType: <%=instance_type%>
         IamInstanceProfile:
           Name: !Ref FrontendInstanceProfile
@@ -187,7 +187,7 @@ frontend_device_name ||= '/dev/sda1'
               - Key: "Name"
                 Value: !Sub "Frontend-${AWS::StackName}"
               - Key: "git-commit"
-                Value: <%=commit%>
+                Value: <%=commit_hash%>
               - Key: "environment"
                 Value: <%=environment%>
         UserData:
