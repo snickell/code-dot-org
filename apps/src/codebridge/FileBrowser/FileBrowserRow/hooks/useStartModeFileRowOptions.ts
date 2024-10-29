@@ -18,7 +18,16 @@ import {setShowLockedFilesBanner} from '../../../redux/workspaceRedux';
  * support, or validation.
  * There can only be one validation file in a project; the option to set a file
  * as validation will only be shown if there is no validation file in the project.
- */
+
+  * @param file - The ProjectFile object representing the file for which options are generated.
+  * @param hasValidationFile - Whether the file has a corresponding validation file.
+  * @returns An array of objects representing the context menu options.
+  *   Each object has the following properties:
+  *     - `condition`:  A boolean that determines if the option should be displayed.
+  *     - `iconName`: The name of the icon to display for the option.
+  *     - `labelText`: The text label to display for the option.
+  *     - `clickHandler`: The function to be called when the option is clicked.
+  */
 export const useStartModeFileRowOptions = (
   file: ProjectFile,
   projectHasValidationFile: boolean

@@ -17,11 +17,30 @@ import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 import {useStartModeFileRowOptions} from './useStartModeFileRowOptions';
 
+/**
+ * Handles downloading a file and sending an analytics event.
+
+ * @param file - The ProjectFile object representing the file to download.
+ * @param appName - (optional) The name of the application triggering the download, used for analytics.
+ * @returns Nothing (void)
+ */
 const handleFileDownload = (file: ProjectFile, appName: string | undefined) => {
   fileDownload(file.contents, file.name);
   sendCodebridgeAnalyticsEvent(EVENTS.CODEBRIDGE_DOWNLOAD_FILE, appName);
 };
 
+/**
+ * Generates options for the context menu displayed for a file row in the file browser.
+
+ * @param file - The ProjectFile object representing the file for which options are generated.
+ * @param hasValidationFile - Whether the file has a corresponding validation file.
+ * @returns An array of objects representing the context menu options.
+ *   Each object has the following properties:
+ *     - `condition`:  A boolean that determines if the option should be displayed.
+ *     - `iconName`: The name of the icon to display for the option.
+ *     - `labelText`: The text label to display for the option.
+ *     - `clickHandler`: The function to be called when the option is clicked.
+ */
 export const useFileRowOptions = (
   file: ProjectFile,
   hasValidationFile: boolean

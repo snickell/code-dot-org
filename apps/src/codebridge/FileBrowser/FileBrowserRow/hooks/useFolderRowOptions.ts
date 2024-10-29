@@ -6,6 +6,18 @@ import {useMemo} from 'react';
 
 import codebridgeI18n from '@cdo/apps/codebridge/locale';
 
+/**
+ * Generates options for the context menu displayed for a folder row in the file browser.
+
+ * @param folder - The ProjectFolder object representing the folder for which options are generated.
+ * @param startFileUpload - a function to start a file upload, should be handed in from the return of `useFileUploader`
+ * @returns An array of objects representing the context menu options.
+ *   Each object has the following properties:
+ *     - `condition`:  A boolean that determines if the option should be displayed.
+ *     - `iconName`: The name of the icon to display for the option.
+ *     - `labelText`: The text label to display for the option.
+ *     - `clickHandler`: The function to be called when the option is clicked.
+ */
 export const useFolderRowOptions = (
   folder: ProjectFolder,
   startFileUpload: ReturnType<typeof useFileUploader>['startFileUpload']
