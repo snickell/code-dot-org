@@ -30,7 +30,7 @@ module LocaleHelper
   end
 
   def current_locale_option(global_edition: false)
-    Cdo::I18n.current_locale_option(locale, global_edition ? ge_region : nil)
+    Cdo::I18n.current_locale_option(locale, global_edition ? request.ge_region : nil)
   end
 
   def options_for_locale_code_select
