@@ -37,8 +37,6 @@ const UnitCalendar: React.FC = () => {
     state => state.calendar?.calendarLessons
   );
 
-  // const versionYear = useAppSelector(state => state.calendar?.versionYear);
-
   const {userId, userType} = useAppSelector(state => state.currentUser);
 
   const dispatch = useAppDispatch();
