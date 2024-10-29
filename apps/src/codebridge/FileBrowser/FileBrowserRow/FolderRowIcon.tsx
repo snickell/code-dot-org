@@ -6,6 +6,12 @@ import {FileBrowserIconComponentType} from '../types';
 
 import moduleStyles from '../styles/filebrowser.module.scss';
 
+/**
+ * Renders the icon for a folder row in the file browser.
+
+ * @param item - The ProjectFolder for this row
+ * @returns A FontAwesomeV6Icon component representing the file icon.
+ */
 export const FolderRowIcon: FileBrowserIconComponentType = ({item}) => {
   return (
     <FontAwesomeV6Icon

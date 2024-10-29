@@ -19,8 +19,11 @@ export type FolderRowProps = {
 };
 
 /**
- * A single file row in the file browser. This component does not handle
+ * A single folder row in the file browser. This component does not handle
  * drag and drop, that is handled by the parent component.
+
+ * @param item - The ProjectFolder to be displayed.
+ * @param enableMenu - Whether to show the context menu for the folder.
  */
 export const FolderRow: React.FunctionComponent<FolderRowProps> = ({
   item,

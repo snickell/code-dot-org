@@ -17,6 +17,10 @@ export type FileRowProps = {
 /**
  * A single file row in the file browser. This component does not handle
  * drag and drop, that is handled by the parent component.
+
+ * @param item - The ProjectFile to be displayed.
+ * @param enableMenu - Whether to show the context menu for the file.
+ * @param hasValidationFile - Indicates if the file has a corresponding validation file.
  */
 export const FileRow: React.FunctionComponent<FileRowProps> = ({
   item,
