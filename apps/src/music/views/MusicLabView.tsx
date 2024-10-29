@@ -300,6 +300,7 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
                 clearCode={clearCode}
                 allowPackSelection={allowPackSelection}
                 skipUrl={skipUrl}
+                blocklyWorkspace={blocklyWorkspace}
               />
             }
           >

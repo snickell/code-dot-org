@@ -66,6 +66,7 @@ interface HeaderButtonsProps {
   clearCode: () => void;
   allowPackSelection: boolean;
   skipUrl: string | undefined;
+  blocklyWorkspace: MusicBlocklyWorkspace | undefined;
 }
 
 /**
@@ -77,6 +78,7 @@ const HeaderButtons: React.FunctionComponent<HeaderButtonsProps> = ({
   clearCode,
   allowPackSelection,
   skipUrl,
+  blocklyWorkspace,
 }) => {
   const readOnlyWorkspace: boolean = useSelector(isReadOnlyWorkspace);
   const {canUndo, canRedo} = useSelector(
@@ -113,7 +115,7 @@ const HeaderButtons: React.FunctionComponent<HeaderButtonsProps> = ({
 
   const onClickStartOver = useCallback(() => {
     // Hide any custom fields that are showing.
-    MusicBlocklyWorkspace.hideChaff();
+    blocklyWorkspace?.hideChaff();
 
     if (dialogControl) {
       dialogControl.showDialog({
@@ -125,7 +127,7 @@ const HeaderButtons: React.FunctionComponent<HeaderButtonsProps> = ({
     if (analyticsReporter) {
       analyticsReporter.onButtonClicked('startOver');
     }
-  }, [dialogControl, analyticsReporter, clearCode]);
+  }, [blocklyWorkspace, dialogControl, analyticsReporter, clearCode]);
 
   const onFeedbackClicked = () => {
     if (analyticsReporter) {
