@@ -17,4 +17,5 @@ yarn build && \
 cd ..
 cd dashboard && \
 bin/rails db:migrate RAILS_ENV=development && \
+bin/rails db:migrate RAILS_ENV=test && \
 cd ..
