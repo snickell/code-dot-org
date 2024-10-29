@@ -39,7 +39,7 @@ export default class MusicBlocklyWorkspace {
 
   // Utility to hide any custom fields that are showing.
   public static hideChaff() {
-    Blockly.getMainWorkspace().hideChaff();
+    Blockly.getMainWorkspace()?.hideChaff();
   }
 
   // Setup the global Blockly environment for Music Lab.
