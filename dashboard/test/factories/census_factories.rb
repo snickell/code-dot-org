@@ -1,30 +1,30 @@
 FactoryBot.define do
   factory :census_submission_school_info, parent: :school_info_us do
     transient do
-      school_year {2017}
+      access_report_year {2017}
     end
 
     trait :with_teaches_yes_teacher_census_submission do
       after(:create) do |school_info, evaluator|
-        create :census_teacher_banner_v1, :with_teaches_yes, school_infos: [school_info], school_year: evaluator.school_year
+        create :census_teacher_banner_v1, :with_teaches_yes, school_infos: [school_info], access_report_year: evaluator.access_report_year
       end
     end
 
     trait :with_teaches_no_teacher_census_submission do
       after(:create) do |school_info, evaluator|
-        create :census_teacher_banner_v1, :with_teaches_no, school_infos: [school_info], school_year: evaluator.school_year
+        create :census_teacher_banner_v1, :with_teaches_no, school_infos: [school_info], access_report_year: evaluator.access_report_year
       end
     end
 
     trait :with_teaches_yes_parent_census_submission do
       after(:create) do |school_info, evaluator|
-        create :census_your_school2017v5, :with_teaches_yes, school_infos: [school_info], submitter_role: 'parent', school_year: evaluator.school_year
+        create :census_your_school2017v5, :with_teaches_yes, school_infos: [school_info], submitter_role: 'parent', access_report_year: evaluator.access_report_year
       end
     end
 
     trait :with_teaches_no_parent_census_submission do
       after(:create) do |school_info, evaluator|
-        create :census_your_school2017v5, :with_teaches_no, school_infos: [school_info], submitter_role: 'parent', school_year: evaluator.school_year
+        create :census_your_school2017v5, :with_teaches_no, school_infos: [school_info], submitter_role: 'parent', access_report_year: evaluator.access_report_year
       end
     end
   end
@@ -33,7 +33,7 @@ FactoryBot.define do
     state {'AK'}
     is_high_school
     transient do
-      school_year {2017}
+      access_report_year {2017}
     end
 
     trait :with_state_not_having_state_data do
@@ -42,86 +42,86 @@ FactoryBot.define do
 
     trait :with_teaches_yes_teacher_census_submission do
       after(:create) do |school, evaluator|
-        create :census_submission_school_info, :with_teaches_yes_teacher_census_submission, school: school, school_year: evaluator.school_year
+        create :census_submission_school_info, :with_teaches_yes_teacher_census_submission, school: school, access_report_year: evaluator.access_report_year
       end
     end
 
     trait :with_teaches_no_teacher_census_submission do
       after(:create) do |school, evaluator|
-        create :census_submission_school_info, :with_teaches_no_teacher_census_submission, school: school, school_year: evaluator.school_year
+        create :census_submission_school_info, :with_teaches_no_teacher_census_submission, school: school, access_report_year: evaluator.access_report_year
       end
     end
 
     trait :with_teaches_yes_parent_census_submission do
       after(:create) do |school, evaluator|
-        create :census_submission_school_info, :with_teaches_yes_parent_census_submission, school: school, school_year: evaluator.school_year
+        create :census_submission_school_info, :with_teaches_yes_parent_census_submission, school: school, access_report_year: evaluator.access_report_year
       end
     end
 
     trait :with_teaches_no_parent_census_submission do
       after(:create) do |school, evaluator|
-        create :census_submission_school_info, :with_teaches_no_parent_census_submission, school: school, school_year: evaluator.school_year
+        create :census_submission_school_info, :with_teaches_no_parent_census_submission, school: school, access_report_year: evaluator.access_report_year
       end
     end
 
     trait :with_one_year_ago_teaches_yes do
       after(:create) do |school, evaluator|
-        create :census_submission_school_info, :with_teaches_yes_teacher_census_submission, school: school, school_year: evaluator.school_year - 1
+        create :census_submission_school_info, :with_teaches_yes_teacher_census_submission, school: school, access_report_year: evaluator.access_report_year - 1
       end
     end
 
     trait :with_one_year_ago_teaches_no do
       after(:create) do |school, evaluator|
-        create :census_submission_school_info, :with_teaches_no_teacher_census_submission, school: school, school_year: evaluator.school_year - 1
+        create :census_submission_school_info, :with_teaches_no_teacher_census_submission, school: school, access_report_year: evaluator.access_report_year - 1
       end
     end
 
     trait :with_one_year_ago_teaches_maybe do
       after(:create) do |school, evaluator|
-        create :census_submission_school_info, :with_teaches_no_teacher_census_submission, :with_teaches_yes_teacher_census_submission, school: school, school_year: evaluator.school_year - 1
+        create :census_submission_school_info, :with_teaches_no_teacher_census_submission, :with_teaches_yes_teacher_census_submission, school: school, access_report_year: evaluator.access_report_year - 1
       end
     end
 
     trait :with_two_years_ago_teaches_yes do
       after(:create) do |school, evaluator|
-        create :census_submission_school_info, :with_teaches_yes_teacher_census_submission, school: school, school_year: evaluator.school_year - 2
+        create :census_submission_school_info, :with_teaches_yes_teacher_census_submission, school: school, access_report_year: evaluator.access_report_year - 2
       end
     end
 
     trait :with_two_years_ago_teaches_no do
       after(:create) do |school, evaluator|
-        create :census_submission_school_info, :with_teaches_no_teacher_census_submission, school: school, school_year: evaluator.school_year - 2
+        create :census_submission_school_info, :with_teaches_no_teacher_census_submission, school: school, access_report_year: evaluator.access_report_year - 2
       end
     end
 
     trait :with_two_years_ago_teaches_maybe do
       after(:create) do |school, evaluator|
-        create :census_submission_school_info, :with_teaches_no_teacher_census_submission, :with_teaches_yes_teacher_census_submission, school: school, school_year: evaluator.school_year - 2
+        create :census_submission_school_info, :with_teaches_no_teacher_census_submission, :with_teaches_yes_teacher_census_submission, school: school, access_report_year: evaluator.access_report_year - 2
       end
     end
 
     trait :with_three_years_ago_teaches_yes do
       after(:create) do |school, evaluator|
-        create :census_submission_school_info, :with_teaches_yes_teacher_census_submission, school: school, school_year: evaluator.school_year - 3
+        create :census_submission_school_info, :with_teaches_yes_teacher_census_submission, school: school, access_report_year: evaluator.access_report_year - 3
       end
     end
 
     trait :with_three_years_ago_teaches_no do
       after(:create) do |school, evaluator|
-        create :census_submission_school_info, :with_teaches_no_teacher_census_submission, school: school, school_year: evaluator.school_year - 3
+        create :census_submission_school_info, :with_teaches_no_teacher_census_submission, school: school, access_report_year: evaluator.access_report_year - 3
       end
     end
 
     trait :with_three_years_ago_teaches_maybe do
       after(:create) do |school, evaluator|
-        create :census_submission_school_info, :with_teaches_no_teacher_census_submission, :with_teaches_yes_teacher_census_submission, school: school, school_year: evaluator.school_year - 3
+        create :census_submission_school_info, :with_teaches_no_teacher_census_submission, :with_teaches_yes_teacher_census_submission, school: school, access_report_year: evaluator.access_report_year - 3
       end
     end
   end
 
   factory :census_submission, class: Census::CensusSubmission do
     submitter_email_address {"parent@school.edu"}
-    school_year {2017}
+    access_report_year {2017}
     how_many_20_hours {"none"}
     how_many_10_hours {"none"}
     how_many_do_hoc {"none"}
@@ -150,8 +150,8 @@ FactoryBot.define do
       class_frequency {'often'}
     end
 
-    trait :with_bad_school_year do
-      school_year {1900}
+    trait :with_bad_access_report_year do
+      access_report_year {1900}
     end
 
     trait :with_long_email do
@@ -273,7 +273,7 @@ FactoryBot.define do
 
   factory :census_summary, class: 'Census::CensusSummary' do
     school {build :school}
-    school_year {2017}
+    access_report_year {2017}
     teaches_cs {nil}
 
     trait :with_valid_teaches_cs do
@@ -288,12 +288,12 @@ FactoryBot.define do
       teaches_cs {"X"}
     end
 
-    trait :with_invalid_school_year do
-      school_year {1900}
+    trait :with_invalid_access_report_year do
+      access_report_year {1900}
     end
 
-    trait :without_school_year do
-      school_year {nil}
+    trait :without_access_report_year do
+      access_report_year {nil}
     end
 
     trait :without_school do

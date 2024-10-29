@@ -22,7 +22,7 @@ end
 def main
   year = SharedConstants::CENSUS_CONSTANTS.CURRENT_CENSUS_SCHOOL_YEAR
   geojson = JSON.parse('{ "type": "FeatureCollection", "features": [] }')
-  Census::CensusSummary.where(school_year: year).find_each do |summary|
+  Census::CensusSummary.where(access_report_year: year).find_each do |summary|
     school = summary.school
     geojson["features"] <<
       {

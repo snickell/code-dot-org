@@ -22,13 +22,13 @@ class Census::CensusSummaryTest < ActiveSupport::TestCase
     end
   end
 
-  test "Summary creation without school year fails" do
-    summary = build :census_summary, :without_school_year
+  test "Summary creation without access report year fails" do
+    summary = build :census_summary, :without_access_report_year
     refute summary.valid?
   end
 
   test "Summary creation with invalid school_year fails" do
-    summary = build :census_summary, :with_invalid_school_year
+    summary = build :census_summary, :with_invalid_access_report_year
     refute summary.valid?
   end
 

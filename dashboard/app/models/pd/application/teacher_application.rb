@@ -1081,7 +1081,7 @@ module Pd::Application
 
       # Check if a school is not teaching CS according to the access report
       # If the school is not in the census_summaries table, treat that as not teaching
-      meets_scholarship_criteria_scores[:school_last_census_status] = Census::CensusSummary.find_by(school_id: school_id, school_year: census_year)&.does_teach? ? NO : YES
+      meets_scholarship_criteria_scores[:school_last_census_status] = Census::CensusSummary.find_by(school_id: school_id, access_report_year: census_year)&.does_teach? ? NO : YES
 
       update(
         response_scores: response_scores_hash.deep_merge(

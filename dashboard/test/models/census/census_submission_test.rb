@@ -51,8 +51,8 @@ class Census::CensusSubmissionTest < ActiveSupport::TestCase
     assert caught, "expected ArgumentError when building submission with bad frequency"
   end
 
-  test "census submission with bad school year" do
-    submission = build(:census_submission, :with_bad_school_year)
+  test "census submission with bad access report year" do
+    submission = build(:census_submission, :with_bad_access_report_year)
     refute submission.valid?, submission.errors.full_messages
   end
 

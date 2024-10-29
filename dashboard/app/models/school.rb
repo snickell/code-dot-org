@@ -52,7 +52,7 @@ class School < ApplicationRecord
   end
 
   def census_for_year(year)
-    census_summaries.find_by(school_year: year)
+    census_summaries.find_by(access_report_year: year)
   end
 
   # Determines if school meets Amazon Future Engineer criteria.

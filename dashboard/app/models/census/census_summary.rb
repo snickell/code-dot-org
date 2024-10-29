@@ -17,7 +17,7 @@
 
 class Census::CensusSummary < ApplicationRecord
   belongs_to :school
-  validates :school_year, presence: true, numericality: {greater_than_or_equal_to: 2015, less_than_or_equal_to: 2030}
+  validates :access_report_year, presence: true, numericality: {greater_than_or_equal_to: 2015, less_than_or_equal_to: 2030}
 
   TEACHES = {
     YES: "Y",
@@ -44,7 +44,7 @@ class Census::CensusSummary < ApplicationRecord
           merge_from_csv(filename) do |row|
             {
               school_id:          row['school_id'],
-              school_year:        row['school_year'].to_i,
+              access_report_year: row['school_year'].to_i,
               teaches_cs:         row['teaches_cs'],
             }
           end

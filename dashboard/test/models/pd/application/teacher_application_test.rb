@@ -535,7 +535,7 @@ module Pd::Application
         principal_underrepresented_minority_percent: 50
 
       application = create :pd_teacher_application, form_data_hash: application_hash
-      create :census_summary, school_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:NO]
+      create :census_summary, access_report_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:NO]
       application.auto_score!
 
       assert_equal(
@@ -575,7 +575,7 @@ module Pd::Application
         principal_underrepresented_minority_percent: 50
 
       application = create :pd_teacher_application, form_data_hash: application_hash
-      create :census_summary, school_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:NO]
+      create :census_summary, access_report_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:NO]
       application.auto_score!
 
       assert_equal(
@@ -617,7 +617,7 @@ module Pd::Application
         principal_underrepresented_minority_percent: 50
 
       application = create :pd_teacher_application, form_data_hash: application_hash
-      create :census_summary, school_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:NO]
+      create :census_summary, access_report_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:NO]
       application.auto_score!
 
       assert_equal(
@@ -690,7 +690,7 @@ module Pd::Application
         principal_underrepresented_minority_percent: 49
 
       application = create :pd_teacher_application, form_data_hash: application_hash
-      create :census_summary, school_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:YES]
+      create :census_summary, access_report_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:YES]
       application.auto_score!
 
       assert_equal(
@@ -730,7 +730,7 @@ module Pd::Application
         principal_underrepresented_minority_percent: 49
 
       application = create :pd_teacher_application, form_data_hash: application_hash
-      create :census_summary, school_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:YES]
+      create :census_summary, access_report_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:YES]
       application.auto_score!
 
       assert_equal(
@@ -772,7 +772,7 @@ module Pd::Application
         principal_underrepresented_minority_percent: 49
 
       application = create :pd_teacher_application, form_data_hash: application_hash
-      create :census_summary, school_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:YES]
+      create :census_summary, access_report_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:YES]
       application.auto_score!
 
       assert_equal(
