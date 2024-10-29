@@ -8,6 +8,7 @@ class CreateUserLevelInteractions < ActiveRecord::Migration[6.1]
       t.string :interaction, null: false
       t.string :code_version
       t.json :metadata
+      t.datetime :deleted_at
 
       t.timestamps
 
