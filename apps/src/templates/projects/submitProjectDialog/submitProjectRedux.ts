@@ -6,7 +6,7 @@ import {registerReducers} from '@cdo/apps/redux';
 import {getSubmissionStatus} from './submitProjectApi';
 export interface SubmitProjectState {
   showSubmitProjectDialog: boolean;
-  submissionStatus: number | undefined;
+  submissionStatus: string | undefined;
 }
 
 const initialState: SubmitProjectState = {
@@ -39,7 +39,7 @@ const submitProjectSlice = createSlice({
     setShowSubmitProjectDialog: (state, action: PayloadAction<boolean>) => {
       state.showSubmitProjectDialog = action.payload;
     },
-    setSubmissionStatus: (state, action: PayloadAction<number>) => {
+    setSubmissionStatus: (state, action: PayloadAction<string>) => {
       state.submissionStatus = action.payload;
     },
   },

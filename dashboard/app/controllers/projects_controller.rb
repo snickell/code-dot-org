@@ -190,6 +190,8 @@ class ProjectsController < ApplicationController
     # Note: When adding to this list, remember that project level files must include "is_project_level": true
   }.with_indifferent_access.freeze
 
+  @@project_level_cache = {}
+
   PROJECT_SUBMISSION_ERROR_MAP = {
     PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED] => "Once submitted, a project cannot be submitted again.",
     PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED] => "Submission disabled because project type is not allowed in the featured project gallery.",
@@ -199,8 +201,6 @@ class ProjectsController < ApplicationController
     PROJECT_SUBMISSION_STATUS[:OWNER_TOO_NEW] => "Submission disabled because user's account has not existed for required time period.",
     PROJECT_SUBMISSION_STATUS[:PROJECT_TOO_NEW] => "Submission disabled because project has not existed for required time period."
   }
-
-  @@project_level_cache = {}
 
   # GET /projects/:tab_name
   # Where a valid :tab_name is (nil|public|libraries)
@@ -523,14 +523,17 @@ class ProjectsController < ApplicationController
   def submission_status
     _, project_id = storage_decrypt_channel_id(params[:channel_id])
     project = Project.find_by(id: project_id)
-    render(status: :ok, json: {status: project.submission_status})
+    status = project.submission_status
+    render(status: :ok, json: {status: status})
   end
 
   # POST /projects/:project_type/:channel_id/submit
   def submit
     submission_description = params[:submissionDescription]
+    channel_id = params[:channel_id]
+    project_type = params[:project_type]
     return render status: :bad_request, json: {error: "Project description is required for submission."} if submission_description.empty?
-    _, project_id = storage_decrypt_channel_id(params[:channel_id])
+    _, project_id = storage_decrypt_channel_id(channel_id)
     project = Project.find_by(id: project_id)
     begin
       authorize! :submit, project
@@ -538,8 +541,6 @@ class ProjectsController < ApplicationController
       return render status: :forbidden, json: {error: PROJECT_SUBMISSION_ERROR_MAP[project.submission_status]}
     end
     # Publish the project, i.e., make it public.
-    channel_id = params[:channel_id]
-    project_type = params[:project_type]
     begin
       Projects.new(get_storage_id).publish(channel_id, project_type, current_user)
     rescue Projects::PublishError => exception
@@ -740,29 +741,31 @@ class ProjectsController < ApplicationController
 
   # Temporary - will be replaced with storing in database.
   private def send_project_submission(name, username, project_type, channel_id, description)
-    subject = 'TESTING: Featured project gallery submission'
-    response = HTTParty.post(
-      'https://codeorg.zendesk.com/api/v2/tickets.json',
-      headers: {"Content-Type" => "application/json", "Accept" => "application/json"},
-      body: {
-        ticket: {
-          requester: {
-            name: username
-          },
-          subject: subject,
-          comment: {
-            body: [
-              "name: #{name}",
-              "user name: #{username}",
-              "project url: https://studio.code.org/projects/#{project_type}/#{channel_id}",
-              "project description: #{description}"
-            ].join("\n")
+    unless Rails.env.development? || Rails.env.test?
+      subject = 'TESTING: Featured project gallery submission'
+      response = HTTParty.post(
+        'https://codeorg.zendesk.com/api/v2/tickets.json',
+        headers: {"Content-Type" => "application/json", "Accept" => "application/json"},
+        body: {
+          ticket: {
+            requester: {
+              name: username
+            },
+            subject: subject,
+            comment: {
+              body: [
+                "name: #{name}",
+                "user name: #{username}",
+                "project url: https://studio.code.org/projects/#{project_type}/#{channel_id}",
+                "project description: #{description}"
+              ].join("\n")
+            }
           }
-        }
-      }.to_json,
-      basic_auth: {username: 'dev@code.org/token', password: 'rCTQZEJQzi5qVhbNuhp9nQBLZJBPtCOY58B9GF27'}
-    )
-    raise ZendeskError.new(response.code, response.body) unless response.success?
+        }.to_json,
+        basic_auth: {username: 'dev@code.org/token', password: Dashboard::Application.config.zendesk_dev_token}
+      )
+      raise ZendeskError.new(response.code, response.body) unless response.success?
+    end
   end
 end
 

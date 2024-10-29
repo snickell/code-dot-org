@@ -1,3 +1,3 @@
 export interface SubmissionStatusResponse {
-  status: number;
+  status: string;
 }

@@ -109,7 +109,7 @@ const ShareDialog: React.FunctionComponent<{
   const submissionStatus = useAppSelector(
     state => state.submitProject.submissionStatus
   );
-  const showSubmitButton = submissionStatus === 0;
+  const showSubmitButton = submissionStatus === 'can_submit';
   const submitButtonText = 'Submit to be featured';
 
   return (
