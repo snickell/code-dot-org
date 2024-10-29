@@ -15,6 +15,7 @@ import {PlayingTrigger} from '../player/interfaces/PlayingTrigger';
 import {isSoundEvent} from '../player/interfaces/SoundEvent';
 import MusicPlayer from '../player/MusicPlayer';
 
+import MusicBlocklyConditionTracker from './MusicBlocklyConditionTracker';
 import {MusicConditions} from './MusicConditions';
 
 export interface ConditionNames {
@@ -30,7 +31,8 @@ export default class MusicValidator extends Validator {
     private readonly getPlayingTriggers: () => PlayingTrigger[],
     private readonly conditionsChecker: ConditionsChecker = new ConditionsChecker(
       Object.values(MusicConditions).map(condition => condition.name)
-    )
+    ),
+    private readonly musicBlocklyValidationTracker: MusicBlocklyConditionTracker
   ) {
     super();
   }
@@ -263,6 +265,15 @@ export default class MusicValidator extends Validator {
         parseInt(trigger.id.replace('trigger', ''))
       );
     });
+    const blocklyConditions =
+      this.musicBlocklyValidationTracker.getBlocklyConditions();
+    blocklyConditions?.length && console.log({blocklyConditions});
+    if (blocklyConditions) {
+      blocklyConditions.forEach(condition => {
+        this.conditionsChecker.addSatisfiedCondition(condition);
+        // TODO: Add satisfied conditioned for all values between 1 and condition.value.
+      });
+    }
   }
 
   // Check for PLAYED_DIFFERENT_SOUNDS_TOGETHER_MULTIPLE_TIMES.

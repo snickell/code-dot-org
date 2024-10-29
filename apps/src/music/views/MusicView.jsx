@@ -21,6 +21,7 @@ import {setExtraCopyrightContent} from '@cdo/apps/sharedComponents/footer/Copyri
 import {SignInState} from '@cdo/apps/templates/currentUserRedux';
 
 import AppConfig from '../appConfig';
+import {PlayBlockTypes} from '../blockly/blockTypes';
 import {TRIGGER_FIELD} from '../blockly/constants';
 import MusicBlocklyWorkspace from '../blockly/MusicBlocklyWorkspace';
 import {
@@ -36,6 +37,7 @@ import MusicPlayer from '../player/MusicPlayer';
 import AdvancedSequencer from '../player/sequencer/AdvancedSequencer';
 import MusicPlayerStubSequencer from '../player/sequencer/MusicPlayerStubSequencer';
 import Simple2Sequencer from '../player/sequencer/Simple2Sequencer';
+import MusicBlocklyConditionTracker from '../progress/MusicBlocklyConditionTracker';
 import MusicValidator from '../progress/MusicValidator';
 import {
   setPackId,
@@ -139,7 +141,9 @@ class UnconnectedMusicView extends React.Component {
       this.getPlaybackEvents,
       this.getValidationTimeout,
       this.player,
-      this.getPlayingTriggers
+      this.getPlayingTriggers,
+      undefined,
+      MusicBlocklyConditionTracker.getInstance()
     );
 
     // Set shared shared objects in the MusicRegistry so views outside of this
@@ -525,6 +529,22 @@ class UnconnectedMusicView extends React.Component {
 
     // This may no-op due to throttling.
     this.saveCode();
+
+    const conditions = [];
+    const playBlocks = Blockly.getMainWorkspace()
+      .getAllBlocks()
+      .filter(
+        block =>
+          PlayBlockTypes.includes(block.type) &&
+          block.getRootBlock().isEnabled()
+      );
+    playBlocks.forEach(playBlock => {
+      // TODO: Recrusively find any parent block that is a loop.
+      // Determine the product of nested loop iterations by inspecting relevant field values.
+      // Push this value as a condition.
+    });
+
+    MusicBlocklyConditionTracker.getInstance().setBlocklyConditions(conditions);
   };
 
   setPlaying = play => {
