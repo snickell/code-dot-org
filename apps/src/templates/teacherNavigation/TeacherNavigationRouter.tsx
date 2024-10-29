@@ -228,6 +228,8 @@ const TeacherNavigationRouter: React.FC<TeacherNavigationRouterProps> = ({
                 showNoCurriculumAssigned={!anyStudentHasProgress}
                 showNoCalendarForLegacyCourses={parseInt(versionYear) < 2021}
                 showNoCalendarForThisUnit={!hasCalendar}
+                isOnCalendarPage={true}
+                courseName={selectedSection?.courseDisplayName}
                 element={applyV1TeacherDashboardWidth(<UnitCalendar />)}
               />
             }

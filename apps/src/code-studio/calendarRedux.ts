@@ -13,19 +13,16 @@ interface CalendarLesson {
 export interface CalendarState {
   showCalendar: boolean;
   calendarLessons: CalendarLesson[] | null;
-  versionYear: string;
 }
 
 interface CalendarDataPayload {
   showCalendar: boolean;
   calendarLessons: CalendarLesson[] | null;
-  versionYear: string;
 }
 
 const initialState: CalendarState = {
   showCalendar: false,
   calendarLessons: null,
-  versionYear: '',
 };
 
 const calendarReduxSlice = createSlice({
@@ -35,7 +32,6 @@ const calendarReduxSlice = createSlice({
     setCalendarData(state, action: PayloadAction<CalendarDataPayload>) {
       state.showCalendar = action.payload.showCalendar;
       state.calendarLessons = action.payload.calendarLessons;
-      state.versionYear = action.payload.versionYear;
     },
   },
 });

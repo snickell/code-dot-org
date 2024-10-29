@@ -1499,8 +1499,6 @@ class Unit < ApplicationRecord
     get_published_state == Curriculum::SharedCourseConstants::PUBLISHED_STATE.in_development
   end
 
-  # main summarize function...
-
   def summarize(include_lessons = true, user = nil, include_bonus_levels = false, locale_code = 'en-us')
     ActiveRecord::Base.connected_to(role: :reading) do
       # TODO: Set up peer reviews to be more consistent with the rest of the system

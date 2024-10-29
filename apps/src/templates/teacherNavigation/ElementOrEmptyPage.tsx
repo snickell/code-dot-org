@@ -22,8 +22,7 @@ interface ElementOrEmptyPageProps {
   showNoCalendarForLegacyCourses?: boolean;
   showNoLessonMaterialsForLesson?: boolean;
   showNoCalendarForThisUnit?: boolean;
-  showNoUnitAssignedOnCalendar?: boolean;
-  showNoUnitAssignedOnLessonMaterials?: boolean;
+  isOnCalendarPage?: boolean;
   courseName?: string | null;
   element: React.ReactElement;
 }
@@ -36,8 +35,7 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
   showNoCalendarForLegacyCourses,
   showNoLessonMaterialsForLesson,
   showNoCalendarForThisUnit,
-  showNoUnitAssignedOnCalendar,
-  showNoUnitAssignedOnLessonMaterials,
+  isOnCalendarPage,
   courseName,
   element,
 }) => {
@@ -45,7 +43,7 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
     state => state.teacherSections.isLoadingSectionData
   );
 
-  const lessonMaterialsOrCalendarPage = showNoUnitAssignedOnCalendar
+  const lessonMaterialsOrCalendarPage = isOnCalendarPage
     ? i18n.theCalendar()
     : i18n.theLessonMaterials();
 
@@ -131,7 +129,7 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
       headline: i18n.almostThere(),
       descriptionText: i18n.noUnitAssigned({
         page: lessonMaterialsOrCalendarPage,
-        courseName: courseName ? courseName : '',
+        courseName: courseName ? courseName : i18n.thisCourse(),
       }),
       imageComponent: (
         <img src={TeacherDashboardEmptyState} alt={i18n.almostThere()} />
@@ -143,16 +141,21 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
   };
 
   // This will be updated to show the correct empty state based on the props passed in
-  const currentEmptyState = showNoStudents
-    ? EMPTY_STATE.noStudents
-    : showNoCurriculumAssigned
-    ? EMPTY_STATE.noCurriculumAssigned
-    : showNoCalendarForLegacyCourses
-    ? EMPTY_STATE.noCalendarForLegacyCourses
-    : showNoCalendarForThisUnit
-    ? EMPTY_STATE.noCalendarForThisUnit
-    : EMPTY_STATE.noUnitAssigned;
+  let currentEmptyState;
 
+  if (showNoStudents) {
+    currentEmptyState = EMPTY_STATE.noStudents;
+  } else if (isOnCalendarPage && showNoCurriculumAssigned) {
+    currentEmptyState = EMPTY_STATE.noUnitAssignedForCalendarOrLessonMaterials;
+  } else if (showNoCalendarForLegacyCourses) {
+    currentEmptyState = EMPTY_STATE.noCalendarForLegacyCourses;
+  } else if (showNoCalendarForThisUnit) {
+    currentEmptyState = EMPTY_STATE.noCalendarForThisUnit;
+  } else if (showNoCurriculumAssigned) {
+    currentEmptyState = EMPTY_STATE.noCurriculumAssigned;
+  } else {
+    currentEmptyState = EMPTY_STATE.noUnitAssigned;
+  }
   const {imageComponent, headline, descriptionText, button} = currentEmptyState;
 
   // Don't show the empty state if we're still loading data
