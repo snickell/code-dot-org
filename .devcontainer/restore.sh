@@ -14,7 +14,7 @@ cd apps && \
 rm -rf node_modules && \
 yarn install && \
 yarn build && \
-cd ..
+cd .. && \
 cd dashboard && \
 bin/rails db:migrate RAILS_ENV=development && \
 bin/rails db:migrate RAILS_ENV=test && \
