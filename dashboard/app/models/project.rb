@@ -76,6 +76,8 @@ class Project < ApplicationRecord
     Time.now > created_at + 30.minutes
   end
 
+  # Returns a project's submission status to determine whether a project is eligible to be submitted
+  # to be considered for the public featured project gallery.
   def submission_status
     return SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED] if published_at
     return SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED] unless SharedConstants::ALL_PUBLISHABLE_PROJECT_TYPES.include?(project_type)

@@ -521,11 +521,9 @@ class ProjectsController < ApplicationController
 
   # GET /projects/:project_type/:channel_id/submission_status
   def submission_status
-    project_type = params[:project_type]
-    channel_id = params[:channel_id]
     _, project_id = storage_decrypt_channel_id(params[:channel_id])
     project = Project.find_by(id: project_id)
-    status = get_status(channel_id, project_type, project)
+    status = project.submission_status
     render(status: :ok, json: {status: status})
   end
 
