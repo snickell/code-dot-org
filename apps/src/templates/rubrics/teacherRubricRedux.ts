@@ -1,4 +1,13 @@
-import {PayloadAction, createSlice, createAsyncThunk} from '@reduxjs/toolkit';
+import {
+  PayloadAction,
+  createSelector,
+  createSlice,
+  createAsyncThunk,
+} from '@reduxjs/toolkit';
+
+import {LevelWithProgress} from '@cdo/apps/code-studio/teacherPanelTypes';
+import {RootState} from '@cdo/apps/types/redux';
+import {LevelStatus} from '@cdo/generated-scripts/sharedConstants';
 
 interface TeacherEvaluation {
   feedback: string;
@@ -25,16 +34,21 @@ interface AiEvalStatusCounters {
   [key: string]: number;
 }
 
-// map from user id to status
+// map from user id to ai eval status
 interface AiEvalStatusMap {
   [key: number]: string;
 }
 
-interface TeacherRubricState {
+export interface TeacherRubricState {
   allTeacherEvaluationData: AllTeacherEvaluationData;
   hasTeacherFeedbackMap: HasTeacherFeedbackMap;
   aiEvalStatusCounters: AiEvalStatusCounters;
   aiEvalStatusMap: AiEvalStatusMap;
+}
+
+// map from user id to student progress status
+interface StudentProgressStatusMap {
+  [key: number]: string;
 }
 
 const initialState: TeacherRubricState = {
@@ -136,6 +150,61 @@ export const loadAiEvalStatusForAll = createAsyncThunk(
         });
       }
     });
+  }
+);
+
+const computeLevelStatus = (level: LevelWithProgress | undefined) => {
+  if (!level || level.status === LevelStatus.not_tried) {
+    return 'NOT_STARTED';
+  } else if (
+    level.status === LevelStatus.attempted ||
+    level.status === LevelStatus.passed
+  ) {
+    return 'IN_PROGRESS';
+  } else if (
+    level.status === LevelStatus.submitted ||
+    level.status === LevelStatus.perfect ||
+    level.status === LevelStatus.completed_assessment ||
+    level.status === LevelStatus.free_play_complete
+  ) {
+    return 'SUBMITTED';
+  } else {
+    return null;
+  }
+};
+
+function computeBubbleStatus(
+  level: LevelWithProgress | undefined,
+  aiEvalStatus: string,
+  hasTeacherFeedback: boolean
+) {
+  if (hasTeacherFeedback) {
+    return 'EVALUATED';
+  }
+  if (aiEvalStatus === 'READY_TO_REVIEW') {
+    return aiEvalStatus;
+  }
+  if (computeLevelStatus(level) === 'SUBMITTED') {
+    return 'SUBMITTED';
+  }
+  return aiEvalStatus;
+}
+
+export const selectStudentProgressStatusMap = createSelector(
+  [
+    (state: RootState) => state.teacherRubric.hasTeacherFeedbackMap || {},
+    (state: RootState) => state.teacherRubric.aiEvalStatusMap || {},
+    (state: RootState) => state.teacherPanel.levelsWithProgress || [],
+  ],
+  (hasTeacherFeedbackMap, aiEvalStatusMap, levelsWithProgress) => {
+    const statusMap: StudentProgressStatusMap = {};
+    levelsWithProgress.forEach((level: LevelWithProgress) => {
+      const userId = level.userId;
+      const aiEvalStatus = aiEvalStatusMap[userId];
+      const hasFeedback = hasTeacherFeedbackMap[userId];
+      statusMap[userId] = computeBubbleStatus(level, aiEvalStatus, hasFeedback);
+    });
+    return statusMap;
   }
 );
 

@@ -14,11 +14,12 @@ import {
 } from '@cdo/apps/componentLibrary/typography';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 import {reload} from '@cdo/apps/utils';
-import {LevelStatus} from '@cdo/generated-scripts/sharedConstants';
 import i18n from '@cdo/locale';
 
 import {reportingDataShape} from './rubricShapes';
+import {selectStudentProgressStatusMap} from './teacherRubricRedux';
 
 import style from './rubrics.module.scss';
 
@@ -57,19 +58,16 @@ function StudentSelector({
     }
   };
 
+  const studentProgressStatusMap = useAppSelector(
+    selectStudentProgressStatusMap
+  );
+
   if (students.length === 0) {
     return null;
   }
 
-  const getLevelWithProgressForUser = userId => {
-    return levelsWithProgress.find(level => level.userId === userId);
-  };
-
   const getStudentProgressStatusForUser = userId => {
-    const level = getLevelWithProgressForUser(userId);
-    const aiEvalStatus = aiEvalStatusMap[userId];
-    const hasTeacherFeedback = hasTeacherFeedbackMap[userId];
-    return computeBubbleStatus(level, aiEvalStatus, hasTeacherFeedback);
+    return studentProgressStatusMap[userId];
   };
 
   return (
@@ -176,39 +174,6 @@ const STATUS_BUBBLE_TEXT = {
   READY_TO_REVIEW: i18n.readyToReview(),
   EVALUATED: i18n.evaluated(),
 };
-
-const computeLevelStatus = level => {
-  if (!level || level.status === LevelStatus.not_tried) {
-    return 'NOT_STARTED';
-  } else if (
-    level.status === LevelStatus.attempted ||
-    level.status === LevelStatus.passed
-  ) {
-    return 'IN_PROGRESS';
-  } else if (
-    level.status === LevelStatus.submitted ||
-    level.status === LevelStatus.perfect ||
-    level.status === LevelStatus.completed_assessment ||
-    level.status === LevelStatus.free_play_complete
-  ) {
-    return 'SUBMITTED';
-  } else {
-    return null;
-  }
-};
-
-function computeBubbleStatus(level, aiEvalStatus, hasTeacherFeedback) {
-  if (hasTeacherFeedback) {
-    return 'EVALUATED';
-  }
-  if (aiEvalStatus === 'READY_TO_REVIEW') {
-    return aiEvalStatus;
-  }
-  if (computeLevelStatus(level) === 'SUBMITTED') {
-    return 'SUBMITTED';
-  }
-  return aiEvalStatus;
-}
 
 function StudentProgressStatus({status}) {
   const bubbleColor = STATUS_BUBBLE_COLOR[status];
