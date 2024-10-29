@@ -17,7 +17,6 @@ export const USER_EDITABLE_SECTION_PROPS = [
   'courseId',
   'courseOfferingId',
   'courseVersionId',
-  'courseYear',
   'unitId',
   'grades',
   'hidden',
@@ -181,7 +180,6 @@ export const sectionFromServerSection = serverSection => ({
   syncEnabled: serverSection.sync_enabled,
   aiTutorEnabled: serverSection.ai_tutor_enabled,
   anyStudentHasProgress: serverSection.any_student_has_progress,
-  courseYear: '3000',
   versionYear: serverSection.version_year ? serverSection.version_year : null,
   hasCalendar: serverSection.has_calendar,
 });
