@@ -5,10 +5,11 @@
 
 set -x
 
-git lfs pull && \
+#git lfs pull && \
 bundle exec rake install:hooks && \
 bundle exec rake install:locals_yml && \
-mysql -uroot -hdb < ../bootstrap-osx.sql && \
+wget http://192.168.1.114:8080/bootstrap-osx.sql && \
+mysql -uroot -hdb < bootstrap-osx.sql && \
 bundle exec rake package && \
 cd apps && \
 rm -rf node_modules && \
@@ -17,4 +18,5 @@ yarn build && \
 cd ..
 cd dashboard && \
 bin/rails db:migrate RAILS_ENV=development && \
+bin/rails db:migrate RAILS_ENV=test && \
 cd ..
