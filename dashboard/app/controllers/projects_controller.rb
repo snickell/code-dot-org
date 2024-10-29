@@ -190,6 +190,16 @@ class ProjectsController < ApplicationController
     # Note: When adding to this list, remember that project level files must include "is_project_level": true
   }.with_indifferent_access.freeze
 
+  PROJECT_SUBMISSION_ERROR_MAP = {
+    PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED] => "Once submitted, a project cannot be submitted again.",
+    PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED] => "Submission disabled because project type is not allowed in the featured project gallery.",
+    PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER] => "Submission disabled for user account because non-owner.",
+    PROJECT_SUBMISSION_STATUS[:SHARING_DISABLED] => "Submission disabled for user account because sharing disabled.",
+    PROJECT_SUBMISSION_STATUS[:RESTRICTED_SHARE_MODE] => "Submission disabled because project is in restricted share mode.",
+    PROJECT_SUBMISSION_STATUS[:OWNER_TOO_NEW] => "Submission disabled because user's account has not existed for required time period.",
+    PROJECT_SUBMISSION_STATUS[:PROJECT_TOO_NEW] => "Submission disabled because project has not existed for required time period."
+  }
+
   @@project_level_cache = {}
 
   # GET /projects/:tab_name
@@ -513,8 +523,7 @@ class ProjectsController < ApplicationController
   def submission_status
     _, project_id = storage_decrypt_channel_id(params[:channel_id])
     project = Project.find_by(id: project_id)
-    status = project.status
-    render(status: :ok, json: {status: status})
+    render(status: :ok, json: {status: project.submission_status})
   end
 
   # POST /projects/:project_type/:channel_id/submit
@@ -523,18 +532,10 @@ class ProjectsController < ApplicationController
     return render status: :bad_request, json: {error: "Project description is required for submission."} if submission_description.empty?
     _, project_id = storage_decrypt_channel_id(params[:channel_id])
     project = Project.find_by(id: project_id)
-    status = project.status
-    case status
-    when SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED]
-      return render status: :forbidden, json: {error: "Once submitted, a project cannot be submitted again."}
-    when SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED]
-      return render status: :forbidden, json: {error: "Submission disabled because project type is not allowed in the featured project gallery."}
-    when SharedConstants::PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER]
-      return render status: :forbidden, json: {error: "Submission disabled for user account because non-owner."}
-    when SharedConstants::PROJECT_SUBMISSION_STATUS[:SHARING_DISABLED]
-      return render status: :forbidden, json: {error: "Submission disabled for user account because sharing disabled."}
-    when SharedConstants::PROJECT_SUBMISSION_STATUS[:RESTRICTED_SHARE_MODE]
-      return render status: :forbidden, json: {error: "Submission disabled because project is in restricted share mode."}
+    begin
+      authorize! :submit, project
+    rescue CanCan::AccessDenied
+      return render status: :forbidden, json: {error: PROJECT_SUBMISSION_ERROR_MAP[project.submission_status]}
     end
     # Publish the project, i.e., make it public.
     channel_id = params[:channel_id]

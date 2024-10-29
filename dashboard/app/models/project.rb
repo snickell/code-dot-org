@@ -76,7 +76,7 @@ class Project < ApplicationRecord
     Time.now > created_at + 30.minutes
   end
 
-  def status
+  def submission_status
     return SharedConstants::PROJECT_SUBMISSION_STATUS[:ALREADY_SUBMITTED] if published_at
     return SharedConstants::PROJECT_SUBMISSION_STATUS[:PROJECT_TYPE_NOT_ALLOWED] unless SharedConstants::ALL_PUBLISHABLE_PROJECT_TYPES.include?(project_type)
     return SharedConstants::PROJECT_SUBMISSION_STATUS[:NOT_PROJECT_OWNER] unless owner

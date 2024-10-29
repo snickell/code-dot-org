@@ -792,13 +792,13 @@ module SharedConstants
   US_STATES = STATE_ABBR_WITH_DC_HASH.merge(DC: 'Washington, D.C.').sort_by(&:last).to_h.freeze
 
   PROJECT_SUBMISSION_STATUS = {
-    CAN_SUBMIT: 0,
-    ALREADY_SUBMITTED: 1,
-    PROJECT_TYPE_NOT_ALLOWED: 102,
-    RESTRICTED_SHARE_MODE: 103,
-    SHARING_DISABLED: 104,
-    NOT_PROJECT_OWNER: 105,
-    OWNER_TOO_NEW: 106,
-    PROJECT_TOO_NEW: 107,
+    CAN_SUBMIT: 'can_submit',
+    ALREADY_SUBMITTED: 'already_submitted',
+    PROJECT_TYPE_NOT_ALLOWED: 'project_type_not_allowed',
+    RESTRICTED_SHARE_MODE: 'restricted_share_mode',
+    SHARING_DISABLED: 'sharing_disabled',
+    NOT_PROJECT_OWNER: 'not_project_owner',
+    OWNER_TOO_NEW: 'owner_too_new',
+    PROJECT_TOO_NEW: 'project_too_new',
   }
 end
