@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.1] (https://github.com/code-dot-org/code-dot-org/pull/62102)
+
+- added `iconLeft` prop support to `SimpleDropdown`
+
 ## [0.7.0] (https://github.com/code-dot-org/code-dot-org/pull/62023)
 
 - added `readOnly` state support to `SimpleDropdown`
