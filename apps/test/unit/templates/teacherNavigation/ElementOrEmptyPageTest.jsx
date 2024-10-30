@@ -138,4 +138,52 @@ describe('ElementOrEmptyPage', () => {
     expect(screen.queryByText(i18n.addStudents())).toBeNull();
     expect(screen.queryByText(TEST_ELEMENT_TEXT)).toBeNull();
   });
+
+  it('Shows no calendar for legacy courses', () => {
+    renderDefault({
+      showNoStudents: false,
+      showNoCurriculumAssigned: false,
+      showNoUnitAssigned: false,
+      showNoCalendarForLegacyCourses: true,
+      isOnCalendarPage: true,
+      courseName: 'CSD',
+    });
+
+    screen.getByText(i18n.calendarNotAvailable());
+    screen.getByText(i18n.calendarLegacyMessage({courseName: 'CSD'}));
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+
+  it('Shows no calendar available when no unit is assigned', () => {
+    renderDefault({
+      showNoStudents: false,
+      showNoCurriculumAssigned: false,
+      showNoUnitAssigned: true,
+      isOnCalendarPage: true,
+      courseName: 'CSD',
+    });
+
+    screen.getByText(i18n.almostThere());
+    screen.getByText(
+      i18n.noUnitAssigned({
+        page: 'the calendar',
+        courseName: 'CSD',
+      })
+    );
+    screen.getByRole('button', {name: i18n.assignAUnit()});
+  });
+
+  it('Shows message indicating calendar isnt available for given post-2020 unit', () => {
+    renderDefault({
+      showNoStudents: false,
+      showNoCurriculumAssigned: false,
+      showNoUnitAssigned: false,
+      showNoCalendarForThisUnit: true,
+      isOnCalendarPage: true,
+      courseName: 'CSD',
+    });
+
+    screen.getByText(i18n.calendarNotAvailable());
+    expect(screen.queryByRole('button')).toBeNull();
+  });
 });
