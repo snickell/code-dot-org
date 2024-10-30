@@ -108,8 +108,7 @@ frontend_device_name ||= '/dev/sda1'
     AutoScalingGroupTags: [
       {Key: 'aws:cloudformation:stack-id', Value: {Ref: 'AWS::StackId'}},
       {Key: 'aws:cloudformation:logical-id', Value: 'Frontends'}
-    ],
-    LaunchConfiguration: {Ref: 'FrontendLaunchConfig'}
+    ]
   %>
   Frontends:
     Type: AWS::AutoScaling::AutoScalingGroup
