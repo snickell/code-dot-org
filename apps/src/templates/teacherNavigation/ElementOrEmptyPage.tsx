@@ -105,7 +105,7 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
       headline: i18n.calendarNotAvailable(),
       descriptionText: i18n.calendarLegacyMessage({courseName: courseName}),
       imageComponent: (
-        <img src={CalendarNotAvailable} alt={i18n.almostThere()} />
+        <img src={CalendarNotAvailable} alt={i18n.calendarNotAvailable()} />
       ),
       button: null,
     },
@@ -121,7 +121,7 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
       headline: i18n.calendarNotAvailable(),
       descriptionText: null,
       imageComponent: (
-        <img src={CalendarNotAvailable} alt={i18n.almostThere()} />
+        <img src={CalendarNotAvailable} alt={i18n.calendarNotAvailable()} />
       ),
       button: null,
     },
