@@ -10,14 +10,16 @@ import './style.scss';
 
 interface I18nDropdownProps {
   localeUrl: string;
-  selectedLocale?: string;
-  optionsForLocaleSelect: SimpleDropdownProps['items'];
+  selected?: string;
+  options?: SimpleDropdownProps['items'];
+  groupedOptions?: SimpleDropdownProps['itemGroups'];
 }
 
 const I18nDropdown: React.FC<I18nDropdownProps> = ({
   localeUrl,
-  selectedLocale = '',
-  optionsForLocaleSelect,
+  selected = '',
+  options = [],
+  groupedOptions = [],
 }) => {
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     event.target.form?.submit();
@@ -34,9 +36,10 @@ const I18nDropdown: React.FC<I18nDropdownProps> = ({
       <SimpleDropdown
         className="languageSelect"
         name="locale"
-        selectedValue={selectedLocale || currentLocale()}
+        selectedValue={selected || currentLocale()}
         onChange={handleChange}
-        items={optionsForLocaleSelect}
+        items={options}
+        itemGroups={groupedOptions}
         labelText="Select Language"
         isLabelVisible={false}
         size="xs"

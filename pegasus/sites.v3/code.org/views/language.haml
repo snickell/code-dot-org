@@ -1,8 +1,17 @@
 - require 'cdo/i18n'
 
-%select{onchange: 'setLocale(this.value);', style: 'color: black; max-width: 162.5px;'}
-  - Cdo::I18n.locale_options_with_ge_regions.each do |name, value|
-    %option{value: value, selected: value == Cdo::I18n.current_locale_option(I18n.locale, request.ge_region)}= name
+%select{onchange: 'setLocale(this.value);', style: 'color: black; width: 100%; max-width: 162.5px;'}
+  - selected = Cdo::I18n.current_locale_option(I18n.locale, request.ge_region)
+
+  - options = request.ge_region ? Cdo::I18n.ge_region_locale_options(request.ge_region) : Cdo::I18n.locale_options
+  - options.each do |name, value|
+    %option{value: value, selected: value == selected}= name
+
+  - unless request.ge_region
+    - Cdo::I18n.grouped_ge_regions_locale_options.each do |region_name, region_options|
+      %optgroup{label: region_name}
+        - region_options.each do |name, value|
+          %option{value: value, selected: value == selected}= name
 
 :javascript
   function setLocale(locale)

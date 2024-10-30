@@ -6,81 +6,94 @@ Feature: Global Edition - Region Select
     And I use a cookie to mock the DCDO key "global_edition_region_selection_enabled" as "true"
 
   Scenario: User can switch between the international and regional versions using the language selector on a Pegasus page
-    When I am on "http://code.org"
-    And I wait until element "#gallerycolumn .headingbox" contains text "Over 35 million Code.org projects created"
-    And element "#selectLanguage option:checked" contains text "English"
-    And element ".language-dropdown option:checked" contains text "English"
+    Given I am on "http://code.org"
+    And element "#selectLanguage option:contains(English)" is checked
+    And element ".language-dropdown:visible option:contains(English)" is checked
+    And element ".language-dropdown:visible optgroup[label='Farsi']" has escaped text "\nفارسی\nEnglish\n"
+    And element "#selectLanguage optgroup[label='Farsi'] option:contains(English)" is not checked
+    And element ".language-dropdown:visible optgroup[label='Farsi'] option:contains(English)" is not checked
+    And element "#pagefooter #return-to-full-site" does not exist
 
-    When I select the "فارسی (global)" option in dropdown with class "language-dropdown select" to load a new page
+    When I select the "فارسی" option in dropdown with class "language-dropdown select" to load a new page
+    Then check that I am on "http://code.org/"
+    And element ".language-dropdown:visible option:contains(فارسی)" is checked
+    And element ".language-dropdown:visible optgroup[label='Farsi']" has escaped text "\nفارسی\nEnglish\n"
+    And element ".language-dropdown:visible optgroup[label='Farsi'] option:contains(فارسی)" is not checked
+    And element "#pagefooter #return-to-full-site" does not exist
+
+    And I select the "English" option withing the "Farsi" group in dropdown ".language-dropdown select" to load a new page
     And I get redirected away from "http://code.org"
     Then check that I am on "http://code.org/global/fa"
-    And I wait until element "main h1" contains text "منابع بنیادی رایگان برای علوم رایانه"
-    And element "#selectLanguage option:checked" contains text "فارسی (global)"
-    And element ".language-dropdown option:checked" contains text "فارسی (global)"
+    And element ".language-dropdown:visible select" has escaped text "\nفارسی\nEnglish\n"
+    And element ".language-dropdown:visible option:contains(English)" is checked
+    And element "#pagefooter #return-to-full-site" is visible
+    And element "#pagefooter #return-to-full-site" contains text "Return to Full Site"
 
     When I am on "http://studio.code.org/users/sign_in"
     Then I get redirected away from "http://studio.code.org/users/sign_in"
     And check that I am on "http://studio.code.org/global/fa/users/sign_in"
-    And I wait until element ".main h2" contains text "دارای حساب کاربری هستید؟ وارد سیستم شوید"
-    And element "#locale option:checked" contains text "فارسی (global)"
-
-    When I am on "http://code.org"
-    And I select the "English" option in dropdown with class "language-dropdown select" to load a new page
-    Then I get redirected away from "http://code.org/global/fa"
-    And check that I am on "http://code.org/"
-    And I wait until element "#gallerycolumn .headingbox" contains text "Over 35 million Code.org projects created"
-    And element "#selectLanguage option:checked" contains text "English"
-    And element ".language-dropdown option:checked" contains text "English"
-
-    When I am on "http://studio.code.org/users/sign_in"
-    And check that I am on "http://studio.code.org/users/sign_in"
-    And I wait until element ".main h2" contains text "Have an account already? Sign in"
-    And element "#locale option:checked" contains text "English"
+    And element "#locale optgroup[label='Farsi'] option:checked" contains text "English"
 
     When I am on "http://code.org"
     And I select the "فارسی" option in dropdown with class "language-dropdown select" to load a new page
+    Then check that I am on "http://code.org/global/fa"
+    And element ".language-dropdown:visible select" has escaped text "\nفارسی\nEnglish\n"
+    And element ".language-dropdown:visible option:contains(فارسی)" is checked
+    And element "#pagefooter #return-to-full-site" is visible
+
+    When I am on "http://studio.code.org/users/sign_in"
+    Then I get redirected away from "http://studio.code.org/users/sign_in"
+    And check that I am on "http://studio.code.org/global/fa/users/sign_in"
+    And element "#locale optgroup[label='Farsi'] option:contains(فارسی)" is checked
+
+    When I am on "http://code.org"
+    And I click selector "#pagefooter #return-to-full-site" once I see it to load a new page
+    Then I get redirected away from "http://code.org/global/fa"
     And check that I am on "http://code.org/"
-    And I wait until element "#gallerycolumn .headingbox" contains text "بیش از  35 میلیون پروژه ایجاد شده در Code.org"
-    And element "#selectLanguage option:checked" contains text "فارسی"
-    And element ".language-dropdown option:checked" contains text "فارسی"
+    And element ".language-dropdown:visible option:contains(فارسی)" is checked
+    And element ".language-dropdown:visible optgroup[label='Farsi']" has escaped text "\nفارسی\nEnglish\n"
+    And element ".language-dropdown:visible optgroup[label='Farsi'] option:contains(فارسی)" is not checked
 
   Scenario: User can switch between the international and regional versions using the language selector on a Studio page
     Given I am on "http://studio.code.org/users/sign_in"
-    And element "#locale option:checked" contains text "English"
-    And I wait until element ".main h2" contains text "Have an account already? Sign in"
+    And element "#locale option:contains(English)" is checked
+    And element "#locale optgroup[label='Farsi']" has escaped text "\nفارسی\nEnglish\n"
+    And element "#locale optgroup[label='Farsi'] option:contains(English)" is not checked
 
-    When I select the "فارسی (global)" option in dropdown "locale" to load a new page
+    When I select the "فارسی" option withing the "Farsi" group in dropdown "#locale" to load a new page
     And I get redirected away from "http://studio.code.org/users/sign_in"
     Then check that I am on "http://studio.code.org/global/fa/users/sign_in?lang=fa-IR"
-    And I wait until element ".main h2" contains text "دارای حساب کاربری هستید؟ وارد سیستم شوید"
-    And element "#locale option:checked" contains text "فارسی (global)"
+    And element "#locale optgroup[label='Farsi'] option:contains(فارسی)" is checked
 
     When I am on "http://code.org"
     Then I get redirected away from "http://code.org"
     And check that I am on "http://code.org/global/fa"
-    And I wait until element "main h1" contains text "منابع بنیادی رایگان برای علوم رایانه"
-    And element "#selectLanguage option:checked" contains text "فارسی (global)"
-    And element ".language-dropdown option:checked" contains text "فارسی (global)"
+    And element "#selectLanguage option:contains(فارسی)" is checked
+    And element ".language-dropdown:visible option:contains(فارسی)" is checked
 
     When I am on "http://studio.code.org/users/sign_in"
-    And I select the "English" option in dropdown "locale" to load a new page
-    Then I get redirected away from "http://studio.code.org/global/fa/users/sign_in"
-    And check that I am on "http://studio.code.org/users/sign_in?lang=en-US"
-    And I wait until element ".main h2" contains text "Have an account already? Sign in"
-    And element "#locale option:checked" contains text "English"
+    And I select the "English" option withing the "Farsi" group in dropdown "#locale" to load a new page
+    Then I get redirected away from "http://studio.code.org/users/sign_in"
+    And check that I am on "http://studio.code.org/global/fa/users/sign_in?lang=en-US"
+    And element "#locale optgroup[label='Farsi'] option:contains(English)" is checked
 
     When I am on "http://code.org"
-    And check that I am on "http://code.org/"
-    And I wait until element "#gallerycolumn .headingbox" contains text "Over 35 million Code.org projects created"
-    And element "#selectLanguage option:checked" contains text "English"
-    And element ".language-dropdown option:checked" contains text "English"
+    Then I get redirected away from "http://code.org"
+    And check that I am on "http://code.org/global/fa"
+    And element "#selectLanguage option:contains(English)" is checked
+    And element ".language-dropdown:visible option:contains(English)" is checked
 
     When I am on "http://studio.code.org/users/sign_in"
     And I select the "فارسی" option in dropdown "locale" to load a new page
-    Then I get redirected away from "http://studio.code.org/users/sign_in"
+    Then I get redirected away from "http://studio.code.org/global/fa/users/sign_in"
     And check that I am on "http://studio.code.org/users/sign_in?lang=fa-IR"
-    And I wait until element ".main h2" contains text "دارای حساب کاربری هستید؟ وارد سیستم شوید"
-    And element "#locale option:checked" contains text "فارسی"
+    And element "#locale option:contains(فارسی)" is checked
+    And element "#locale optgroup[label='Farsi'] option:contains(فارسی)" is not checked
+
+    When I am on "http://code.org"
+    And check that I am on "http://code.org/"
+    And element ".language-dropdown:visible option:contains(فارسی)" is checked
+    And element ".language-dropdown:visible select optgroup[label='Farsi'] option:contains(فارسی)" is not checked
 
   Scenario: User can switch between the international and regional versions using the language selector on a Lab page
     Given I am on "http://studio.code.org/projects/artist/new"
@@ -88,20 +101,28 @@ Feature: Global Edition - Region Select
     And I wait until element ".uitest-instructionsTab" contains text "Instructions"
     And element "#localeForm option:checked" contains text "English"
 
-    When I select the "فارسی (global)" option in dropdown named "locale"
+    When I select the "فارسی" option withing the "Farsi" group in dropdown "#localeForm select" to load a new page
     And I wait for the lab page to fully load
     Then check that the URL matches "/global/fa/projects/artist/.*/edit\?lang=fa-IR"
     And I wait until element ".uitest-instructionsTab" contains text "دستورالعمل"
-    And element "#localeForm option:checked" contains text "فارسی (global)"
+    And element "#localeForm optgroup[label='Farsi'] option:contains(فارسی)" is checked
+
+    When I select the "English" option withing the "Farsi" group in dropdown "#localeForm select" to load a new page
+    And I wait for the lab page to fully load
+    Then check that the URL matches "/global/fa/projects/artist/.*/edit\?lang=en-US"
+    And I wait until element ".uitest-instructionsTab" contains text "Instructions"
+    And element "#localeForm optgroup[label='Farsi'] option:contains(English)" is checked
 
     When I select the "English" option in dropdown named "locale"
     And I wait for the lab page to fully load
     Then check that the URL matches "/projects/artist/.*/edit\?lang=en-US"
     And I wait until element ".uitest-instructionsTab" contains text "Instructions"
-    And element "#localeForm option:checked" contains text "English"
+    And element "#localeForm option:contains(English)" is checked
+    And element "#localeForm optgroup[label='Farsi'] option:contains(English)" is not checked
 
     When I select the "فارسی" option in dropdown named "locale"
     And I wait for the lab page to fully load
     Then check that the URL matches "/projects/artist/.*/edit\?lang=fa-IR"
     And I wait until element ".uitest-instructionsTab" contains text "دستورالعمل"
-    And element "#localeForm option:checked" contains text "فارسی"
+    And element "#localeForm option:contains(فارسی)" is checked
+    And element "#localeForm optgroup[label='Farsi'] option:contains(فارسی)" is not checked

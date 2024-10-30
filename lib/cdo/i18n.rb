@@ -2,6 +2,7 @@
 
 require 'csv'
 require 'yaml'
+require 'i18n'
 
 require 'cdo/global_edition'
 
@@ -22,40 +23,43 @@ module Cdo
     class << self
       def available_languages
         @available_languages ||= CDO_LANGUAGES.filter_map do |cdo_language|
-          next cdo_language if cdo_language[:supported_codeorg_b]
+          next cdo_language if cdo_language[:supported_codeorg_b] == 'TRUE'
           # Enables languages available for debugging in all non-production environments
           cdo_language if debug_language?(cdo_language) && !CDO.rack_env?(:production)
-        end
+        end.freeze
       end
 
-      def locale_direction(locale)
-        LOCALE_CONFIGS.dig(locale.to_s, :dir) || TEXT_DIRECTION_LTR
+      def available_languages_by_locale
+        @available_languages_by_locale ||= available_languages.index_by {|cdo_language| cdo_language[:locale_s]}.freeze
       end
 
       def locale_options
         @locale_options ||= available_languages.map do |cdo_language|
-          locale = cdo_language[:locale_s]
-
-          name = cdo_language[:native_name_s]
-          name = "#{name} DBG" if debug_language?(cdo_language)
-
-          [name, locale]
+          [language_name(cdo_language), cdo_language[:locale_s]]
         end.sort_by(&:second).freeze
       end
 
-      def locale_options_with_ge_regions
-        return locale_options unless DCDO.get('global_edition_region_selection_enabled', false)
+      def ge_region_locale_options(ge_region)
+        @ge_region_locale_options ||= {}
 
-        @locale_options_with_ge_regions ||= begin
-          options = locale_options.dup
+        @ge_region_locale_options[ge_region] ||= Cdo::GlobalEdition.region_locales(ge_region).filter_map do |locale|
+          cdo_language = available_languages_by_locale[locale]
+          [language_name(cdo_language), "#{locale}|#{ge_region}"] if cdo_language
+        end.freeze
+      end
 
-          Cdo::GlobalEdition::REGIONS.excluding('en', 'root').each do |region|
-            region_locale = Cdo::GlobalEdition.region_locale(region)
-            language_name = Dashboard::Application::LOCALES.dig(region_locale, :native)
-            options << ["#{language_name} (global)", "#{region_locale}|#{region}"] if language_name
+      def grouped_ge_regions_locale_options
+        return {} unless DCDO.get('global_edition_region_selection_enabled', false)
+
+        @grouped_ge_regions_locale_options ||= begin
+          grouped_options = {}
+
+          Cdo::GlobalEdition::REGIONS.excluding('en', 'root').each do |ge_region|
+            region_name = ::I18n.t(ge_region, scope: %i[global_edition regions])
+            grouped_options[region_name] = ge_region_locale_options(ge_region)
           end
 
-          options.sort_by(&:second).freeze
+          grouped_options.freeze
         end
       end
 
@@ -63,11 +67,24 @@ module Cdo
         ge_region.nil? || ge_region.empty? ? locale.to_s : "#{locale}|#{ge_region}"
       end
 
+      def locale_direction(locale)
+        LOCALE_CONFIGS.dig(locale.to_s, :dir) || TEXT_DIRECTION_LTR
+      end
+
       # @param cdo_language [CdoLanguage] CDO language record
       # @return [Boolean] whether the language is a debug language
       private def debug_language?(cdo_language)
-        return false if cdo_language[:supported_codeorg_b]
         LOCALE_CONFIGS.dig(cdo_language[:locale_s], :debug)
+      end
+
+      private def language_name(cdo_language)
+        language_name = cdo_language[:native_name_s]
+
+        if debug_language?(cdo_language) && (cdo_language[:supported_codeorg_b] != 'TRUE' || !CDO.rack_env?(:production))
+          language_name = "#{language_name} DBG"
+        end
+
+        language_name
       end
     end
   end

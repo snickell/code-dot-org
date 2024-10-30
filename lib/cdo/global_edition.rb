@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'request_store'
+require 'uri'
+require 'yaml'
 
 module Cdo
   # Lazily loads global configurations for regional pages
@@ -52,8 +54,18 @@ module Cdo
       region.present? && REGIONS.include?(region.to_s)
     end
 
-    def self.region_locale(region)
-      configuration_for(region)[:locale]
+    def self.region_locales(region)
+      configuration_for(region)&.dig(:locales)
+    end
+
+    def self.region_change_url(url, region = nil)
+      uri = URI.parse(url)
+
+      params = URI.decode_www_form(uri.query.to_s).to_h
+      params[REGION_KEY] = region
+      uri.query = URI.encode_www_form(params)
+
+      uri.to_s
     end
   end
 end

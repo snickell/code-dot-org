@@ -7,8 +7,9 @@ export default {
   component: I18nDropdown,
   argTypes: {
     localeUrl: {control: 'text'},
-    selectedLocale: {control: 'text'},
-    optionsForLocaleSelect: {control: 'object'},
+    selected: {control: 'text'},
+    options: {control: 'object'},
+    groupedOptions: {control: 'object'},
   },
 } as Meta;
 
@@ -19,11 +20,7 @@ const localeOptions = [
 ];
 
 const Template: StoryFn<typeof I18nDropdown> = args => (
-  <I18nDropdown
-    {...args}
-    localeUrl="/set_locale"
-    optionsForLocaleSelect={localeOptions}
-  />
+  <I18nDropdown {...args} localeUrl="/set_locale" options={localeOptions} />
 );
 
 export const Default = Template.bind({});
@@ -31,5 +28,18 @@ Default.args = {};
 
 export const WithSelectedLocale = Template.bind({});
 WithSelectedLocale.args = {
-  selectedLocale: 'es',
+  selected: 'es',
+};
+
+export const WithGroupedLocales = Template.bind({});
+WithGroupedLocales.args = {
+  groupedOptions: [
+    {
+      label: 'Farsi',
+      groupItems: [
+        {value: 'fa-IR|fa', text: 'Persian'},
+        {value: 'en-US|fa', text: 'English'},
+      ],
+    },
+  ],
 };

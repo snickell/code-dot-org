@@ -119,21 +119,21 @@ const SimpleDropdown: React.FunctionComponent<SimpleDropdownProps> = ({
         })}
         {...rest}
       >
-        {itemGroups.length > 0
-          ? itemGroups.map(({label, groupItems}, index) => (
-              <optgroup key={index} label={label}>
-                {groupItems.map(({value, text}) => (
-                  <option value={value} key={value}>
-                    {text}
-                  </option>
-                ))}
-              </optgroup>
-            ))
-          : items.map(({value, text}) => (
+        {items.map(({value, text}) => (
+          <option value={value} key={value}>
+            {text}
+          </option>
+        ))}
+
+        {itemGroups.map(({label, groupItems}, index) => (
+          <optgroup key={index} label={label}>
+            {groupItems.map(({value, text}) => (
               <option value={value} key={value}>
                 {text}
               </option>
             ))}
+          </optgroup>
+        ))}
       </select>
     </div>
     {!errorMessage && (helperMessage || helperIcon) && (

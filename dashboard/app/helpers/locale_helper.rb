@@ -25,12 +25,8 @@ module LocaleHelper
     locale_code.to_s.downcase.tr('-', '_')
   end
 
-  def options_for_locale_select(global_edition: false)
-    global_edition ? Cdo::I18n.locale_options_with_ge_regions : Cdo::I18n.locale_options
-  end
-
-  def current_locale_option(global_edition: false)
-    Cdo::I18n.current_locale_option(locale, global_edition ? request.ge_region : nil)
+  def options_for_locale_select
+    Cdo::I18n.locale_options
   end
 
   def options_for_locale_code_select

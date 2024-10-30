@@ -49,8 +49,7 @@ module Rack
           redirect_uri.query = URI.encode_www_form(request.params.except(REGION_KEY)).presence
           redirect_path = redirect_uri.to_s
 
-          setup_region(new_region) if region_changed?(new_region)
-
+          setup_region(new_region)
           response.redirect(redirect_path)
         elsif PATH_PATTERN.match?(request.path_info)
           ge_prefix, ge_region, main_path = request_path_vars(:ge_prefix, :ge_region, :main_path)
@@ -103,7 +102,11 @@ module Rack
 
         # Sets the request cookies to apply changes immediately without needing to reload the page.
         request.cookies[REGION_KEY] = region
-        request.cookies[LOCALE_KEY] = Cdo::GlobalEdition.region_locale(region) if region
+
+        if region
+          region_locales = Cdo::GlobalEdition.region_locales(region)
+          request.cookies[LOCALE_KEY] = region_locales.first unless region_locales.include?(request.cookies[LOCALE_KEY])
+        end
 
         # Updates the global `ge_region` cookie to lock the platform to the regional version.
         set_global_cookie(REGION_KEY, region, high_priority: true)
