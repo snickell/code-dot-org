@@ -1,10 +1,12 @@
 import React, {useCallback, useEffect, useState} from 'react';
 
-import Button from '@cdo/apps/componentLibrary/button/Button';
-import ValidationResultsModal from './ValidationResultsModal';
-import {useAppDispatch, useAppSelector} from '../util/reduxHooks';
-import {askAITutor} from '../aiTutor/redux/aiTutorRedux';
 import {AITutorTypes as ActionType} from '@cdo/apps/aiTutor/types';
+import Button from '@cdo/apps/componentLibrary/button/Button';
+
+import {askAITutor} from '../aiTutor/redux/aiTutorRedux';
+import {useAppDispatch, useAppSelector} from '../util/reduxHooks';
+
+import ValidationResultsModal from './ValidationResultsModal';
 
 /**
  * Renders a button in App Lab that when clicked makes a call to AI to
