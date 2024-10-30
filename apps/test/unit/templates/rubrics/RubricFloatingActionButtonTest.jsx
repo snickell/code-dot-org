@@ -17,7 +17,7 @@ import {UnconnectedRubricFloatingActionButton as RubricFloatingActionButton} fro
 import teacherRubric from '@cdo/apps/templates/rubrics/teacherRubricRedux';
 import teacherSections from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
 
-import {expect} from '../../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
+import {expect as chaiExpect} from '../../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
 
 jest.mock('@cdo/apps/util/HttpClient', () => ({
   post: jest.fn().mockResolvedValue({
@@ -75,7 +75,7 @@ describe('RubricFloatingActionButton - React Testing Library', () => {
           <RubricFloatingActionButton {...defaultProps} />
         </Provider>
       );
-      expect(sendEventSpy).to.have.been.calledWith(
+      chaiExpect(sendEventSpy).to.have.been.calledWith(
         EVENTS.TA_RUBRIC_CLOSED_ON_PAGE_LOAD,
         {
           viewingStudentWork: false,
@@ -83,15 +83,15 @@ describe('RubricFloatingActionButton - React Testing Library', () => {
         }
       );
       const fab = screen.getByRole('button', {name: 'AI bot'});
-      expect(fab.classList.contains('unittest-fab-pulse')).to.be.false;
+      chaiExpect(fab.classList.contains('unittest-fab-pulse')).to.be.false;
 
       const fabImage = screen.getByRole('img', {name: 'AI bot'});
       fireEvent.load(fabImage);
-      expect(fab.classList.contains('unittest-fab-pulse')).to.be.false;
+      chaiExpect(fab.classList.contains('unittest-fab-pulse')).to.be.false;
 
       const taImage = screen.getByRole('img', {name: 'TA overlay'});
       fireEvent.load(taImage);
-      expect(fab.classList.contains('unittest-fab-pulse')).to.be.true;
+      chaiExpect(fab.classList.contains('unittest-fab-pulse')).to.be.true;
       sendEventSpy.restore();
     });
 
@@ -103,7 +103,7 @@ describe('RubricFloatingActionButton - React Testing Library', () => {
           <RubricFloatingActionButton {...defaultProps} />
         </Provider>
       );
-      expect(sendEventSpy).to.have.been.calledWith(
+      chaiExpect(sendEventSpy).to.have.been.calledWith(
         EVENTS.TA_RUBRIC_OPEN_ON_PAGE_LOAD,
         {
           viewingStudentWork: false,
@@ -113,7 +113,7 @@ describe('RubricFloatingActionButton - React Testing Library', () => {
       const image = screen.getByRole('img', {name: 'AI bot'});
       fireEvent.load(image);
       const fab = screen.getByRole('button', {name: 'AI bot'});
-      expect(fab.classList.contains('unittest-fab-pulse')).to.be.false;
+      chaiExpect(fab.classList.contains('unittest-fab-pulse')).to.be.false;
       sendEventSpy.restore();
     });
 
@@ -125,7 +125,7 @@ describe('RubricFloatingActionButton - React Testing Library', () => {
           <RubricFloatingActionButton {...defaultProps} />
         </Provider>
       );
-      expect(sendEventSpy).to.have.been.calledWith(
+      chaiExpect(sendEventSpy).to.have.been.calledWith(
         EVENTS.TA_RUBRIC_CLOSED_ON_PAGE_LOAD,
         {
           viewingStudentWork: false,
@@ -135,7 +135,7 @@ describe('RubricFloatingActionButton - React Testing Library', () => {
       const image = screen.getByRole('img', {name: 'AI bot'});
       fireEvent.load(image);
       const fab = screen.getByRole('button', {name: 'AI bot'});
-      expect(fab.classList.contains('unittest-fab-pulse')).to.be.false;
+      chaiExpect(fab.classList.contains('unittest-fab-pulse')).to.be.false;
       sendEventSpy.restore();
     });
   });
@@ -144,8 +144,8 @@ describe('RubricFloatingActionButton - React Testing Library', () => {
 describe('RubricFloatingActionButton - Enzyme', () => {
   it('begins closed when student level info is null', () => {
     const wrapper = shallow(<RubricFloatingActionButton {...defaultProps} />);
-    expect(wrapper.find('Connect(RubricContainer)').length).to.equal(1);
-    expect(wrapper.find('Connect(RubricContainer)').props().open).to.equal(
+    chaiExpect(wrapper.find('Connect(RubricContainer)').length).to.equal(1);
+    chaiExpect(wrapper.find('Connect(RubricContainer)').props().open).to.equal(
       false
     );
   });
@@ -159,14 +159,14 @@ describe('RubricFloatingActionButton - Enzyme', () => {
         }}
       />
     );
-    expect(wrapper.find('Connect(RubricContainer)').length).to.equal(1);
+    chaiExpect(wrapper.find('Connect(RubricContainer)').length).to.equal(1);
   });
 
   it('opens RubricContainer when clicked', () => {
     const wrapper = shallow(<RubricFloatingActionButton {...defaultProps} />);
-    expect(wrapper.find('button').length).to.equal(1);
+    chaiExpect(wrapper.find('button').length).to.equal(1);
     wrapper.find('button').simulate('click');
-    expect(wrapper.find('Connect(RubricContainer)').length).to.equal(1);
+    chaiExpect(wrapper.find('Connect(RubricContainer)').length).to.equal(1);
   });
 
   it('sends events when opened and closed', () => {
@@ -179,7 +179,7 @@ describe('RubricFloatingActionButton - Enzyme', () => {
       />
     );
     wrapper.find('button').simulate('click');
-    expect(sendEventSpy).to.have.been.calledWith(
+    chaiExpect(sendEventSpy).to.have.been.calledWith(
       EVENTS.TA_RUBRIC_OPENED_FROM_FAB_EVENT,
       {
         ...reportingData,
@@ -188,7 +188,7 @@ describe('RubricFloatingActionButton - Enzyme', () => {
       }
     );
     wrapper.find('button').simulate('click');
-    expect(sendEventSpy).to.have.been.calledWith(
+    chaiExpect(sendEventSpy).to.have.been.calledWith(
       EVENTS.TA_RUBRIC_CLOSED_FROM_FAB_EVENT,
       {
         ...reportingData,
