@@ -138,7 +138,7 @@ frontend_device_name ||= '/dev/sda1'
       DesiredCapacity: !GetAtt ASGCount.DesiredCapacity
       HealthCheckType: EC2 # TODO: use ELB health check that returns healthy even when fully loaded.
       HealthCheckGracePeriod: 2000
-        <%=indent(add_properties(frontend_properties), 6)%>
+      <%=indent(add_properties(frontend_properties), 6)%>
       MetricsCollection:
         - Granularity: 1Minute
       Tags:
