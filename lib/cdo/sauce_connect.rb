@@ -27,10 +27,6 @@ module Cdo
 
         # Regexes defining the localhost domains we want to tunnel:
         tunnel_domains = [
-          %q(.*\.code.org),
-          %q(.*\.csedweek.org),
-          %q(.*\.hourofcode.com),
-          %q(.*\.codeprojects.org),
           %q(.*\.localhost),
         ].join(',')
 
