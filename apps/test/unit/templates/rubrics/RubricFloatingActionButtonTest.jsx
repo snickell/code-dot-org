@@ -48,6 +48,7 @@ const defaultProps = {
 
 describe('RubricFloatingActionButton', () => {
   let sendEventSpy;
+  let store;
 
   beforeEach(() => {
     stubRedux();
@@ -56,6 +57,7 @@ describe('RubricFloatingActionButton', () => {
       teacherSections,
       teacherPanel,
     });
+    store = getStore();
     sendEventSpy = jest.spyOn(analyticsReporter, 'sendEvent');
     sessionStorage.clear();
   });
@@ -69,7 +71,7 @@ describe('RubricFloatingActionButton', () => {
   describe('pulse animation', () => {
     it('renders pulse animation when session storage is empty', () => {
       render(
-        <Provider store={getStore()}>
+        <Provider store={store}>
           <RubricFloatingActionButton {...defaultProps} />
         </Provider>
       );
@@ -97,7 +99,7 @@ describe('RubricFloatingActionButton', () => {
     it('sends open on page load event when open state is true in session storage', () => {
       sessionStorage.setItem('RubricFabOpenStateKey', 'true');
       render(
-        <Provider store={getStore()}>
+        <Provider store={store}>
           <RubricFloatingActionButton {...defaultProps} />
         </Provider>
       );
@@ -119,7 +121,7 @@ describe('RubricFloatingActionButton', () => {
     it('does not render pulse animation when open state is present in session storage', () => {
       sessionStorage.setItem('RubricFabOpenStateKey', 'false');
       render(
-        <Provider store={getStore()}>
+        <Provider store={store}>
           <RubricFloatingActionButton {...defaultProps} />
         </Provider>
       );
@@ -141,7 +143,7 @@ describe('RubricFloatingActionButton', () => {
 
   it('begins closed when student level info is null', () => {
     render(
-      <Provider store={getStore()}>
+      <Provider store={store}>
         <RubricFloatingActionButton {...defaultProps} />
       </Provider>
     );
@@ -150,7 +152,7 @@ describe('RubricFloatingActionButton', () => {
 
   it('opens RubricContainer when clicked', () => {
     render(
-      <Provider store={getStore()}>
+      <Provider store={store}>
         <RubricFloatingActionButton {...defaultProps} />
       </Provider>
     );
@@ -164,7 +166,7 @@ describe('RubricFloatingActionButton', () => {
   it('sends events when opened and closed', () => {
     const reportingData = {unitName: 'test-2023', levelName: 'test-level'};
     render(
-      <Provider store={getStore()}>
+      <Provider store={store}>
         <RubricFloatingActionButton
           {...defaultProps}
           reportingData={reportingData}
