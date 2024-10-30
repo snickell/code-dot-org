@@ -91,15 +91,15 @@ describe('RubricFloatingActionButton', () => {
       const fab = screen.getByRole('button', {
         name: i18n.openOrCloseTeachingAssistant(),
       });
-      chaiExpect(fab.classList.contains('unittest-fab-pulse')).to.be.false;
+      expect(fab.classList.contains('unittest-fab-pulse')).toBe(false);
 
       const fabImage = screen.getByRole('img', {name: 'AI bot'});
       fireEvent.load(fabImage);
-      chaiExpect(fab.classList.contains('unittest-fab-pulse')).to.be.false;
+      expect(fab.classList.contains('unittest-fab-pulse')).toBe(false);
 
       const taImage = screen.getByRole('img', {name: 'TA overlay'});
       fireEvent.load(taImage);
-      chaiExpect(fab.classList.contains('unittest-fab-pulse')).to.be.true;
+      expect(fab.classList.contains('unittest-fab-pulse')).toBe(true);
       sendEventSpy.restore();
     });
 
@@ -123,7 +123,7 @@ describe('RubricFloatingActionButton', () => {
       const fab = screen.getByRole('button', {
         name: i18n.openOrCloseTeachingAssistant(),
       });
-      chaiExpect(fab.classList.contains('unittest-fab-pulse')).to.be.false;
+      expect(fab.classList.contains('unittest-fab-pulse')).toBe(false);
       sendEventSpy.restore();
     });
 
@@ -147,7 +147,7 @@ describe('RubricFloatingActionButton', () => {
       const fab = screen.getByRole('button', {
         name: i18n.openOrCloseTeachingAssistant(),
       });
-      chaiExpect(fab.classList.contains('unittest-fab-pulse')).to.be.false;
+      expect(fab.classList.contains('unittest-fab-pulse')).toBe(false);
       sendEventSpy.restore();
     });
   });
