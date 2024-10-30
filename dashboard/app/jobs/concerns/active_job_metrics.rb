@@ -58,7 +58,8 @@ module ActiveJobMetrics
   end
 
   protected def report_job_count
-    # Splitting into two pushes because 'includes_metrics' can't match multiple metrics with the same name.
+    # Splitting into two pushes because our 'includes_metrics' testing
+    # utility can't match multiple metrics with the same name.
     # Generic Metrics (similar to "bin/cron/report_activejob_metrics")
     generic_metrics = [
       {
