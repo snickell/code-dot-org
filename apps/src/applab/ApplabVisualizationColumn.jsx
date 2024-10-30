@@ -17,6 +17,8 @@ import {getAppWidth, APP_HEIGHT} from './constants';
 import PhoneFrame from './PhoneFrame';
 import PlaySpaceHeader from './PlaySpaceHeader';
 import Visualization from './Visualization';
+import ValidationButton from './ValidationButton';
+import experiments from '@cdo/apps/util/experiments';
 
 class ApplabVisualizationColumn extends React.Component {
   static propTypes = {
@@ -142,6 +144,9 @@ class ApplabVisualizationColumn extends React.Component {
         <GameButtons noRunResetButton={playspacePhoneFrame}>
           {/* This div is used to control whether or not our finish button is centered*/}
           <div style={this.getCompletionButtonSyle()}>
+            {experiments.isEnabled(experiments.CSP_VALIDATION_VIA_AI) && (
+              <ValidationButton />
+            )}
             <CompletionButton />
           </div>
         </GameButtons>

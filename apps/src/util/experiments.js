@@ -65,6 +65,8 @@ experiments.VIEW_CHAT_HISTORY = 'view_chat_history';
 experiments.TEACHER_LOCAL_NAV_V2 = 'teacher-local-nav-v2';
 // Enables LTI account disconnect buttons on the Account Settings page
 experiments.LTI_ACCOUNT_UNLINKING = 'lti_account_unlinking';
+// Shows 'check my code' button in App Lab for validation via AI
+experiments.CSP_VALIDATION_VIA_AI = 'csp_validation_via_ai';
 
 /**
  * This was a gamified version of the finish dialog, built in 2018,
