@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import React, {useEffect, useMemo, useState} from 'react';
 import {connect} from 'react-redux';
 
+import {BodyFourText, StrongText} from '@cdo/apps/componentLibrary/typography';
 import ErrorBoundary from '@cdo/apps/lab2/ErrorBoundary';
 import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
@@ -90,8 +91,7 @@ function RubricFloatingActionButton({
 
   const readyStudentCount = useAppSelector(selectReadyStudentCount);
   const hasLoadedStudentStatus = useAppSelector(selectHasLoadedStudentStatus);
-
-  console.log('FAB', hasLoadedStudentStatus, readyStudentCount);
+  const showCountBubble = hasLoadedStudentStatus && readyStudentCount > 0;
 
   const eventData = useMemo(() => {
     return {
@@ -157,8 +157,10 @@ function RubricFloatingActionButton({
   }, [isOpen]);
 
   const fabIcon = aiEnabled ? aiFabIcon : rubricFabIcon;
+  const allImagesLoaded =
+    isFabImageLoaded && (showCountBubble || isTaImageLoaded);
 
-  const showPulse = isFirstSession && isFabImageLoaded && isTaImageLoaded;
+  const showPulse = isFirstSession && allImagesLoaded && hasLoadedStudentStatus;
   const classes = showPulse
     ? classnames(style.floatingActionButton, style.pulse, 'unittest-fab-pulse')
     : style.floatingActionButton;
@@ -178,16 +180,24 @@ function RubricFloatingActionButton({
           onLoad={() => !isFabImageLoaded && setIsFabImageLoaded(true)}
         />
       </button>
-      <div
-        className={style.taOverlay}
-        style={{backgroundImage: `url(${taIcon})`}}
-      >
-        <img
-          src={taIcon}
-          alt="TA overlay"
-          onLoad={() => !isTaImageLoaded && setIsTaImageLoaded(true)}
-        />
-      </div>
+      {showCountBubble ? (
+        <div className={style.countOverlay}>
+          <BodyFourText className={style.countText}>
+            <StrongText>{readyStudentCount}</StrongText>
+          </BodyFourText>
+        </div>
+      ) : (
+        <div
+          className={style.taOverlay}
+          style={{backgroundImage: `url(${taIcon})`}}
+        >
+          <img
+            src={taIcon}
+            alt="TA overlay"
+            onLoad={() => !isTaImageLoaded && setIsTaImageLoaded(true)}
+          />
+        </div>
+      )}
       {/* TODO: do not hardcode in AI setting */}
       <ErrorBoundary
         fallback={
