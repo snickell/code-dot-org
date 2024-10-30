@@ -249,6 +249,8 @@ export function newSectionData(participantType) {
     hidden: false,
     restrictSection: false,
     aiTutorEnabled: false,
+    versionYear: null,
+    hasCalendar: false,
   };
 }
 

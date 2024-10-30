@@ -42,7 +42,7 @@ export interface Section {
   unitId?: number | null;
   unitName: string | null;
   versionYear?: number | null;
-  hasCalendar?: boolean | undefined;
+  hasCalendar?: boolean;
 }
 
 export interface UserEditableSection {
@@ -61,6 +61,8 @@ export interface UserEditableSection {
   restrictSection?: boolean;
   ttsAutoplayEnabled?: boolean;
   unitId?: number | null;
+  versionYear?: number | null;
+  hasCalendar?: boolean;
 }
 
 export type OAuthSectionTypeName = keyof typeof OAuthSectionTypes;
