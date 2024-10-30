@@ -1,7 +1,6 @@
 import {render, screen, fireEvent} from '@testing-library/react';
 import React from 'react';
 import {Provider} from 'react-redux';
-import sinon from 'sinon'; // eslint-disable-line no-restricted-imports
 
 import teacherPanel from '@cdo/apps/code-studio/teacherPanelRedux';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
@@ -16,8 +15,6 @@ import {UnconnectedRubricFloatingActionButton as RubricFloatingActionButton} fro
 import teacherRubric from '@cdo/apps/templates/rubrics/teacherRubricRedux';
 import teacherSections from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
 import i18n from '@cdo/locale';
-
-import {expect as chaiExpect} from '../../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
 
 jest.mock('@cdo/apps/util/HttpClient', () => ({
   post: jest.fn().mockResolvedValue({
@@ -50,6 +47,8 @@ const defaultProps = {
 };
 
 describe('RubricFloatingActionButton', () => {
+  let sendEventSpy;
+
   beforeEach(() => {
     stubRedux();
     registerReducers({
@@ -57,31 +56,24 @@ describe('RubricFloatingActionButton', () => {
       teacherSections,
       teacherPanel,
     });
+    sendEventSpy = jest.spyOn(analyticsReporter, 'sendEvent');
     sessionStorage.clear();
   });
 
   afterEach(() => {
     restoreRedux();
+    jest.restoreAllMocks();
     sessionStorage.clear();
   });
 
   describe('pulse animation', () => {
-    beforeEach(() => {
-      sinon.stub(sessionStorage, 'getItem');
-    });
-
-    afterEach(() => {
-      sessionStorage.removeItem('RubricFabOpenStateKey');
-    });
-
     it('renders pulse animation when session storage is empty', () => {
-      const sendEventSpy = sinon.stub(analyticsReporter, 'sendEvent');
       render(
         <Provider store={getStore()}>
           <RubricFloatingActionButton {...defaultProps} />
         </Provider>
       );
-      chaiExpect(sendEventSpy).to.have.been.calledWith(
+      expect(sendEventSpy).toHaveBeenCalledWith(
         EVENTS.TA_RUBRIC_CLOSED_ON_PAGE_LOAD,
         {
           viewingStudentWork: false,
@@ -100,18 +92,16 @@ describe('RubricFloatingActionButton', () => {
       const taImage = screen.getByRole('img', {name: 'TA overlay'});
       fireEvent.load(taImage);
       expect(fab.classList.contains('unittest-fab-pulse')).toBe(true);
-      sendEventSpy.restore();
     });
 
     it('sends open on page load event when open state is true in session storage', () => {
-      const sendEventSpy = sinon.stub(analyticsReporter, 'sendEvent');
       sessionStorage.setItem('RubricFabOpenStateKey', 'true');
       render(
         <Provider store={getStore()}>
           <RubricFloatingActionButton {...defaultProps} />
         </Provider>
       );
-      chaiExpect(sendEventSpy).to.have.been.calledWith(
+      expect(sendEventSpy).toHaveBeenCalledWith(
         EVENTS.TA_RUBRIC_OPEN_ON_PAGE_LOAD,
         {
           viewingStudentWork: false,
@@ -124,18 +114,16 @@ describe('RubricFloatingActionButton', () => {
         name: i18n.openOrCloseTeachingAssistant(),
       });
       expect(fab.classList.contains('unittest-fab-pulse')).toBe(false);
-      sendEventSpy.restore();
     });
 
     it('does not render pulse animation when open state is present in session storage', () => {
-      const sendEventSpy = sinon.stub(analyticsReporter, 'sendEvent');
       sessionStorage.setItem('RubricFabOpenStateKey', 'false');
       render(
         <Provider store={getStore()}>
           <RubricFloatingActionButton {...defaultProps} />
         </Provider>
       );
-      chaiExpect(sendEventSpy).to.have.been.calledWith(
+      expect(sendEventSpy).toHaveBeenCalledWith(
         EVENTS.TA_RUBRIC_CLOSED_ON_PAGE_LOAD,
         {
           viewingStudentWork: false,
@@ -148,7 +136,6 @@ describe('RubricFloatingActionButton', () => {
         name: i18n.openOrCloseTeachingAssistant(),
       });
       expect(fab.classList.contains('unittest-fab-pulse')).toBe(false);
-      sendEventSpy.restore();
     });
   });
 
@@ -175,7 +162,6 @@ describe('RubricFloatingActionButton', () => {
   });
 
   it('sends events when opened and closed', () => {
-    const sendEventSpy = sinon.stub(analyticsReporter, 'sendEvent');
     const reportingData = {unitName: 'test-2023', levelName: 'test-level'};
     render(
       <Provider store={getStore()}>
@@ -192,7 +178,7 @@ describe('RubricFloatingActionButton', () => {
     fireEvent.click(button);
     expect(screen.getByText(i18n.rubricAiHeaderText())).toBeVisible();
 
-    chaiExpect(sendEventSpy).to.have.been.calledWith(
+    expect(sendEventSpy).toHaveBeenCalledWith(
       EVENTS.TA_RUBRIC_OPENED_FROM_FAB_EVENT,
       {
         ...reportingData,
@@ -204,7 +190,7 @@ describe('RubricFloatingActionButton', () => {
     fireEvent.click(button);
     expect(screen.queryByText(i18n.rubricAiHeaderText())).not.toBeVisible();
 
-    chaiExpect(sendEventSpy).to.have.been.calledWith(
+    expect(sendEventSpy).toHaveBeenCalledWith(
       EVENTS.TA_RUBRIC_CLOSED_FROM_FAB_EVENT,
       {
         ...reportingData,
@@ -212,6 +198,5 @@ describe('RubricFloatingActionButton', () => {
         viewingEvaluationLevel: true,
       }
     );
-    sendEventSpy.restore();
   });
 });
