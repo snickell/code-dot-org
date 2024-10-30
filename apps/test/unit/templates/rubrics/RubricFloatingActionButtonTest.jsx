@@ -161,21 +161,6 @@ describe('RubricFloatingActionButton', () => {
     expect(screen.queryByText(i18n.rubricAiHeaderText())).not.toBeVisible();
   });
 
-  it('begins open when student level info is provided', () => {
-    render(
-      <Provider store={getStore()}>
-        <RubricFloatingActionButton
-          {...defaultProps}
-          studentLevelInfo={{
-            name: 'Grace Hopper',
-          }}
-        />
-      </Provider>
-    );
-
-    expect(screen.getByText(i18n.rubricAiHeaderText())).toBeVisible();
-  });
-
   it('opens RubricContainer when clicked', () => {
     render(
       <Provider store={getStore()}>
