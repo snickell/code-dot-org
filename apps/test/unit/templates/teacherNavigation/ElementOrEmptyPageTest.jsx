@@ -22,6 +22,8 @@ const DEFAULT_PROPS = {
   showNoStudents: false,
   showNoCurriculumAssigned: false,
   showNoUnitAssigned: false,
+  showNoCalendarForThisUnit: false,
+  showNoCalendarForLegacyCourses: false,
   courseName: null,
   element: <div>{TEST_ELEMENT_TEXT}</div>,
 };
@@ -135,5 +137,19 @@ describe('ElementOrEmptyPage', () => {
     expect(screen.queryByAltText('empty desk')).toBeNull();
     expect(screen.queryByText(i18n.addStudents())).toBeNull();
     expect(screen.queryByText(TEST_ELEMENT_TEXT)).toBeNull();
+  });
+
+  it('Shows no calendar available for legacy course', () => {
+    renderDefault({
+      showNoStudents: false,
+      showNoCurriculumAssigned: false,
+      showNoUnitAssigned: false,
+      showNoCalendarForLegacyCourses: true,
+      isOnCalendarPage: true,
+      courseName: 'CSD',
+    });
+
+    screen.getByText(i18n.calendarNotAvailable());
+    screen.getByText(i18n.calendarLegacyMessage({courseName: 'CSD'}));
   });
 });

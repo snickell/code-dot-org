@@ -94,6 +94,8 @@ const sections = [
         instructor_email: 'teacher@code.org',
       },
     ],
+    hasCalendar: false,
+    versionYear: 2017,
   },
   {
     id: 12,
@@ -134,6 +136,8 @@ const sections = [
         instructor_email: 'coteacher@code.org',
       },
     ],
+    hasCalendar: false,
+    versionYear: 2017,
   },
   {
     id: 307,
@@ -168,6 +172,8 @@ const sections = [
         instructor_email: 'teacher@code.org',
       },
     ],
+    hasCalendar: false,
+    versionYear: 2017,
   },
 ];
 
@@ -456,8 +462,12 @@ describe('teacherSectionsRedux', () => {
 
     it('populates sectionBeingEdited', () => {
       const stateWithSections = reducer(initialState, setSections(sections));
+      console.log('stateWithSections');
+      console.log(stateWithSections);
       assert.isNull(stateWithSections.sectionBeingEdited);
       const state = reducer(stateWithSections, beginEditingSection(12));
+      console.log('state.sectionBeingEdited');
+      console.log(state.sectionBeingEdited);
       assert.deepEqual(state.sectionBeingEdited, {
         id: 12,
         name: 'My Other Section',
@@ -503,6 +513,8 @@ describe('teacherSectionsRedux', () => {
         syncEnabled: undefined,
         aiTutorEnabled: undefined,
         anyStudentHasProgress: undefined,
+        versionYear: 2017,
+        hasCalendar: false,
       });
     });
   });

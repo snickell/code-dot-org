@@ -225,7 +225,10 @@ const sectionSlice = createSlice({
           autoSelectOnlySection: boolean;
         }>
       ) {
+        console.log(action.payload.sections);
         const sections = action.payload.sections.map(sectionFromServerSection);
+        console.log('sections from server **');
+        console.log(sections);
 
         // If we have only one section, autoselect it
         const selectedSectionId =
@@ -440,9 +443,11 @@ const sectionSlice = createSlice({
           state.availableParticipantTypes.length === 1
             ? state.availableParticipantTypes[0]
             : undefined;
+        console.log(action.payload.sectionId);
         const initialSectionData: Section = action.payload.sectionId
           ? {...state.sections[action.payload.sectionId]}
           : newSectionData(initialParticipantType);
+        console.log(initialSectionData);
         state.initialCourseId = initialSectionData.courseId;
         state.initialUnitId = initialSectionData.unitId;
         state.initialCourseOfferingId = initialSectionData.courseOfferingId;

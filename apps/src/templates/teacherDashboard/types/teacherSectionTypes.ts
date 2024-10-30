@@ -41,6 +41,8 @@ export interface Section {
   ttsAutoplayEnabled: boolean;
   unitId?: number | null;
   unitName: string | null;
+  versionYear?: number | null;
+  hasCalendar?: boolean | undefined;
 }
 
 export interface UserEditableSection {
@@ -90,6 +92,8 @@ export interface ServerSection {
   sync_enabled?: boolean;
   tts_autoplay_enabled?: boolean;
   unit_id?: number | null;
+  version_year?: number | null;
+  has_calendar?: boolean;
 }
 
 export interface Student {
