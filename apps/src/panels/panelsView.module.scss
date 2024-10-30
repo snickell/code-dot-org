@@ -4,6 +4,8 @@
 
 $text-offset-x: 2cqw;
 $text-offset-y: 2cqw;
+$text-vertical-padding: 1.8cqw;
+$text-horizontal-padding: 2.6cqw;
 
 @keyframes fade-in {
   from {
@@ -71,7 +73,7 @@ $text-offset-y: 2cqw;
       border-radius: 5px;
       width: 40%;
       position: absolute;
-      padding: 1.8cqw 2.6cqw;
+      padding: $text-vertical-padding $text-horizontal-padding;
       animation: 0.5s ease 0.5s fade-in, 0.5s ease 0.5s slide-in;
       animation-fill-mode: both;
       font-size: 1.6cqw;
@@ -110,6 +112,7 @@ $text-offset-y: 2cqw;
       .typist {
         position: absolute;
         top: 1.8cqw;
+        width: calc(100% - 2 * $text-horizontal-padding);
       }
 
       &TopLeft {

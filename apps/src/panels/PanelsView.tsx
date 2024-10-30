@@ -8,6 +8,7 @@ import TextToSpeech from '@cdo/apps/lab2/views/components/TextToSpeech';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 import usePrevious from '@cdo/apps/util/usePrevious';
 
+import {queryParams} from '../code-studio/utils';
 import FontAwesome from '../legacySharedComponents/FontAwesome';
 import {useBrowserTextToSpeech} from '../sharedComponents/BrowserTextToSpeechWrapper';
 import EnhancedSafeMarkdown from '../templates/EnhancedSafeMarkdown';
@@ -145,8 +146,11 @@ const PanelsView: React.FunctionComponent<PanelsProps> = ({
 
   const plainText = markdownToTxt(panel.text);
 
+  const showTyping =
+    panel.typing || queryParams('panels-show-typing') === 'true';
+
   // When typing, only show the button when the typing is done.
-  const showButton = !panel.typing || typingDone;
+  const showButton = !showTyping || typingDone;
 
   return (
     <div
@@ -178,7 +182,7 @@ const PanelsView: React.FunctionComponent<PanelsProps> = ({
             )}
           >
             {offerBrowserTts && <TextToSpeech text={panel.text} />}
-            {panel.typing ? (
+            {showTyping ? (
               <div>
                 <div className={styles.invisiblePlaceholder}>{plainText}</div>
                 <Typist
@@ -211,7 +215,7 @@ const PanelsView: React.FunctionComponent<PanelsProps> = ({
             onClick={handleButtonClick}
             className={classNames(
               styles.button,
-              panel.typing ? styles.buttonReady : styles.buttonDelay
+              showTyping ? styles.buttonReady : styles.buttonDelay
             )}
             text={buttonText}
           />
