@@ -81,7 +81,7 @@ ActiveRecord::Schema.define(version: 2024_10_22_150616) do
     t.index ["user_id", "level_id", "script_id"], name: "index_ace_user_level_script"
   end
 
-  create_table "aichat_messages", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "aichat_messages", charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
     t.bigint "aichat_thread_id", null: false
     t.text "external_id", null: false
     t.integer "role", null: false
@@ -119,7 +119,7 @@ ActiveRecord::Schema.define(version: 2024_10_22_150616) do
     t.index ["user_id", "level_id", "script_id"], name: "index_acs_user_level_script"
   end
 
-  create_table "aichat_threads", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "aichat_threads", charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.text "external_id", null: false
     t.text "llm_version", null: false
