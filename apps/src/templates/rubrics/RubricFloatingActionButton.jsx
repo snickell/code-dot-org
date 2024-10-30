@@ -7,7 +7,12 @@ import ErrorBoundary from '@cdo/apps/lab2/ErrorBoundary';
 import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import {
+  selectHasLoadedStudentStatus,
+  selectReadyStudentCount,
+} from '@cdo/apps/templates/rubrics/teacherRubricRedux';
 import {selectedSectionSelector} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
+import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 import {tryGetSessionStorage, trySetSessionStorage} from '@cdo/apps/utils';
 import i18n from '@cdo/locale';
 import aiFabIcon from '@cdo/static/ai-bot-centered-teal.png';
@@ -82,6 +87,11 @@ function RubricFloatingActionButton({
   const [isTaImageLoaded, setIsTaImageLoaded] = useState(false);
 
   const [internalError, setInternalError] = useState(null);
+
+  const readyStudentCount = useAppSelector(selectReadyStudentCount);
+  const hasLoadedStudentStatus = useAppSelector(selectHasLoadedStudentStatus);
+
+  console.log('FAB', hasLoadedStudentStatus, readyStudentCount);
 
   const eventData = useMemo(() => {
     return {
