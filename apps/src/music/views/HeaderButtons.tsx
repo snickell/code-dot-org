@@ -9,7 +9,6 @@ import {commonI18n} from '@cdo/apps/types/locale';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 import {getBaseAssetUrl} from '../appConfig';
-import MusicBlocklyWorkspace from '../blockly/MusicBlocklyWorkspace';
 import {AnalyticsContext} from '../context';
 import musicI18n from '../locale';
 import MusicLibrary, {SoundFolder} from '../player/MusicLibrary';
@@ -66,7 +65,7 @@ interface HeaderButtonsProps {
   clearCode: () => void;
   allowPackSelection: boolean;
   skipUrl: string | undefined;
-  blocklyWorkspace: MusicBlocklyWorkspace | undefined;
+  hideChaff: () => void;
 }
 
 /**
@@ -78,7 +77,7 @@ const HeaderButtons: React.FunctionComponent<HeaderButtonsProps> = ({
   clearCode,
   allowPackSelection,
   skipUrl,
-  blocklyWorkspace,
+  hideChaff,
 }) => {
   const readOnlyWorkspace: boolean = useSelector(isReadOnlyWorkspace);
   const {canUndo, canRedo} = useSelector(
@@ -115,7 +114,7 @@ const HeaderButtons: React.FunctionComponent<HeaderButtonsProps> = ({
 
   const onClickStartOver = useCallback(() => {
     // Hide any custom fields that are showing.
-    blocklyWorkspace?.hideChaff();
+    hideChaff();
 
     if (dialogControl) {
       dialogControl.showDialog({
@@ -127,7 +126,7 @@ const HeaderButtons: React.FunctionComponent<HeaderButtonsProps> = ({
     if (analyticsReporter) {
       analyticsReporter.onButtonClicked('startOver');
     }
-  }, [blocklyWorkspace, dialogControl, analyticsReporter, clearCode]);
+  }, [hideChaff, dialogControl, analyticsReporter, clearCode]);
 
   const onFeedbackClicked = () => {
     if (analyticsReporter) {

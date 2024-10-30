@@ -182,7 +182,7 @@ export default class MusicBlocklyWorkspace {
     if (this.headlessMode) {
       return;
     }
-    (this.workspace as GoogleBlockly.WorkspaceSvg).hideChaff();
+    (this.workspace as GoogleBlockly.WorkspaceSvg)?.hideChaff();
   }
 
   /**
