@@ -5,6 +5,8 @@ import {LinkButton} from '@cdo/apps/componentLibrary/button';
 import Button from '@cdo/apps/componentLibrary/button/Button';
 import emptyDesk from '@cdo/apps/templates/teacherDashboard/images/empty_desk.svg';
 import blankScreen from '@cdo/apps/templates/teacherDashboard/images/no_curriculum_assigned.svg';
+import CalendarNotAvailable from '@cdo/apps/templates/teacherNavigation/images/CalendarNotAvailable.svg';
+import NoUnitAssigned from '@cdo/apps/templates/teacherNavigation/images/NoUnitAssigned.svg';
 import TeacherDashboardEmptyState from '@cdo/apps/templates/teacherNavigation/images/TeacherDashboardEmptyState.svg';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 import i18n from '@cdo/locale';
@@ -82,9 +84,7 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
       descriptionText: i18n.noUnitAssigned({
         courseName: courseName ? courseName : '',
       }),
-      imageComponent: (
-        <img src={TeacherDashboardEmptyState} alt={i18n.almostThere()} />
-      ),
+      imageComponent: <img src={NoUnitAssigned} alt={i18n.almostThere()} />,
       button: (
         <Button onClick={navigateToCoursePage} text={i18n.assignAUnit()} />
       ),
@@ -105,7 +105,7 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
       headline: i18n.calendarNotAvailable(),
       descriptionText: i18n.calendarLegacyMessage({courseName: courseName}),
       imageComponent: (
-        <img src={TeacherDashboardEmptyState} alt={i18n.almostThere()} />
+        <img src={CalendarNotAvailable} alt={i18n.almostThere()} />
       ),
       button: null,
     },
@@ -121,7 +121,7 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
       headline: i18n.calendarNotAvailable(),
       descriptionText: null,
       imageComponent: (
-        <img src={TeacherDashboardEmptyState} alt={i18n.almostThere()} />
+        <img src={CalendarNotAvailable} alt={i18n.almostThere()} />
       ),
       button: null,
     },
@@ -131,9 +131,7 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
         page: lessonMaterialsOrCalendarPage,
         courseName: courseName ? courseName : i18n.thisCourse(),
       }),
-      imageComponent: (
-        <img src={TeacherDashboardEmptyState} alt={i18n.almostThere()} />
-      ),
+      imageComponent: <img src={NoUnitAssigned} alt={i18n.almostThere()} />,
       button: (
         <Button onClick={navigateToCoursePage} text={i18n.assignAUnit()} />
       ),
