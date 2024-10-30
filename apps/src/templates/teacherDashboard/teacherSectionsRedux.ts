@@ -440,11 +440,9 @@ const sectionSlice = createSlice({
           state.availableParticipantTypes.length === 1
             ? state.availableParticipantTypes[0]
             : undefined;
-
         const initialSectionData: Section = action.payload.sectionId
           ? {...state.sections[action.payload.sectionId]}
           : newSectionData(initialParticipantType);
-
         state.initialCourseId = initialSectionData.courseId;
         state.initialUnitId = initialSectionData.unitId;
         state.initialCourseOfferingId = initialSectionData.courseOfferingId;

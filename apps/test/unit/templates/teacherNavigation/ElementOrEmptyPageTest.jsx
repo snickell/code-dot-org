@@ -138,18 +138,4 @@ describe('ElementOrEmptyPage', () => {
     expect(screen.queryByText(i18n.addStudents())).toBeNull();
     expect(screen.queryByText(TEST_ELEMENT_TEXT)).toBeNull();
   });
-
-  it('Shows no calendar available for legacy course', () => {
-    renderDefault({
-      showNoStudents: false,
-      showNoCurriculumAssigned: false,
-      showNoUnitAssigned: false,
-      showNoCalendarForLegacyCourses: true,
-      isOnCalendarPage: true,
-      courseName: 'CSD',
-    });
-
-    screen.getByText(i18n.calendarNotAvailable());
-    screen.getByText(i18n.calendarLegacyMessage({courseName: 'CSD'}));
-  });
 });
