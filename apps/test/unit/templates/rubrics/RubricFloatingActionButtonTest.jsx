@@ -96,28 +96,6 @@ describe('RubricFloatingActionButton', () => {
       expect(fab.classList.contains('unittest-fab-pulse')).toBe(true);
     });
 
-    it('sends open on page load event when open state is true in session storage', () => {
-      sessionStorage.setItem('RubricFabOpenStateKey', 'true');
-      render(
-        <Provider store={store}>
-          <RubricFloatingActionButton {...defaultProps} />
-        </Provider>
-      );
-      expect(sendEventSpy).toHaveBeenCalledWith(
-        EVENTS.TA_RUBRIC_OPEN_ON_PAGE_LOAD,
-        {
-          viewingStudentWork: false,
-          viewingEvaluationLevel: true,
-        }
-      );
-      const image = screen.getByRole('img', {name: 'AI bot'});
-      fireEvent.load(image);
-      const fab = screen.getByRole('button', {
-        name: i18n.openOrCloseTeachingAssistant(),
-      });
-      expect(fab.classList.contains('unittest-fab-pulse')).toBe(false);
-    });
-
     it('does not render pulse animation when open state is present in session storage', () => {
       sessionStorage.setItem('RubricFabOpenStateKey', 'false');
       render(
@@ -200,5 +178,27 @@ describe('RubricFloatingActionButton', () => {
         viewingEvaluationLevel: true,
       }
     );
+  });
+
+  it('sends open on page load event when open state is true in session storage', () => {
+    sessionStorage.setItem('RubricFabOpenStateKey', 'true');
+    render(
+      <Provider store={store}>
+        <RubricFloatingActionButton {...defaultProps} />
+      </Provider>
+    );
+    expect(sendEventSpy).toHaveBeenCalledWith(
+      EVENTS.TA_RUBRIC_OPEN_ON_PAGE_LOAD,
+      {
+        viewingStudentWork: false,
+        viewingEvaluationLevel: true,
+      }
+    );
+    const image = screen.getByRole('img', {name: 'AI bot'});
+    fireEvent.load(image);
+    const fab = screen.getByRole('button', {
+      name: i18n.openOrCloseTeachingAssistant(),
+    });
+    expect(fab.classList.contains('unittest-fab-pulse')).toBe(false);
   });
 });
