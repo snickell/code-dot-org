@@ -1,5 +1,4 @@
 import {render, screen, fireEvent} from '@testing-library/react';
-import {shallow} from 'enzyme'; // eslint-disable-line no-restricted-imports
 import React from 'react';
 import {Provider} from 'react-redux';
 import sinon from 'sinon'; // eslint-disable-line no-restricted-imports
@@ -16,6 +15,7 @@ import {
 import {UnconnectedRubricFloatingActionButton as RubricFloatingActionButton} from '@cdo/apps/templates/rubrics/RubricFloatingActionButton';
 import teacherRubric from '@cdo/apps/templates/rubrics/teacherRubricRedux';
 import teacherSections from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
+import i18n from '@cdo/locale';
 
 import {expect as chaiExpect} from '../../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
 
@@ -49,14 +49,20 @@ const defaultProps = {
   studentLevelInfo: null,
 };
 
-describe('RubricFloatingActionButton - React Testing Library', () => {
+describe('RubricFloatingActionButton', () => {
   beforeEach(() => {
     stubRedux();
-    registerReducers({teacherRubric, teacherSections, teacherPanel});
+    registerReducers({
+      teacherRubric,
+      teacherSections,
+      teacherPanel,
+    });
+    sessionStorage.clear();
   });
 
   afterEach(() => {
     restoreRedux();
+    sessionStorage.clear();
   });
 
   describe('pulse animation', () => {
@@ -82,7 +88,9 @@ describe('RubricFloatingActionButton - React Testing Library', () => {
           viewingEvaluationLevel: true,
         }
       );
-      const fab = screen.getByRole('button', {name: 'AI bot'});
+      const fab = screen.getByRole('button', {
+        name: i18n.openOrCloseTeachingAssistant(),
+      });
       chaiExpect(fab.classList.contains('unittest-fab-pulse')).to.be.false;
 
       const fabImage = screen.getByRole('img', {name: 'AI bot'});
@@ -112,7 +120,9 @@ describe('RubricFloatingActionButton - React Testing Library', () => {
       );
       const image = screen.getByRole('img', {name: 'AI bot'});
       fireEvent.load(image);
-      const fab = screen.getByRole('button', {name: 'AI bot'});
+      const fab = screen.getByRole('button', {
+        name: i18n.openOrCloseTeachingAssistant(),
+      });
       chaiExpect(fab.classList.contains('unittest-fab-pulse')).to.be.false;
       sendEventSpy.restore();
     });
@@ -134,51 +144,69 @@ describe('RubricFloatingActionButton - React Testing Library', () => {
       );
       const image = screen.getByRole('img', {name: 'AI bot'});
       fireEvent.load(image);
-      const fab = screen.getByRole('button', {name: 'AI bot'});
+      const fab = screen.getByRole('button', {
+        name: i18n.openOrCloseTeachingAssistant(),
+      });
       chaiExpect(fab.classList.contains('unittest-fab-pulse')).to.be.false;
       sendEventSpy.restore();
     });
   });
-});
 
-describe('RubricFloatingActionButton - Enzyme', () => {
   it('begins closed when student level info is null', () => {
-    const wrapper = shallow(<RubricFloatingActionButton {...defaultProps} />);
-    chaiExpect(wrapper.find('Connect(RubricContainer)').length).to.equal(1);
-    chaiExpect(wrapper.find('Connect(RubricContainer)').props().open).to.equal(
-      false
+    render(
+      <Provider store={getStore()}>
+        <RubricFloatingActionButton {...defaultProps} />
+      </Provider>
     );
+    expect(screen.queryByText(i18n.rubricAiHeaderText())).not.toBeVisible();
   });
 
   it('begins open when student level info is provided', () => {
-    const wrapper = shallow(
-      <RubricFloatingActionButton
-        {...defaultProps}
-        studentLevelInfo={{
-          name: 'Grace Hopper',
-        }}
-      />
+    render(
+      <Provider store={getStore()}>
+        <RubricFloatingActionButton
+          {...defaultProps}
+          studentLevelInfo={{
+            name: 'Grace Hopper',
+          }}
+        />
+      </Provider>
     );
-    chaiExpect(wrapper.find('Connect(RubricContainer)').length).to.equal(1);
+
+    expect(screen.getByText(i18n.rubricAiHeaderText())).toBeVisible();
   });
 
   it('opens RubricContainer when clicked', () => {
-    const wrapper = shallow(<RubricFloatingActionButton {...defaultProps} />);
-    chaiExpect(wrapper.find('button').length).to.equal(1);
-    wrapper.find('button').simulate('click');
-    chaiExpect(wrapper.find('Connect(RubricContainer)').length).to.equal(1);
+    render(
+      <Provider store={getStore()}>
+        <RubricFloatingActionButton {...defaultProps} />
+      </Provider>
+    );
+    const button = screen.getByRole('button', {
+      name: i18n.openOrCloseTeachingAssistant(),
+    });
+    fireEvent.click(button);
+    expect(screen.getByText(i18n.rubricAiHeaderText())).toBeVisible();
   });
 
   it('sends events when opened and closed', () => {
     const sendEventSpy = sinon.stub(analyticsReporter, 'sendEvent');
     const reportingData = {unitName: 'test-2023', levelName: 'test-level'};
-    const wrapper = shallow(
-      <RubricFloatingActionButton
-        {...defaultProps}
-        reportingData={reportingData}
-      />
+    render(
+      <Provider store={getStore()}>
+        <RubricFloatingActionButton
+          {...defaultProps}
+          reportingData={reportingData}
+        />
+      </Provider>
     );
-    wrapper.find('button').simulate('click');
+    expect(screen.queryByText(i18n.rubricAiHeaderText())).not.toBeVisible();
+    const button = screen.getByRole('button', {
+      name: i18n.openOrCloseTeachingAssistant(),
+    });
+    fireEvent.click(button);
+    expect(screen.getByText(i18n.rubricAiHeaderText())).toBeVisible();
+
     chaiExpect(sendEventSpy).to.have.been.calledWith(
       EVENTS.TA_RUBRIC_OPENED_FROM_FAB_EVENT,
       {
@@ -187,7 +215,10 @@ describe('RubricFloatingActionButton - Enzyme', () => {
         viewingEvaluationLevel: true,
       }
     );
-    wrapper.find('button').simulate('click');
+
+    fireEvent.click(button);
+    expect(screen.queryByText(i18n.rubricAiHeaderText())).not.toBeVisible();
+
     chaiExpect(sendEventSpy).to.have.been.calledWith(
       EVENTS.TA_RUBRIC_CLOSED_FROM_FAB_EVENT,
       {
