@@ -31,6 +31,7 @@ module Cdo
           %q(.*\.csedweek.org),
           %q(.*\.hourofcode.com),
           %q(.*\.codeprojects.org),
+          %q(.*\.localhost),
         ].join(',')
 
         cmd = [
