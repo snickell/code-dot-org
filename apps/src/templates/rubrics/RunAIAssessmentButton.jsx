@@ -126,10 +126,7 @@ function RunAIAssessmentButton({
                 data.status === RubricAiEvaluationStatus.SUCCESS
               ) {
                 setStatus(STATUS.SUCCESS);
-                setUserAiEvalStatus({
-                  userId: studentUserId,
-                  status: 'READY_TO_REVIEW',
-                });
+                setUserAiEvalStatus(studentUserId, 'READY_TO_REVIEW');
                 refreshAiEvaluations();
               } else if (data.status === RubricAiEvaluationStatus.QUEUED) {
                 setStatus(STATUS.EVALUATION_PENDING);
@@ -234,7 +231,7 @@ RunAIAssessmentButton.propTypes = {
 };
 
 export default connect(null, dispatch => ({
-  setUserAiEvalStatus(params) {
-    dispatch(setUserAiEvalStatus(params));
+  setUserAiEvalStatus(userId, status) {
+    dispatch(setUserAiEvalStatus(userId, status));
   },
 }))(RunAIAssessmentButton);

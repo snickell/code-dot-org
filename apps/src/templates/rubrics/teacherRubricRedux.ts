@@ -85,11 +85,13 @@ const teacherRubricReduxSlice = createSlice({
     setAiEvalStatusMap(state, action: PayloadAction<AiEvalStatusMap>) {
       state.aiEvalStatusMap = action.payload;
     },
-    setUserAiEvalStatus: (
-      state,
-      action: PayloadAction<{userId: number; status: string}>
-    ) => {
-      state.aiEvalStatusMap[action.payload.userId] = action.payload.status;
+    setUserAiEvalStatus: {
+      reducer(state, action: PayloadAction<{userId: number; status: string}>) {
+        state.aiEvalStatusMap[action.payload.userId] = action.payload.status;
+      },
+      prepare(userId: number, status: string) {
+        return {payload: {userId, status}};
+      },
     },
   },
 });
