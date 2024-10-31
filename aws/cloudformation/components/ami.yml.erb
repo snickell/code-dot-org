@@ -179,7 +179,7 @@ frontend_device_name ||= '/dev/sda1'
         BlockDeviceMappings:
           - DeviceName: <%=frontend_device_name%>
             Ebs:
-              VolumeSize: <%=frontend_volume_size * 2%>
+              VolumeSize: <%=frontend_volume_size * 2%> # Double volume size to leave room for logs written to disk
               VolumeType: gp2
         TagSpecifications:
           - ResourceType: instance
@@ -193,9 +193,6 @@ frontend_device_name ||= '/dev/sda1'
         UserData:
           Fn::Base64: !Sub |
             #!/bin/bash -x
-            # UserData bootstrap script for CloudFormation stack instances.
-            # Note: Every time this script's contents change,
-            # the LaunchTemplate version will need to be updated.
 
             STACK=${AWS::StackName}
             REGION=${AWS::Region}
