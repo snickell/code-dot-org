@@ -24,8 +24,29 @@
 # https://github.com/code-dot-org/code-dot-org/pull/56279
 
 class DatablockStorageController < ApplicationController
+  # These methods can be called by data blocks in applab/gamelab
+  METHODS_CALLED_BY_DATA_BLOCKS = [
+    :set_key_value,
+    :get_key_value,
+    :get_column,
+    :create_record,
+    :read_records,
+    :update_record,
+    :delete_record,
+    :get_library_manifest,
+  ]
+
+  DATABLOCK_STORAGE_THROTTLE_PERIOD_S = 10
+
   before_action :validate_channel_id
-  before_action :authenticate_user!
+
+  # Methods that are called directly by data blocks need to be accessible
+  # even when the applab/gamelab project is shared. In this case we won't
+  # necessarily have a logged-in user.
+  before_action :authenticate_user!, except: METHODS_CALLED_BY_DATA_BLOCKS
+
+  # Throttle all requests coming from data blocks based on project_id
+  before_action :throttle!, only: METHODS_CALLED_BY_DATA_BLOCKS
 
   StudentFacingError = DatablockStorageTable::StudentFacingError
 
@@ -46,17 +67,6 @@ class DatablockStorageController < ApplicationController
   ]
 
   ##########################################################
-  #   Debug View                                           #
-  ##########################################################
-  def index
-    @key_value_pairs = DatablockStorageKvp.where(project_id: @project_id)
-    @records = DatablockStorageRecord.where(project_id: @project_id)
-    @tables = DatablockStorageTable.where(project_id: @project_id)
-    @library_manifest = DatablockStorageLibraryManifest.instance.library_manifest
-    @storage_backend = ProjectUseDatablockStorage.use_data_block_storage_for?(params[:channel_id]) ? "Datablock Storage" : "Firebase"
-  end
-
-  ##########################################################
   #   Key-Value-Pair API                                   #
   ##########################################################
 
@@ -69,7 +79,8 @@ class DatablockStorageController < ApplicationController
 
   def get_key_value
     kvp = DatablockStorageKvp.find_by(project_id: @project_id, key: params[:key])
-    render json: kvp ? JSON.parse(kvp.value).to_json : nil
+    # render json: assumes a string is already json encoded, so to_json is necessary.
+    render json: kvp&.value.to_json
   end
 
   def delete_key_value
@@ -289,22 +300,6 @@ class DatablockStorageController < ApplicationController
   end
 
   ##########################################################
-  #   Project Use Datablock Storage API                    #
-  ##########################################################
-
-  # TODO: post-firebase-cleanup, remove this code: #56994
-  def use_datablock_storage
-    ProjectUseDatablockStorage.set_data_block_storage_for!(params[:channel_id], true)
-    render json: true
-  end
-
-  # TODO: post-firebase-cleanup, remove this code: #56994
-  def use_firebase_storage
-    ProjectUseDatablockStorage.set_data_block_storage_for!(params[:channel_id], false)
-    render json: true
-  end
-
-  ##########################################################
   #   Private                                              #
   ##########################################################
 
@@ -325,10 +320,10 @@ class DatablockStorageController < ApplicationController
   end
 
   private def where_table
-    if params[:table_name]
+    if params[:table_name] && params[:table_name].is_a?(String)
       DatablockStorageTable.where(project_id: @project_id, table_name: params[:table_name])
     else
-      raise StudentFacingError, "You must specify a table"
+      raise StudentFacingError, "Table parameter value must be a string"
     end
   end
 
@@ -347,5 +342,15 @@ class DatablockStorageController < ApplicationController
       raise "DatablockStorage is only available for applab and gamelab projects"
     end
     @project_id = project.id
+  end
+
+  private def throttle!
+    id = @project_id
+    limit = DCDO.get('datablock_storage_request_limit_per_ten_seconds', 30) # default is 30 requests per 10 seconds
+    should_throttle = Cdo::Throttle.throttle("datablock_storage/#{id}", limit, DATABLOCK_STORAGE_THROTTLE_PERIOD_S, DATABLOCK_STORAGE_THROTTLE_PERIOD_S)
+
+    if should_throttle
+      raise StudentFacingError.new(:THROTTLED), "Data access rate limit exceeded; Please wait #{DATABLOCK_STORAGE_THROTTLE_PERIOD_S} seconds before retrying. The app is reading/writing data too many times per second. If you were trying to write data, it wasn't written."
+    end
   end
 end

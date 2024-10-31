@@ -51,33 +51,79 @@ const optionsList = [
     ],
   },
   {
-    name: 'sounds-panel-1-preview',
+    name: 'pack-dialog-1',
+    type: 'radio',
+    values: [
+      {value: 'false', description: 'Use pack dialog 2 (default).'},
+      {value: 'true', description: 'Use older pack dialog.'},
+    ],
+  },
+  {
+    name: 'show-tts',
+    type: 'radio',
+    values: [
+      {value: 'false', description: 'Hide text to speech.'},
+      {value: 'true', description: 'Show text to speech.'},
+    ],
+  },
+  {
+    name: 'tts-play-pause',
     type: 'radio',
     values: [
       {
         value: 'false',
-        description: 'Use original sounds panel with preview (default).',
+        description:
+          'Disable play/pause functionality for text to speech (default).',
       },
       {
         value: 'true',
-        description: 'Use original sounds panel with preview on select.',
+        description: 'Enable play/pause functionality for text to speech.',
       },
     ],
   },
   {
-    name: 'sounds-panel-2',
+    name: 'tts-play-icon',
+    type: 'string',
+    description: 'Use a specific icon for text to speech play button.',
+  },
+  {
+    name: 'tts-stop-icon',
+    type: 'string',
+    description: 'Use a specific icon for text to speech stop button.',
+  },
+  {
+    name: 'play-tune-block',
     type: 'radio',
     values: [
-      {value: 'false', description: 'Use original sounds panel (default).'},
-      {value: 'true', description: 'Use new sounds panel.'},
+      {value: 'false', description: 'Hide play tune block (default).'},
+      {value: 'true', description: 'Show play tune block.'},
     ],
   },
   {
-    name: 'pack-dialog-preview',
+    name: 'play-pattern-ai-block',
     type: 'radio',
     values: [
-      {value: 'false', description: 'Use original pack dialog (default).'},
-      {value: 'true', description: 'Use pack dialog with preview on select.'},
+      {value: 'false', description: 'Hide play pattern AI block (default).'},
+      {value: 'true', description: 'Show play pattern AI block.'},
+    ],
+  },
+  {
+    name: 'hide-ai-temperature',
+    type: 'radio',
+    values: [
+      {value: 'false', description: 'Show AI temperature (default).'},
+      {value: 'true', description: 'Hide AI temperature.'},
+    ],
+  },
+  {
+    name: 'show-ai-temperature-explanation',
+    type: 'radio',
+    values: [
+      {
+        value: 'false',
+        description: 'Hide AI temperature explanation (default).',
+      },
+      {value: 'true', description: 'Show AI temperature.'},
     ],
   },
   {
@@ -115,6 +161,39 @@ const optionsList = [
     ],
   },
   {
+    name: 'allow-change-starting-playhead-position',
+    type: 'radio',
+    values: [
+      {
+        value: 'false',
+        description: "Don't allow change starting playhead position (default).",
+      },
+      {value: 'true', description: 'Allow change starting playhead position.'},
+    ],
+  },
+  {
+    name: 'use-secondary-finish-button',
+    type: 'radio',
+    values: [
+      {
+        value: 'false',
+        description: "Don't use secondary finish button (default).",
+      },
+      {value: 'true', description: 'Use secondary finish button.'},
+    ],
+  },
+  {
+    name: 'show-secondary-finish-button-question',
+    type: 'radio',
+    values: [
+      {
+        value: 'false',
+        description: "Don't show secondary finish button question (default).",
+      },
+      {value: 'true', description: 'Show secondary finish button question.'},
+    ],
+  },
+  {
     name: 'advanced-controls-enabled',
     type: 'radio',
     values: [
@@ -130,22 +209,11 @@ const optionsList = [
     ],
   },
   {
-    name: 'timeline-layout-2',
+    name: 'timeline-original-layout',
     type: 'radio',
     values: [
-      {value: 'false', description: 'Original timeline (default).'},
-      {value: 'true', description: 'New timeline.'},
-    ],
-  },
-  {
-    name: 'clickable-text-with-glow',
-    type: 'radio',
-    values: [
-      {
-        value: 'false',
-        description: 'No glow for clickable text in instructions (default).',
-      },
-      {value: 'true', description: 'Glow for clickable text in instructions.'},
+      {value: 'false', description: 'New timeline (default).'},
+      {value: 'true', description: 'Original timeline.'},
     ],
   },
 ];

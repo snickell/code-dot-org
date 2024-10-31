@@ -206,11 +206,15 @@ module AWS
       # supported by safe_load
       #
       # rubocop:disable Security/YAMLLoad
-      params = YAML.load(template)['Parameters']
+      params = if RUBY_VERSION >= '3.1'
+                 YAML.load(template, permitted_classes: [Date])['Parameters']
+               else
+                 YAML.load(template)['Parameters']
+               end
       # rubocop:enable Security/YAMLLoad
       return [] unless params
       params.filter_map do |key, properties|
-        value = CDO[key.underscore] || ENV[key.underscore.upcase]
+        value = CDO[key.underscore] || ENV.fetch(key.underscore.upcase, nil)
         param = {parameter_key: key}
         if value
           param[:parameter_value] = value

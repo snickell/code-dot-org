@@ -8,7 +8,7 @@ import {
   Heading3,
   Heading4,
 } from '@cdo/apps/componentLibrary/typography';
-import FontAwesome from '@cdo/apps/templates/FontAwesome';
+import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import i18n from '@cdo/locale';
 
 import LearningGoals from './LearningGoals';
@@ -51,6 +51,7 @@ export default function RubricContent({
   feedbackAdded,
   setFeedbackAdded,
   sectionId,
+  aiEvalStatusMap,
 }) {
   const {lesson} = rubric;
   const rubricLevel = rubric.level;
@@ -89,6 +90,7 @@ export default function RubricContent({
             reloadOnChange={true}
             sectionId={sectionId}
             reportingData={reportingData}
+            aiEvalStatusMap={aiEvalStatusMap}
           />
         </div>
 
@@ -164,6 +166,7 @@ RubricContent.propTypes = {
   feedbackAdded: PropTypes.bool,
   setFeedbackAdded: PropTypes.func,
   sectionId: PropTypes.number,
+  aiEvalStatusMap: PropTypes.object,
 };
 
 export const InfoAlert = ({text, dismissable}) => {
@@ -178,9 +181,14 @@ export const InfoAlert = ({text, dismissable}) => {
         [style.infoAlert]: !closed,
         [style.infoAlertClosed]: !!closed,
       })}
+      data-testid="info-alert"
     >
       <div className={style.infoAlertLeft}>
-        <FontAwesome icon="info-circle" className={style.infoAlertIcon} />
+        <FontAwesome
+          icon="info-circle"
+          className={style.infoAlertIcon}
+          title="info circle icon"
+        />
         <BodyTwoText>{text}</BodyTwoText>
       </div>
       {!!dismissable && (

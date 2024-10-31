@@ -58,7 +58,7 @@ class ContactRollupsV2
     # Its default value is 1024, too short for the amount of data we need to concat.
     # @see:
     #   ContactRollupsProcessed.get_data_aggregation_query
-    #   https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_group_concat_max_len
+    #   https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_group_concat_max_len
     DASHBOARD_DB_WRITER.run('SET SESSION group_concat_max_len = 65535')
   end
 
@@ -128,17 +128,11 @@ class ContactRollupsV2
   end
 
   # Process contacts in ContactRollupsRaw table and save the results to ContactRollupsProcessed.
-  # The results are then copied over to ContactRollupsFinal for further analysis.
   def process_contacts
     start_time = Time.now
     @log_collector.time!("Processes all extracted data with batch size #{ContactRollupsProcessed::BATCH_SIZE}") do
       results = ContactRollupsProcessed.import_from_raw_table
       @log_collector.record_metrics({ContactsWithInvalidData: results[:invalid_contacts]})
-    end
-
-    @log_collector.time!("Overwrites contact_rollups_final table") do
-      truncate_or_delete_table ContactRollupsFinal
-      ContactRollupsFinal.insert_from_processed_table
     end
   ensure
     @log_collector.record_metrics(

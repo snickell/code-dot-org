@@ -6,20 +6,25 @@
 
 import React, {useEffect} from 'react';
 import {useSelector} from 'react-redux';
-import Lab2Registry from '../Lab2Registry';
-import {
-  setUpWithLevel,
-  setUpWithoutLevel,
-  shouldHideShareAndRemix,
-} from '../lab2Redux';
-import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
+
+import header from '@cdo/apps/code-studio/header';
+import {clearHeader} from '@cdo/apps/code-studio/headerRedux';
 import {
   getCurrentScriptLevelId,
   getLevelPropertiesPath,
 } from '@cdo/apps/code-studio/progressReduxSelectors';
-import header from '@cdo/apps/code-studio/header';
-import {clearHeader} from '@cdo/apps/code-studio/headerRedux';
-import {AppName} from '../types';
+import useLifecycleNotifier from '@cdo/apps/lab2/hooks/useLifecycleNotifier';
+import {
+  isReadOnlyWorkspace,
+  setUpWithLevel,
+  setUpWithoutLevel,
+  shouldHideShareAndRemix,
+} from '@cdo/apps/lab2/lab2Redux';
+import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
+import {resetProjectMetadata} from '@cdo/apps/lab2/redux/lab2ProjectRedux';
+import {AppName} from '@cdo/apps/lab2/types';
+import {LifecycleEvent} from '@cdo/apps/lab2/utils';
+import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 const ProjectContainer: React.FunctionComponent<ProjectContainerProps> = ({
   children,
@@ -49,6 +54,12 @@ const ProjectContainer: React.FunctionComponent<ProjectContainerProps> = ({
   const levelPropertiesPath = useSelector(getLevelPropertiesPath);
 
   const dispatch = useAppDispatch();
+  const isReadOnly = useAppSelector(isReadOnlyWorkspace);
+
+  // When the level changes, reset metadata relating to the project in redux.
+  useLifecycleNotifier(LifecycleEvent.LevelLoadStarted, () =>
+    dispatch(resetProjectMetadata())
+  );
 
   useEffect(() => {
     // The redux types are very complicated, so in order to re-use this variable
@@ -104,18 +115,20 @@ const ProjectContainer: React.FunctionComponent<ProjectContainerProps> = ({
       // Force a save before the page unloads, if there are unsaved changes.
       // If we need to force a save, prevent navigation so we can save first.
       // We skip this if we are already force reloading, as that will occur when
-      // saving already encountered an issue.
+      // saving already encountered an issue. We also can skip this in read only mode,
+      // as we never save in read only mode.
       if (
         projectManager &&
         !projectManager.isForceReloading() &&
-        projectManager.hasUnsavedChanges()
+        projectManager.hasUnsavedChanges() &&
+        !isReadOnly
       ) {
         projectManager.cleanUp();
         event.preventDefault();
         event.returnValue = '';
       }
     });
-  }, []);
+  }, [isReadOnly]);
 
   useEffect(() => {
     // Ensure the header is cleared when we have a change,

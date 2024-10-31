@@ -1,31 +1,33 @@
-import {AnyAction, Dispatch} from 'redux';
-import {MultiFileSource} from '@cdo/apps/lab2/types';
-import {asyncRun} from './pyodideWorkerManager';
-import {getTestRunnerScript} from './pythonHelpers/scripts';
 import {appendSystemMessage} from '@codebridge/redux/consoleRedux';
-import {MAIN_PYTHON_FILE} from '@cdo/apps/lab2/constants';
-import {getFileByName} from '@cdo/apps/lab2/projects/utils';
+import {AnyAction, Dispatch} from 'redux';
 
-export function handleRunClick(
+import {MAIN_PYTHON_FILE} from '@cdo/apps/lab2/constants';
+import ProgressManager from '@cdo/apps/lab2/progress/ProgressManager';
+import {getFileByName} from '@cdo/apps/lab2/projects/utils';
+import {MultiFileSource, ProjectFile} from '@cdo/apps/lab2/types';
+
+import {getValidationFromSource} from '../codebridge';
+
+import PythonValidationTracker from './progress/PythonValidationTracker';
+import {
+  asyncRun,
+  restartPyodideIfProgramIsRunning,
+} from './pyodideWorkerManager';
+import {runStudentTests, runValidationTests} from './pythonHelpers/scripts';
+
+export async function handleRunClick(
   runTests: boolean,
   dispatch: Dispatch<AnyAction>,
-  permissions: string[],
-  source: MultiFileSource | undefined
+  source: MultiFileSource | undefined,
+  progressManager: ProgressManager | null,
+  validationFile?: ProjectFile
 ) {
-  // For now, restrict running python code to levelbuilders.
-  if (!permissions.includes('levelbuilder')) {
-    dispatch(
-      appendSystemMessage('You do not have permission to run python code.')
-    );
-    return;
-  }
   if (!source) {
     dispatch(appendSystemMessage('You have no code to run.'));
     return;
   }
   if (runTests) {
-    dispatch(appendSystemMessage('Running tests...'));
-    runAllTests(source);
+    await runAllTests(source, dispatch, progressManager, validationFile);
   } else {
     // Run main.py
     const code = getFileByName(source.files, MAIN_PYTHON_FILE)?.contents;
@@ -34,18 +36,17 @@ export function handleRunClick(
       return;
     }
     dispatch(appendSystemMessage('Running program...'));
-    runPythonCode(code, source);
+    await runPythonCode(code, source);
   }
 }
 
-export async function runPythonCode(mainFile: string, source: MultiFileSource) {
+export async function runPythonCode(
+  mainFile: string,
+  source: MultiFileSource,
+  validationFile?: ProjectFile
+) {
   try {
-    const {results, error} = await asyncRun(mainFile, source);
-    if (results) {
-      console.log('pyodideWorker return results: ', results);
-    } else if (error) {
-      console.log('pyodideWorker error: ', error);
-    }
+    return await asyncRun(mainFile, source, validationFile);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     console.log(
@@ -54,7 +55,45 @@ export async function runPythonCode(mainFile: string, source: MultiFileSource) {
   }
 }
 
-export async function runAllTests(source: MultiFileSource) {
-  // To run all tests in the project, we look for files that follow the regex 'test*.py'
-  await runPythonCode(getTestRunnerScript('test*.py'), source);
+export function stopPythonCode() {
+  // This will terminate the worker and create a new one if there is a running program.
+  restartPyodideIfProgramIsRunning();
+}
+
+export async function runAllTests(
+  source: MultiFileSource,
+  dispatch: Dispatch<AnyAction>,
+  progressManager: ProgressManager | null,
+  validationFile?: ProjectFile
+) {
+  // We default to using the validation file passed in. If it does not exist,
+  // we check the source for the validation file (this is the case in start mode).
+  const validationToRun = validationFile || getValidationFromSource(source);
+  if (validationToRun) {
+    dispatch(appendSystemMessage(`Running level tests...`));
+    progressManager?.resetValidation();
+    // We only send the separate validation file, because otherwise the
+    // source already has the validation file.
+    const result = await runPythonCode(
+      runValidationTests(validationToRun.name),
+      source,
+      validationFile
+    );
+    if (result?.message) {
+      // Get validation test results
+      // Message is an array of Maps with the keys "name" and "result",
+      // where "name" is the name of the test and "result" is one of
+      // "PASS/FAIL/ERROR/SKIP/EXPECTED_FAILURE/UNEXPECTED_SUCCESS"
+      // See this PR for details: https://github.com/code-dot-org/pythonlab-packages/pull/5
+      const testResults = result.message as Map<string, string>[];
+      if (progressManager) {
+        PythonValidationTracker.getInstance().setValidationResults(testResults);
+        progressManager.updateProgress();
+      }
+    }
+  } else {
+    dispatch(appendSystemMessage(`Running your project's tests...`));
+    // Otherwise, we look for files that follow the regex 'test*.py' and run those.
+    await runPythonCode(runStudentTests(), source);
+  }
 }

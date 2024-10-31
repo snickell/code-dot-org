@@ -179,7 +179,7 @@ class Pd::ProfessionalLearningLandingControllerTest < ActionController::TestCase
     load_pl_landing @teacher
 
     response = assigns(:landing_page_data)
-    assert_equal(['CSP Support', 'ECS Support', 'Bills Fandom 101'], response[:summarized_plc_enrollments].map {|enrollment| enrollment[:courseName]})
+    assert_equal(['CSP Support', 'ECS Support', 'Bills Fandom 101'], response[:summarized_plc_enrollments].pluck(:courseName))
   end
 
   test 'id of current year application is passed down' do
@@ -207,6 +207,7 @@ class Pd::ProfessionalLearningLandingControllerTest < ActionController::TestCase
 
     @teacher.permission = UserPermission::FACILITATOR
     workshop = create :pd_workshop, facilitators: [@teacher]
+    create :pd_workshop, :ended, facilitators: [@teacher]
     @teacher.reload
 
     load_pl_landing @teacher
@@ -221,6 +222,7 @@ class Pd::ProfessionalLearningLandingControllerTest < ActionController::TestCase
 
     @teacher.permission = UserPermission::WORKSHOP_ORGANIZER
     workshop = create :pd_workshop, organizer: @teacher
+    create :pd_workshop, :ended, organizer: @teacher
 
     load_pl_landing @teacher
 
@@ -235,6 +237,7 @@ class Pd::ProfessionalLearningLandingControllerTest < ActionController::TestCase
     regional_partner = create :regional_partner
     @teacher.regional_partners << regional_partner
     workshop = create :pd_workshop, regional_partner: regional_partner
+    create :pd_workshop, :ended, regional_partner: regional_partner
 
     load_pl_landing @teacher
 
@@ -271,7 +274,7 @@ class Pd::ProfessionalLearningLandingControllerTest < ActionController::TestCase
 
     response = assigns(:landing_page_data)
     assert_equal 2, response[:pl_courses_started].length
-    assert_equal([pl_unit1.name, pl_unit2.name], response[:pl_courses_started].map {|u| u[:name]})
+    assert_equal([pl_unit1.name, pl_unit2.name], response[:pl_courses_started].pluck(:name))
     assert_equal 100, response[:pl_courses_started].find {|u| u[:name] == pl_unit1.name}[:percent_completed]
     assert_equal 50, response[:pl_courses_started].find {|u| u[:name] == pl_unit2.name}[:percent_completed]
   end

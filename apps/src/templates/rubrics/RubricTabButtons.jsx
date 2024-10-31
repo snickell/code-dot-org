@@ -1,10 +1,12 @@
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
+import ReactTooltip from 'react-tooltip';
 
 import SegmentedButtons from '@cdo/apps/componentLibrary/segmentedButtons/SegmentedButtons';
+import {RubricAiEvaluationLimits} from '@cdo/generated-scripts/sharedConstants';
 import i18n from '@cdo/locale';
 
-import {InfoAlert} from './RubricContent';
 import {TAB_NAMES} from './rubricHelpers';
 import {reportingDataShape, rubricShape} from './rubricShapes';
 import RunAIAssessmentButton, {STATUS} from './RunAIAssessmentButton';
@@ -22,6 +24,7 @@ export default function RubricTabButtons({
   rubric,
   studentName,
   reportingData,
+  updateAiEvalStatusForUser,
 }) {
   const [status, setStatus] = useState(STATUS.INITIAL_LOAD);
 
@@ -49,19 +52,29 @@ export default function RubricTabButtons({
         return i18n.aiEvaluationStatus_profanity_error();
       case STATUS.REQUEST_TOO_LARGE:
         return i18n.aiEvaluationStatus_request_too_large();
+      case STATUS.TEACHER_LIMIT_EXCEEDED:
+        return i18n.aiEvaluationStatus_teacher_limit_exceeded({
+          limit: RubricAiEvaluationLimits.TEACHER_LIMIT,
+        });
     }
   };
 
+  const runButtonTooltipId = _.uniqueId();
+
   return (
-    <div>
-      <div className={style.rubricTabGroup}>
+    <div className="uitest-rubric-tab-buttons">
+      <div id="tour-tab-buttons" className={style.rubricTabGroup}>
         <SegmentedButtons
-          className="uitest-rubric-tab-buttons"
           selectedButtonValue={selectedTab}
           size="s"
           buttons={[
-            {label: i18n.rubricTabStudent(), value: TAB_NAMES.RUBRIC},
             {
+              id: 'assess-a-student-button',
+              label: i18n.rubricTabStudent(),
+              value: TAB_NAMES.RUBRIC,
+            },
+            {
+              id: 'class-data-button',
               label: i18n.rubricTabClassManagement(),
               value: TAB_NAMES.SETTINGS,
               disabled: !showSettings,
@@ -70,7 +83,7 @@ export default function RubricTabButtons({
           onChange={value => tabSelectCallback(value)}
         />
         {selectedTab === TAB_NAMES.RUBRIC && teacherHasEnabledAi && (
-          <div>
+          <div data-tip data-for={runButtonTooltipId}>
             <RunAIAssessmentButton
               canProvideFeedback={canProvideFeedback}
               teacherHasEnabledAi={teacherHasEnabledAi}
@@ -81,20 +94,21 @@ export default function RubricTabButtons({
               status={status}
               setStatus={setStatus}
               reportingData={reportingData}
+              updateAiEvalStatusForUser={updateAiEvalStatusForUser}
             />
+            {!!statusText() && (
+              <ReactTooltip
+                id={runButtonTooltipId}
+                role="tooltip"
+                effect="solid"
+                place="bottom"
+              >
+                {statusText()}
+              </ReactTooltip>
+            )}
           </div>
         )}
       </div>
-      {selectedTab === TAB_NAMES.RUBRIC &&
-        canProvideFeedback &&
-        teacherHasEnabledAi &&
-        !!statusText() && (
-          <InfoAlert
-            className={'uitest-eval-status-text'}
-            text={statusText() || ''}
-            dismissable={true}
-          />
-        )}
     </div>
   );
 }
@@ -111,4 +125,5 @@ RubricTabButtons.propTypes = {
   rubric: rubricShape.isRequired,
   studentName: PropTypes.string,
   reportingData: reportingDataShape,
+  updateAiEvalStatusForUser: PropTypes.func,
 };

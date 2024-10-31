@@ -3,22 +3,18 @@ import PropTypes from 'prop-types';
 import React, {useState, useEffect, useRef} from 'react';
 import {connect} from 'react-redux';
 
-import {LinkButton} from '@cdo/apps/componentLibrary/button';
-import {Heading2, BodyTwoText} from '@cdo/apps/componentLibrary/typography';
-import {EVENTS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
-import {studio} from '@cdo/apps/lib/util/urlHelpers';
+import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import Notification from '@cdo/apps/sharedComponents/Notification';
 import DonorTeacherBanner from '@cdo/apps/templates/DonorTeacherBanner';
 import ParticipantFeedbackNotification from '@cdo/apps/templates/feedback/ParticipantFeedbackNotification';
-import Notification from '@cdo/apps/templates/Notification';
 import ProjectWidgetWithData from '@cdo/apps/templates/projects/ProjectWidgetWithData';
 import BorderedCallToAction from '@cdo/apps/templates/studioHomepages/BorderedCallToAction';
 import JoinSectionArea from '@cdo/apps/templates/studioHomepages/JoinSectionArea';
 import {tryGetSessionStorage, trySetSessionStorage} from '@cdo/apps/utils';
 import i18n from '@cdo/locale';
 
-import CensusTeacherBanner from '../census2017/CensusTeacherBanner';
-import ContentContainer from '../ContentContainer';
+import CensusTeacherBanner from '../census/CensusTeacherBanner';
 import HeaderBanner from '../HeaderBanner';
 import ProfessionalLearningSkinnyBanner from '../ProfessionalLearningSkinnyBanner';
 import ProtectedStatefulDiv from '../ProtectedStatefulDiv';
@@ -43,7 +39,7 @@ export const UnconnectedTeacherHomepage = ({
   afeEligible,
   joinedStudentSections,
   joinedPlSections,
-  ncesSchoolId,
+  existingSchoolInfo,
   queryStringOpen,
   schoolYear,
   showCensusBanner,
@@ -61,19 +57,18 @@ export const UnconnectedTeacherHomepage = ({
   showIncubatorBanner,
   currentUserId,
 }) => {
-  const censusBanner = useRef(null);
   const teacherReminders = useRef(null);
   const flashes = useRef(null);
 
   /*
    * Determines whether the AFE banner will take premium space on the Teacher Homepage
    */
-  const shouldShowAFEBanner = true;
+  const shouldShowAFEBanner = false;
 
   /*
    * Set to true to hide the census banner
    */
-  const forceHideCensusBanner = true;
+  const forceHideCensusBanner = false;
 
   /* We are hiding the PL application banner to free up space on the Teacher Homepage (May 2023)
    * when we want to show the PL banner again set this to true
@@ -83,14 +78,10 @@ export const UnconnectedTeacherHomepage = ({
   const [displayCensusBanner, setDisplayCensusBanner] = useState(
     showCensusBanner && !forceHideCensusBanner
   );
-  const [censusSubmittedSuccessfully, setCensusSubmittedSuccessfully] =
-    useState(null);
   const [censusBannerTeachesSelection, setCensusBannerTeachesSelection] =
     useState(null);
   const [censusBannerInClassSelection, setCensusBannerInClassSelection] =
     useState(null);
-  const [showCensusUnknownError, setShowCensusUnknownError] = useState(false);
-  const [showCensusInvalidError, setShowCensusInvalidError] = useState(false);
 
   useEffect(() => {
     // The component used here is implemented in legacy HAML/CSS rather than React.
@@ -108,26 +99,6 @@ export const UnconnectedTeacherHomepage = ({
   useEffect(() => {
     analyticsReporter.sendEvent(EVENTS.TEACHER_HOMEPAGE_VISITED);
   }, []);
-
-  const handleCensusBannerSubmit = () => {
-    if (censusBanner.current.isValid()) {
-      $.ajax({
-        url: '/dashboardapi/v1/census/CensusTeacherBannerV1',
-        type: 'post',
-        dataType: 'json',
-        data: censusBanner.current.getData(),
-      })
-        .done(() => {
-          setCensusSubmittedSuccessfully(true);
-          dismissCensusBanner(null, null);
-        })
-        .fail(() => {
-          setShowCensusUnknownError(true);
-        });
-    } else {
-      setShowCensusInvalidError(true);
-    }
-  };
 
   const dismissCensusBanner = (onSuccess, onFailure) => {
     $.ajax({
@@ -179,9 +150,13 @@ export const UnconnectedTeacherHomepage = ({
   ) {
     trySetSessionStorage(LOGGED_TEACHER_SESSION, 'true');
 
-    analyticsReporter.sendEvent(EVENTS.TEACHER_LOGIN_EVENT, {
-      'user id': currentUserId,
-    });
+    analyticsReporter.sendEvent(
+      EVENTS.TEACHER_LOGIN_EVENT,
+      {
+        'user id': currentUserId,
+      },
+      PLATFORMS.BOTH
+    );
   }
 
   return (
@@ -211,7 +186,6 @@ export const UnconnectedTeacherHomepage = ({
               buttonText={announcement.buttonText}
               buttonLink={announcement.link}
               newWindow={true}
-              googleAnalyticsId={announcement.id}
             />
             <div style={styles.clear} />
           </div>
@@ -239,19 +213,15 @@ export const UnconnectedTeacherHomepage = ({
         {displayCensusBanner && (
           <div>
             <CensusTeacherBanner
-              ref={censusBanner}
               schoolYear={schoolYear}
-              ncesSchoolId={ncesSchoolId}
+              existingSchoolInfo={existingSchoolInfo}
               question={censusQuestion}
               teaches={censusBannerTeachesSelection}
               inClass={censusBannerInClassSelection}
               teacherId={teacherId}
               teacherName={teacherName}
               teacherEmail={teacherEmail}
-              showInvalidError={showCensusInvalidError}
-              showUnknownError={showCensusUnknownError}
-              submittedSuccessfully={censusSubmittedSuccessfully}
-              onSubmit={() => handleCensusBannerSubmit()}
+              onSubmitSuccess={() => dismissCensusBanner(null, null)}
               onDismiss={() => dismissAndHideCensusBanner()}
               onPostpone={() => postponeCensusBanner()}
               onTeachesChange={event =>
@@ -286,28 +256,6 @@ export const UnconnectedTeacherHomepage = ({
             isProfessionalLearningCourse={true}
           />
         )}
-        {/* TODO - We will eventually remove this section
-          once enough time has passed */}
-        {(plCourses?.length > 0 || topPlCourse) && (
-          <section id={'pl-courses-placeholder'} style={{marginBlock: '6rem'}}>
-            <Heading2 visualAppearance="heading-md">
-              {i18n.myProfessionalLearningCourses()}
-            </Heading2>
-            <BodyTwoText>
-              {i18n.myProfessionalLearningCoursesHomepageDesc()}
-            </BodyTwoText>
-            <LinkButton
-              color={'purple'}
-              href={studio('/my-professional-learning#self-paced-pl')}
-              iconLeft={{
-                iconName: 'book-circle-arrow-right',
-                iconStyle: 'solid',
-              }}
-              size="s"
-              text={i18n.myProfessionalLearningCoursesHomepageButton()}
-            />
-          </section>
-        )}
         <TeacherResources />
         {showIncubatorBanner && <IncubatorBanner />}
         <ProjectWidgetWithData
@@ -321,23 +269,6 @@ export const UnconnectedTeacherHomepage = ({
             isTeacher={true}
           />
         </section>
-        <ContentContainer
-          heading={i18n.joinedProfessionalLearningSectionsHomepageTitle()}
-        >
-          <BodyTwoText>
-            {i18n.joinedProfessionalLearningSectionsHomepageDesc()}
-          </BodyTwoText>
-          <LinkButton
-            color={'purple'}
-            href={studio('/my-professional-learning')}
-            iconLeft={{
-              iconName: 'book-circle-arrow-right',
-              iconStyle: 'solid',
-            }}
-            size="s"
-            text={i18n.myProfessionalLearningSectionsHomepageButton()}
-          />
-        </ContentContainer>
       </div>
     </div>
   );
@@ -353,7 +284,13 @@ UnconnectedTeacherHomepage.propTypes = {
   hocLaunch: PropTypes.string,
   joinedStudentSections: shapes.sections,
   joinedPlSections: shapes.sections,
-  ncesSchoolId: PropTypes.string,
+  existingSchoolInfo: PropTypes.shape({
+    country: PropTypes.string,
+    id: PropTypes.string,
+    name: PropTypes.string,
+    zip: PropTypes.string,
+    type: PropTypes.string,
+  }),
   queryStringOpen: PropTypes.string,
   schoolYear: PropTypes.number,
   showCensusBanner: PropTypes.bool.isRequired,

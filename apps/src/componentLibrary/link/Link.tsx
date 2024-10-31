@@ -1,13 +1,11 @@
 import classNames from 'classnames';
-import React from 'react';
+import React, {HTMLAttributes} from 'react';
 
 import {ComponentSizeXSToL} from '@cdo/apps/componentLibrary/common/types';
 
 import moduleStyles from './link.module.scss';
 
-export interface LinkProps {
-  /** Link content */
-  children: React.ReactNode;
+export interface LinkBaseProps extends HTMLAttributes<HTMLAnchorElement> {
   /** Link id */
   id?: string;
   /** Custom class name */
@@ -26,7 +24,23 @@ export interface LinkProps {
   size?: ComponentSizeXSToL;
   /** Type of link */
   type?: 'primary' | 'secondary';
+  /** Role of link */
+  role?: string;
 }
+
+export type LinkWithChildren = LinkBaseProps & {
+  /** Link content */
+  children: React.ReactNode;
+  text?: never;
+};
+
+export type LinkWithText = LinkBaseProps & {
+  /** Link text content */
+  text: string;
+  children?: never;
+};
+
+export type LinkProps = LinkWithChildren | LinkWithText;
 
 /**
  * ### Production-ready Checklist:
@@ -44,6 +58,7 @@ export interface LinkProps {
  */
 const Link: React.FunctionComponent<LinkProps> = ({
   children,
+  text,
   id,
   className,
   external,
@@ -53,25 +68,27 @@ const Link: React.FunctionComponent<LinkProps> = ({
   onClick,
   size = 'm',
   type = 'primary',
-}) => {
-  return (
-    <a
-      className={classNames(
-        moduleStyles.link,
-        moduleStyles[`link-${type}`],
-        moduleStyles[`link-${size}`],
-        className
-      )}
-      href={!disabled ? href : undefined}
-      id={id}
-      onClick={!disabled ? onClick : undefined}
-      rel={openInNewTab || external ? 'noopener noreferrer' : undefined}
-      target={(openInNewTab || undefined) && '_blank'}
-      {...(disabled ? {'aria-disabled': true} : {})}
-    >
-      {children}
-    </a>
-  );
-};
+  role,
+  ...HTMLAttributes
+}) => (
+  <a
+    className={classNames(
+      moduleStyles.link,
+      moduleStyles[`link-${type}`],
+      moduleStyles[`link-${size}`],
+      className
+    )}
+    href={!disabled ? href : undefined}
+    id={id}
+    onClick={!disabled ? onClick : undefined}
+    rel={openInNewTab || external ? 'noopener noreferrer' : undefined}
+    target={(openInNewTab || undefined) && '_blank'}
+    role={role}
+    {...(disabled ? {'aria-disabled': true} : {})}
+    {...HTMLAttributes}
+  >
+    {text || children}
+  </a>
+);
 
 export default Link;

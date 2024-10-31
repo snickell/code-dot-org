@@ -9,22 +9,24 @@ import {
 import {
   ComponentSizeXSToL,
   DropdownColor,
+  DropdownFormFieldRelatedProps,
 } from '@cdo/apps/componentLibrary/common/types';
-import CustomDropdown from '@cdo/apps/componentLibrary/dropdown/_CustomDropdown';
+import CustomDropdown, {
+  _CustomDropdownOption,
+} from '@cdo/apps/componentLibrary/dropdown/_CustomDropdown';
 import FontAwesomeV6Icon, {
   FontAwesomeV6IconProps,
 } from '@cdo/apps/componentLibrary/fontAwesomeV6Icon';
 
 import moduleStyles from '@cdo/apps/componentLibrary/dropdown/customDropdown.module.scss';
 
-export interface IconDropdownOption {
-  value: string;
-  label: string;
-  isOptionDisabled?: boolean;
+export interface IconDropdownOption extends _CustomDropdownOption {
   icon: FontAwesomeV6IconProps;
 }
 
-export interface IconDropdownProps extends AriaAttributes {
+export interface IconDropdownProps
+  extends DropdownFormFieldRelatedProps,
+    AriaAttributes {
   /** IconDropdown name.
    * Name of the dropdown, used as unique identifier of the dropdown's HTML element */
   name: string;
@@ -36,6 +38,8 @@ export interface IconDropdownProps extends AriaAttributes {
   size: ComponentSizeXSToL;
   /** IconDropdown disabled state */
   disabled?: boolean;
+  /** IconDropdown readOnly state */
+  readOnly?: boolean;
   /** IconDropdown label
    * The user-facing label of the dropdown */
   labelText: string;
@@ -58,8 +62,13 @@ const IconDropdown: React.FunctionComponent<IconDropdownProps> = ({
   selectedOption = {},
   onChange,
   disabled = false,
+  readOnly = false,
   color = dropdownColors.black,
   size = 'm',
+  helperMessage,
+  helperIcon,
+  errorMessage,
+  styleAsFormField = false,
   ...rest
 }) => {
   const {setActiveDropdownName} = useDropdownContext();
@@ -80,12 +89,18 @@ const IconDropdown: React.FunctionComponent<IconDropdownProps> = ({
       labelText={labelText}
       labelType={labelType}
       disabled={disabled}
+      readOnly={readOnly}
       color={color}
       icon={selectedOption?.icon}
       size={size}
+      helperMessage={helperMessage}
+      helperIcon={helperIcon}
+      errorMessage={errorMessage}
+      styleAsFormField={styleAsFormField}
+      selectedValueText={selectedOption?.label}
       {...rest}
     >
-      <form className={moduleStyles.dropdownMenuContainer}>
+      <div className={moduleStyles.dropdownMenuContainer}>
         <ul>
           {options.map(option => {
             const {
@@ -124,7 +139,7 @@ const IconDropdown: React.FunctionComponent<IconDropdownProps> = ({
             );
           })}
         </ul>
-      </form>
+      </div>
     </CustomDropdown>
   );
 };

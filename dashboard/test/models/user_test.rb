@@ -84,37 +84,6 @@ class UserTest < ActiveSupport::TestCase
     @levelbuilder = create :levelbuilder
   end
 
-  class CAPEventLogging < ActiveSupport::TestCase
-    setup do
-      @student = create(:non_compliant_child)
-    end
-
-    test 'logs CAP event "account_locking" after student compliance state changed to "l"' do
-      Services::ChildAccount.update_compliance(@student, Policies::ChildAccount::ComplianceState::LOCKED_OUT)
-
-      Services::ChildAccount::EventLogger.expects(:log_account_locking).with(@student).once
-
-      @student.save!
-    end
-
-    test 'logs CAP event "permission_granting" after student compliance state changed to "g"' do
-      Services::ChildAccount.update_compliance(@student, Policies::ChildAccount::ComplianceState::PERMISSION_GRANTED)
-
-      Services::ChildAccount::EventLogger.expects(:log_permission_granting).with(@student).once
-
-      @student.save!
-    end
-
-    test 'does not log any CAP events if compliance state was not changed' do
-      Services::ChildAccount.update_compliance(@student, Policies::ChildAccount::ComplianceState::LOCKED_OUT)
-      @student.save!
-
-      Services::ChildAccount::EventLogger.expects(:new).with(user: @student, event_name: anything).never
-
-      @student.save!
-    end
-  end
-
   test 'from_identifier finds user by id' do
     student = create :student
     assert_equal student, User.from_identifier(student.id.to_s)
@@ -142,6 +111,11 @@ class UserTest < ActiveSupport::TestCase
   test 'make_teachers_21' do
     teacher = create :teacher, birthday: Time.now - 18.years
     assert_equal '21+', teacher.age
+  end
+
+  test 'creating teacher sets show_progress_table_v2 to true' do
+    teacher = create :teacher
+    assert teacher.show_progress_table_v2
   end
 
   # Disable this test if and when we do require teachers to complete school data
@@ -364,10 +338,10 @@ class UserTest < ActiveSupport::TestCase
     user = create :teacher
     application = create :pd_teacher_application, user: user
     application_form_data = application.form_data_hash
-    application_form_data['alternateEmail'] = ''
+    application_form_data['alternateEmail'] = nil
     application.update!(form_data_hash: application_form_data)
 
-    assert application.form_data_hash['alternateEmail'].empty?
+    assert application.form_data_hash['alternateEmail'].blank?
     assert_equal user.email_for_enrollments, user.email
   end
 
@@ -414,10 +388,10 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "cannot build user with panda in name" do
+  test "can build user with panda in name" do
     user = build :user, name: panda_panda
-    refute user.valid?
-    assert user.errors[:name].length == 1
+    assert user.valid?
+    assert user.errors[:name].empty?
   end
 
   test "cannot build user with panda in email" do
@@ -514,6 +488,44 @@ class UserTest < ActiveSupport::TestCase
   test "cannot create multi-auth user with duplicate of multi-auth user's second email" do
     create_multi_auth_user_with_second_email COLLISION_EMAIL
     cannot_create_multi_auth_users_with_email COLLISION_EMAIL
+  end
+
+  test "can create multi-auth LTI user with duplicate of multi-auth user's second email" do
+    create :student, email: COLLISION_EMAIL
+    # trigger the email validation by changing the email (partial registration has email as "" which becomes the actual
+    # email in the finish sign up flow)
+    user = create :student
+    user.authentication_options.destroy_all
+
+    lti_authentication_option = create(:lti_authentication_option, user: user, email: COLLISION_EMAIL)
+    user.authentication_options << lti_authentication_option
+    user.email = COLLISION_EMAIL
+
+    user.save!
+
+    user.valid?
+  end
+
+  test "email does not have to be unique when existing user has LTI authentication" do
+    user = create :teacher, :with_lti_auth
+    dupe_user = create(:teacher, email: user.email)
+    assert dupe_user.valid?
+  end
+
+  test "cannot create multi-auth LTI user multiple auth options and duplicate of multi-auth user's second email" do
+    create :student, email: COLLISION_EMAIL
+    # trigger the email validation by changing the email (partial registration has email as "" which becomes the actual
+    # email in the finish sign up flow)
+    user = create :student
+    user.authentication_options.destroy_all
+
+    lti_authentication_option = create(:lti_authentication_option, user: user, email: COLLISION_EMAIL)
+    user.authentication_options << lti_authentication_option
+    user.email = COLLISION_EMAIL
+
+    user.save!
+    user.authentication_options << create(:lti_authentication_option, user: user, email: COLLISION_EMAIL)
+    cannot_create_user_with_email :google_authentication_option, user: user, email: COLLISION_EMAIL
   end
 
   def cannot_create_multi_auth_users_with_email(email)
@@ -831,28 +843,6 @@ class UserTest < ActiveSupport::TestCase
   test "non LTI users should not have a LtiUserIdentity when created" do
     user = create :user
     assert_empty user.lti_user_identities
-  end
-
-  test 'LTI teacher should be verified after creation' do
-    lti_integration = create(:lti_integration)
-    auth_id = "#{lti_integration[:issuer]}|#{lti_integration[:client_id]}|#{SecureRandom.alphanumeric}"
-
-    lti_teacher = build(:teacher)
-    lti_teacher.authentication_options << build(:lti_authentication_option, user: lti_teacher, authentication_id: auth_id)
-    lti_teacher.save!
-
-    assert lti_teacher.verified_teacher?
-  end
-
-  test 'LTI student should not be verified after creation' do
-    lti_integration = create(:lti_integration)
-    auth_id = "#{lti_integration[:issuer]}|#{lti_integration[:client_id]}|#{SecureRandom.alphanumeric}"
-
-    lti_student = build(:student)
-    lti_student.authentication_options << build(:lti_authentication_option, user: lti_student, authentication_id: auth_id)
-    lti_student.save!
-
-    refute lti_student.verified_teacher?
   end
 
   # FND-1130: This test will no longer be required
@@ -1719,16 +1709,9 @@ class UserTest < ActiveSupport::TestCase
     assert ActionMailer::Base.deliveries.empty?
   end
 
-  test 'provides helpful error on bad email address' do
-    # Though validation now exists to prevent grossly malformed emails, such was not always the
-    # case. Consequently, we must bypass validation to create the state of such an account.
-    user = create :user
-    user.email = 'bounce@xyz'
-    user.save(validate: false)
-
-    error_user = User.send_reset_password_instructions(email: 'bounce@xyz')
-
-    assert error_user.errors[:base]
+  test 'do not indicate if email is not tied to a user' do
+    empty_user = User.send_reset_password_instructions(email: 'bounce@xyz.com')
+    assert empty_user.errors.nil_or_empty?
   end
 
   test 'send reset password for student' do
@@ -1801,35 +1784,6 @@ class UserTest < ActiveSupport::TestCase
     old_password = student.encrypted_password
 
     assert_includes(mail.body.to_s, 'Change my password')
-
-    assert mail.body.to_s =~ /reset_password_token=(.+)"/
-    # HACK: Fix my syntax highlighting "
-    token = $1
-
-    User.reset_password_by_token(
-      reset_password_token: token,
-      password: 'newone',
-      password_confirmation: 'newone'
-    )
-
-    student = User.find(student.id)
-    # password was changed
-    assert old_password != student.encrypted_password
-  end
-
-  test 'send reset password to parent for student without email address' do
-    parent_email = 'parent_reset_email@email.xx'
-    student = create :student, password: 'oldone', email: nil, parent_email: parent_email
-
-    assert User.send_reset_password_instructions(email: parent_email)
-
-    mail = ActionMailer::Base.deliveries.first
-    assert_equal [parent_email], mail.to
-    assert_equal 'Code.org reset password instructions', mail.subject
-    student = User.find(student.id)
-    old_password = student.encrypted_password
-
-    assert_includes(mail.body.to_s, 'Change password for')
 
     assert mail.body.to_s =~ /reset_password_token=(.+)"/
     # HACK: Fix my syntax highlighting "
@@ -3761,7 +3715,7 @@ class UserTest < ActiveSupport::TestCase
       courses_and_scripts = @student.recent_student_courses_and_units(false)
       assert_equal 2, courses_and_scripts.length
 
-      assert_equal(['Computer Science Discoveries', 'Unit Other'], courses_and_scripts.map {|cs| cs[:title]})
+      assert_equal(['Computer Science Discoveries', 'Unit Other'], courses_and_scripts.pluck(:title))
     end
 
     test "it does not return pl scripts that are in returned pl courses" do
@@ -3771,7 +3725,7 @@ class UserTest < ActiveSupport::TestCase
       courses_and_scripts = @teacher.recent_pl_courses_and_units(false)
       assert_equal 2, courses_and_scripts.length
 
-      assert_equal(['Computer Science Discoveries PL Course', 'PL Unit Other'], courses_and_scripts.map {|cs| cs[:title]})
+      assert_equal(['Computer Science Discoveries PL Course', 'PL Unit Other'], courses_and_scripts.pluck(:title))
     end
 
     test "it optionally does not return primary course in returned student courses" do
@@ -3793,7 +3747,7 @@ class UserTest < ActiveSupport::TestCase
 
       assert_equal 1, courses_and_scripts.length
 
-      assert_equal(['testcourse'], courses_and_scripts.map {|cs| cs[:name]})
+      assert_equal(['testcourse'], courses_and_scripts.pluck(:name))
     end
   end
 
@@ -3884,7 +3838,9 @@ class UserTest < ActiveSupport::TestCase
         user_type: 'student'
       },
     )
-    params = {}
+    params = {
+      'roster_synced' => true
+    }
 
     assert_creates(User) do
       user = User.from_omniauth(auth, params)
@@ -3894,6 +3850,7 @@ class UserTest < ActiveSupport::TestCase
       assert_equal 'fake oauth token', user.primary_contact_info.data_hash[:oauth_token]
       assert_equal 'fake refresh token', user.primary_contact_info.data_hash[:oauth_refresh_token]
       assert_equal User::TYPE_STUDENT, user.user_type
+      assert_equal true, user.roster_synced
     end
   end
 
@@ -3918,6 +3875,7 @@ class UserTest < ActiveSupport::TestCase
       assert_equal 'fake oauth token', user.primary_contact_info.data_hash[:oauth_token]
       assert_equal 'fake refresh token', user.primary_contact_info.data_hash[:oauth_refresh_token]
       assert_equal 'google_oauth2', user.primary_contact_info.credential_type
+      assert_nil user.roster_synced
     end
   end
 
@@ -3986,6 +3944,12 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test 'summarize' do
+    latest_permission_request_sent_at = 1.month.ago.change(usec: 0)
+    create(:parental_permission_request, user: @student, updated_at: latest_permission_request_sent_at)
+
+    us_state = 'CO'
+    @student.update!(us_state: us_state)
+
     assert_equal(
       {
         id: @student.id,
@@ -4007,7 +3971,9 @@ class UserTest < ActiveSupport::TestCase
         has_ever_signed_in: @student.has_ever_signed_in?,
         ai_tutor_access_denied: !!@student.ai_tutor_access_denied,
         at_risk_age_gated: false,
-        child_account_compliance_state: @student.child_account_compliance_state,
+        child_account_compliance_state: @student.cap_status,
+        latest_permission_request_sent_at: latest_permission_request_sent_at,
+        us_state: us_state,
       },
       @student.summarize
     )
@@ -5229,19 +5195,6 @@ class UserTest < ActiveSupport::TestCase
     assert_equal User.marketing_segment_data_keys.sort, teacher.marketing_segment_data.keys.map(&:to_s).sort
   end
 
-  test "given a noncompliant child account, that account is locked out" do
-    student = create :non_compliant_child
-    student.save!
-    assert_equal Policies::ChildAccount::ComplianceState::LOCKED_OUT, student.child_account_compliance_state
-    refute_empty student.child_account_compliance_lock_out_date
-  end
-
-  test "given a compliant child account, that account is NOT locked out" do
-    student = create :non_compliant_child, :with_parent_permission
-    student.save!
-    assert_equal Policies::ChildAccount::ComplianceState::PERMISSION_GRANTED, student.child_account_compliance_state
-  end
-
   test "does not return deleted followers from the followers helper" do
     student = create :student
     teacher = create :teacher
@@ -5405,5 +5358,169 @@ class UserTest < ActiveSupport::TestCase
     refute student.us_state_changed?
     student.us_state = 'WA'
     assert student.us_state_changed?
+  end
+
+  test "student in cpa lockout flow cannot change us_state or age" do
+    student = create :student, :U13, :in_colorado, :without_parent_permission
+    assert_raises(ActiveRecord::RecordInvalid) do
+      student.update!(us_state: 'CA')
+    end
+
+    assert_raises(ActiveRecord::RecordInvalid) do
+      student.update!(age: 16)
+    end
+    student.reload
+    refute_equal student.age, 16
+
+    student = create :student, :U13, :in_colorado, :with_parent_permission
+    student.update!(us_state: 'WA')
+    student.reload
+    assert_equal student.us_state, 'WA'
+
+    student = create :student, :U13
+    student.update!(us_state: 'WA')
+    student.reload
+    assert_equal student.us_state, 'WA'
+
+    student = create :student, :in_colorado
+    student.update!(us_state: 'WA')
+    student.reload
+    assert_equal student.us_state, 'WA'
+  end
+
+  test 'teacher can change us_state of student in cpa lockout flow' do
+    new_us_state = 'WA'
+
+    teacher = create(:teacher)
+    student = create(:student, :U13, :in_colorado, :without_parent_permission)
+
+    RequestStore.store[:current_user] = teacher
+    student.update!(us_state: new_us_state)
+
+    assert_equal new_us_state, student.reload.us_state
+  end
+
+  test "teacher with oauth account can access AI Chat" do
+    teacher = create :teacher, :google_sso_provider
+    assert teacher.teacher_can_access_ai_chat?
+  end
+
+  test "teacher with LTI account can access AI Chat" do
+    teacher = create :teacher, :with_lti_auth
+    assert teacher.teacher_can_access_ai_chat?
+  end
+
+  test "teacher with AUTHORIZED_TEACHER permissions can access AI Chat" do
+    teacher = create :authorized_teacher
+    assert teacher.teacher_can_access_ai_chat?
+  end
+
+  test "teacher with email account cannot access AI Chat" do
+    teacher = create :teacher
+    refute teacher.teacher_can_access_ai_chat?
+  end
+
+  test "student with email account cannot access AI Chat" do
+    student = create :student
+    refute student.student_can_access_ai_chat?
+  end
+
+  test "student with verified teacher and in appropriate section can access AI Chat" do
+    unit_group = create :unit_group, name: 'exploring-gen-ai-2024'
+    teacher = create :authorized_teacher
+    section = create :section, teacher: teacher, unit_group: unit_group
+    student = create :student
+    create :follower, section: section, student_user: student, user: teacher
+
+    assert student.student_can_access_ai_chat?
+  end
+
+  test "student with verified teacher but not in appropriate section cannot access AI Chat" do
+    teacher = create :authorized_teacher
+    section = create :section, teacher: teacher
+    student = create :student
+    create :follower, section: section, student_user: student, user: teacher
+
+    refute student.student_can_access_ai_chat?
+  end
+
+  describe '#latest_parental_permission_request' do
+    let(:latest_parental_permission_request) {user.latest_parental_permission_request}
+
+    let(:user) {create(:non_compliant_child)}
+
+    let(:user_permission_request1) {create(:parental_permission_request, user: user, parent_email: 'test1@example.org')}
+    let(:user_permission_request2) {create(:parental_permission_request, user: user, parent_email: 'test2@example.org')}
+
+    before do
+      user_permission_request1
+      user_permission_request2
+    end
+
+    it 'returns latest parental permission request' do
+      _(latest_parental_permission_request).must_equal user_permission_request2
+    end
+
+    context 'when oldest parental permission request was resent' do
+      before do
+        user_permission_request1.update(resends_sent: 1)
+      end
+
+      it 'returns resend parental permission request' do
+        _(latest_parental_permission_request).must_equal user_permission_request1
+      end
+    end
+  end
+
+  describe 'CAP compliance status removing after #us_state updating' do
+    subject(:user) {create(:user, us_state: old_us_state, cap_status: cap_status)}
+
+    let(:cap_status) {'l'}
+    let(:old_us_state) {'CO'}
+    let(:new_us_state) {'WA'}
+
+    let(:update_us_state) do
+      user.us_state = new_us_state
+      user.save(validate: false)
+    end
+
+    let(:expect_cap_compliance_removing) do
+      Services::ChildAccount.expects(:remove_compliance).with(user)
+    end
+
+    it 'calls CAP compliance removing service' do
+      expect_cap_compliance_removing.once
+      update_us_state
+    end
+
+    it 'removes #cap_status' do
+      assert_changes -> {user.reload.cap_status}, from: cap_status, to: nil do
+        update_us_state
+      end
+    end
+
+    it 'updates #us_state' do
+      assert_changes -> {user.reload.us_state}, from: old_us_state, to: new_us_state do
+        update_us_state
+      end
+    end
+
+    context 'when #us_state property is not changed' do
+      let(:new_us_state) {old_us_state}
+
+      it 'does not call CAP compliance removing service' do
+        expect_cap_compliance_removing.never
+        update_us_state
+      end
+    end
+
+    context 'when no CAP compliance status' do
+      let(:cap_status) {nil}
+
+      it 'does not call CAP compliance removing service' do
+        expect_cap_compliance_removing.never
+        update_us_state
+      end
+    end
   end
 end

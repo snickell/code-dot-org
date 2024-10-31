@@ -4,7 +4,8 @@ import * as Sticky from 'reactabular-sticky';
 import * as Table from 'reactabular-table';
 import * as Virtualized from 'reactabular-virtualized';
 
-import {scriptUrlForStudent} from '@cdo/apps/templates/teacherDashboard/urlHelpers';
+import {getFullName} from '@cdo/apps/templates/manageStudents/utils.ts';
+import {unitUrlForStudent} from '@cdo/apps/templates/teacherDashboard/urlHelpers';
 import i18n from '@cdo/locale';
 
 import {
@@ -57,17 +58,14 @@ export default class ProgressTableStudentList extends React.Component {
 
   studentNameFormatter(rowData) {
     const {sectionId, scriptData, studentTimestamps} = this.props;
-    const studentUrl = scriptUrlForStudent(
+    const studentUrl = unitUrlForStudent(
       sectionId,
       scriptData.name,
       rowData.student.id
     );
-    const fullName = rowData.student.familyName
-      ? `${rowData.student.name} ${rowData.student.familyName}`
-      : rowData.student.name;
     return (
       <ProgressTableStudentName
-        name={fullName}
+        name={getFullName(rowData.student)}
         studentId={rowData.student.id}
         sectionId={sectionId}
         scriptId={scriptData.id}

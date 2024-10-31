@@ -3,7 +3,7 @@ import {render, screen, act} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import {Provider} from 'react-redux';
-import sinon from 'sinon';
+import sinon from 'sinon'; // eslint-disable-line no-restricted-imports
 
 import {
   getStore,
@@ -18,7 +18,7 @@ import RubricSubmitFooter from '@cdo/apps/templates/rubrics/RubricSubmitFooter';
 import HttpClient from '@cdo/apps/util/HttpClient';
 import i18n from '@cdo/locale';
 
-import {expect} from '../../../util/reconfiguredChai';
+import {expect} from '../../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
 
 describe('RubricSubmitFooter', () => {
   let store;
@@ -64,11 +64,7 @@ describe('RubricSubmitFooter', () => {
         true,
         sinon.match.any
       )
-      .returns(
-        new Promise(resolve => {
-          throw new Error('some error');
-        })
-      );
+      .rejects();
   }
 
   // Stubs HttpClient.post() to respond with some incorrect response body
@@ -227,6 +223,7 @@ describe('RubricSubmitFooter', () => {
           reportingData={{}}
           studentLevelInfo={defaultStudentInfo}
           open
+          onSubmitTeacherFeedback={() => {}}
         />
       </Provider>
     );
@@ -288,6 +285,7 @@ describe('RubricSubmitFooter', () => {
           reportingData={{}}
           studentLevelInfo={defaultStudentInfo}
           open
+          onSubmitTeacherFeedback={() => {}}
         />
       </Provider>
     );
@@ -335,6 +333,7 @@ describe('RubricSubmitFooter', () => {
           reportingData={{}}
           studentLevelInfo={defaultStudentInfo}
           open
+          onSubmitTeacherFeedback={() => {}}
         />
       </Provider>
     );
@@ -368,6 +367,7 @@ describe('RubricSubmitFooter', () => {
           reportingData={{}}
           studentLevelInfo={defaultStudentInfo}
           open
+          onSubmitTeacherFeedback={() => {}}
         />
       </Provider>
     );
@@ -411,6 +411,7 @@ describe('RubricSubmitFooter', () => {
           reportingData={{}}
           studentLevelInfo={defaultStudentInfo}
           open
+          onSubmitTeacherFeedback={() => {}}
         />
       </Provider>
     );
@@ -451,6 +452,7 @@ describe('RubricSubmitFooter', () => {
           reportingData={{}}
           studentLevelInfo={defaultStudentInfo}
           open
+          onSubmitTeacherFeedback={() => {}}
         />
       </Provider>
     );
@@ -491,6 +493,7 @@ describe('RubricSubmitFooter', () => {
           reportingData={{}}
           studentLevelInfo={defaultStudentInfo}
           open
+          onSubmitTeacherFeedback={() => {}}
         />
       </Provider>
     );

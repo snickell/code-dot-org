@@ -29,14 +29,6 @@ class CoursesController < ApplicationController
     @course_families_course_types = @course_families_course_types.to_h
   end
 
-  def index
-    view_options(full_width: true, responsive_content: true, no_padding_container: true, has_i18n: true)
-    @is_english = request.language == 'en'
-    @is_signed_out = current_user.nil?
-    @force_race_interstitial = params[:forceRaceInterstitial]
-    @modern_elementary_courses_available = Unit.modern_elementary_courses_available?(request.locale)
-  end
-
   def show
     if !params[:section_id] && current_user&.last_section_id
       redirect_to "#{request.path}?section_id=#{current_user.last_section_id}"
@@ -50,8 +42,7 @@ class CoursesController < ApplicationController
       return
     end
 
-    sections = current_user.try {|u| u.sections_instructed.all.reject(&:hidden).map(&:summarize)}
-    @sections_with_assigned_info = sections&.map {|section| section.merge!({"isAssigned" => section[:course_id] == @unit_group.id})}
+    @sections = current_user.try {|u| u.sections_instructed.all.reject(&:hidden).map(&:summarize)}
 
     @locale_code = request.locale
 
@@ -97,9 +88,10 @@ class CoursesController < ApplicationController
     raise ActiveRecord::ReadOnlyRecord if @unit_group.try(:plc_course)
     @unit_group_data = {
       course_summary: @unit_group.summarize(@current_user, for_edit: true),
-      script_names: Unit.all.select {|unit| unit.is_course? == false}.map(&:name),
+      script_names: Unit.all.select {|unit| unit.is_course? == false && unit.unit_groups.none?}.map(&:name),
       course_families: UnitGroup.family_names,
-      version_year_options: UnitGroup.get_version_year_options
+      version_year_options: UnitGroup.get_version_year_options,
+      missing_required_device_compatibilities: @unit_group&.course_version&.course_offering&.missing_required_device_compatibility?
     }
     render 'edit', locals: {unit_group: @unit_group}
   end
@@ -161,7 +153,11 @@ class CoursesController < ApplicationController
 
     # When the url of a course family is requested, redirect to a specific course version.
     if UnitGroup.family_names.include?(params[:course_name])
-      unit_group = UnitGroup.latest_stable_version(params[:course_name])
+      # Look for latest version in the user's locale, fall back to latest version
+      # in English if no translated version exists.
+      unit_group =
+        UnitGroup.latest_stable_version(params[:course_name], locale: request.locale) ||
+        UnitGroup.latest_stable_version(params[:course_name])
       if unit_group
         redirect_path = url_for(action: params[:action], course_name: unit_group.name)
         redirect_query_string = request.query_string.empty? ? '' : "?#{request.query_string}"
@@ -208,11 +204,12 @@ class CoursesController < ApplicationController
 
   private def redirect_unit_group(unit_group)
     # Return nil if unit_group is nil or we know the user can view the version requested.
-    return nil if !unit_group || unit_group.can_view_version?(current_user)
+    return nil if !unit_group || unit_group.can_view_version?(current_user, request.locale)
 
     # Redirect the user to the latest assigned unit_group in this family, or to the latest unit_group in this family if none
     # are assigned.
     redirect_unit_group = UnitGroup.latest_assigned_version(unit_group.family_name, current_user)
+    redirect_unit_group ||= UnitGroup.latest_stable_version(unit_group.family_name, locale: request.locale)
     redirect_unit_group ||= UnitGroup.latest_stable_version(unit_group.family_name)
 
     # Do not redirect if we are already on the correct unit_group.

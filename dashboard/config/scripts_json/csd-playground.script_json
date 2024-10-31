@@ -10,7 +10,7 @@
     },
     "new_name": null,
     "family_name": "csd-playground",
-    "serialized_at": "2024-05-21 22:52:19 UTC",
+    "serialized_at": "2024-10-25 18:00:02 UTC",
     "published_state": "in_development",
     "instruction_type": "teacher_led",
     "instructor_audience": "teacher",
@@ -2433,6 +2433,28 @@
       },
       "seeding_key": {
         "activity_section.key": "b7b46520-04b8-471f-a69e-ac97d76da412",
+        "lesson_activity.key": "bd22b255-6fbc-4ac9-97f6-565f7b9ab30d"
+      }
+    },
+    {
+      "key": "c21d0ea2-19ed-4407-8037-1f349ea28c14",
+      "position": 2,
+      "properties": {
+        "description": "\n\n![expandable](https://images.code.org/8af3c1808b1a032735e26fefa773a480-IMG_7529.jpg)"
+      },
+      "seeding_key": {
+        "activity_section.key": "c21d0ea2-19ed-4407-8037-1f349ea28c14",
+        "lesson_activity.key": "bd22b255-6fbc-4ac9-97f6-565f7b9ab30d"
+      }
+    },
+    {
+      "key": "1db2dccb-00c4-4d00-afbd-02a753c9d4fc",
+      "position": 3,
+      "properties": {
+        "description": "<span data-url=\"https://images.code.org/8af3c1808b1a032735e26fefa773a480-IMG_7529.jpg\" class=\"expandable-image\"></span>"
+      },
+      "seeding_key": {
+        "activity_section.key": "1db2dccb-00c4-4d00-afbd-02a753c9d4fc",
         "lesson_activity.key": "bd22b255-6fbc-4ac9-97f6-565f7b9ab30d"
       }
     },
@@ -5003,6 +5025,27 @@
       "level_keys": [
         "course_e_maker_juicemind_bridging_activity_stretch_test"
       ]
+    },
+    {
+      "chapter": 88,
+      "position": 1,
+      "activity_section_position": 1,
+      "assessment": false,
+      "properties": {
+      },
+      "bonus": false,
+      "seeding_key": {
+        "script_level.level_keys": [
+          "gen-ai-customizing-project-L0_2024_TEST"
+        ],
+        "lesson.key": "Option A",
+        "lesson_group.key": "",
+        "script.name": "csd-playground",
+        "activity_section.key": "34c52b0d-fd00-42da-98b3-83465bb2bbf1"
+      },
+      "level_keys": [
+        "gen-ai-customizing-project-L0_2024_TEST"
+      ]
     }
   ],
   "levels_script_levels": [
@@ -6048,6 +6091,18 @@
         "lesson_group.key": "",
         "script.name": "csd-playground",
         "activity_section.key": "60274cbe-4bbb-4bc2-953e-3715b3994d62"
+      }
+    },
+    {
+      "seeding_key": {
+        "level.key": "gen-ai-customizing-project-L0_2024_TEST",
+        "script_level.level_keys": [
+          "gen-ai-customizing-project-L0_2024_TEST"
+        ],
+        "lesson.key": "Option A",
+        "lesson_group.key": "",
+        "script.name": "csd-playground",
+        "activity_section.key": "34c52b0d-fd00-42da-98b3-83465bb2bbf1"
       }
     }
   ],

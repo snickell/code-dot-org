@@ -1,25 +1,30 @@
-import React, {useState, useMemo} from 'react';
 import classNames from 'classnames';
+import React, {useState, useMemo} from 'react';
+import {useSelector} from 'react-redux';
 
-import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
-import {StrongText} from '@cdo/apps/componentLibrary/typography/TypographyElements';
+import {AichatLevelProperties, ModelDescription} from '@cdo/apps/aichat/types';
 import Button from '@cdo/apps/componentLibrary/button/Button';
 import SimpleDropdown from '@cdo/apps/componentLibrary/dropdown/simpleDropdown/SimpleDropdown';
+import Slider, {SliderProps} from '@cdo/apps/componentLibrary/slider/Slider';
+import {isReadOnlyWorkspace} from '@cdo/apps/lab2/lab2Redux';
+import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
+
+import {modelDescriptions} from '../../constants';
 import {setAiCustomizationProperty} from '../../redux/aichatRedux';
-import styles from '../model-customization-workspace.module.scss';
+
+import CompareModelsDialog from './CompareModelsDialog';
 import {
   DEFAULT_VISIBILITIES,
   MAX_TEMPERATURE,
   MIN_TEMPERATURE,
   SET_TEMPERATURE_STEP,
 } from './constants';
-import {isVisible, isDisabled, isEditable} from './utils';
-import CompareModelsDialog from './CompareModelsDialog';
-import {modelDescriptions} from '../../constants';
-import {AichatLevelProperties, ModelDescription} from '@cdo/apps/aichat/types';
-import {isReadOnlyWorkspace} from '@cdo/apps/lab2/lab2Redux';
-import {useSelector} from 'react-redux';
+import FieldLabel from './FieldLabel';
+import SaveChangesAlerts from './SaveChangesAlerts';
 import UpdateButton from './UpdateButton';
+import {isVisible, isDisabled, isEditable} from './utils';
+
+import styles from '../model-customization-workspace.module.scss';
 
 const SetupCustomization: React.FunctionComponent = () => {
   const dispatch = useAppDispatch();
@@ -74,9 +79,15 @@ const SetupCustomization: React.FunctionComponent = () => {
 
   const renderChooseAndCompareModels = () => {
     return (
-      <div className={styles.inputContainer}>
+      <div>
+        <FieldLabel
+          id="selected-model"
+          label="Selected model"
+          tooltipText="This is the underlying language model being used by the chatbot. Use the dropdown to select from additional fine-tuned models."
+        />
         <SimpleDropdown
-          labelText="Selected model:"
+          labelText="Selected model"
+          isLabelVisible={false}
           onChange={event =>
             dispatch(
               setAiCustomizationProperty({
@@ -99,6 +110,7 @@ const SetupCustomization: React.FunctionComponent = () => {
             text="Compare Models"
             onClick={() => setIsShowingModelDialog(true)}
             type="secondary"
+            color="gray"
             className={classNames(
               styles.updateButton,
               styles.compareModelsButton
@@ -116,42 +128,64 @@ const SetupCustomization: React.FunctionComponent = () => {
     );
   };
 
+  // The reason we're multiplying by 10 and dividing by 10 is because the slider
+  // component adds and subtracts by the step value, and with float math, those values
+  // can end up being slightly off after multiple increments/decrements by 0.1.
+  // This way, we can avoid any issues from funky float math.
+  const sliderProps: SliderProps = {
+    name: 'temperature-slider',
+    value: Math.round(aiCustomizations.temperature * 10),
+    minValue: Math.round(MIN_TEMPERATURE * 10),
+    maxValue: Math.round(MAX_TEMPERATURE * 10),
+    step: Math.round(SET_TEMPERATURE_STEP * 10),
+    hideValue: true,
+    disabled: isDisabled(temperature) || readOnlyWorkspace,
+    onChange: event => {
+      const value = parseInt(event.target.value) / 10;
+      dispatch(
+        setAiCustomizationProperty({
+          property: 'temperature',
+          value: value,
+        })
+      );
+    },
+    className: styles.temperatureSlider,
+    leftButtonProps: {
+      icon: {iconName: 'minus', title: 'Decrease'},
+      ['aria-label']: 'Decrease',
+    },
+    rightButtonProps: {
+      icon: {iconName: 'plus', title: 'Increase'},
+      ['aria-label']: 'Increase',
+    },
+  };
+
   return (
     <div className={styles.verticalFlexContainer}>
       <div className={styles.customizationContainer}>
         {isVisible(selectedModelId) && renderChooseAndCompareModels()}
         {isVisible(temperature) && (
-          <div className={styles.inputContainer}>
+          <>
             <div className={styles.horizontalFlexContainer}>
-              <label htmlFor="temperature">
-                <StrongText>Temperature</StrongText>
-              </label>
+              <FieldLabel
+                id="temperature"
+                label="Temperature"
+                tooltipText="Temperature affects which words are generated as a response. Use the slider to change the temperature."
+              />
               {aiCustomizations.temperature}
             </div>
-            <input
-              type="range"
-              min={MIN_TEMPERATURE}
-              max={MAX_TEMPERATURE}
-              step={SET_TEMPERATURE_STEP}
-              value={aiCustomizations.temperature}
-              disabled={isDisabled(temperature) || readOnlyWorkspace}
-              onChange={event =>
-                dispatch(
-                  setAiCustomizationProperty({
-                    property: 'temperature',
-                    value: event.target.value,
-                  })
-                )
-              }
-            />
-          </div>
+            <Slider {...sliderProps} />
+          </>
         )}
         {isVisible(systemPrompt) && (
-          <div className={styles.inputContainer}>
-            <label htmlFor="system-prompt">
-              <StrongText>System prompt</StrongText>
-            </label>
+          <>
+            <FieldLabel
+              id="system-prompt"
+              label="System Prompt"
+              tooltipText="The system prompt controls how the chatbot behaves. Type your instructions into the text box."
+            />
             <textarea
+              className={styles.systemPromptInput}
               id="system-prompt"
               value={aiCustomizations.systemPrompt}
               disabled={isDisabled(systemPrompt) || readOnlyWorkspace}
@@ -164,12 +198,13 @@ const SetupCustomization: React.FunctionComponent = () => {
                 )
               }
             />
-          </div>
+          </>
         )}
       </div>
       <div className={styles.footerButtonContainer}>
         <UpdateButton isDisabledDefault={allFieldsDisabled} />
       </div>
+      <SaveChangesAlerts isReadOnly={allFieldsDisabled} />
     </div>
   );
 };

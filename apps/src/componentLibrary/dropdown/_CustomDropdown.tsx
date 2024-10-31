@@ -8,6 +8,7 @@ import React, {
   KeyboardEvent,
 } from 'react';
 
+import {Button, ButtonProps} from '@cdo/apps/componentLibrary/button';
 import {dropdownColors} from '@cdo/apps/componentLibrary/common/constants';
 import {useDropdownContext} from '@cdo/apps/componentLibrary/common/contexts/DropdownContext';
 import {getAriaPropsFromProps} from '@cdo/apps/componentLibrary/common/helpers';
@@ -21,6 +22,21 @@ import FontAwesomeV6Icon, {
 
 import moduleStyles from './customDropdown.module.scss';
 
+export interface TriggerComponentProps extends AriaAttributes {
+  id: string;
+  onClick: () => void;
+  disabled: boolean;
+  'aria-haspopup': boolean;
+  'aria-label': string;
+  'data-toggle': string;
+}
+
+export interface _CustomDropdownOption {
+  value: string;
+  label: string;
+  isOptionDisabled?: boolean;
+}
+
 export interface CustomDropdownProps extends AriaAttributes {
   /** CustomDropdown name.
    * Name of the dropdown, used as unique identifier of the dropdown's HTML element */
@@ -31,8 +47,12 @@ export interface CustomDropdownProps extends AriaAttributes {
   color?: DropdownColor;
   /** CustomDropdown size */
   size: ComponentSizeXSToL;
+  /** CustomDropdown menu placement */
+  menuPlacement?: 'left' | 'right';
   /** CustomDropdown disabled state */
   disabled?: boolean;
+  /** CustomDropdown readOnly state */
+  readOnly?: boolean;
   /** CustomDropdown label
    * The user-facing label of the dropdown */
   labelText: string;
@@ -42,8 +62,22 @@ export interface CustomDropdownProps extends AriaAttributes {
   isSomeValueSelected?: boolean;
   /** Custom icon to show for the dropdown button*/
   icon?: FontAwesomeV6IconProps;
+  /** Whether to use DSCO (Design System) Button component as DropdownTrigger or not */
+  useDSCOButtonAsTrigger?: boolean;
+  /** Dropdown Trigger DSCO (Design System) Button Props */
+  triggerButtonProps?: ButtonProps;
   /** Children */
   children: React.ReactNode;
+  /** CustomDropdown helper message */
+  helperMessage?: string;
+  /** CustomDropdown helper icon */
+  helperIcon?: FontAwesomeV6IconProps;
+  /** CustomDropdown error message */
+  errorMessage?: string;
+  /** Style the dropdown as a form field */
+  styleAsFormField?: boolean;
+  /** (used with styleAsFormField: true) Selected value text */
+  selectedValueText?: string;
 }
 
 /**
@@ -60,8 +94,17 @@ const CustomDropdown: React.FunctionComponent<CustomDropdownProps> = ({
   isSomeValueSelected = false,
   icon,
   disabled = false,
+  readOnly = false,
   color = dropdownColors.black,
   size = 'm',
+  menuPlacement = 'left',
+  useDSCOButtonAsTrigger = false,
+  triggerButtonProps = {},
+  helperMessage,
+  helperIcon,
+  errorMessage,
+  styleAsFormField = false,
+  selectedValueText,
   ...rest
 }) => {
   const {activeDropdownName, setActiveDropdownName} = useDropdownContext();
@@ -91,6 +134,14 @@ const CustomDropdown: React.FunctionComponent<CustomDropdownProps> = ({
     };
   }, [handleClickOutside]);
 
+  useEffect(() => {
+    if (useDSCOButtonAsTrigger && !triggerButtonProps) {
+      console.warn(
+        'Warning: `triggerButtonProps` must be defined when `useDSCOButtonAsTrigger` is true.'
+      );
+    }
+  }, [useDSCOButtonAsTrigger, triggerButtonProps]);
+
   const toggleDropdown = useCallback(() => {
     if (activeDropdownName !== name) {
       setActiveDropdownName(name);
@@ -111,12 +162,28 @@ const CustomDropdown: React.FunctionComponent<CustomDropdownProps> = ({
     }
   };
 
+  const triggerComponentProps: TriggerComponentProps = {
+    id: `${name}-dropdown-button`,
+    'data-toggle': 'dropdown',
+    onClick: toggleDropdown,
+    disabled: disabled || readOnly,
+    ...ariaProps,
+    'aria-haspopup': true,
+    'aria-label': ariaProps['aria-label'] || `${name} filter dropdown`,
+  };
+
   return (
     <div
       id={`${name}-dropdown`}
       className={classNames(
-        {[moduleStyles.open]: isOpen},
+        {
+          [moduleStyles.open]: isOpen,
+          [moduleStyles.hasError]: errorMessage,
+          [moduleStyles.readOnly]: readOnly,
+          [moduleStyles.styleAsFormField]: styleAsFormField,
+        },
         moduleStyles.dropdownContainer,
+        moduleStyles[`dropdownContainer-${menuPlacement}-menuPlacement`],
         moduleStyles[`dropdownContainer-${color}`],
         moduleStyles[`dropdownContainer-${size}`],
         className
@@ -125,40 +192,73 @@ const CustomDropdown: React.FunctionComponent<CustomDropdownProps> = ({
       ref={dropdownRef}
       aria-describedby={ariaProps['aria-describedby']}
     >
-      <button
-        id={`${name}-dropdown-button`}
-        type="button"
-        className={moduleStyles.dropdownButton}
-        data-toggle="dropdown"
-        onClick={toggleDropdown}
-        disabled={disabled}
-        {...ariaProps}
-        aria-haspopup={true}
-        aria-label={ariaProps['aria-label'] || `${name} filter dropdown`}
-      >
-        {isSomeValueSelected && (
-          <FontAwesomeV6Icon iconName="check-circle" iconStyle="solid" />
-        )}
-        {icon && (
-          <FontAwesomeV6Icon
-            iconName={icon.iconName}
-            iconStyle={icon.iconStyle}
-            title={icon.title}
-            className={icon.className}
-          />
-        )}
-        <span
-          className={classNames(
-            moduleStyles.dropdownLabel,
-            moduleStyles[`dropdownLabel-${labelType}`]
-          )}
+      {styleAsFormField && labelText && (
+        <div>
+          <span className={moduleStyles.dropdownFieldLabel}>{labelText}</span>
+        </div>
+      )}
+      {useDSCOButtonAsTrigger ? (
+        <Button
+          {...triggerComponentProps}
+          {...triggerButtonProps}
+          size={size}
+          aria-label={
+            triggerButtonProps?.isIconOnly
+              ? labelText
+              : triggerButtonProps['aria-label'] ||
+                triggerComponentProps['aria-label']
+          }
+        />
+      ) : (
+        <button
+          {...triggerComponentProps}
+          type="button"
+          className={moduleStyles.dropdownButton}
         >
-          {labelText}
-        </span>
-        <FontAwesomeV6Icon iconStyle="solid" iconName="chevron-down" />
-      </button>
+          {isSomeValueSelected && (
+            <FontAwesomeV6Icon iconName="check-circle" iconStyle="solid" />
+          )}
+          {icon && (
+            <FontAwesomeV6Icon
+              iconName={icon.iconName}
+              iconStyle={icon.iconStyle}
+              title={icon.title}
+              className={icon.className}
+            />
+          )}
+          <span
+            className={classNames(
+              moduleStyles.dropdownLabel,
+              moduleStyles[
+                `dropdownLabel-${styleAsFormField ? 'thin' : labelType}`
+              ]
+            )}
+          >
+            {styleAsFormField ? selectedValueText : labelText}
+          </span>
+          <FontAwesomeV6Icon iconStyle="solid" iconName="chevron-down" />
+        </button>
+      )}
       {/** Dropdown menu content is rendered here as children props*/}
       {children}
+
+      {!errorMessage && (helperMessage || helperIcon) && (
+        <div className={moduleStyles.helperSection}>
+          {helperIcon && <FontAwesomeV6Icon {...helperIcon} />}
+          {helperMessage && <span>{helperMessage}</span>}
+        </div>
+      )}
+      {errorMessage && (
+        <div
+          className={classNames(
+            moduleStyles.errorSection,
+            moduleStyles.helperSection
+          )}
+        >
+          <FontAwesomeV6Icon iconName="circle-exclamation" />
+          <span>{errorMessage}</span>
+        </div>
+      )}
     </div>
   );
 };

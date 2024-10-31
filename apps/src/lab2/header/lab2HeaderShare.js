@@ -1,22 +1,25 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
-import Lab2Registry from '../Lab2Registry';
-import {getStore} from '@cdo/apps/redux';
-import Lab2ShareDialogWrapper from '../views/Lab2ShareDialogWrapper';
+
 import {showShareDialog} from '@cdo/apps/code-studio/components/shareDialogRedux';
+import {getStore} from '@cdo/apps/redux';
+
+import Lab2Registry from '../Lab2Registry';
+import Lab2ShareDialogWrapper from '../views/Lab2ShareDialogWrapper';
 
 const PROJECT_SHARE_DIALOG_ID = 'project-share-dialog';
 
 /**
  * Save, then show the share dialog for a Lab2 project.
- * @param {string} shareUrl - The URL of the project to share.
  */
-export function shareLab2Project(shareUrl) {
+export function shareLab2Project(id, finishUrl) {
   const projectManager = Lab2Registry.getInstance().getProjectManager();
   if (!projectManager) {
     return null;
   }
+
+  const shareUrl = projectManager.getShareUrl();
 
   projectManager.flushSave().then(() => {
     var dialogDom = document.getElementById(PROJECT_SHARE_DIALOG_ID);
@@ -27,7 +30,11 @@ export function shareLab2Project(shareUrl) {
     }
     ReactDOM.render(
       <Provider store={getStore()}>
-        <Lab2ShareDialogWrapper shareUrl={shareUrl} />
+        <Lab2ShareDialogWrapper
+          dialogId={id}
+          shareUrl={shareUrl}
+          finishUrl={finishUrl}
+        />
       </Provider>,
       dialogDom
     );

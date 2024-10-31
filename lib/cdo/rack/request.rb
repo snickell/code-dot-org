@@ -59,8 +59,8 @@ module Cdo
       host_parts.sub!('-', '.') unless rack_env?(:production)
       parts = host_parts.split('.')
 
-      if parts.count >= 3
-        domains = (%w(studio learn advocacy) + CDO.partners).map {|x| x + '.code.org'}
+      if parts.count >= 2
+        domains = (%w(studio learn) + CDO.partners).map {|x| x + '.code.org'}
         domain = parts.last(3).join('.').split(':').first
         return domain if domains.include? domain
       end
@@ -118,6 +118,10 @@ module Cdo
     def country
       env['HTTP_CLOUDFRONT_VIEWER_COUNTRY'] ||
         location&.country_code
+    end
+
+    def country_code
+      country.to_s.strip.upcase.presence
     end
 
     def gdpr?

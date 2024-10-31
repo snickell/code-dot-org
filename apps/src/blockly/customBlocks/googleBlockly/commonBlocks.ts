@@ -4,13 +4,15 @@
  * Defines blocks useful in multiple blockly apps
  */
 
-import {Block, CodeGenerator} from 'blockly';
+import * as GoogleBlockly from 'blockly/core';
 
 import {
   BlocklyWrapperType,
   JavascriptGeneratorType,
 } from '@cdo/apps/blockly/types';
+import i18n from '@cdo/locale';
 
+import {BLOCK_TYPES} from '../../constants';
 import {readBooleanAttribute} from '../../utils';
 
 const mutatorProperties: string[] = [];
@@ -23,6 +25,20 @@ export const blocks = {
     blockly.JavaScript.forBlock.text_join_simple =
       blockly.JavaScript.forBlock.text_join;
   },
+  // We need to use a custom block so that English users will see "random color".
+  installCustomColourRandomBlock(blockly: BlocklyWrapperType) {
+    delete blockly.Blocks['colour_random'];
+    blockly.common.defineBlocks(
+      blockly.common.createBlockDefinitionsFromJsonArray([
+        {
+          type: BLOCK_TYPES.colourRandom,
+          message0: i18n.colourRandom(),
+          output: 'Colour',
+          style: 'colour_blocks',
+        },
+      ])
+    );
+  },
   copyBlockGenerator(
     generator: JavascriptGeneratorType,
     type1: string,
@@ -34,8 +50,8 @@ export const blocks = {
     generator: JavascriptGeneratorType,
     type: string,
     generatorFunction: (
-      block: Block,
-      generator: CodeGenerator
+      block: GoogleBlockly.Block,
+      generator: GoogleBlockly.CodeGenerator
     ) => [string, number] | string | null
   ) {
     generator.forBlock[type] = generatorFunction;
@@ -87,7 +103,7 @@ export const blocks = {
     }
   },
   // Global function to handle serialization hooks
-  addSerializationHooksToBlock(block: Block) {
+  addSerializationHooksToBlock(block: GoogleBlockly.Block) {
     if (!block.mutationToDom) {
       block.mutationToDom = this.mutationToDom;
     }
@@ -106,7 +122,10 @@ export const blocks = {
   // We need to override this generator in order to continue using the
   // legacy function name from CDO Blockly. Other custom blocks in pools
   // depend on the original name..
-  mathRandomIntGenerator(block: Block, generator: JavascriptGeneratorType) {
+  mathRandomIntGenerator(
+    block: GoogleBlockly.Block,
+    generator: JavascriptGeneratorType
+  ) {
     // Random integer between [X] and [Y].
     const argument0 =
       generator.valueToCode(block, 'FROM', generator.ORDER_NONE) || '0';
@@ -128,5 +147,22 @@ export const blocks = {
     );
     const code = `${functionName}(${argument0}, ${argument1})`;
     return [code, generator.ORDER_FUNCTION_CALL];
+  },
+  // Creates and returns a 3-column colour field with an increased height/width
+  // for menu options and the field itself. Used for the K1 Artist colour picker block.
+  getColourDropdownField(colours: string[]) {
+    const configOptions = {
+      colourOptions: colours,
+      columns: 3,
+    };
+    const defaultColour = colours[0];
+    const optionalValidator = undefined;
+    const isK1 = true;
+    return new Blockly.FieldColour(
+      defaultColour,
+      optionalValidator,
+      configOptions,
+      isK1
+    );
   },
 };

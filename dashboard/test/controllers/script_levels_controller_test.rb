@@ -115,7 +115,19 @@ class ScriptLevelsControllerTest < ActionController::TestCase
     assert_response :success
 
     body = JSON.parse(response.body)
-    assert_equal({"id" => level.id, "levelData" => {"hello" => "there"}, "other" => "other", "preloadAssetList" => nil, "type" => "Maze", "appName" => "maze", "useRestrictedSongs" => false, "sharedBlocks" => [], "usesProjects" => false, "exampleSolutions" => []}, body)
+
+    assert_equal body["id"], level.id
+    assert_equal body["levelData"], {"hello" => "there"}
+    assert_equal body["other"], "other"
+    assert_equal body["preloadAssetList"], nil
+    assert_equal body["type"], "Maze"
+    assert_equal body["appName"], "maze"
+    assert_equal body["useRestrictedSongs"], false
+    assert_equal body["sharedBlocks"], []
+    assert_equal body["usesProjects"], false
+    assert_equal body["exampleSolutions"], []
+    assert_equal body["helpVideos"], []
+    assert_match Regexp.new("^/s/bogus-script-[0-9]+"), body["finishUrl"]
   end
 
   test 'should show script level for csp1-2020 lockable lesson with lesson plan' do
@@ -195,6 +207,27 @@ class ScriptLevelsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_equal @script_level, assigns(:script_level)
+  end
+
+  test 'should show script level by script name' do
+    params = {
+      script_id: @script_level.script.name,
+      lesson_position: @script_level.lesson.absolute_position,
+      id: @script_level.position
+    }
+    get :show, params: params
+    assert_response :success
+  end
+
+  test 'should not show script level by script id' do
+    params = {
+      script_id: @script_level.script.id,
+      lesson_position: @script_level.lesson.absolute_position,
+      id: @script_level.position
+    }
+    assert_raises ActiveRecord::RecordNotFound do
+      get :show, params: params
+    end
   end
 
   test 'should make script level pages uncachable by default' do
