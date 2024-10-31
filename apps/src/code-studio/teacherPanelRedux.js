@@ -55,6 +55,8 @@ const setLoadedLevelsWithProgress = () => ({
   type: SET_LOADED_LEVELS_WITH_PROGRESS,
 });
 
+export const setLoadedLevelsWithProgressForTest = setLoadedLevelsWithProgress;
+
 export const loadLevelsWithProgress = () => (dispatch, getState) => {
   const state = getState();
 

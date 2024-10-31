@@ -5,6 +5,7 @@ import {
   createAsyncThunk,
 } from '@reduxjs/toolkit';
 
+import {setLoadedLevelsWithProgressForTest} from '@cdo/apps/code-studio/teacherPanelRedux';
 import {LevelWithProgress} from '@cdo/apps/code-studio/teacherPanelTypes';
 import {computeBubbleStatus} from '@cdo/apps/templates/rubrics/rubricUtils';
 import {RootState} from '@cdo/apps/types/redux';
@@ -163,6 +164,15 @@ export const loadAiEvalStatusForAll = createAsyncThunk(
         });
       }
     });
+  }
+);
+
+export const setLoadedStudentStatusForTest = createAsyncThunk(
+  'teacherRubric/setLoadedStudentStatusForTest',
+  async (_, thunkAPI) => {
+    thunkAPI.dispatch(setLoadedHasTeacherFeedback());
+    thunkAPI.dispatch(setLoadedAiEvalStatus());
+    thunkAPI.dispatch(setLoadedLevelsWithProgressForTest());
   }
 );
 

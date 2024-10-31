@@ -12,7 +12,9 @@ import {
   restoreRedux,
 } from '@cdo/apps/redux';
 import {UnconnectedRubricFloatingActionButton as RubricFloatingActionButton} from '@cdo/apps/templates/rubrics/RubricFloatingActionButton';
-import teacherRubric from '@cdo/apps/templates/rubrics/teacherRubricRedux';
+import teacherRubric, {
+  setLoadedStudentStatusForTest,
+} from '@cdo/apps/templates/rubrics/teacherRubricRedux';
 import teacherSections from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
 import i18n from '@cdo/locale';
 
@@ -70,6 +72,7 @@ describe('RubricFloatingActionButton', () => {
 
   describe('pulse animation', () => {
     it('renders pulse animation when session storage is empty', () => {
+      store.dispatch(setLoadedStudentStatusForTest());
       render(
         <Provider store={store}>
           <RubricFloatingActionButton {...defaultProps} />
@@ -97,6 +100,7 @@ describe('RubricFloatingActionButton', () => {
     });
 
     it('does not render pulse animation when open state is present in session storage', () => {
+      store.dispatch(setLoadedStudentStatusForTest());
       sessionStorage.setItem('RubricFabOpenStateKey', 'false');
       render(
         <Provider store={store}>
