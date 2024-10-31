@@ -4842,6 +4842,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@statsig/client-core@npm:3.2.0":
+  version: 3.2.0
+  resolution: "@statsig/client-core@npm:3.2.0"
+  checksum: 8c4b9b8f680b2cc413bad369871785d98b13c5caf781a594219154424794aa2143cfa4d95904231609d137f80f74a6fdd5b2d08edcdd53f7f8ab3b47b09f96bd
+  languageName: node
+  linkType: hard
+
+"@statsig/js-client@npm:3.2.0":
+  version: 3.2.0
+  resolution: "@statsig/js-client@npm:3.2.0"
+  dependencies:
+    "@statsig/client-core": 3.2.0
+  checksum: 2c361fb0676ef459627be40b20e546f491f233e674302e36489f3d8e5725459d0b47d0caa60ab3a8c61426acf163bb23669f9889ae7f161209e3609439e7722a
+  languageName: node
+  linkType: hard
+
+"@statsig/web-analytics@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "@statsig/web-analytics@npm:3.2.0"
+  dependencies:
+    "@statsig/client-core": 3.2.0
+    "@statsig/js-client": 3.2.0
+  checksum: e34edb9e30a8018565e0977fd31be409639a057c4955a8f35951949bdb1212953bb2cfd53453371d34b4a2f26642e4e976b73080dda0fdde01a251d025cdcc59
+  languageName: node
+  linkType: hard
+
 "@storybook/addon-a11y@npm:~8.1.11":
   version: 8.1.11
   resolution: "@storybook/addon-a11y@npm:8.1.11"
@@ -6511,6 +6537,15 @@ __metadata:
     "@types/history": ^4.7.11
     "@types/react": "*"
   checksum: 128764143473a5e9457ddc715436b5d49814b1c214dde48939b9bef23f0e77f52ffcdfa97eb8d3cc27e2c229869c0cdd90f637d887b62f2c9f065a87d6425419
+  languageName: node
+  linkType: hard
+
+"@types/react-select@npm:^1.2.1":
+  version: 1.3.6
+  resolution: "@types/react-select@npm:1.3.6"
+  dependencies:
+    "@types/react": "*"
+  checksum: 25ba53ba7b4207f8709834f3eeb717b38b90fbf4314ed206fed2c6bc0ee09a4c2f86a79d96f895329e5e0de4c13edc7fe3f84c06af9e9a0492232d1b1e806fe1
   languageName: node
   linkType: hard
 
@@ -8720,6 +8755,7 @@ __metadata:
     "@react-bootstrap/pagination": ^1.0.0
     "@reduxjs/toolkit": ^1.9.3
     "@selectize/selectize": ^0.15.2
+    "@statsig/web-analytics": ^3.2.0
     "@storybook/addon-a11y": ~8.1.11
     "@storybook/addon-essentials": ~8.1.11
     "@storybook/addon-webpack5-compiler-babel": ^3.0.0
@@ -8743,6 +8779,7 @@ __metadata:
     "@types/react-bootstrap": ^0.32.36
     "@types/react-dom": ^18.0.11
     "@types/react-router-dom": ^5.3.3
+    "@types/react-select": ^1.2.1
     "@types/react-typist": ^2.0.6
     "@types/reactabular-table": ^8.14.6
     "@types/sinon": ^10.0.14
