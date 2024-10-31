@@ -23,7 +23,7 @@ module AWS
     # @return [Hash]
     attr_reader :options
 
-    # Default S3 bucket for uploading temporary template files.
+    # Default S3 bucket for uploading template files.
     TEMP_S3_BUCKET = 'cf-templates-p9nfb0gyyrpf-us-east-1'
 
     # A stack name can contain only alphanumeric characters (case sensitive) and hyphens.

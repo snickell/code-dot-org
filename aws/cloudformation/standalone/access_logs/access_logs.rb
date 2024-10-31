@@ -2,6 +2,7 @@
 # Use environment variables to determine CSV column headers,
 # and Glue-table schema to determine column formats.
 
+# Only native gems and AWS SDK are available in AWS Lambda.
 require 'base64'
 require 'csv'
 require 'json'

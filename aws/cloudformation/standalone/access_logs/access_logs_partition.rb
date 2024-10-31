@@ -3,7 +3,9 @@
 # This function is made redundant by Athena Partition Projection, but
 # adding partitions manually is still currently necessary for Redshift Spectrum.
 
+# Only native gems and AWS SDK are available in AWS Lambda.
 require 'aws-sdk-glue'
+
 GLUE = Aws::Glue::Client.new
 
 DATABASE = ENV.fetch('DATABASE', nil)
