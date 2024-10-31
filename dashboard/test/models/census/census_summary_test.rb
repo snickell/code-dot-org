@@ -27,7 +27,7 @@ class Census::CensusSummaryTest < ActiveSupport::TestCase
     refute summary.valid?
   end
 
-  test "Summary creation with invalid school_year fails" do
+  test "Summary creation with invalid access_report_year fails" do
     summary = build :census_summary, :with_invalid_access_report_year
     refute summary.valid?
   end
