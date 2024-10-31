@@ -15,6 +15,8 @@ import experiments from '@cdo/apps/util/experiments';
 import i18n from '@cdo/locale';
 
 import SectionProgress from '../sectionProgress/SectionProgress';
+import {generalShouldShowEmptyState} from '../teacherDashboard/teacherSectionsReduxSelectors';
+import EmptyState from '../teacherNavigation/EmptyState';
 
 import InviteToV2ProgressModal from './InviteToV2ProgressModal';
 import ProgressBanners from './ProgressBanners';
@@ -142,6 +144,11 @@ function SectionProgressSelector({
       );
     }
   };
+
+  const emptyState = generalShouldShowEmptyState();
+  if (emptyState) {
+    return <EmptyState {...emptyState} />;
+  }
 
   return (
     <div

@@ -28,6 +28,7 @@ import {
 import TextResponses from '../textResponses/TextResponses';
 
 import ElementOrEmptyPage from './ElementOrEmptyPage';
+import EmptyState from './EmptyState';
 import LessonMaterialsContainer, {
   lessonMaterialsLoader,
 } from './lessonMaterials/LessonMaterialsContainer';
@@ -61,15 +62,6 @@ const TeacherNavigationRouter: React.FC<TeacherNavigationRouterProps> = ({
     state => state.teacherSections.selectedSectionId
   );
   const selectedSection = useAppSelector(selectedSectionSelector);
-
-  const anyStudentHasProgress = React.useMemo(
-    () => (selectedSection ? selectedSection.anyStudentHasProgress : true),
-    [selectedSection]
-  );
-
-  const studentCount = useAppSelector(
-    state => state.teacherSections.selectedStudents.length
-  );
 
   const versionYear = React.useMemo(
     () => (selectedSection ? selectedSection.versionYear : null),
@@ -175,13 +167,7 @@ const TeacherNavigationRouter: React.FC<TeacherNavigationRouterProps> = ({
           />
           <Route
             path={TEACHER_NAVIGATION_PATHS.progress}
-            element={
-              <ElementOrEmptyPage
-                showNoStudents={studentCount === 0}
-                showNoCurriculumAssigned={!anyStudentHasProgress}
-                element={<SectionProgressSelector isInV1Navigaton={false} />}
-              />
-            }
+            element={<SectionProgressSelector isInV1Navigaton={false} />}
           />
           <Route
             path={TEACHER_NAVIGATION_PATHS.textResponses}

@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 
 import {ParticipantAudience} from '@cdo/apps/generated/curriculum/sharedCourseConstants';
 
+import ElementOrEmptyPage from '../teacherNavigation/ElementOrEmptyPage';
+
 /**
  * @const {string[]} The only properties that can be updated by the user
  * when creating or editing a section.
@@ -108,6 +110,19 @@ export function assignedCourseOffering(state) {
 export function getVisibleSections(state) {
   const allSections = Object.values(getRoot(state).sections);
   return sortSectionsList(allSections || []).filter(section => !section.hidden);
+}
+
+export function generalShouldShowEmptyState(state) {
+  const selectedSection = selectedSectionSelector(state);
+  const studentCount = selectedSection.selectedStudents.length;
+  const anyStudentHasProgress = selectedSection.anyStudentHasProgress;
+
+  if (studentCount === 0) {
+    return ElementOrEmptyPage.EMPTY_STATE.noStudents;
+  } else if (!anyStudentHasProgress) {
+    return ElementOrEmptyPage.EMPTY_STATE.noCurriculumAssigned;
+  }
+  return null;
 }
 
 /**
