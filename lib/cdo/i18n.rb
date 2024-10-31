@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 require 'csv'
-require 'yaml'
 require 'i18n'
+require 'uri'
+require 'yaml'
 
 require 'cdo/global_edition'
 
@@ -33,9 +34,22 @@ module Cdo
         @available_languages_by_locale ||= available_languages.index_by {|cdo_language| cdo_language[:locale_s]}.freeze
       end
 
+      def language_name(locale)
+        cdo_language = available_languages_by_locale[locale.to_s]
+        return unless cdo_language
+
+        language_name = cdo_language[:native_name_s]
+
+        if debug_language?(cdo_language) && (cdo_language[:supported_codeorg_b] != 'TRUE' || !CDO.rack_env?(:production))
+          language_name = "#{language_name} DBG"
+        end
+
+        language_name
+      end
+
       def locale_options
         @locale_options ||= available_languages.map do |cdo_language|
-          [language_name(cdo_language), cdo_language[:locale_s]]
+          [language_name(cdo_language[:locale_s]), cdo_language[:locale_s]]
         end.sort_by(&:second).freeze
       end
 
@@ -44,7 +58,7 @@ module Cdo
 
         @ge_region_locale_options[ge_region] ||= Cdo::GlobalEdition.region_locales(ge_region).filter_map do |locale|
           cdo_language = available_languages_by_locale[locale]
-          [language_name(cdo_language), "#{locale}|#{ge_region}"] if cdo_language
+          [language_name(locale), "#{locale}|#{ge_region}"] if cdo_language
         end.freeze
       end
 
@@ -71,20 +85,20 @@ module Cdo
         LOCALE_CONFIGS.dig(locale.to_s, :dir) || TEXT_DIRECTION_LTR
       end
 
+      def language_change_url(url, locale, ge_region = nil)
+        uri = URI.parse(url)
+
+        params = URI.decode_www_form(uri.query.to_s).to_h
+        params[VarnishEnvironment::LOCALE_PARAM_KEY] = [locale, ge_region].compact.join('|')
+        uri.query = URI.encode_www_form(params)
+
+        uri.to_s
+      end
+
       # @param cdo_language [CdoLanguage] CDO language record
       # @return [Boolean] whether the language is a debug language
       private def debug_language?(cdo_language)
         LOCALE_CONFIGS.dig(cdo_language[:locale_s], :debug)
-      end
-
-      private def language_name(cdo_language)
-        language_name = cdo_language[:native_name_s]
-
-        if debug_language?(cdo_language) && (cdo_language[:supported_codeorg_b] != 'TRUE' || !CDO.rack_env?(:production))
-          language_name = "#{language_name} DBG"
-        end
-
-        language_name
       end
     end
   end

@@ -126,3 +126,27 @@ Feature: Global Edition - Region Select
     And I wait until element ".uitest-instructionsTab" contains text "دستورالعمل"
     And element "#localeForm option:contains(فارسی)" is checked
     And element "#localeForm optgroup[label='Farsi'] option:contains(فارسی)" is not checked
+
+  Scenario: Users can switch between Global Edition Region languages using the header links on a Pegasus page
+    Given I am on "http://code.org"
+    And element "#ge-region-languages" does not exist
+    And element ".language-dropdown:visible option:contains(English)" is checked
+    And element ".language-dropdown:visible optgroup[label='Farsi'] option:contains(English)" is not checked
+
+    When I am on "http://code.org/global/fa"
+    And element ".language-dropdown:visible option:contains(فارسی)" is checked
+    And element "#ge-region-languages" is visible
+    And element "#ge-region-languages" has escaped text "\n\n\nView in English\n\n\n"
+    Then I click selector "#ge-region-languages a:contains(View in English)" to load a new page
+    And I get redirected away from "http://code.org/global/fa"
+    And check that I am on "http://code.org/global/fa"
+    And element ".language-dropdown:visible option:contains(English)" is checked
+    And element "#ge-region-languages" is visible
+    And element "#ge-region-languages" has escaped text "\n\n\nView in فارسی\n\n\n"
+
+    When I click selector "#ge-region-languages a:contains(View in فارسی)" to load a new page
+    Then I get redirected away from "http://code.org/global/fa"
+    And check that I am on "http://code.org/global/fa"
+    And element ".language-dropdown:visible option:contains(فارسی)" is checked
+    And element "#ge-region-languages" is visible
+    And element "#ge-region-languages" has escaped text "\n\n\nView in English\n\n\n"
