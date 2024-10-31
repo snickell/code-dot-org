@@ -7,7 +7,7 @@ import _ from 'lodash';
 import {PyodideInterface} from 'pyodide';
 
 import {MAIN_PYTHON_FILE} from '@cdo/apps/lab2/constants';
-import {MultiFileSource} from '@cdo/apps/lab2/types';
+import {MultiFileSource, ProjectFile} from '@cdo/apps/lab2/types';
 
 import {PyodideMessage, PyodidePathContent} from '../types';
 
@@ -52,7 +52,14 @@ export function writeSource(
   Object.values(source.files)
     .filter(f => f.folderId === currentFolderId)
     .forEach(file => {
-      pyodide.FS.writeFile(`${currentPath}${file.name}`, file.contents);
+      const fileEncoding = getFileEncoding(file);
+      const contents =
+        fileEncoding === 'binary'
+          ? Uint8Array.from(file.contents, c => c.codePointAt(0) || 0)
+          : file.contents;
+      pyodide.FS.writeFile(`${currentPath}${file.name}`, contents, {
+        encoding: fileEncoding,
+      });
     });
   Object.values(source.folders)
     .filter(f => f.parentId === currentFolderId)
@@ -116,9 +123,10 @@ function updateAndDeleteSourceWithContents(
         const file = Object.values(source.files).find(
           f => f.name === content.name && f.folderId === folderId
         );
+        const isBinary = file ? getFileEncoding(file) === 'binary' : false;
         try {
           const newContents = pyodide.FS.readFile(fullPath, {
-            encoding: 'utf8',
+            encoding: file ? getFileEncoding(file) : 'utf8',
           });
           if (!file) {
             const newFileId = getNextFileId(Object.values(source.files));
@@ -130,7 +138,9 @@ function updateAndDeleteSourceWithContents(
               contents: newContents,
             };
           } else {
-            file.contents = newContents;
+            file.contents = isBinary
+              ? bufferToString(newContents)
+              : newContents;
           }
         } catch (e) {
           sendMessage({
@@ -246,4 +256,17 @@ function createFolderIfNotExists(
   } catch (e) {
     pyodide.FS.mkdir(qualifiedFolderName);
   }
+}
+
+function getFileEncoding(file: ProjectFile) {
+  if (file.language === 'jpg') {
+    return 'binary';
+  } else {
+    return 'utf8';
+  }
+}
+
+function bufferToString(buffer: ArrayBuffer) {
+  const bytes = new Uint8Array(buffer);
+  return bytes.reduce((string, byte) => string + String.fromCharCode(byte), '');
 }
