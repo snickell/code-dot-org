@@ -26,14 +26,14 @@ module Cdo
         raise "saucelabs_tunnel_name must be set in locals.yml, 'cdo-tunnel' is a good default choice" unless CDO.saucelabs_tunnel_name
 
         # Regexes defining the localhost domains we want to tunnel:
-        tunnel_domains = [
-          %q(.*\.localhost),
-        ].join(',')
+        # tunnel_domains = [
+        #   %q(.*\.localhost),
+        # ].join(',')
 
         cmd = [
           "sc", "run",
           "--region", "us-west-1",
-          "--tunnel-domains", tunnel_domains,
+          # "--tunnel-domains", tunnel_domains,
           "--tunnel-name", CDO.saucelabs_tunnel_name,
         ]
 
