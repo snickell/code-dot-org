@@ -1,4 +1,3 @@
-require 'cdo/global_edition'
 require 'cdo/statsig'
 
 # This is a wrapper for the Statsig SDK.
@@ -65,33 +64,32 @@ module Metrics
 
       # Builds a StatsigUser object from a user entity
       private def build_statsig_user(user:, enabled_experiments:, statsig_stable_id:)
-        user_params = {
-          user_id: '',
-          custom: {
-            geRegion: Cdo::GlobalEdition.current_region,
-          },
-          custom_ids: {
-            stableID: statsig_stable_id,
-          },
-        }
+        custom_ids = {stableID: statsig_stable_id}
 
         if user.present?
-          user_params[:user_id] = user.id.to_s
-          user_params[:custom_ids][:user_type] = user.user_type if user.user_type
-          user_params[:custom_ids][:enabled_experiments] = enabled_experiments if enabled_experiments
+          custom_ids.merge!(
+            {
+              user_type: user.user_type,
+              enabled_experiments: enabled_experiments,
+            }.compact
+          )
+          StatsigUser.new({'userID' => user.id.to_s, 'custom_ids' => custom_ids})
+        else
+          StatsigUser.new({'userID' => '', 'custom_ids' => custom_ids})
         end
-
-        StatsigUser.new(user_params)
       end
 
       # Logs an event to stdout, useful for development and debugging
       private def log_event_to_stdout(user:, event_name:, event_value:, metadata:, enabled_experiments:, statsig_stable_id:)
+        user_id = user.present? ? user.id : ''
+        user_type = user.present? ? user.user_type : ''
         event_details = {
-          **build_statsig_user(
-            user: user,
+          user_id: user_id,
+          custom_ids: {
+            user_type: user_type,
             enabled_experiments: enabled_experiments,
-            statsig_stable_id: statsig_stable_id,
-          ).serialize(true),
+            stableID: statsig_stable_id,
+          }.compact,
           event_name: event_name,
           event_value: event_value,
           metadata: metadata,
