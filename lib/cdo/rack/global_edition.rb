@@ -6,8 +6,6 @@ require 'request_store'
 require 'cdo/global_edition'
 require 'helpers/cookies'
 
-require_relative '../../../dashboard/lib/metrics/events' # rubocop:disable CustomCops/DashboardRequires
-
 module Rack
   class GlobalEdition
     REGION_KEY = Cdo::GlobalEdition::REGION_KEY
@@ -112,15 +110,6 @@ module Rack
         set_global_cookie(REGION_KEY, region, high_priority: true)
         # Updates the global `language` cookie to enforce the switch to the regional language.
         set_locale_cookie(request.cookies[LOCALE_KEY])
-
-        Metrics::Events.log_event(
-          event_name: 'Global Edition Region Changed',
-          metadata: {
-            country: request.country_code,
-            locale: request.cookies[LOCALE_KEY],
-            region: region,
-          }
-        )
       end
 
       private def dashboard_route?(path = request.path)

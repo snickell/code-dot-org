@@ -5,6 +5,8 @@ require 'cdo/shared_constants'
 require 'cdo/rack/global_edition'
 require 'helpers/cookies'
 
+require_relative '../../dashboard/lib/metrics/events' # rubocop:disable CustomCops/DashboardRequires
+
 class VarnishEnvironment < Sinatra::Base
   LOCALE_PARAM_KEY = 'set_locale'.freeze
 
@@ -26,7 +28,21 @@ class VarnishEnvironment < Sinatra::Base
 
       redirect_uri = URI(request.path)
       redirect_params = request.params.except(LOCALE_PARAM_KEY)
-      redirect_params[Rack::GlobalEdition::REGION_KEY] = param_ge_region unless param_ge_region == request.ge_region
+
+      unless param_ge_region == request.ge_region
+        redirect_params[Rack::GlobalEdition::REGION_KEY] = param_ge_region
+
+        Metrics::Events.log_event(
+          event_name: 'Global Edition Region Selected',
+          session: request.session,
+          metadata: {
+            country: request.country_code,
+            region: param_ge_region,
+            locale: param_locale,
+          }
+        )
+      end
+
       redirect_uri.query = URI.encode_www_form(redirect_params).presence
 
       response.redirect(redirect_uri.to_s)
