@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
-require 'request_store'
 require 'cdo/global_edition'
 
 module Rack
   class GlobalEdition
-    REGION_KEY = Cdo::GlobalEdition::REGION_KEY
+    REGION_KEY = 'ge_region'
     LANGUAGE_COOKIE_KEY = 'language_'
 
     class RouteHandler
@@ -55,28 +54,21 @@ module Rack
           request.path_info = main_path
 
           setup_region(ge_region) if region_changed?(ge_region)
-        elsif Cdo::GlobalEdition.region_available?(region) && request_redirectable?
+        elsif Cdo::GlobalEdition.region_available?(request.cookies[REGION_KEY]) && request_redirectable?
           # Redirects to the regional version of the path.
-          response.redirect regional_path_for(region, request.fullpath)
+          response.redirect regional_path_for(request.cookies[REGION_KEY], request.fullpath)
         end
 
         response.finish
       end
 
-      private def region
-        request.cookies[REGION_KEY]
-      end
-
       # @note Once the `response` instance is initialized, any changes to the `request` made afterward will not be applied.
       private def response
-        @response ||= begin
-          RequestStore.store[Cdo::GlobalEdition::REGION_KEY] = region if Cdo::GlobalEdition.region_available?(region)
-          Rack::Response[*app.call(request.env)]
-        end
+        @response ||= Rack::Response[*app.call(request.env)]
       end
 
       private def region_changed?(new_region)
-        region != new_region
+        request.cookies[REGION_KEY] != new_region
       end
 
       private def request_path_vars(*keys)
@@ -109,7 +101,7 @@ module Rack
         request.cookies[LANGUAGE_COOKIE_KEY] = Cdo::GlobalEdition.region_locale(region) if region
 
         # Updates the global `ge_region` cookie to lock the platform to the regional version.
-        set_global_cookie(REGION_KEY, region)
+        set_global_cookie(REGION_KEY, request.cookies[REGION_KEY])
         # Updates the global `language` cookie to enforce the switch to the regional language.
         set_global_cookie(LANGUAGE_COOKIE_KEY, request.cookies[LANGUAGE_COOKIE_KEY])
       end
