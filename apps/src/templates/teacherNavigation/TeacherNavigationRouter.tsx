@@ -216,6 +216,10 @@ const TeacherNavigationRouter: React.FC<TeacherNavigationRouterProps> = ({
                 showNoUnitAssigned={!selectedSection?.unitId}
                 courseName={selectedSection?.courseDisplayName}
                 showNoCurriculumAssigned={!anyStudentHasProgress}
+                showNoLessonMaterialsForLegacyCourses={
+                  parseInt(versionYear) < 2021
+                }
+                isOnLessonMaterialsPage={true}
                 element={<LessonMaterialsContainer />}
               />
             }

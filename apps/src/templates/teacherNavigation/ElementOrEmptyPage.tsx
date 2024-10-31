@@ -25,6 +25,7 @@ interface ElementOrEmptyPageProps {
   showNoLessonMaterialsForLesson?: boolean;
   showNoCalendarForThisUnit?: boolean;
   isOnCalendarPage?: boolean;
+  isOnLessonMaterialsPage?: boolean;
   courseName?: string | null;
   element: React.ReactElement;
 }
@@ -38,6 +39,7 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
   showNoLessonMaterialsForLesson,
   showNoCalendarForThisUnit,
   isOnCalendarPage,
+  isOnLessonMaterialsPage,
   courseName,
   element,
 }) => {
@@ -47,7 +49,9 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
 
   const lessonMaterialsOrCalendarPage = isOnCalendarPage
     ? i18n.theCalendar()
-    : i18n.theLessonMaterials();
+    : isOnLessonMaterialsPage
+    ? i18n.theLessonMaterials()
+    : '';
 
   const navigate = useNavigate();
 
@@ -145,6 +149,13 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
     ? EMPTY_STATE.noUnitAssignedForCalendarOrLessonMaterials
     : EMPTY_STATE.noCalendarForThisUnit;
 
+  // separate out logic for the calendar page
+  const lessonMaterialsState = showNoLessonMaterialsForLegacyCourses
+    ? EMPTY_STATE.noLessonMaterialsForLegacyCourses
+    : showNoUnitAssigned
+    ? EMPTY_STATE.noUnitAssignedForCalendarOrLessonMaterials
+    : EMPTY_STATE.noLessonMaterialsForThisLesson;
+
   let currentEmptyState;
 
   if (showNoStudents) {
@@ -153,10 +164,8 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
     currentEmptyState = EMPTY_STATE.noCurriculumAssigned;
   } else if (isOnCalendarPage) {
     currentEmptyState = calendarState;
-  } else if (showNoLessonMaterialsForLegacyCourses) {
-    currentEmptyState = EMPTY_STATE.noLessonMaterialsForLegacyCourses;
-  } else if (showNoLessonMaterialsForLesson) {
-    currentEmptyState = EMPTY_STATE.noLessonMaterialsForThisLesson;
+  } else if (isOnLessonMaterialsPage) {
+    currentEmptyState = lessonMaterialsState;
   } else {
     currentEmptyState = EMPTY_STATE.noUnitAssigned;
   }
@@ -171,6 +180,7 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
       !showNoCalendarForLegacyCourses &&
       !showNoCalendarForThisUnit &&
       !showNoLessonMaterialsForLegacyCourses &&
+      !showNoLessonMaterialsForLesson &&
       !showNoLessonMaterialsForLesson)
   ) {
     return element;
