@@ -175,7 +175,7 @@ def parse_options
       opts.on("-m", "--maximize", "Maximize local webdriver window on startup") do
         options.maximize = true
       end
-      opts.on("--drone", "Whether is Drone (skip failing Drone tests)") do
+      opts.on("--ci", "Whether is CI (skip failing CI tests)") do
         options.is_ci = true
       end
       opts.on("--html", "Use html reporter") do
@@ -543,7 +543,7 @@ end
 
 def parallel_config(parallel_limit)
   {
-    # Run in parallel threads on Drone (less memory), processes on main test machine (better CPU utilization)
+    # Run in parallel threads on CI (less memory), processes on main test machine (better CPU utilization)
     in_threads: ENV['CI'] ? parallel_limit : nil,
     in_processes: ENV['CI'] ? nil : parallel_limit,
 
@@ -675,9 +675,9 @@ def cucumber_arguments_for_browser(browser, options)
   arguments += skip_tag('@only_phone') unless browser['name'] == 'iPhone'
   arguments += skip_tag('@no_ci') if options.is_ci
 
-  # always run locally or during Drone runs.
+  # always run locally or during CI runs.
   # Note that you may end up running in more than one browser if you use flags
-  # like [test safari] or [test firefox] during a Drone run.
+  # like [test safari] or [test firefox] during a CI run.
   arguments += skip_tag('@only_one_browser') if !options.local && !options.is_ci
 
   arguments += skip_tag('@chrome') if browser['browserName'] != 'chrome' && !options.local
@@ -700,6 +700,13 @@ def cucumber_arguments_for_feature(options, test_run_string, max_reruns)
   # if auto-retrying, output a rerun file so on retry we only run failed tests
   if max_reruns > 0
     arguments += " --format rerun --out #{rerun_filename test_run_string}"
+  end
+
+  # In CircleCI we export additional logs in junit xml format so CircleCI can
+  # provide pretty test reports with success/fail/timing data upon completion.
+  # See: https://circleci.com/docs/test-metadata/#cucumber
+  if ENV['CI']
+    arguments += " --format junit --out $CIRCLE_TEST_REPORTS/cucumber/#{test_run_string}.xml"
   end
 
   arguments
@@ -738,7 +745,6 @@ def run_feature(browser, feature, options)
   run_environment['MAXIMIZE_LOCAL'] = options.maximize ? "true" : "false"
   run_environment['MOBILE'] = browser['mobile'] ? "true" : "false"
   run_environment['TEST_RUN_NAME'] = test_run_string
-  run_environment['IS_CI'] = options.is_circle ? "true" : "false"
   run_environment['PRIORITY'] = options.priority
 
   # disable some stuff to make require_rails_env run faster within cucumber.
