@@ -20,29 +20,29 @@ class ApplicationJobTest < ActiveJob::TestCase
   end
 
   test 'enqueued jobs log several metrics' do
-    expected_failed_count = 6
-    expected_pending_count = 4
-    expected_workable_count = 2
-    expected_my_failed_count = 5
-    expected_my_pending_count = 3
-    expected_my_workable_count = 1
+    expected_counts = {
+      failed_count: 6,
+      pending_count: 4,
+      workable_count: 2,
+      my_failed_count: 5,
+      my_pending_count: 3,
+      my_workable_count: 1
+    }
 
-    # Mock these helper methods because mocking the Delayed::Job calls is impossible/complex
-    ApplicationJob.any_instance.stubs(:get_failed_job_count).returns(expected_failed_count)
-    ApplicationJob.any_instance.stubs(:get_pending_job_count).returns(expected_pending_count)
-    ApplicationJob.any_instance.stubs(:get_workable_job_count).returns(expected_workable_count)
-    ApplicationJob.any_instance.stubs(:get_my_failed_job_count).returns(expected_my_failed_count)
-    ApplicationJob.any_instance.stubs(:get_my_pending_job_count).returns(expected_my_pending_count)
-    ApplicationJob.any_instance.stubs(:get_my_workable_job_count).returns(expected_my_workable_count)
+    # Mocking the single database query and its return values
+    job_counts_mock = mock
+    expected_counts.each do |key, count|
+      job_counts_mock.stubs(key).returns(count)
+    end
+    Delayed::Job.expects(:select).returns([job_counts_mock])
 
-    # Splitting this into two assertions because 'includes_metrics' can't match multiple metrics with the same name.
     Cdo::Metrics.expects(:push).with(
       ApplicationJob::METRICS_NAMESPACE,
       all_of(
         includes_metrics(
-          FailedJobCount: expected_failed_count,
-          PendingJobCount: expected_pending_count,
-          WorkableJobCount: expected_workable_count
+          FailedJobCount: expected_counts[:failed_count],
+          PendingJobCount: expected_counts[:pending_count],
+          WorkableJobCount: expected_counts[:workable_count]
         ),
         includes_dimensions(:FailedJobCount, Environment: CDO.rack_env),
         includes_dimensions(:PendingJobCount, Environment: CDO.rack_env),
@@ -53,9 +53,9 @@ class ApplicationJobTest < ActiveJob::TestCase
       ApplicationJob::METRICS_NAMESPACE,
       all_of(
         includes_metrics(
-          FailedJobCount: expected_my_failed_count,
-          PendingJobCount: expected_my_pending_count,
-          WorkableJobCount: expected_my_workable_count
+          FailedJobCount: expected_counts[:my_failed_count],
+          PendingJobCount: expected_counts[:my_pending_count],
+          WorkableJobCount: expected_counts[:my_workable_count]
         ),
         includes_dimensions(:FailedJobCount, Environment: CDO.rack_env, JobName: 'ApplicationJobTest::TestableJob'),
         includes_dimensions(:PendingJobCount, Environment: CDO.rack_env, JobName: 'ApplicationJobTest::TestableJob'),
@@ -64,6 +64,7 @@ class ApplicationJobTest < ActiveJob::TestCase
     )
 
     # before_perform metrics
+    # TODO: Test that WaitTime is an expected value
     Cdo::Metrics.expects(:push).with(
       ApplicationJob::METRICS_NAMESPACE,
       all_of(
@@ -73,6 +74,7 @@ class ApplicationJobTest < ActiveJob::TestCase
     )
 
     # after_perform metrics
+    # TODO: Test that ExecutionTime and TotalTime are expected values
     Cdo::Metrics.expects(:push).with(
       ApplicationJob::METRICS_NAMESPACE,
       all_of(
@@ -88,6 +90,7 @@ class ApplicationJobTest < ActiveJob::TestCase
   end
 
   test 'non-queued jobs log ExecutionTime and TotalTime only' do
+    # TODO: Test that ExecutionTime and TotalTime are expected values
     Cdo::Metrics.expects(:push).with(
       ApplicationJob::METRICS_NAMESPACE,
       all_of(
@@ -164,31 +167,5 @@ class ApplicationJobTest < ActiveJob::TestCase
     rescue => exception
       raise exception, 'Expected error to be squashed'
     end
-  end
-
-  test 'get_pending_job_count returns the number of pending jobs' do
-    Delayed::Job.expects(:where).with(failed_at: nil).returns(stub(count: 42))
-    assert_equal 42, ApplicationJob.new.get_pending_job_count
-  end
-
-  test 'get_failed_job_count returns the number of failed jobs' do
-    failed_jobs_mock = mock('failed_jobs')
-    where_mock = mock('where')
-
-    Delayed::Job.expects(:where).returns(where_mock)
-    where_mock.expects(:not).with(failed_at: nil).returns(failed_jobs_mock)
-    failed_jobs_mock.expects(:count).returns(42)
-
-    assert_equal 42, ApplicationJob.new.get_failed_job_count
-  end
-
-  test 'get_workable_job_count returns the number of workable jobs' do
-    workable_mock = mock('workable_jobs')
-    pending_mock = mock('pending_jobs')
-    Delayed::Job.expects(:where).with(failed_at: nil, locked_at: nil).returns(pending_mock)
-    pending_mock.expects(:where).with('run_at <= ?', anything).returns(workable_mock)
-    workable_mock.expects(:count).returns(42)
-
-    assert_equal 42, ApplicationJob.new.get_workable_job_count
   end
 end

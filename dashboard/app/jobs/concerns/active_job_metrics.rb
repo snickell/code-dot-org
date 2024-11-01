@@ -30,79 +30,63 @@ module ActiveJobMetrics
     ]
   end
 
-  # Failed jobs are those that have failed at least once.
-  def get_failed_job_count
-    Delayed::Job.where.not(failed_at: nil).count
-  end
+  def report_job_count
+    # Single database query to get all counts in one go, modified for MySQL syntax
+    job_counts = Delayed::Job.
+      select(
+        "COUNT(IF(failed_at IS NOT NULL, 1, NULL)) AS failed_count",
+        "COUNT(IF(failed_at IS NULL AND locked_at IS NULL AND run_at <= CURRENT_TIMESTAMP, 1, NULL)) AS workable_count",
+        "COUNT(IF(failed_at IS NULL, 1, NULL)) AS pending_count",
+        "COUNT(IF(failed_at IS NOT NULL AND handler LIKE '%job_class: #{self.class.name}%', 1, NULL)) AS my_failed_count",
+        "COUNT(IF(failed_at IS NULL AND locked_at IS NULL AND run_at <= CURRENT_TIMESTAMP AND handler LIKE '%job_class: #{self.class.name}%', 1, NULL)) AS my_workable_count",
+        "COUNT(IF(failed_at IS NULL AND handler LIKE '%job_class: #{self.class.name}%', 1, NULL)) AS my_pending_count"
+      ).
+      take
 
-  def get_my_failed_job_count
-    Delayed::Job.where.not(failed_at: nil).where('handler LIKE ?', "%job_class: #{self.class.name}%").count
-  end
-
-  # Pending jobs are those that have not yet been run.
-  def get_pending_job_count
-    Delayed::Job.where(failed_at: nil).count
-  end
-
-  def get_my_pending_job_count
-    Delayed::Job.where(failed_at: nil).where('handler LIKE ?', "%job_class: #{self.class.name}%").count
-  end
-
-  # Workable jobs are those that are not locked and are ready to run.
-  def get_workable_job_count
-    Delayed::Job.where(failed_at: nil, locked_at: nil).where('run_at <= ?', Time.now).count
-  end
-
-  def get_my_workable_job_count
-    Delayed::Job.where(failed_at: nil, locked_at: nil).where('run_at <= ?', Time.now).where('handler LIKE ?', "%job_class: #{self.class.name}%").count
-  end
-
-  protected def report_job_count
-    # Splitting into two pushes because our 'includes_metrics' testing
-    # utility can't match multiple metrics with the same name.
-    # Generic Metrics (similar to "bin/cron/report_activejob_metrics")
+    # Generic Metrics
     generic_metrics = [
       {
         metric_name: 'PendingJobCount',
-        value: get_pending_job_count,
+        value: job_counts.pending_count,
         unit: 'Count',
         timestamp: Time.now,
         dimensions: [{name: 'Environment', value: CDO.rack_env}]
       },
       {
         metric_name: 'FailedJobCount',
-        value: get_failed_job_count,
+        value: job_counts.failed_count,
         unit: 'Count',
         timestamp: Time.now,
         dimensions: [{name: 'Environment', value: CDO.rack_env}]
       },
       {
         metric_name: 'WorkableJobCount',
-        value: get_workable_job_count,
+        value: job_counts.workable_count,
         unit: 'Count',
         timestamp: Time.now,
         dimensions: [{name: 'Environment', value: CDO.rack_env}]
       }
     ]
 
+    # Per-job-class metrics
     per_job_class_metrics = [
       {
         metric_name: 'PendingJobCount',
-        value: get_my_pending_job_count,
+        value: job_counts.my_pending_count,
         unit: 'Count',
         timestamp: Time.now,
         dimensions: common_dimensions
       },
       {
         metric_name: 'FailedJobCount',
-        value: get_my_failed_job_count,
+        value: job_counts.my_failed_count,
         unit: 'Count',
         timestamp: Time.now,
         dimensions: common_dimensions
       },
       {
         metric_name: 'WorkableJobCount',
-        value: get_my_workable_job_count,
+        value: job_counts.my_workable_count,
         unit: 'Count',
         timestamp: Time.now,
         dimensions: common_dimensions
