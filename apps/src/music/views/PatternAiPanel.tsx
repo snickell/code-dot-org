@@ -19,7 +19,6 @@ const arrowImage = require(`@cdo/static/music/music-callout-arrow.png`);
 import {Button} from '@cdo/apps/componentLibrary/button';
 import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
 import {useInterval} from '@cdo/apps/util/useInterval';
-import usePrevious from '@cdo/apps/util/usePrevious';
 
 import {generatePattern} from '../ai/patternAi';
 import appConfig from '../appConfig';
@@ -248,14 +247,6 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
     );
   }, [availableKits, currentValue.instrument]);
   const [currentPreviewTick, setCurrentPreviewTick] = useState(0);
-
-  const previousPreviewTick = usePrevious(currentPreviewTick);
-
-  if (previousPreviewTick !== 0 && currentPreviewTick === 0) {
-    if (userCompletedTask === 'generated') {
-      console.log('Finished play after generate.');
-    }
-  }
 
   const toggleEvent = useCallback(
     (tick: number, note: number) => {
