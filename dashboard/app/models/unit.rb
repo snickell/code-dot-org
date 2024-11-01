@@ -569,7 +569,7 @@ class Unit < ApplicationRecord
   def self.get_family_without_cache(family_name)
     # This SQL string is not at risk for injection vulnerabilites because it's
     # just a hardcoded string, so it's safe to wrap in Arel.sql
-    Unit.where(family_name: family_name).order(Arel.sql("JSON_EXTRACT(properties, '$.version_year') DESC"))
+    Unit.where(family_name: family_name).order(Arel.sql("properties -> '$.version_year' DESC"))
   end
 
   # Returns all units within a family from the Rails cache.
