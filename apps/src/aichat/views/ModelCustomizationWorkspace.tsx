@@ -7,6 +7,8 @@ import Tabs, {TabsProps} from '@cdo/apps/componentLibrary/tabs/Tabs';
 import {isReadOnlyWorkspace} from '@cdo/apps/lab2/lab2Redux';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
+import aichatI18n from '../locale';
+
 import PublishNotes from './modelCustomization/PublishNotes';
 import RetrievalCustomization from './modelCustomization/RetrievalCustomization';
 import SetupCustomization from './modelCustomization/SetupCustomization';
@@ -51,10 +53,10 @@ const ModelCustomizationWorkspace: React.FunctionComponent = () => {
       visibleTabs.push({
         value: 'setup',
         text:
-          'Setup' +
+          aichatI18n.modelCustomizationTab_setupText() +
           ((isSetupCustomizationReadOnly || isReadOnly) &&
           selectedTab === 'setup'
-            ? ' (view only)'
+            ? aichatI18n.modelCustomizationTab_viewOnlySuffixTag()
             : ''),
         tabContent: <SetupCustomization />,
         iconLeft:
@@ -65,10 +67,10 @@ const ModelCustomizationWorkspace: React.FunctionComponent = () => {
       visibleTabs.push({
         value: 'retrieval',
         text:
-          'Retrieval' +
+          aichatI18n.modelCustomizationTab_retrievalText() +
           ((isDisabled(retrievalContexts) || isReadOnly) &&
           selectedTab === 'retrieval'
-            ? ' (view only)'
+            ? aichatI18n.modelCustomizationTab_viewOnlySuffixTag()
             : ''),
         tabContent: <RetrievalCustomization />,
         iconLeft:
@@ -79,10 +81,10 @@ const ModelCustomizationWorkspace: React.FunctionComponent = () => {
       visibleTabs.push({
         value: 'modelCardInfo',
         text:
-          'Publish' +
+          aichatI18n.modelCustomizationTab_modelPublishText() +
           ((isDisabled(modelCardInfo) || isReadOnly) &&
           selectedTab === 'modelCardInfo'
-            ? ' (view only)'
+            ? aichatI18n.modelCustomizationTab_viewOnlySuffixTag()
             : ''),
         tabContent: <PublishNotes />,
         iconLeft:
