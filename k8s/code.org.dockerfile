@@ -108,15 +108,6 @@ RUN <<EOF
   eval "$(rbenv init -)"
   gem install bundler -v 2.3.22
   rbenv rehash
-  #
-  # SETUP SOME HACK WORKAROUNDS FOR APPLE SILICON
-  #
-  # Running this lets us build on arm64 until staging is updated to use newer mini_racer gem
-  bundle config --local without staging test production levelbuilder
-  # Linux+arm64 has a problem with 0.0.7.2 that MacOS+arm64 doesn't, hack an update in here for now
-  sed -i "s/gem 'unf_ext', '0.0.7.2'/gem 'unf_ext', '0.0.8.2'/g" Gemfile
-  #
-  # DONE HACK WORKAROUNDS FOR APPLE SILICON
 EOF
 
 RUN --mount=type=cache,sharing=locked,uid=1000,gid=1000,target=${SRC}/vendor/cache <<EOF
