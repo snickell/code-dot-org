@@ -119,13 +119,14 @@ module ActiveJobMetrics
   protected def report_wait_time
     # Record the time the job started
     @perform_started_at = Time.now
-    @enqueued_or_started_at = Time.now
 
-    # Log wait times only for jobs that were enqueued
-    return if enqueued_at.nil?
+    # For jobs that aren't enqueued or don't have a run_at, use now.
+    @wait_started_at = Time.now
+    # Use the delayed_job `run_at` field if it exists.
+    @wait_started_at = Time.parse(run_at) unless run_at.nil?
 
-    @enqueued_or_started_at = Time.parse(enqueued_at)
-    wait_time = @perform_started_at - @enqueued_or_started_at
+    @run_at_or_started_at = Time.parse(run_at)
+    wait_time = @perform_started_at - @wait_started_at
 
     Cdo::Metrics.push(
       METRICS_NAMESPACE, [
