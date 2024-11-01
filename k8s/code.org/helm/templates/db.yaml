@@ -28,18 +28,20 @@ spec:
     spec:
       containers:
       - name: db
-        image: mariadb:10.2
+        image: mysql:8
         ports:
         - containerPort: 3306
         env:
-        - name: MARIADB_ALLOW_EMPTY_ROOT_PASSWORD
+        - name: MYSQL_ALLOW_EMPTY_ROOT_PASSWORD
           value: "1"
-        # - name: MARIADB_ROOT_PASSWORD
+        # - name: MYSQL_ROOT_PASSWORD
         #   value: secret
-        - name: MARIADB_USER
+        - name: MYSQL_USER
           value: code.org
-        - name: MARIADB_PASSWORD
+        - name: MYSQL_PASSWORD
           value: FIXME_WITH_REAL_PASSWORD
+        - name: MYSQL_DATABASE
+          value: codeorg_db
         volumeMounts:
         - name: mysql-data
           mountPath: /var/lib/mysql/
