@@ -7,7 +7,7 @@ import _ from 'lodash';
 import {PyodideInterface} from 'pyodide';
 
 import {MAIN_PYTHON_FILE} from '@cdo/apps/lab2/constants';
-import {MultiFileSource, ProjectFile} from '@cdo/apps/lab2/types';
+import {MultiFileSource} from '@cdo/apps/lab2/types';
 
 import {PyodideMessage, PyodidePathContent} from '../types';
 
@@ -52,7 +52,7 @@ export function writeSource(
   Object.values(source.files)
     .filter(f => f.folderId === currentFolderId)
     .forEach(file => {
-      const fileEncoding = getFileEncoding(file);
+      const fileEncoding = getFileEncoding(file.name);
       const contents =
         fileEncoding === 'binary'
           ? Uint8Array.from(file.contents, c => c.codePointAt(0) || 0)
@@ -123,11 +123,14 @@ function updateAndDeleteSourceWithContents(
         const file = Object.values(source.files).find(
           f => f.name === content.name && f.folderId === folderId
         );
-        const isBinary = file ? getFileEncoding(file) === 'binary' : false;
+        const isBinary = getFileEncoding(content.name) === 'binary';
         try {
           const newContents = pyodide.FS.readFile(fullPath, {
-            encoding: file ? getFileEncoding(file) : 'utf8',
+            encoding: getFileEncoding(content.name),
           });
+          const parsedContents = isBinary
+            ? bufferToString(newContents)
+            : newContents;
           if (!file) {
             const newFileId = getNextFileId(Object.values(source.files));
             source.files[newFileId] = {
@@ -135,12 +138,10 @@ function updateAndDeleteSourceWithContents(
               folderId,
               name: content.name,
               language: fileExtension || '',
-              contents: newContents,
+              contents: parsedContents,
             };
           } else {
-            file.contents = isBinary
-              ? bufferToString(newContents)
-              : newContents;
+            file.contents = parsedContents;
           }
         } catch (e) {
           sendMessage({
@@ -258,8 +259,8 @@ function createFolderIfNotExists(
   }
 }
 
-function getFileEncoding(file: ProjectFile) {
-  if (file.language === 'jpg') {
+function getFileEncoding(filePath: string) {
+  if (filePath.endsWith('jpg')) {
     return 'binary';
   } else {
     return 'utf8';
