@@ -19,6 +19,7 @@ const arrowImage = require(`@cdo/static/music/music-callout-arrow.png`);
 import {Button} from '@cdo/apps/componentLibrary/button';
 import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
 import {useInterval} from '@cdo/apps/util/useInterval';
+import usePrevious from '@cdo/apps/util/usePrevious';
 
 import {generatePattern} from '../ai/patternAi';
 import appConfig from '../appConfig';
@@ -59,6 +60,8 @@ interface HelpProps {
   generateState: GenerateStateType;
   generatingScanStep: number;
   eventsLength: number;
+  isPlaying: boolean;
+  shouldShowGenerateAgainHelp: boolean;
 }
 
 const Help: React.FunctionComponent<HelpProps> = ({
@@ -66,6 +69,8 @@ const Help: React.FunctionComponent<HelpProps> = ({
   generateState,
   generatingScanStep,
   eventsLength,
+  isPlaying,
+  shouldShowGenerateAgainHelp,
 }) => {
   const clickDrumsText = [
     musicI18n.patternAiClickDrums(),
@@ -152,6 +157,30 @@ const Help: React.FunctionComponent<HelpProps> = ({
             </div>
           </div>
         )}
+      {generateState === 'none' &&
+        MusicRegistry.showAiGenerateAgainHelp &&
+        userCompletedTask === 'generated' &&
+        !isPlaying &&
+        shouldShowGenerateAgainHelp && (
+          <div className={styles.helpContainer}>
+            <div className={classNames(styles.help, styles.helpGenerateAgain)}>
+              {musicI18n.patternAiGenerateAgain()}
+            </div>
+            <div
+              className={classNames(
+                styles.arrowContainer,
+                styles.arrowContainerGenerateAgain
+              )}
+            >
+              <div
+                id="callout-arrow"
+                className={classNames(styles.arrow, styles.arrowRight)}
+              >
+                <img src={arrowImage} alt="" />
+              </div>
+            </div>
+          </div>
+        )}
       {generateState === 'error' && (
         <div className={styles.helpContainer}>
           <div
@@ -191,6 +220,18 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
 
   const [aiTemperature, setAiTemperature] = useState(defaultAiTemperature);
 
+  const hasGeneratedEvents = currentValue.events.some(
+    event => event.tick >= PATTERN_AI_NUM_SEED_EVENTS
+  );
+
+  // Count generates so that we can show the "generate again" help after
+  // the first generate, but not beyond that.
+  // If the panel starts with generated events, presume that the user
+  // has already generated twice, so that we won't show that help.
+  const [generateCount, setGenerateCount] = useState(
+    hasGeneratedEvents ? 2 : 0
+  );
+
   const availableKits = useMemo(() => {
     return MusicLibrary.getInstance()?.kits || [];
   }, []);
@@ -207,6 +248,14 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
     );
   }, [availableKits, currentValue.instrument]);
   const [currentPreviewTick, setCurrentPreviewTick] = useState(0);
+
+  const previousPreviewTick = usePrevious(currentPreviewTick);
+
+  if (previousPreviewTick !== 0 && currentPreviewTick === 0) {
+    if (userCompletedTask === 'generated') {
+      console.log('Finished play after generate.');
+    }
+  }
 
   const toggleEvent = useCallback(
     (tick: number, note: number) => {
@@ -306,10 +355,7 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
 
   // Tracks the tasks completed by the user.
   useEffect(() => {
-    if (
-      generateState === 'generating' ||
-      currentValue.events.some(event => event.tick >= 9)
-    ) {
+    if (generateState === 'generating' || hasGeneratedEvents) {
       setUserCompletedTask('generated');
     } else if (
       MusicRegistry.showAiTemperatureExplanation &&
@@ -323,7 +369,13 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
         setUserCompletedTask('drawnDrums');
       }
     }
-  }, [generateState, currentValue.events, userCompletedTask, aiTemperature]);
+  }, [
+    hasGeneratedEvents,
+    generateState,
+    currentValue.events,
+    userCompletedTask,
+    aiTemperature,
+  ]);
 
   const stopPreview = useCallback(() => {
     MusicRegistry.player.cancelPreviews();
@@ -332,6 +384,7 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
 
   const startPreview = useCallback(
     (value: InstrumentEventValue) => {
+      setCurrentPreviewTick(1);
       MusicRegistry.player.previewNotes(
         value,
         (tick: number) => {
@@ -395,7 +448,15 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
     );
     setGenerateState('generating');
     setGeneratingScanStep(1);
-  }, [currentValue, onChange, aiTemperature, stopPreview, playPreview]);
+    setGenerateCount(generateCount + 1);
+  }, [
+    currentValue,
+    onChange,
+    aiTemperature,
+    stopPreview,
+    playPreview,
+    generateCount,
+  ]);
 
   const [generatingScanStep, setGeneratingScanStep] = useState(0);
   useInterval(() => {
@@ -435,6 +496,8 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
           generateState={generateState}
           generatingScanStep={generatingScanStep}
           eventsLength={currentValue.events.length}
+          isPlaying={!!currentPreviewTick}
+          shouldShowGenerateAgainHelp={generateCount === 1}
         />
 
         <div className={styles.leftArea}>
