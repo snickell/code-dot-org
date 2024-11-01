@@ -15,6 +15,12 @@ const rulesToEventuallyReenable = {
   'jsx-a11y/tabindex-no-positive': 'off',
 };
 
+const noDataTestIdMessage =
+  'Attribute data-testid is not accessible. Tests should resemble how the user interacts with the application and should not rely on technical details, see https://testing-library.com/docs/queries/about/#priority';
+
+const noByTestIdMessage =
+  'Tests should resemble how the user interacts with the application and should not rely on technical details, see https://testing-library.com/docs/queries/about/#priority';
+
 // This config defines globals available especially in apps,
 // enables es6, and enables apps-specific plugins and rules.
 // See the root .eslintrc.js for generic eslint linting rules.
@@ -171,6 +177,41 @@ module.exports = {
             message: 'Use jest matchers instead of chai',
           },
         ],
+      },
+    ],
+    'no-restricted-properties': [
+      'error',
+      {object: 'screen', property: 'getByTestId', message: noByTestIdMessage},
+      {
+        object: 'screen',
+        property: 'queryByTestId',
+        message: noByTestIdMessage,
+      },
+      {
+        object: 'screen',
+        property: 'getAllByTestId',
+        message: noByTestIdMessage,
+      },
+      {
+        object: 'screen',
+        property: 'queryAllByTestId',
+        message: noByTestIdMessage,
+      },
+      {
+        object: 'screen',
+        property: 'findByTestId',
+        message: noByTestIdMessage,
+      },
+      {
+        object: 'screen',
+        property: 'findAllByTestId',
+        message: noByTestIdMessage,
+      },
+    ],
+    'react/forbid-dom-props': [
+      'error',
+      {
+        forbid: [{propName: 'data-testid', message: noDataTestIdMessage}],
       },
     ],
   },
