@@ -1,4 +1,14 @@
 GIT
+  remote: https://github.com/code-dot-org/aws-google.git
+  revision: ded320a364b2bac8573863192bec2fee1f7dd779
+  branch: cli-only-auth
+  specs:
+    aws-google (0.2.1)
+      aws-sdk-core (~> 3.130)
+      google-apis-core
+      launchy (~> 2)
+
+GIT
   remote: https://github.com/code-dot-org/image_optim.git
   revision: c7a4bc3d1c29d3c1c3359016acd5b9eaee7b6014
   ref: cdo
@@ -78,16 +88,6 @@ GIT
   revision: 316b4f3f4b1e5902dedc2a369d1d9052f042dd50
   specs:
     full-name-splitter (0.1.2)
-
-GIT
-  remote: https://github.com/snickell/aws-google.git
-  revision: ded320a364b2bac8573863192bec2fee1f7dd779
-  branch: cli-only-auth
-  specs:
-    aws-google (0.2.1)
-      aws-sdk-core (~> 3.130)
-      google-apis-core
-      launchy (~> 2)
 
 GEM
   remote: https://rubygems.org/

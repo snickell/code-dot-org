@@ -65,7 +65,7 @@ group :development do
   gem 'annotate', '~> 3.1.1'
 
   # FIXME @snickell before merge: push to branch on code-dot-org/aws-google and update here once perms added
-  gem 'aws-google', '>= 0.2.1', github: 'snickell/aws-google', branch: 'cli-only-auth'
+  gem 'aws-google', '>= 0.2.1', github: 'code-dot-org/aws-google', branch: 'cli-only-auth'
 
   # Enable interactive repl on `/__better_errors`
   gem 'binding_of_caller'
