@@ -1,9 +1,17 @@
-import GoogleBlockly from 'blockly/core';
 import HighContrastTheme from '@blockly/theme-highcontrast';
+import * as GoogleBlockly from 'blockly/core';
+
+import fontConstants from '@cdo/apps/fontConstants';
+
 import {Themes} from '../constants';
 
+// We use the primary colour for variable shadow blocks. Shadow blocks cannot include a variable field,
+// so this only applies to argument_reporter blocks.
+const variableColor =
+  HighContrastTheme.blockStyles.variable_blocks.colourPrimary;
+
 // Intentionally overriden styles from Google Blockly.
-// We do not override list, math, text, or variable blocks.
+// We do not override list, math, or text blocks.
 const coreBlocklyOverrides = {
   logic_blocks: {
     colourPrimary: '#007FAD',
@@ -22,6 +30,10 @@ const coreBlocklyOverrides = {
     colourPrimary: '#39700F',
     colourSecondary: '#B0C69F',
     colourTertiary: '#749B57',
+  },
+  variable_blocks: {
+    colourPrimary: variableColor,
+    colourSecondary: variableColor,
   },
 };
 
@@ -58,6 +70,9 @@ const cdoCustomHighContrastStyles = {
   world_blocks: {
     colourPrimary: '#4A4A88',
   },
+  ai_blocks: {
+    colourPrimary: '#566065',
+  },
   ...spriteLabHighContrastStyles,
 };
 
@@ -74,7 +89,8 @@ export default GoogleBlockly.Theme.defineTheme(Themes.HIGH_CONTRAST, {
     toolboxBackgroundColour: '#DDDDDD',
   },
   fontStyle: {
-    family: '"Gotham 4r", sans-serif',
+    family: fontConstants['main-font'],
+    weight: fontConstants['regular-font-weight'],
   },
   startHats: null,
 });

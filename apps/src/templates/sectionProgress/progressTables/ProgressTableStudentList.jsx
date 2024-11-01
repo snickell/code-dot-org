@@ -1,24 +1,30 @@
-import React from 'react';
-import * as Table from 'reactabular-table';
-import * as Sticky from 'reactabular-sticky';
-import * as Virtualized from 'reactabular-virtualized';
 import PropTypes from 'prop-types';
+import React from 'react';
+import * as Sticky from 'reactabular-sticky';
+import * as Table from 'reactabular-table';
+import * as Virtualized from 'reactabular-virtualized';
+
+import {getFullName} from '@cdo/apps/templates/manageStudents/utils.ts';
+import {unitUrlForStudent} from '@cdo/apps/templates/teacherDashboard/urlHelpers';
+import i18n from '@cdo/locale';
+
 import {
-  scriptDataPropType,
+  unitDataPropType,
   studentTableRowType,
 } from '../sectionProgressConstants';
+
 import ProgressTableStudentName from './ProgressTableStudentName';
+
 import styleConstants from './progress-table-constants.module.scss';
+
 import './progressTableStyles.scss';
-import {scriptUrlForStudent} from '@cdo/apps/templates/teacherDashboard/urlHelpers';
-import i18n from '@cdo/locale';
 
 export default class ProgressTableStudentList extends React.Component {
   static propTypes = {
     rows: PropTypes.arrayOf(studentTableRowType).isRequired,
     onRow: PropTypes.func.isRequired,
     sectionId: PropTypes.number.isRequired,
-    scriptData: scriptDataPropType.isRequired,
+    scriptData: unitDataPropType.isRequired,
     headers: PropTypes.arrayOf(PropTypes.string).isRequired,
     studentTimestamps: PropTypes.object,
     onToggleRow: PropTypes.func.isRequired,
@@ -52,14 +58,14 @@ export default class ProgressTableStudentList extends React.Component {
 
   studentNameFormatter(rowData) {
     const {sectionId, scriptData, studentTimestamps} = this.props;
-    const studentUrl = scriptUrlForStudent(
+    const studentUrl = unitUrlForStudent(
       sectionId,
       scriptData.name,
       rowData.student.id
     );
     return (
       <ProgressTableStudentName
-        name={rowData.student.name}
+        name={getFullName(rowData.student)}
         studentId={rowData.student.id}
         sectionId={sectionId}
         scriptId={scriptData.id}

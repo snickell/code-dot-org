@@ -7,24 +7,27 @@
 
 import React, {useEffect} from 'react';
 import {useSelector} from 'react-redux';
-import {useAppDispatch} from '@cdo/apps/util/reduxHooks';
-import Video from './Video';
+
 import {
   sendSuccessReport,
   navigateToNextLevel,
 } from '@cdo/apps/code-studio/progressRedux';
 import {LabState} from '@cdo/apps/lab2/lab2Redux';
 import {VideoLevelData} from '@cdo/apps/lab2/types';
+import {useAppDispatch} from '@cdo/apps/util/reduxHooks';
+
 import standaloneVideoLocale from './locale';
+import Video from './Video';
+
 import styles from './video.module.scss';
 
 const StandaloneVideo: React.FunctionComponent = () => {
   const dispatch = useAppDispatch();
   const levelData = useSelector(
-    (state: {lab: LabState}) => state.lab.levelData
+    (state: {lab: LabState}) => state.lab.levelProperties?.levelData
   );
   const currentAppName = useSelector(
-    (state: {lab: LabState}) => state.lab.appName
+    (state: {lab: LabState}) => state.lab.levelProperties?.appName
   );
 
   const [levelVideo, setLevelVideo] = React.useState<VideoLevelData | null>(
@@ -45,7 +48,11 @@ const StandaloneVideo: React.FunctionComponent = () => {
 
   return (
     <div id="standalone-video">
-      <Video src={levelVideo?.src}>
+      <Video
+        src={levelVideo?.src}
+        download={levelVideo?.download}
+        thumbnail={levelVideo?.thumbnail}
+      >
         <button
           id="standalone-video-continue-button"
           type="button"

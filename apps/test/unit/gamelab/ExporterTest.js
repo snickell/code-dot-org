@@ -1,9 +1,20 @@
-import {assert, expect} from '../../util/reconfiguredChai';
-import sinon from 'sinon';
+import sinon from 'sinon'; // eslint-disable-line no-restricted-imports
 
-var testUtils = require('../../util/testUtils');
 import * as assetPrefix from '@cdo/apps/assetManagement/assetPrefix';
 import Exporter from '@cdo/apps/p5lab/gamelab/Exporter';
+import {
+  getStore,
+  registerReducers,
+  stubRedux,
+  restoreRedux,
+} from '@cdo/apps/redux';
+import pageConstantsReducer, {
+  setPageConstants,
+} from '@cdo/apps/redux/pageConstants';
+
+import {assert, expect} from '../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
+
+var testUtils = require('../../util/testUtils');
 
 const emptyAnimationOpts = {
   animationList: {
@@ -95,12 +106,20 @@ describe('The Gamelab Exporter,', function () {
 
     stashedCookieKey = window.userNameCookieKey;
     window.userNameCookieKey = 'CoolUser';
+    stubRedux();
+    registerReducers({pageConstants: pageConstantsReducer});
+    getStore().dispatch(
+      setPageConstants({
+        isCurriculumLevel: true,
+      })
+    );
   });
 
   afterEach(function () {
     server.restore();
     assetPrefix.init({});
     window.userNameCookieKey = stashedCookieKey;
+    restoreRedux();
   });
 
   describe("when assets can't be fetched,", function () {

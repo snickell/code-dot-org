@@ -4,13 +4,16 @@
  */
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
+
+import Button from '@cdo/apps/legacySharedComponents/Button';
 import i18n from '@cdo/locale';
-import {Heading3} from '../../lib/ui/Headings';
+
+import {Heading3} from '../../legacySharedComponents/Headings';
+import styleConstants from '../../styleConstants';
 import color from '../../util/color';
+
 import CardContainer from './CardContainer';
 import LoginTypeCard from './LoginTypeCard';
-import Button from '../Button';
-import styleConstants from '../../styleConstants';
 
 const cardInfoByAudience = {
   student: {

@@ -1,12 +1,15 @@
-import React from 'react';
 import PropTypes from 'prop-types';
-import i18n from '@cdo/locale';
-import * as assets from '../code-studio/assets';
+import React from 'react';
+
+import CollapserIcon from '@cdo/apps/templates/CollapserIcon';
 import PaneHeader, {
   PaneSection,
   PaneButton,
 } from '@cdo/apps/templates/PaneHeader';
-import CollapserIcon from '@cdo/apps/templates/CollapserIcon';
+import color from '@cdo/apps/util/color';
+import i18n from '@cdo/locale';
+
+import * as assets from '../code-studio/assets';
 import {RecordingFileType} from '../code-studio/components/recorders';
 
 export default function PreviewPaneHeader({
@@ -22,7 +25,12 @@ export default function PreviewPaneHeader({
       <PaneSection className={'pane-header-section pane-header-section-left'}>
         <PaneButton
           headerHasFocus
-          icon={<CollapserIcon isCollapsed={isCollapsed} />}
+          icon={
+            <CollapserIcon
+              isCollapsed={isCollapsed}
+              style={styles.collapserIcon}
+            />
+          }
           onClick={toggleVisualizationCollapsed}
           label=""
           isRtl={false}
@@ -89,5 +97,8 @@ const styles = {
     ':hover': {
       backgroundColor: 'transparent',
     },
+  },
+  collapserIcon: {
+    color: color.white,
   },
 };

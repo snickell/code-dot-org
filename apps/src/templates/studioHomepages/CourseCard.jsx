@@ -1,9 +1,12 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import color from '../../util/color';
+
+import Button, {buttonColors} from '@cdo/apps/componentLibrary/button/Button';
+import fontConstants from '@cdo/apps/fontConstants';
 import i18n from '@cdo/locale';
-import Button from '@cdo/apps/templates/Button';
+
+import color from '../../util/color';
 
 /**
  * A card used on the homepage to display information about a particular course
@@ -21,19 +24,22 @@ class CourseCard extends Component {
     const {title, description, link, isRtl} = this.props;
 
     return (
-      <a href={link} style={styles.card}>
+      <div style={styles.card}>
         <div style={styles.header} />
         <div style={isRtl ? styles.titleRtl : styles.title}>{title}</div>
         <div style={styles.description}>
           <p>{description}</p>
           <Button
-            style={styles.linkBox}
-            color={Button.ButtonColor.neutralDark}
-            text={i18n.viewCourse()}
+            useAsLink={true}
             href={link}
+            ariaLabel={i18n.viewCourse()}
+            color={buttonColors.gray}
+            text={i18n.viewCourse()}
+            type="secondary"
+            size="s"
           />
         </div>
-      </a>
+      </div>
     );
   }
 }
@@ -62,7 +68,7 @@ const styles = {
     paddingBottom: 5,
     marginTop: 15,
     fontSize: 20,
-    fontFamily: '"Gotham 4r", sans-serif',
+    ...fontConstants['main-font-regular'],
     color: color.white,
     zIndex: 2,
     position: 'absolute',
@@ -75,7 +81,7 @@ const styles = {
     paddingBottom: 5,
     marginTop: 15,
     fontSize: 20,
-    fontFamily: '"Gotham 4r", sans-serif',
+    ...fontConstants['main-font-regular'],
     color: color.white,
     zIndex: 2,
     position: 'absolute',
@@ -91,7 +97,7 @@ const styles = {
     marginTop: 115,
     fontSize: 14,
     lineHeight: 1.5,
-    fontFamily: '"Gotham 4r", sans-serif',
+    ...fontConstants['main-font-regular'],
     color: color.neutral_dark,
     background: color.neutral_light,
     height: 130,
@@ -103,8 +109,7 @@ const styles = {
   continueLink: {
     color: color.teal,
     fontSize: 14,
-    fontFamily: '"Gotham 4r", sans-serif',
-    fontWeight: 'bold',
+    ...fontConstants['main-font-regular'],
     marginTop: -5,
     display: 'inline',
   },

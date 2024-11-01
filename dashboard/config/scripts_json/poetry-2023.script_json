@@ -13,7 +13,7 @@
     },
     "new_name": null,
     "family_name": "poetry",
-    "serialized_at": "2023-06-30 15:47:48 UTC",
+    "serialized_at": "2024-07-26 22:44:52 UTC",
     "published_state": "stable",
     "instruction_type": "teacher_led",
     "instructor_audience": "teacher",
@@ -1900,6 +1900,39 @@
       }
     },
     {
+      "name": "“The Forest for the Trees” by Rena Priest",
+      "url": "https://poets.org/lesson-plan/teach-poem-forest-trees-rena-priest",
+      "key": "_the_forest_for_the_trees_by_rena_priest",
+      "properties": {
+        "audience": "Teacher"
+      },
+      "seeding_key": {
+        "resource.key": "_the_forest_for_the_trees_by_rena_priest"
+      }
+    },
+    {
+      "name": "“The Forest for the Trees” by Rena Priest",
+      "url": "https://poets.org/lesson-plan/teach-poem-forest-trees-rena-priest",
+      "key": "_the_forest_for_the_trees_by_rena_priest_1",
+      "properties": {
+        "audience": "Teacher",
+        "type": "Resource"
+      },
+      "seeding_key": {
+        "resource.key": "_the_forest_for_the_trees_by_rena_priest_1"
+      }
+    },
+    {
+      "name": "Standards in Coding with Poetry ",
+      "url": "https://studio.code.org/s/poetry-2023/standards",
+      "key": "all_standards",
+      "properties": {
+      },
+      "seeding_key": {
+        "resource.key": "all_standards"
+      }
+    },
+    {
       "name": "Coding with Poetry",
       "url": "https://docs.google.com/presentation/d/1k0VP9so-gmAHq9mSOTxiZ98pX7gNfN6TutBeoDa3pxY/template/preview",
       "key": "coding_with_poetry_lesson_1",
@@ -1922,6 +1955,40 @@
       },
       "seeding_key": {
         "resource.key": "coding_with_poetry_rubric"
+      }
+    },
+    {
+      "name": "Vocabulary in Coding with Poetry ",
+      "url": "https://studio.code.org/s/poetry-2023/vocab",
+      "key": "coding_with_poetry_vocabulary",
+      "properties": {
+      },
+      "seeding_key": {
+        "resource.key": "coding_with_poetry_vocabulary"
+      }
+    },
+    {
+      "name": "CS Connections Landing Page",
+      "url": "https://code.org/educate/csc",
+      "key": "cs_connections_landing_page",
+      "properties": {
+        "type": "Resource"
+      },
+      "seeding_key": {
+        "resource.key": "cs_connections_landing_page"
+      }
+    },
+    {
+      "name": "CSC Extended Connections Book List",
+      "url": "https://docs.google.com/document/d/14azofBAy5Riq109ruUPi8BbZRvJ1KIthqA3mH7t428Y/template/preview",
+      "key": "csc_extended_connections_book_list",
+      "properties": {
+        "audience": "Teacher",
+        "download_url": "https://docs.google.com/document/d/14azofBAy5Riq109ruUPi8BbZRvJ1KIthqA3mH7t428Y/export/pdf",
+        "type": "Resource"
+      },
+      "seeding_key": {
+        "resource.key": "csc_extended_connections_book_list"
       }
     },
     {
@@ -1960,6 +2027,17 @@
       },
       "seeding_key": {
         "resource.key": "helpful_hints_1"
+      }
+    },
+    {
+      "name": "Helpful hints for teachers and learners",
+      "url": "https://docs.google.com/presentation/d/1RSJhxO9ZMtyLrt160kvAVdyekR4wT2fVSgbrPHR4HS0/template/preview\t",
+      "key": "helpful_hints_for_teachers_and_learners",
+      "properties": {
+        "type": "Resource"
+      },
+      "seeding_key": {
+        "resource.key": "helpful_hints_for_teachers_and_learners"
       }
     },
     {
@@ -2059,6 +2137,16 @@
       }
     },
     {
+      "name": "Resource list for all lessons",
+      "url": "https://studio.code.org/s/poetry-2023/resources",
+      "key": "resource_list_for_all_lessons",
+      "properties": {
+      },
+      "seeding_key": {
+        "resource.key": "resource_list_for_all_lessons"
+      }
+    },
+    {
       "name": "Share Your App!",
       "url": "https://docs.google.com/document/d/1kO4SNEIVyM0GrxxJb6NzVYauXXpi6rzQkDIfrzQf1Ls/template/preview",
       "key": "share_your_app_",
@@ -2154,6 +2242,12 @@
     {
       "seeding_key": {
         "lesson.key": "Poem Art",
+        "resource.key": "_the_forest_for_the_trees_by_rena_priest_1"
+      }
+    },
+    {
+      "seeding_key": {
+        "lesson.key": "Poem Art",
         "resource.key": "coding_with_poetry_lesson_1"
       }
     },
@@ -2243,7 +2337,48 @@
     }
   ],
   "scripts_resources": [
-
+    {
+      "seeding_key": {
+        "resource.key": "_the_forest_for_the_trees_by_rena_priest",
+        "script.name": "poetry-2023"
+      }
+    },
+    {
+      "seeding_key": {
+        "resource.key": "all_standards",
+        "script.name": "poetry-2023"
+      }
+    },
+    {
+      "seeding_key": {
+        "resource.key": "coding_with_poetry_vocabulary",
+        "script.name": "poetry-2023"
+      }
+    },
+    {
+      "seeding_key": {
+        "resource.key": "cs_connections_landing_page",
+        "script.name": "poetry-2023"
+      }
+    },
+    {
+      "seeding_key": {
+        "resource.key": "csc_extended_connections_book_list",
+        "script.name": "poetry-2023"
+      }
+    },
+    {
+      "seeding_key": {
+        "resource.key": "helpful_hints_for_teachers_and_learners",
+        "script.name": "poetry-2023"
+      }
+    },
+    {
+      "seeding_key": {
+        "resource.key": "resource_list_for_all_lessons",
+        "script.name": "poetry-2023"
+      }
+    }
   ],
   "scripts_student_resources": [
 
@@ -2774,6 +2909,15 @@
     }
   ],
   "lessons_opportunity_standards": [
+
+  ],
+  "rubrics": [
+
+  ],
+  "learning_goals": [
+
+  ],
+  "learning_goal_evidence_levels": [
 
   ]
 }

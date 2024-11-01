@@ -1,7 +1,10 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import FontAwesome from '../FontAwesome';
+
+import fontConstants from '@cdo/apps/fontConstants';
+
+import FontAwesome from '../../legacySharedComponents/FontAwesome';
 import color from '../../util/color';
 
 class LargeChevronLink extends Component {
@@ -42,8 +45,8 @@ const styles = {
   linkText: {
     fontSize: 20,
     lineHeight: '22px',
-    fontFamily: 'Gotham 5r',
-    color: color.teal,
+    ...fontConstants['main-font-semi-bold'],
+    color: color.light_secondary_500,
     clear: 'both',
     display: 'inline',
     fontWeight: 'bold',
@@ -52,7 +55,7 @@ const styles = {
   },
   chevron: {
     display: 'inline',
-    color: color.teal,
+    color: color.light_secondary_500,
     fontSize: 20,
     fontWeight: 'bold',
   },

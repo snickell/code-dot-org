@@ -25,38 +25,45 @@
  * @author fraser@google.com (Neil Fraser)
  */
 
-var React = require('react');
-var ReactDOM = require('react-dom');
-var color = require('../util/color');
-var commonMsg = require('@cdo/locale');
-var turtleMsg = require('./locale');
-import CustomMarshalingInterpreter from '../lib/tools/jsinterpreter/CustomMarshalingInterpreter';
-var ArtistAPI = require('./api');
-var apiJavascript = require('./apiJavascript');
-var Provider = require('react-redux').Provider;
-import AppView from '../templates/AppView';
-var ArtistVisualizationColumn = require('./ArtistVisualizationColumn');
-var utils = require('../utils');
-var Slider = require('../slider');
-var _ = require('lodash');
-var dropletConfig = require('./dropletConfig');
-var JSInterpreter = require('../lib/tools/jsinterpreter/JSInterpreter');
-var JsInterpreterLogger = require('../JsInterpreterLogger');
+import Visualization from '@code-dot-org/artist';
+
+import {DEFAULT_EXECUTION_INFO} from '@cdo/apps/lib/tools/jsinterpreter/CustomMarshalingInterpreter';
+import {SignInState} from '@cdo/apps/templates/currentUserRedux';
+
+import {blockAsXmlNode, cleanBlocks} from '../block_utils';
+import {TestResults} from '../constants';
 import {
   getContainedLevelResultInfo,
   postContainedLevelAttempt,
   runAfterPostContainedLevel,
 } from '../containedLevels';
-import {getStore} from '../redux';
-import {TestResults} from '../constants';
-import {captureThumbnailFromCanvas} from '../util/thumbnail';
-import {blockAsXmlNode, cleanBlocks} from '../block_utils';
-import ArtistSkins from './skins';
 import dom from '../dom';
-import {SignInState} from '@cdo/apps/templates/currentUserRedux';
-import Visualization from '@code-dot-org/artist';
+import CustomMarshalingInterpreter from '../lib/tools/jsinterpreter/CustomMarshalingInterpreter';
+import {getStore} from '../redux';
+import AppView from '../templates/AppView';
 import experiments from '../util/experiments';
-import {DEFAULT_EXECUTION_INFO} from '@cdo/apps/lib/tools/jsinterpreter/CustomMarshalingInterpreter';
+import {captureThumbnailFromCanvas} from '../util/thumbnail';
+
+import ArtistSkins from './skins';
+
+var _ = require('lodash');
+var React = require('react');
+var ReactDOM = require('react-dom');
+var Provider = require('react-redux').Provider;
+
+var commonMsg = require('@cdo/locale');
+
+var JsInterpreterLogger = require('../JsInterpreterLogger');
+var JSInterpreter = require('../lib/tools/jsinterpreter/JSInterpreter');
+var Slider = require('../slider');
+var color = require('../util/color');
+var utils = require('../utils');
+
+var ArtistAPI = require('./api');
+var apiJavascript = require('./apiJavascript');
+var ArtistVisualizationColumn = require('./ArtistVisualizationColumn');
+var dropletConfig = require('./dropletConfig');
+var turtleMsg = require('./locale');
 
 const CANVAS_HEIGHT = 400;
 const CANVAS_WIDTH = 400;
@@ -548,16 +555,20 @@ Artist.prototype.afterInject_ = function (config) {
   visualization.appendChild(this.visualization.displayCanvas);
 
   if (this.studioApp_.isUsingBlockly() && this.isFrozenSkin()) {
+    // Google Blockly uses forBlock, CDO Blockly does not.
+    const blockGeneratorFunctionDictionary =
+      Blockly.JavaScript.forBlock || Blockly.JavaScript;
     // Override colour_random to only generate random colors from within our frozen
     // palette
-    Blockly.JavaScript.colour_random = function () {
+    blockGeneratorFunctionDictionary.colour_random = function () {
       // Generate a random colour.
       if (!Blockly.JavaScript.definitions_.colour_random) {
         var functionName = Blockly.JavaScript.variableDB_.getDistinctName(
           'colour_random',
           Blockly.Generator.NAME_TYPE
         );
-        Blockly.JavaScript.colour_random.functionName = functionName;
+        blockGeneratorFunctionDictionary.colour_random.functionName =
+          functionName;
         var func = [];
         func.push('function ' + functionName + '() {');
         func.push(
@@ -567,7 +578,8 @@ Artist.prototype.afterInject_ = function (config) {
         func.push('}');
         Blockly.JavaScript.definitions_.colour_random = func.join('\n');
       }
-      var code = Blockly.JavaScript.colour_random.functionName + '()';
+      var code =
+        blockGeneratorFunctionDictionary.colour_random.functionName + '()';
       return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];
     };
   }
@@ -630,10 +642,9 @@ Artist.prototype.drawLogOnCanvas = function (log, canvas) {
  * Evaluates blocks or code, and draws onto given canvas.
  */
 Artist.prototype.drawBlocksOnCanvas = function (blocksOrCode, canvas) {
-  var code;
+  let code;
   if (this.studioApp_.isUsingBlockly()) {
-    var domBlocks = Blockly.Xml.textToDom(blocksOrCode);
-    code = Blockly.Generator.xmlToCode('JavaScript', domBlocks);
+    code = Blockly.cdoUtils.getCodeFromBlockXmlSource(blocksOrCode);
   } else {
     code = blocksOrCode;
   }
@@ -886,13 +897,10 @@ Artist.prototype.execute = function (executionInfo) {
   if (this.level.editCode) {
     this.initInterpreter();
   } else {
-    let codeBlocks = Blockly.mainBlockSpace.getTopBlocks(true);
-    if (this.studioApp_.initializationBlocks) {
-      codeBlocks = this.studioApp_.initializationBlocks.concat(codeBlocks);
-    }
-
-    this.code = Blockly.Generator.blocksToCode('JavaScript', codeBlocks);
-    this.evalCode(this.code, executionInfo);
+    const code = Blockly.cdoUtils.getAllGeneratedCode(
+      this.studioApp_.initializationCode
+    );
+    this.evalCode(code, executionInfo);
   }
 
   // api.log now contains a transcript of all the user's actions.

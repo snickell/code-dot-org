@@ -1,10 +1,15 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import Radium from 'radium'; // eslint-disable-line no-restricted-imports
-import color from '@cdo/apps/util/color';
-import i18n from '@cdo/locale';
+import React from 'react';
+import {connect} from 'react-redux';
+
+import fontConstants from '@cdo/apps/fontConstants';
+import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import ProgressBubble from '@cdo/apps/templates/progress/ProgressBubble';
-import FontAwesome from '@cdo/apps/templates/FontAwesome';
+import color from '@cdo/apps/util/color';
+import stringKeyComparator from '@cdo/apps/util/stringKeyComparator';
+import i18n from '@cdo/locale';
+
 import {levelWithProgress, studentShape} from './types';
 
 class StudentTable extends React.Component {
@@ -15,7 +20,15 @@ class StudentTable extends React.Component {
     levelsWithProgress: PropTypes.arrayOf(levelWithProgress),
     sectionId: PropTypes.number,
     unitName: PropTypes.string,
+
+    // provided by redux
+    isSortedByFamilyName: PropTypes.bool,
   };
+
+  constructor(props) {
+    super(props);
+    this.state = {sortedStudents: []};
+  }
 
   getRowLink = studentId => {
     const queryStr = `?section_id=${this.props.sectionId}&user_id=${studentId}`;
@@ -37,9 +50,26 @@ class StudentTable extends React.Component {
     return isSelected ? [styles.tr, styles.selected] : styles.tr;
   };
 
+  componentDidMount() {
+    this.setState({sortedStudents: this.sortStudents()});
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.isSortedByFamilyName !== this.props.isSortedByFamilyName) {
+      this.setState({sortedStudents: this.sortStudents()});
+    }
+  }
+
+  sortStudents() {
+    const {students, isSortedByFamilyName} = this.props;
+    return isSortedByFamilyName
+      ? [...students].sort(stringKeyComparator(['familyName', 'name']))
+      : [...students].sort(stringKeyComparator(['name', 'familyName']));
+  }
+
   render() {
-    const {students, onSelectUser, selectedUserId, levelsWithProgress} =
-      this.props;
+    const {onSelectUser, selectedUserId, levelsWithProgress} = this.props;
+    const {sortedStudents} = this.state;
 
     return (
       <table style={styles.table} className="student-table">
@@ -50,7 +80,7 @@ class StudentTable extends React.Component {
           >
             <td style={styles.meRow}>{i18n.studentTableTeacherDemo()}</td>
           </tr>
-          {students.map(student => (
+          {sortedStudents.map(student => (
             <tr
               key={`tr-${student.id}`}
               style={this.getRowStyle(selectedUserId, student.id)}
@@ -69,7 +99,7 @@ class StudentTable extends React.Component {
                     />
                   )}
                   <div style={styles.name}>
-                    {student.name}
+                    {`${student.name} ${student.familyName || ''}`}
                     <a
                       href={this.getRowLink(student.id)}
                       target="_blank"
@@ -92,7 +122,7 @@ class StudentTable extends React.Component {
 const styles = {
   table: {
     width: '90%',
-    margin: 'auto',
+    margin: '8px auto auto',
   },
   tr: {
     height: 41,
@@ -108,7 +138,7 @@ const styles = {
     padding: 1,
   },
   selected: {
-    fontFamily: '"Gotham 7r", sans-serif',
+    ...fontConstants['main-font-bold'],
     color: color.white,
     backgroundColor: color.light_cyan,
   },
@@ -130,4 +160,7 @@ const styles = {
   },
 };
 
-export default Radium(StudentTable);
+export const UnconnectedStudentTable = Radium(StudentTable);
+export default connect(state => ({
+  isSortedByFamilyName: state.currentUser.isSortedByFamilyName,
+}))(UnconnectedStudentTable);

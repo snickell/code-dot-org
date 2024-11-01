@@ -3,8 +3,8 @@ require 'email_reminder'
 require 'mocha/mini_test'
 
 class EmailReminderTest < ActiveSupport::TestCase
-  setup_all do
-    @student = create(:student, child_account_compliance_state: 'not_g')
+  setup do
+    @student = create(:student, cap_status: 'p')
     @request = create(:parental_permission_request, user_id: @student.id, parent_email: 'foo-parent@code.org')
 
     Cdo::Metrics.expects(:push).never
@@ -44,7 +44,7 @@ class EmailReminderTest < ActiveSupport::TestCase
     email_reminder.send_all_reminder_emails
 
     email = ActionMailer::Base.deliveries.last
-    assert_not_nil email
+    refute_nil email
     assert_equal @request.parent_email, email.to[0]
     assert_equal 1, @request.reload.reminders_sent
   end

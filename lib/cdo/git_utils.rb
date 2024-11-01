@@ -75,7 +75,7 @@ module GitUtils
     `git rev-parse HEAD`.strip
   end
 
-  def self.git_revision_short(project_directory=Dir.pwd)
+  def self.git_revision_short(project_directory = Dir.pwd)
     return nil if project_directory.nil?
     # Cron jobs execute as root and may not be in the current project directory, preventing git commands from working.
     # Eventually other (or all) GitUtils methods may need to explicitly change to the project root, but currently
@@ -110,7 +110,7 @@ module GitUtils
   end
 
   def self.circle_pr_branch_base_no_origin
-    ENV['DRONE_TARGET_BRANCH']
+    ENV.fetch('DRONE_TARGET_BRANCH', nil)
   end
 
   # Given a branch name, returns its likely base branch / merge destination

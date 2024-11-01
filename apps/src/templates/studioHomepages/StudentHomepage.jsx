@@ -1,17 +1,27 @@
+import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import HeaderBanner from '../HeaderBanner';
-import SpecialAnnouncement from './SpecialAnnouncement';
-import RecentCourses from './RecentCourses';
-import JoinSectionArea from '@cdo/apps/templates/studioHomepages/JoinSectionArea';
-import ProjectWidgetWithData from '@cdo/apps/templates/projects/ProjectWidgetWithData';
+
+import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import Notification, {
+  NotificationType,
+} from '@cdo/apps/sharedComponents/Notification';
 import ParticipantFeedbackNotification from '@cdo/apps/templates/feedback/ParticipantFeedbackNotification';
-import shapes from './shapes';
-import ProtectedStatefulDiv from '../ProtectedStatefulDiv';
-import Notification, {NotificationType} from '@cdo/apps/templates/Notification';
+import ProjectWidgetWithData from '@cdo/apps/templates/projects/ProjectWidgetWithData';
+import JoinSectionArea from '@cdo/apps/templates/studioHomepages/JoinSectionArea';
+import {tryGetSessionStorage, trySetSessionStorage} from '@cdo/apps/utils';
 import i18n from '@cdo/locale';
-import $ from 'jquery';
+
+import HeaderBanner from '../HeaderBanner';
+import ProtectedStatefulDiv from '../ProtectedStatefulDiv';
+
+import MarketingAnnouncementBanner from './MarketingAnnouncementBanner';
+import RecentCourses from './RecentCourses';
+import shapes from './shapes';
+
+const LOGGED_STUDENT_SESSION = 'logged_student_session';
 
 export default class StudentHomepage extends Component {
   static propTypes = {
@@ -21,9 +31,9 @@ export default class StudentHomepage extends Component {
     sections: shapes.sections,
     canViewAdvancedTools: PropTypes.bool,
     studentId: PropTypes.number.isRequired,
-    isEnglish: PropTypes.bool.isRequired,
     showVerifiedTeacherWarning: PropTypes.bool,
-    showDeprecatedCalcAndEvalWarning: PropTypes.bool,
+    specialAnnouncement: shapes.specialAnnouncement,
+    topComponents: PropTypes.arrayOf(PropTypes.node),
   };
 
   componentDidMount() {
@@ -37,32 +47,46 @@ export default class StudentHomepage extends Component {
       sections,
       topCourse,
       hasFeedback,
-      isEnglish,
       showVerifiedTeacherWarning,
-      showDeprecatedCalcAndEvalWarning,
+      specialAnnouncement,
+      topComponents,
     } = this.props;
     const {canViewAdvancedTools, studentId} = this.props;
     // Verify background image works for both LTR and RTL languages.
     const backgroundUrl = '/shared/images/banners/teacher-homepage-hero.jpg';
 
+    // Send one analytics event when a student logs in. Use session storage to determine
+    // whether they've just logged in.
+    if (
+      !!studentId &&
+      tryGetSessionStorage(LOGGED_STUDENT_SESSION, 'false') !== 'true'
+    ) {
+      trySetSessionStorage(LOGGED_STUDENT_SESSION, 'true');
+
+      analyticsReporter.sendEvent(
+        EVENTS.STUDENT_LOGIN_EVENT,
+        {},
+        PLATFORMS.BOTH
+      );
+    }
+
     return (
       <div>
         <HeaderBanner
           headingText={i18n.homepageHeading()}
-          short={true}
           backgroundUrl={backgroundUrl}
+          backgroundImageStyling={{backgroundPosition: '90% 30%'}}
         />
         <div className={'container main'}>
+          {topComponents && topComponents.map(component => component)}
+
           <ProtectedStatefulDiv ref="flashes" />
-          {showDeprecatedCalcAndEvalWarning && (
-            <Notification
-              type={NotificationType.warning}
-              notice={i18n.deprecatedCalcAndEvalWarning()}
-              details={i18n.deprecatedCalcAndEvalDetails()}
-              dismissible={false}
+          {specialAnnouncement && (
+            <MarketingAnnouncementBanner
+              announcement={specialAnnouncement}
+              marginBottom="30px"
             />
           )}
-          {isEnglish && <SpecialAnnouncement isTeacher={false} />}
           {showVerifiedTeacherWarning && (
             <Notification
               type={NotificationType.failure}
@@ -82,11 +106,11 @@ export default class StudentHomepage extends Component {
             isTeacher={false}
             hasFeedback={hasFeedback}
           />
+          <JoinSectionArea initialJoinedStudentSections={sections} />
           <ProjectWidgetWithData
             canViewFullList={true}
             canViewAdvancedTools={canViewAdvancedTools}
           />
-          <JoinSectionArea initialJoinedStudentSections={sections} />
         </div>
       </div>
     );

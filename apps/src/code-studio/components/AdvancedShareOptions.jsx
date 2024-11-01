@@ -1,12 +1,18 @@
-import React from 'react';
-import Radium from 'radium'; // eslint-disable-line no-restricted-imports
 import PropTypes from 'prop-types';
-import * as color from '../../util/color';
-import {CIPHER, ALPHABET} from '../../constants';
+import Radium from 'radium'; // eslint-disable-line no-restricted-imports
+import React from 'react';
 import {connect} from 'react-redux';
+
+import fontConstants from '@cdo/apps/fontConstants';
+import Button from '@cdo/apps/legacySharedComponents/Button';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import i18n from '@cdo/locale';
+
+import {CIPHER, ALPHABET} from '../../constants';
+import * as color from '../../util/color';
+
 import {hideShareDialog, showLibraryCreationDialog} from './shareDialogRedux';
-import Button from '../../templates/Button';
 
 const style = {
   nav: {
@@ -21,9 +27,8 @@ const style = {
     li: {
       display: 'inline-block',
       color: color.neutral_dark90,
-      fontFamily: "'Gotham 5r', sans-serif",
+      ...fontConstants['main-font-semi-bold'],
       fontSize: 'larger',
-      fontWeight: 'bold',
       marginRight: 10,
       cursor: 'pointer',
     },
@@ -36,19 +41,21 @@ const style = {
     fontSize: 'inherit',
     lineHeight: 'inherit',
     color: color.neutral_dark,
-    fontFamily: "'Gotham 5r', sans-serif",
+    ...fontConstants['main-font-semi-bold'],
+  },
+  warningp: {
+    color: color.red,
   },
   bold: {
-    fontFamily: "'Gotham 7r', sans-serif",
+    ...fontConstants['main-font-bold'],
   },
   root: {
     marginTop: 20,
   },
   expand: {
     color: color.brand_secondary_default,
-    fontFamily: "'Gotham 5r', sans-serif",
+    ...fontConstants['main-font-semi-bold'],
     cursor: 'pointer',
-    fontWeight: 'bold',
   },
   embedInput: {
     cursor: 'copy',
@@ -60,6 +67,15 @@ const style = {
     margin: 0,
     fontSize: 'large',
     height: 40,
+  },
+  embedCodeCheckbox: {
+    accentColor: color.brand_primary_default,
+    margin: 0,
+  },
+  embedCodeCheckboxLabel: {
+    display: 'inline-block',
+    paddingLeft: 8,
+    paddingTop: 8,
   },
 };
 
@@ -82,6 +98,7 @@ class AdvancedShareOptions extends React.Component {
       iframeHeight: PropTypes.number.isRequired,
       iframeWidth: PropTypes.number.isRequired,
     }).isRequired,
+    appType: PropTypes.string.isRequired,
   };
 
   constructor(props) {
@@ -97,6 +114,9 @@ class AdvancedShareOptions extends React.Component {
   }
 
   downloadExport = () => {
+    analyticsReporter.sendEvent(EVENTS.EXPORT_APP, {
+      lab_type: this.props.appType,
+    });
     this.setState({exporting: true});
     this.props
       .exportApp()
@@ -129,24 +149,34 @@ class AdvancedShareOptions extends React.Component {
     return (
       <div>
         <p style={style.p}>{i18n.shareEmbedDescription()}</p>
+        <p style={{...style.p, ...style.warningp}}>
+          {i18n.shareEmbedWarning()}
+        </p>
         <textarea
           type="text"
           onClick={e => e.target.select()}
-          readOnly="true"
+          readOnly={true}
           value={iframeHtml}
           style={style.embedInput}
+          aria-label={i18n.codeToEmbed()}
         />
-        <label style={{display: 'flex'}}>
+        <div>
           <input
+            id="embedCodeCheckbox"
             type="checkbox"
-            style={{accentColor: color.brand_primary_default}}
+            style={style.embedCodeCheckbox}
             checked={this.state.embedWithoutCode}
             onChange={() =>
               this.setState({embedWithoutCode: !this.state.embedWithoutCode})
             }
           />
-          <span style={{marginLeft: 5}}>Hide ability to view code</span>
-        </label>
+          <label
+            htmlFor="embedCodeCheckbox"
+            style={style.embedCodeCheckboxLabel}
+          >
+            {i18n.hideAbilityToViewCode()}
+          </label>
+        </div>
       </div>
     );
   }

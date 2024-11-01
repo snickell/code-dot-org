@@ -1,6 +1,11 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
+import {CSVLink} from 'react-csv';
+import {connect} from 'react-redux';
+
+import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import {setScriptId} from '@cdo/apps/redux/unitSelectionRedux';
+import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
 import {
   asyncLoadAssessments,
   getCurrentScriptAssessmentList,
@@ -11,28 +16,26 @@ import {
   setStudentId,
   ASSESSMENT_FEEDBACK_OPTION_ID,
 } from '@cdo/apps/templates/sectionAssessments/sectionAssessmentsRedux';
-import {connect} from 'react-redux';
-import {h3Style} from '../../lib/ui/Headings';
-import firehoseClient from '../../lib/util/firehose';
-import i18n from '@cdo/locale';
 import UnitSelector from '@cdo/apps/templates/sectionProgress/UnitSelector';
-import MultipleChoiceAssessmentsOverviewContainer from './MultipleChoiceAssessmentsOverviewContainer';
-import MultipleChoiceByStudentContainer from './MultipleChoiceByStudentContainer';
-import SubmissionStatusAssessmentsContainer from './SubmissionStatusAssessmentsContainer';
+import i18n from '@cdo/locale';
+
+import {h3Style} from '../../legacySharedComponents/Headings';
+import firehoseClient from '../../metrics/firehose';
+
+import AssessmentSelector from './AssessmentSelector';
+import FeedbackDownload from './FeedbackDownload';
+import FreeResponseDetailsDialog from './FreeResponseDetailsDialog';
 import FreeResponsesAssessmentsContainer from './FreeResponsesAssessmentsContainer';
 import FreeResponsesSurveyContainer from './FreeResponsesSurveyContainer';
-import FreeResponseDetailsDialog from './FreeResponseDetailsDialog';
-import MultipleChoiceSurveyOverviewContainer from './MultipleChoiceSurveyOverviewContainer';
-import MultipleChoiceDetailsDialog from './MultipleChoiceDetailsDialog';
 import MatchAssessmentsOverviewContainer from './MatchAssessmentsOverviewContainer';
-import MatchDetailsDialog from './MatchDetailsDialog';
 import MatchByStudentContainer from './MatchByStudentContainer';
-import AssessmentSelector from './AssessmentSelector';
+import MatchDetailsDialog from './MatchDetailsDialog';
+import MultipleChoiceAssessmentsOverviewContainer from './MultipleChoiceAssessmentsOverviewContainer';
+import MultipleChoiceByStudentContainer from './MultipleChoiceByStudentContainer';
+import MultipleChoiceDetailsDialog from './MultipleChoiceDetailsDialog';
+import MultipleChoiceSurveyOverviewContainer from './MultipleChoiceSurveyOverviewContainer';
 import StudentSelector from './StudentSelector';
-import FontAwesome from '@cdo/apps/templates/FontAwesome';
-import {CSVLink} from 'react-csv';
-import FeedbackDownload from './FeedbackDownload';
-import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
+import SubmissionStatusAssessmentsContainer from './SubmissionStatusAssessmentsContainer';
 
 const CSV_ASSESSMENT_HEADERS = [
   {label: i18n.name(), key: 'studentName'},
@@ -57,7 +60,6 @@ class SectionAssessments extends Component {
     // provided by redux
     sectionId: PropTypes.number.isRequired,
     isLoading: PropTypes.bool.isRequired,
-    coursesWithProgress: PropTypes.array.isRequired,
     assessmentList: PropTypes.array.isRequired,
     scriptId: PropTypes.number,
     assessmentId: PropTypes.number,
@@ -179,7 +181,6 @@ class SectionAssessments extends Component {
   render() {
     const {
       sectionName,
-      coursesWithProgress,
       scriptId,
       assessmentList,
       assessmentId,
@@ -195,17 +196,13 @@ class SectionAssessments extends Component {
       this.props.assessmentId === ASSESSMENT_FEEDBACK_OPTION_ID;
 
     return (
-      <div>
+      <div data-testid={'assessments-tab'}>
         <div style={styles.selectors}>
           <div style={styles.unitSelection}>
             <div style={{...h3Style, ...styles.header}}>
               {i18n.selectACourse()}
             </div>
-            <UnitSelector
-              coursesWithProgress={coursesWithProgress}
-              scriptId={scriptId}
-              onChange={this.onSelectScript}
-            />
+            <UnitSelector scriptId={scriptId} onChange={this.onSelectScript} />
           </div>
           {!isLoading && assessmentList.length > 0 && (
             <div style={styles.assessmentSelection}>
@@ -367,7 +364,6 @@ export default connect(
   state => ({
     sectionId: state.teacherSections.selectedSectionId,
     isLoading: !!state.sectionAssessments.isLoading,
-    coursesWithProgress: state.unitSelection.coursesWithProgress,
     assessmentList: getCurrentScriptAssessmentList(state),
     scriptId: state.unitSelection.scriptId,
     assessmentId: state.sectionAssessments.assessmentId,

@@ -1,14 +1,16 @@
+import {shallow} from 'enzyme'; // eslint-disable-line no-restricted-imports
 import React from 'react';
-import {shallow} from 'enzyme';
-import {expect} from '../../util/reconfiguredChai';
+import sinon from 'sinon'; // eslint-disable-line no-restricted-imports
+
+import {updateHiddenScript} from '@cdo/apps/code-studio/hiddenLessonRedux';
 import {UnconnectedMultipleSectionsAssigner as MultipleSectionsAssigner} from '@cdo/apps/templates/MultipleSectionsAssigner';
 import {fakeTeacherSectionsForDropdown} from '@cdo/apps/templates/teacherDashboard/sectionAssignmentTestHelper';
 import {
   assignToSection,
   unassignSection,
 } from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
-import {updateHiddenScript} from '@cdo/apps/code-studio/hiddenLessonRedux';
-import sinon from 'sinon';
+
+import {expect} from '../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
 
 describe('MultipleSectionsAssigner', () => {
   const assigedStandaloneUnitSection = fakeTeacherSectionsForDropdown[3];
@@ -455,7 +457,7 @@ describe('MultipleSectionsAssigner', () => {
       scriptId: assignedCourseANDUnitSection.unitId,
     });
 
-    wrapper.find('.select-all-sections').simulate('click');
+    wrapper.find('#select-all-sections').simulate('click');
     const allSections = wrapper.find('Checkbox');
     for (let i = 0; i < allSections.length; i++) {
       expect(allSections.at(i).props().checked).to.be.true;

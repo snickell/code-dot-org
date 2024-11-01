@@ -1,20 +1,23 @@
+import {uniq, map, filter} from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useState, useEffect, useRef, useCallback} from 'react';
-import {connect} from 'react-redux';
-import {uniq, map, filter} from 'lodash';
 import {CSVLink} from 'react-csv';
-import i18n from '@cdo/locale';
-import UnitSelector from '@cdo/apps/templates/sectionProgress/UnitSelector';
-import {h3Style} from '../../lib/ui/Headings';
-import color from '../../util/color';
-import TextResponsesTable from './TextResponsesTable';
-import Button from '../Button';
-import TextResponsesLessonSelector from '@cdo/apps/templates/textResponses/TextResponsesLessonSelector';
+import {connect} from 'react-redux';
+
+import Button from '@cdo/apps/legacySharedComponents/Button';
 import {
   setScriptId,
   getSelectedScriptName,
 } from '@cdo/apps/redux/unitSelectionRedux';
+import UnitSelector from '@cdo/apps/templates/sectionProgress/UnitSelector';
 import {loadTextResponsesFromServer} from '@cdo/apps/templates/textResponses/textReponsesDataApi';
+import TextResponsesLessonSelector from '@cdo/apps/templates/textResponses/TextResponsesLessonSelector';
+import i18n from '@cdo/locale';
+
+import {h3Style} from '../../legacySharedComponents/Headings';
+import color from '../../util/color';
+
+import TextResponsesTable from './TextResponsesTable';
 
 const CSV_HEADERS = [
   {label: i18n.name(), key: 'studentName'},
@@ -25,13 +28,7 @@ const CSV_HEADERS = [
 ];
 const PADDING = 8;
 
-function TextResponses({
-  sectionId,
-  coursesWithProgress,
-  scriptId,
-  scriptName,
-  setScriptId,
-}) {
+function TextResponses({sectionId, scriptId, scriptName, setScriptId}) {
   const [textResponsesByScript, setTextResponsesByScript] = useState({});
   const [isLoadingResponses, setIsLoadingResponses] = useState(false);
   const [filterByLessonName, setFilterByLessonName] = useState(null);
@@ -100,11 +97,7 @@ function TextResponses({
     <div>
       <div style={styles.unitSelection}>
         <div style={{...h3Style, ...styles.header}}>{i18n.selectACourse()}</div>
-        <UnitSelector
-          coursesWithProgress={coursesWithProgress}
-          scriptId={scriptId}
-          onChange={onChangeScript}
-        />
+        <UnitSelector scriptId={scriptId} onChange={onChangeScript} />
       </div>
       {filteredResponses.length > 0 && (
         <div id="uitest-response-actions" style={styles.actionRow}>
@@ -142,7 +135,6 @@ function TextResponses({
 TextResponses.propTypes = {
   // Provided by redux.
   sectionId: PropTypes.number.isRequired,
-  coursesWithProgress: PropTypes.array.isRequired,
   scriptId: PropTypes.number,
   scriptName: PropTypes.string,
   setScriptId: PropTypes.func.isRequired,
@@ -178,7 +170,6 @@ export const UnconnectedTextResponses = TextResponses;
 export default connect(
   state => ({
     sectionId: state.teacherSections.selectedSectionId,
-    coursesWithProgress: state.unitSelection.coursesWithProgress,
     scriptId: state.unitSelection.scriptId,
     scriptName: getSelectedScriptName(state),
   }),

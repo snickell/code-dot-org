@@ -1,7 +1,6 @@
 {
   "key": "aichat",
   "display_name": "aichat",
-  "category": "other",
   "is_featured": false,
   "assignable": true,
   "curriculum_type": null,
@@ -11,5 +10,10 @@
   "image": null,
   "cs_topic": null,
   "school_subject": null,
-  "device_compatibility": null
+  "device_compatibility": null,
+  "description": null,
+  "professional_learning_program": null,
+  "video": null,
+  "published_date": null,
+  "self_paced_pl_course_offering_key": null
 }

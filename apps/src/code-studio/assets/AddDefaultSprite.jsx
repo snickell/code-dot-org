@@ -1,6 +1,7 @@
-import React from 'react';
 import PropTypes from 'prop-types';
-import Button from '@cdo/apps/templates/Button';
+import React from 'react';
+
+import Button from '@cdo/apps/legacySharedComponents/Button';
 import color from '@cdo/apps/util/color';
 
 export default class AddDefaultSprite extends React.Component {
@@ -58,13 +59,13 @@ export default class AddDefaultSprite extends React.Component {
         />
         <Button
           text="Add to start"
-          color={Button.ButtonColor.orange}
+          color={Button.ButtonColor.brandSecondaryDefault}
           onClick={() => this.handleSpriteAdd(true)}
           size={Button.ButtonSize.narrow}
         />
         <Button
           text="Add to end"
-          color={Button.ButtonColor.orange}
+          color={Button.ButtonColor.brandSecondaryDefault}
           onClick={() => this.handleSpriteAdd(false)}
           size={Button.ButtonSize.narrow}
         />

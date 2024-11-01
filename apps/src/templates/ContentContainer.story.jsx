@@ -1,11 +1,12 @@
 import React from 'react';
-import ContentContainer from './ContentContainer';
-import CourseCard from './studioHomepages/CourseCard';
 import {Provider} from 'react-redux';
+
 import {reduxStore} from '@cdo/storybook/decorators';
 
+import ContentContainer from './ContentContainer';
+import CourseCard from './studioHomepages/CourseCard';
+
 export default {
-  title: 'ContentContainer',
   component: ContentContainer,
 };
 
@@ -54,7 +55,7 @@ export const WithLink = Template.bind({});
 WithLink.args = {
   heading: 'Recent Courses',
   linkText: 'View all courses',
-  link: 'link to see all of the courses',
+  link: '/courses',
   showLink: true,
 };
 
@@ -62,7 +63,7 @@ export const WithLinkAndDescription = Template.bind({});
 WithLinkAndDescription.args = {
   heading: 'Recent Courses',
   linkText: 'View all courses',
-  link: 'link to see all of the courses',
+  link: '/courses',
   showLink: true,
   description: 'These are courses that you have worked on recently',
 };

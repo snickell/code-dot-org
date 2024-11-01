@@ -1,21 +1,24 @@
 import $ from 'jquery';
-import React from 'react';
-import PropTypes from 'prop-types';
-import {Button} from 'react-bootstrap'; // eslint-disable-line no-restricted-imports
 import moment from 'moment';
-import MoveEnrollmentsDialog from './components/move_enrollments_dialog';
-import EditEnrollmentNameDialog from './components/edit_enrollment_name_dialog';
-import Spinner from '../components/spinner';
-import WorkshopEnrollment from './components/workshop_enrollment';
-import WorkshopPanel from './WorkshopPanel';
+import PropTypes from 'prop-types';
+import React from 'react';
+import {Button} from 'react-bootstrap'; // eslint-disable-line no-restricted-imports
+
 import {
   SubjectNames,
   ActiveCoursesWithSurveys,
 } from '@cdo/apps/generated/pd/sharedWorkshopConstants';
+
+import Spinner from '../../../sharedComponents/Spinner';
+
+import EditEnrollmentNameDialog from './components/edit_enrollment_name_dialog';
+import MoveEnrollmentsDialog from './components/move_enrollments_dialog';
+import WorkshopEnrollment from './components/workshop_enrollment';
 import {
   shouldUseFoormSurvey,
   shouldShowSurveyResults,
 } from './workshop_summary_utils';
+import WorkshopPanel from './WorkshopPanel';
 
 export const MOVE_ENROLLMENT_BUTTON_NAME = 'moveEnrollment';
 export const EDIT_ENROLLMENT_NAME_BUTTON_NAME = 'editEnrollmentName';
@@ -34,6 +37,7 @@ export default class EnrollmentsPanel extends React.Component {
       ['scholarship_workshop?']: PropTypes.bool,
       sessions: PropTypes.array,
       subject: PropTypes.string,
+      state: PropTypes.string,
     }),
     enrollments: PropTypes.array,
     isLoadingEnrollments: PropTypes.bool,
@@ -122,25 +126,30 @@ export default class EnrollmentsPanel extends React.Component {
       });
   };
 
-  handleEditEnrollmentConfirmed = updatedName => {
-    this.handleEditEnrollment(updatedName, this.state.selectedEnrollments[0]);
+  handleEditEnrollmentConfirmed = (updatedName, updatedEmail) => {
+    this.handleEditEnrollment(
+      updatedName,
+      updatedEmail,
+      this.state.selectedEnrollments[0]
+    );
     this.setState({
       enrollmentChangeDialogOpen: null,
       selectedEnrollments: [],
     });
   };
 
-  handleEditEnrollment = (updatedName, selectedEnrollment) => {
-    let updatedNameSnakeCase = {
+  handleEditEnrollment = (updatedName, updatedEmail, selectedEnrollment) => {
+    let updatedInfoSnakeCase = {
       first_name: updatedName.firstName,
       last_name: updatedName.lastName,
+      email: updatedEmail,
     };
 
     this.editEnrollmentRequest = $.ajax({
       method: 'POST',
       url: `/api/v1/pd/enrollment/${selectedEnrollment.id}/edit`,
       contentType: 'application/json',
-      data: JSON.stringify(updatedNameSnakeCase),
+      data: JSON.stringify(updatedInfoSnakeCase),
     })
       .done(() => {
         // reload
@@ -148,7 +157,7 @@ export default class EnrollmentsPanel extends React.Component {
         this.editEnrollmentRequest = null;
       })
       .fail(() => {
-        this.setState({error: 'Error: unable to rename attendee'});
+        this.setState({error: 'Error: unable to update attendee information'});
         this.handleEnrollmentRefresh();
         this.editEnrollmentRequest = null;
       });
@@ -261,7 +270,7 @@ export default class EnrollmentsPanel extends React.Component {
             onClick={this.handleClickChangeEnrollments}
             name={EDIT_ENROLLMENT_NAME_BUTTON_NAME}
           >
-            Edit name (admin)
+            Edit (admin)
             <EditEnrollmentNameDialog
               show={
                 this.state.enrollmentChangeDialogOpen ===
@@ -318,8 +327,6 @@ export default class EnrollmentsPanel extends React.Component {
 
           {viewSurveyUrl &&
             shouldShowSurveyResults(
-              // TODO: Add prop types for this field
-              // eslint-disable-next-line react/prop-types
               workshop.state,
               workshop.course,
               workshop.subject,

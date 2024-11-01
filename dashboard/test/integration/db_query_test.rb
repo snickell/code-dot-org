@@ -2,6 +2,10 @@ require 'test_helper'
 
 # Prevent regressions in the number of database queries on high-traffic routes.
 class DBQueryTest < ActionDispatch::IntegrationTest
+  setup_all do
+    seed_deprecated_unit_fixtures
+  end
+
   def setup
     setup_script_cache
   end
@@ -20,7 +24,7 @@ class DBQueryTest < ActionDispatch::IntegrationTest
       level: level,
       level_source: create(:level_source, level: level)
 
-    assert_cached_queries(8) do
+    assert_cached_queries(10) do
       get script_lesson_script_level_path(
         script_id: script.name,
         lesson_position: 1,
@@ -58,13 +62,31 @@ class DBQueryTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "post milestone passing" do
+  test "post milestone passing last level of progression" do
     student = create :student
     sign_in student
 
     sl = create(:script, :with_levels, levels_count: 3).script_levels[2]
     params = {program: 'fake program', testResult: 100, result: 'true'}
 
+    setup_script_cache
+    assert_cached_queries(9) do
+      post milestone_path(
+        user_id: student.id,
+        script_level_id: sl.id
+      ), params: params
+      assert_response :success
+    end
+  end
+
+  test "post milestone passing middle level of progression" do
+    student = create :student
+    sign_in student
+
+    sl = create(:script, :with_levels, levels_count: 3).script_levels[1]
+    params = {program: 'fake program', testResult: 100, result: 'true'}
+
+    setup_script_cache
     assert_cached_queries(7) do
       post milestone_path(
         user_id: student.id,
@@ -81,7 +103,7 @@ class DBQueryTest < ActionDispatch::IntegrationTest
     sl = create(:script, :with_levels, levels_count: 3).script_levels[2]
     params = {program: 'fake program', testResult: 0, result: 'false'}
 
-    assert_cached_queries(7) do
+    assert_cached_queries(8) do
       post milestone_path(
         user_id: student.id,
         script_level_id: sl.id
@@ -152,7 +174,7 @@ class DBQueryTest < ActionDispatch::IntegrationTest
     student.assign_script(unit)
     sign_in student
 
-    assert_cached_queries(16) do
+    assert_cached_queries(19) do
       get "/s/#{unit.name}/lessons/1/levels/1"
       assert_response :success
     end

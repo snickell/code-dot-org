@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
+
+import Button from '@cdo/apps/legacySharedComponents/Button';
+import firehoseClient from '@cdo/apps/metrics/firehose';
 import i18n from '@cdo/locale';
-import color from '../../util/color';
-import firehoseClient from '@cdo/apps/lib/util/firehose';
 
 // Record events to Firehose to understand how often users:
 //   - see the download button,
@@ -239,7 +240,10 @@ class DownloadReplayVideoButton extends React.Component {
   };
 
   shouldRenderButton() {
-    return this.props.channelId && this.hasReplayVideo();
+    // this is temporarily disabled until we decide for sure that we want to remove
+    // it entirely or re-enable it after making sure it's working properly.
+    return false;
+    // return this.props.channelId && this.hasReplayVideo();
   }
 
   render() {
@@ -253,12 +257,10 @@ class DownloadReplayVideoButton extends React.Component {
     }
 
     const style = Object.assign({}, this.props.style);
-    if (!this.buttonEnabled()) {
-      Object.assign(style, styles.disabledLink);
-    }
 
     return (
-      <button
+      <Button
+        color={Button.ButtonColor.neutralDark}
         type="button"
         className="download-replay-video-button"
         style={style}
@@ -269,17 +271,12 @@ class DownloadReplayVideoButton extends React.Component {
         <span style={styles.span}>
           {i18n.downloadReplayVideoButtonDownload()}
         </span>
-      </button>
+      </Button>
     );
   }
 }
 
 const styles = {
-  disabledLink: {
-    backgroundColor: color.lighter_gray,
-    borderColor: color.lighter_gray,
-    boxShadow: 'none',
-  },
   icon: {
     fontSize: 17,
   },

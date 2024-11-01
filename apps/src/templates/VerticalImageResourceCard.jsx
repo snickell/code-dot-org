@@ -1,8 +1,11 @@
-import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import React, {Component} from 'react';
+
+import fontConstants from '@cdo/apps/fontConstants';
+import Button from '@cdo/apps/legacySharedComponents/Button';
 import {pegasus} from '@cdo/apps/lib/util/urlHelpers';
+
 import color from '../util/color';
-import Button from './Button';
 
 /**
  * A card used on /congrats to display information about a particular course or
@@ -151,7 +154,7 @@ const styles = {
     height: 220,
   },
   text: {
-    fontFamily: '"Gotham 4r", sans-serif',
+    ...fontConstants['main-font-regular'],
     color: color.charcoal,
   },
   title: {

@@ -1,6 +1,11 @@
 require 'cdo/activity_constants'
+require 'policies/child_account'
 
 FactoryBot.define do
+  trait :skip_validation do
+    to_create {|instance| instance.save(validate: false)}
+  end
+
   factory :course_offering do
     sequence(:key, 'a') {|c| "bogus-course-offering-#{c}"}
     sequence(:display_name, 'a') {|c| "bogus-course-offering-#{c}"}
@@ -63,10 +68,11 @@ FactoryBot.define do
       min_user_id {0}
       max_user_id {0}
       overflow_max_user_id {0}
-      script {nil}
+      script
     end
     factory :single_section_experiment, class: 'SingleSectionExperiment' do
       section
+      script
     end
     factory :single_user_experiment, class: 'SingleUserExperiment' do
     end
@@ -98,7 +104,7 @@ FactoryBot.define do
 
   factory :user do
     birthday {Time.zone.today - 21.years}
-    email {("#{user_type}_#{SecureRandom.uuid}@code.org")}
+    email {"#{user_type}_#{SecureRandom.uuid}@code.org"}
     password {"00secret"}
     locale {'en-US'}
     sequence(:name) {|n| "User#{n} Codeberg"}
@@ -154,6 +160,12 @@ FactoryBot.define do
         after(:create) do |authorized_teacher|
           authorized_teacher.permission = UserPermission::AUTHORIZED_TEACHER
           authorized_teacher.save
+        end
+      end
+      factory :ai_tutor_access do
+        after(:create) do |ai_tutor_access|
+          ai_tutor_access.permission = UserPermission::AI_TUTOR_ACCESS
+          ai_tutor_access.save
         end
       end
       factory :facilitator do
@@ -336,6 +348,26 @@ FactoryBot.define do
         end
       end
 
+      factory :student_with_ai_tutor_access do
+        after(:create) do |user|
+          teacher = create :teacher
+          create :single_user_experiment, min_user_id: teacher.id, name: 'ai-tutor'
+          section = create :section, ai_tutor_enabled: true, user: teacher
+          create :follower, student_user: user, section: section
+          user.reload
+        end
+      end
+
+      factory :student_without_ai_tutor_access do
+        after(:create) do |user|
+          teacher = create :teacher
+          create :single_user_experiment, min_user_id: teacher.id, name: 'ai-tutor'
+          section = create :section, ai_tutor_enabled: false, user: teacher
+          create :follower, student_user: user, section: section
+          user.reload
+        end
+      end
+
       trait :migrated_imported_from_google_classroom do
         google_sso_provider
         without_email
@@ -379,17 +411,49 @@ FactoryBot.define do
         birthday {Time.zone.today - 13.years}
       end
 
+      trait :with_interpolated_co do
+        us_state {'CO'}
+        country_code {nil}
+      end
+
+      trait :with_interpolated_wa do
+        us_state {'wa'}
+        country_code {nil}
+      end
+
+      trait :with_interpolated_colorado do
+        us_state {'Colorado'}
+        country_code {nil}
+      end
+
       trait :with_parent_permission do
-        child_account_compliance_state {User::ChildAccountCompliance::PERMISSION_GRANTED}
-        child_account_compliance_state_last_updated {DateTime.now}
+        cap_status {Policies::ChildAccount::ComplianceState::PERMISSION_GRANTED}
+        cap_status_date {DateTime.now}
       end
 
       trait :without_parent_permission do
-        child_account_compliance_state {nil}
-        child_account_compliance_state_last_updated {DateTime.now}
+        cap_status {nil}
+        cap_status_date {DateTime.now}
       end
 
-      factory :locked_out_student, traits: [:U13, :in_colorado]
+      factory :cpa_non_compliant_student, traits: [:U13, :in_colorado], aliases: %i[non_compliant_child] do
+        trait :predates_policy do
+          created_at {Policies::ChildAccount.state_policies.dig('CO', :start_date).ago(1.second)}
+        end
+
+        trait :in_grace_period do
+          cap_status {Policies::ChildAccount::ComplianceState::GRACE_PERIOD}
+          cap_status_date {DateTime.now}
+        end
+
+        factory :locked_out_child do
+          cap_status {Policies::ChildAccount::ComplianceState::LOCKED_OUT}
+          cap_status_date {DateTime.now}
+          trait :expired do
+            cap_status_date {7.days.ago}
+          end
+        end
+      end
     end
 
     # We have some tests which want to create student accounts which don't have any authentication setup.
@@ -402,9 +466,20 @@ FactoryBot.define do
       end
     end
 
+    trait :with_lti_auth do
+      after(:create) do |user|
+        user.lms_landing_opted_out = true
+        user.authentication_options.destroy_all
+        lti_auth = create(:lti_authentication_option, user: user)
+        user.authentication_options << lti_auth
+        user.lti_roster_sync_enabled = true
+        user.save!
+      end
+    end
+
     trait :sso_provider do
       encrypted_password {nil}
-      provider {%w(facebook windowslive clever).sample}
+      provider {%w(facebook clever).sample}
       sequence(:uid) {|n| n}
     end
 
@@ -445,16 +520,6 @@ FactoryBot.define do
       provider {'microsoft_v2_auth'}
     end
 
-    trait :powerschool_sso_provider do
-      untrusted_email_sso_provider
-      provider {'powerschool'}
-    end
-
-    trait :the_school_project_sso_provider do
-      sso_provider
-      provider {'the_school_project'}
-    end
-
     trait :twitter_sso_provider do
       sso_provider
       provider {'twitter'}
@@ -465,9 +530,21 @@ FactoryBot.define do
       provider {'lti_lti_prod_kids.qwikcamps.com'}
     end
 
-    trait :windowslive_sso_provider do
-      sso_provider_with_token
-      provider {'windowslive'}
+    trait :with_facebook_authentication_option do
+      after(:create) do |user|
+        create(:authentication_option,
+          user: user,
+          email: user.email,
+          hashed_email: user.hashed_email,
+          credential_type: AuthenticationOption::FACEBOOK,
+          authentication_id: SecureRandom.uuid,
+          data: {
+            oauth_token: 'some-facebook-token',
+            oauth_refresh_token: 'some-facebook-refresh-token',
+            oauth_token_expiration: '999999'
+          }.to_json
+        )
+      end
     end
 
     trait :with_google_authentication_option do
@@ -481,6 +558,23 @@ FactoryBot.define do
           data: {
             oauth_token: 'some-google-token',
             oauth_refresh_token: 'some-google-refresh-token',
+            oauth_token_expiration: '999999'
+          }.to_json
+        )
+      end
+    end
+
+    trait :with_microsoft_authentication_option do
+      after(:create) do |user|
+        create(:authentication_option,
+          user: user,
+          email: user.email,
+          hashed_email: user.hashed_email,
+          credential_type: AuthenticationOption::MICROSOFT,
+          authentication_id: SecureRandom.uuid,
+          data: {
+            oauth_token: 'some-microsoft-token',
+            oauth_refresh_token: 'some-microsoft-refresh-token',
             oauth_token_expiration: '999999'
           }.to_json
         )
@@ -547,6 +641,12 @@ FactoryBot.define do
     factory :facebook_authentication_option do
       credential_type {AuthenticationOption::FACEBOOK}
     end
+
+    factory :lti_authentication_option do
+      sequence(:email) {|n| "lti_user#{n}@lms.com"}
+      credential_type {AuthenticationOption::LTI_V1}
+      authentication_id {"#{SecureRandom.alphanumeric}|#{SecureRandom.alphanumeric}|#{SecureRandom.alphanumeric}"}
+    end
   end
 
   factory :districts_users do
@@ -573,6 +673,12 @@ FactoryBot.define do
       login_type {'email'}
       grades {['pl']}
     end
+  end
+
+  factory :section_instructor do
+    instructor {create(:teacher)}
+    section {create(:section)}
+    status {:active}
   end
 
   factory :game do
@@ -637,6 +743,13 @@ FactoryBot.define do
       after :create do |level|
         script_level = create(:script_level, levels: [level])
         create(:lesson_group, lessons: [script_level.lesson], script: script_level.script)
+      end
+    end
+
+    trait :with_instructions do
+      after(:create) do |level|
+        level.properties['long_instructions'] = 'Write a loop.'
+        level.save!
       end
     end
 
@@ -791,6 +904,16 @@ FactoryBot.define do
     level_num {'custom'}
   end
 
+  factory :panels, parent: :level, class: Panels do
+    game {Game.panels}
+    level_num {'custom'}
+  end
+
+  factory :pythonlab, parent: :level, class: Pythonlab do
+    game {Game.pythonlab}
+    level_num {'custom'}
+  end
+
   factory :block do
     transient do
       sequence(:index)
@@ -918,13 +1041,20 @@ FactoryBot.define do
       after(:create) do |csc_script|
         csc_script.curriculum_umbrella = Curriculum::SharedCourseConstants::CURRICULUM_UMBRELLA.CSC
         csc_script.save!
+        course_offering = CourseOffering.add_course_offering(csc_script)
+        course_offering.update!(marketing_initiative: 'CSC')
       end
     end
 
     factory :hoc_script do
+      is_course {true}
+      sequence(:version_year) {|n| "bogus-hoc-version-year-#{n}"}
+      sequence(:family_name) {|n| "bogus-hoc-family-name-#{n}"}
       after(:create) do |hoc_script|
         hoc_script.curriculum_umbrella = Curriculum::SharedCourseConstants::CURRICULUM_UMBRELLA.HOC
         hoc_script.save!
+        course_offering = CourseOffering.add_course_offering(hoc_script)
+        course_offering.update!(marketing_initiative: 'HOC')
       end
     end
 
@@ -934,13 +1064,33 @@ FactoryBot.define do
         standalone_unit.save!
       end
     end
+
+    factory :pl_unit do
+      participant_audience {"teacher"}
+      instructor_audience {"facilitator"}
+    end
+
+    factory :foundations_of_cs_script do
+      after(:create) do |foundations_of_cs_script|
+        foundations_of_cs_script.curriculum_umbrella = Curriculum::SharedCourseConstants::CURRICULUM_UMBRELLA.foundations_of_cs
+        foundations_of_cs_script.save!
+      end
+    end
+
+    factory :foundations_of_programming_script do
+      after(:create) do |foundations_of_programming_script|
+        foundations_of_programming_script.curriculum_umbrella = Curriculum::SharedCourseConstants::CURRICULUM_UMBRELLA.foundations_of_programming
+        foundations_of_programming_script.save!
+      end
+    end
   end
 
-  # WARNING: Using this factory in new tests may cause other tests, including
-  # ProjectsController tests, to fail.
   factory :project_storage do
   end
 
+  # WARNING: using this factory in new tests may cause other tests, including
+  # ProjectsController tests, to fail with: `Mysql2::Error::TimeoutError`
+  # See: https://codedotorg.atlassian.net/browse/TEACH-230
   factory :project do
     transient do
       owner {create :user}
@@ -955,7 +1105,14 @@ FactoryBot.define do
   end
 
   factory :featured_project do
-    project_id {456}
+    factory :active_featured_project do
+      featured_at {DateTime.now}
+    end
+
+    factory :archived_featured_project do
+      featured_at {DateTime.now}
+      unfeatured_at {DateTime.now}
+    end
   end
 
   factory :user_ml_model do
@@ -1027,6 +1184,13 @@ FactoryBot.define do
         csf_script_level.save
       end
     end
+
+    factory :csa_script_level do
+      after(:create) do |csa_script_level|
+        csa_script_level.script.curriculum_umbrella = 'CSA'
+        csa_script_level.save
+      end
+    end
   end
 
   factory :lesson_group do
@@ -1062,6 +1226,12 @@ FactoryBot.define do
       after(:create) do |lesson|
         activity = create :lesson_activity, lesson: lesson
         create :activity_section, lesson_activity: activity
+      end
+    end
+
+    trait :with_lesson_group do
+      after(:create) do |lesson|
+        create(:lesson_group, script: lesson.script, lessons: [lesson]) unless lesson.lesson_group
       end
     end
   end
@@ -1448,14 +1618,6 @@ FactoryBot.define do
       grade_07_offered {true}
       grade_08_offered {true}
     end
-
-    # Schools eligible for circuit playground discount codes
-    # are schools where over 50% of students are eligible
-    # for free and reduced meals.
-    trait :is_maker_high_needs_school do
-      frl_eligible_total {51}
-      students_total {100}
-    end
   end
 
   # Default school to public school. More specific factories below
@@ -1463,7 +1625,7 @@ FactoryBot.define do
 
   factory :school_common, class: School do
     # school ids are not auto-assigned, so we have to assign one here
-    id {((School.maximum(:id) || 0).next).to_s}
+    id {(School.maximum(:id) || 0).next.to_s}
     address_line1 {"123 Sample St"}
     address_line2 {"attn: Main Office"}
     city {"Seattle"}
@@ -1485,28 +1647,12 @@ FactoryBot.define do
         build :school_stats_by_year, :is_k8_school, school: school
       end
     end
-
-    trait :is_maker_high_needs_school do
-      after(:create) do |school|
-        create :school_stats_by_year, :is_maker_high_needs_school, school: school
-      end
-    end
   end
 
   factory :public_school, parent: :school_common do
     school_type {SchoolInfo::SCHOOL_TYPE_PUBLIC}
     name {"A seattle public school"}
     with_district
-
-    state_school_id {School.construct_state_school_id(state, school_district.try(:id), id)}
-
-    trait :without_state_school_id do
-      state_school_id {nil}
-    end
-
-    trait :with_invalid_state_school_id do
-      state_school_id {"123456789"}
-    end
   end
 
   factory :private_school, parent: :school_common do
@@ -1586,16 +1732,6 @@ FactoryBot.define do
     storage_app_id {1}
     association :level
     storage_id {storage_user.try(:id) || 2}
-  end
-
-  factory :circuit_playground_discount_application do
-    user {create :teacher}
-  end
-
-  factory :circuit_playground_discount_code do
-    sequence(:code) {|n| "FAKE#{n}_asdf123"}
-    full_discount {true}
-    expiration {Time.now + 30.days}
   end
 
   factory :seeded_s3_object do
@@ -1722,10 +1858,17 @@ FactoryBot.define do
     data_synced_at {Time.now.utc}
   end
 
+  factory :lti_feedback, class: 'Lti::Feedback' do
+    association :user, factory: :teacher
+
+    locale {I18n.locale.to_s}
+    satisfied {true}
+  end
+
   factory :lti_integration do
-    issuer {"issuer"}
-    client_id {"client_id"}
-    platform_name {"platform_name"}
+    issuer {SecureRandom.alphanumeric}
+    client_id {SecureRandom.alphanumeric}
+    platform_name {"canvas_cloud"}
     auth_redirect_url {"http://test.org/auth"}
     jwks_url {"jwks_url"}
     access_token_url {"access_token_url"}
@@ -1740,6 +1883,28 @@ FactoryBot.define do
   factory :lti_deployment do
     deployment_id {"deployment"}
     lti_integration {create :lti_integration}
+  end
+
+  factory :lti_course do
+    lti_integration {create :lti_integration}
+    lti_deployment {create :lti_deployment, lti_integration: lti_integration}
+    context_id {SecureRandom.uuid}
+    course_id {SecureRandom.uuid}
+    nrps_url {"http://test.org/api/names_and_roles"}
+    resource_link_id {"resource_link_id"}
+  end
+
+  factory :lti_section do
+    lti_course {create :lti_course}
+    section {create :section}
+    lms_section_id {SecureRandom.uuid}
+  end
+
+  factory :new_feature_feedback do
+    association :user, factory: :teacher
+
+    form_key {'progress_v2'}
+    satisfied {true}
   end
 
   factory :parental_permission_request do
@@ -1757,5 +1922,141 @@ FactoryBot.define do
     trait :granted do
       user {create :young_student, :with_parent_permission}
     end
+  end
+
+  factory :rubric do
+    association :lesson
+    association :level
+
+    trait :with_learning_goals do
+      transient do
+        num_learning_goals {2}
+      end
+
+      after(:create) do |rubric, evaluator|
+        evaluator.num_learning_goals.times do
+          create :learning_goal, rubric: rubric
+        end
+      end
+    end
+
+    trait :with_teacher_evaluations do
+      transient do
+        num_learning_goals {1}
+        num_evaluations_per_goal {1}
+        teacher {create :teacher}
+        student {create :student}
+      end
+
+      after(:create) do |rubric, evaluator|
+        evaluator.num_learning_goals.times do
+          create(
+            :learning_goal,
+            :with_teacher_evaluations,
+            rubric: rubric,
+            num_evaluations: evaluator.num_evaluations_per_goal,
+            teacher: evaluator.teacher,
+            student: evaluator.student
+          )
+        end
+      end
+    end
+  end
+
+  factory :learning_goal do
+    association :rubric
+    position {0}
+    learning_goal {"Test Learning Goal"}
+    ai_enabled {false}
+
+    trait :with_teacher_evaluations do
+      transient do
+        num_evaluations {1}
+        teacher {create :teacher}
+        student {create :student}
+      end
+
+      after(:create) do |learning_goal, evaluator|
+        evaluator.num_evaluations.times do
+          create(
+            :learning_goal_teacher_evaluation,
+            learning_goal: learning_goal,
+            teacher: evaluator.teacher,
+            user: evaluator.student
+          )
+        end
+      end
+    end
+  end
+
+  factory :learning_goal_evidence_level do
+    association :learning_goal
+    understanding {0}
+    teacher_description {"Description for teacher"}
+  end
+
+  factory :learning_goal_teacher_evaluation do
+    association :learning_goal
+    association :teacher, factory: :teacher
+    association :user, factory: :student
+    understanding {0}
+  end
+
+  factory :rubric_ai_evaluation do
+    transient do
+      student {create :student}
+    end
+
+    user {student}
+    project_id {789}
+    association :requester, factory: :teacher
+    association :rubric
+    status {1}
+    project_version {"1"}
+  end
+
+  factory :learning_goal_ai_evaluation do
+    association :learning_goal
+    association :rubric_ai_evaluation
+    understanding {0}
+    ai_confidence {1}
+  end
+
+  factory :learning_goal_ai_evaluation_feedback do
+    association :learning_goal_ai_evaluation
+    teacher_id {0}
+    ai_feedback_approval {false}
+    false_positive {false}
+    false_negative {false}
+    vague {false}
+    feedback_other {true}
+    other_content {'other'}
+  end
+
+  factory :potential_teacher do
+    association :script
+    name {"foosbars"}
+    email {"foobar@example.com"}
+    receives_marketing {true}
+  end
+
+  factory :ai_tutor_interaction do
+    association :user
+    type {SharedConstants::AI_TUTOR_TYPES[:GENERAL_CHAT]}
+    status {SharedConstants::AI_TUTOR_INTERACTION_STATUS[:OK]}
+  end
+
+  factory :aichat_event do
+    association :user
+  end
+
+  factory :aichat_request do
+    association :user
+    model_customizations {{temperature: 0.5, retrievalContexts: ["test"], systemPrompt: "test", selectedModelId: "test"}.to_json}
+    new_message {{chatMessageText: "hello", role: 'user', status: 'unknown', timestamp: Time.now.to_i}.to_json}
+    stored_messages {[].to_json}
+    level_id {1}
+    script_id {1}
+    project_id {1}
   end
 end

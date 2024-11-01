@@ -11,7 +11,6 @@
   - `lib/cdo/rake_utils.rb` contains git, npm, rake helper functions
 
 - `lib/rake/ci.rake`
-  - Run Firebase CI (:upload_rules, :set_config, :clear_test_channels)
   - Build apps, dashboard, pegasus and tools
   - Deploy: Upgrade frontend and update CloudFormation stack
   - Flush cache
@@ -24,7 +23,7 @@
     - Only build if any of the apps_build_trigger_paths have changed since last build.
     - Install dependencies by running `yarn`
     - Rebuild PhantomJS `npm rebuild phantomjs-prebuilt`
-    - Then `npm run build` or `npm run build:dist` (minified/uglified version) depends on the environment
+    - Then `yarn build` or `yarn build:dist` (minified/uglified version) depends on the environment
       - Execute grunt build tasks as set in `apps/package.json`, e.g. `grunt clean build`
       - `apps/Gruntfile.js` confgiures and delegates work to the various webpack tasks
       - `apps/webpack.js` bundles javascript files and minifies them. Results are in `apps/build/package/js/`
@@ -60,8 +59,6 @@
   - Example of a successful build
     ```
     [adhoc] Running CI build...
-    [adhoc] Uploading security rules to firebase...
-    [adhoc] Setting firebase configuration parameters...
     [adhoc] Updating local <b>chef</b> cookbooks...
     [adhoc] Running rake build...
     [adhoc] Running build...

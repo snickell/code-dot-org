@@ -1,5 +1,6 @@
-import cdoBlockStyles from './cdoBlockStyles.mjs';
 import nearestColor from 'nearest-color';
+
+import cdoBlockStyles from './cdoBlockStyles.js';
 
 // The colors here come Martin Krzywinski's 24-color palette for colorblindness:
 // http://mkweb.bcgsc.ca/colorblind/palettes.mhtml#top
@@ -9,7 +10,7 @@ import nearestColor from 'nearest-color';
 const themes = {
   PROTANOPIA: 'protanopia',
   DEUTERANOPIA: 'deuteranopia',
-  TRITANOPIA: 'tritanopia'
+  TRITANOPIA: 'tritanopia',
 };
 
 const accessiblePalettes = {
@@ -40,7 +41,8 @@ const accessiblePalettes = {
     color16Primary: '#003D30',
     color17Primary: '#005745',
     color18Primary: '#00735C',
-    color19Primary: '#009175'
+    color19Primary: '#009175',
+    color20Primary: '#566065',
   },
   [themes.DEUTERANOPIA]: {
     color01Primary: '#460B70',
@@ -69,7 +71,8 @@ const accessiblePalettes = {
     color13Secondary: '#00735C',
     color14Primary: '#D80D7B',
     color14Secondary: '#009175',
-    color15Primary: '#FF2E95'
+    color15Primary: '#FF2E95',
+    color16Primary: '#566065',
   },
   [themes.TRITANOPIA]: {
     color01Primary: '#004002',
@@ -98,8 +101,9 @@ const accessiblePalettes = {
     color12Primary: '#8E06CD',
     color13Primary: '#B40AFC',
     color14Primary: '#ED0DFD',
-    color15Primary: '#0079FA'
-  }
+    color15Primary: '#0079FA',
+    color16Primary: '#566065',
+  },
 };
 
 Object.values(themes).forEach(theme => {
@@ -116,13 +120,18 @@ function mapBlockStylesToPalette(blockStyles, theme) {
 
   if (enoughColors) {
     // Each color in our standard palette is mapped to a new "nearest" color from the accesible palette.
-    for (const [, value] of Object.entries(blockStyles)) {
+    for (const [blockType, value] of Object.entries(blockStyles)) {
       const nearestAvailableColor = nearestColor.from(
         accessiblePalettes[theme]
       );
       const newColor = nearestAvailableColor(value.colourPrimary);
       value.colourPrimary = newColor.value;
       const colorKey = newColor.name.substring(0, 7);
+      // We use the primary colour for variable shadow blocks. Shadow blocks cannot include a variable field,
+      // so this only applies to argument_reporter blocks.
+      if (blockType === 'variable_blocks') {
+        value.colourSecondary = value.colourPrimary;
+      }
       // Remove the color (and any alternates) from the available palette so we don't assign it twice.
       delete accessiblePalettes[theme][`${colorKey}Primary`];
       delete accessiblePalettes[theme][`${colorKey}Secondary`];
@@ -143,7 +152,7 @@ function mapBlockStylesToPalette(blockStyles, theme) {
 
 console.log(
   '\x1b[33m%s\x1b[0m',
-  'Copy the above values into cdoAccessible.js.'
+  'Copy the above values into cdoAccessibleStyles.js.'
 );
 
 console.log(

@@ -1,24 +1,25 @@
 import $ from 'jquery';
+import queryString from 'query-string';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import queryString from 'query-string';
-import TeacherHomepage from '@cdo/apps/templates/studioHomepages/TeacherHomepage';
-import StudentHomepage from '@cdo/apps/templates/studioHomepages/StudentHomepage';
-import i18n from '@cdo/locale';
 import {Provider} from 'react-redux';
+
+import {initializeHiddenScripts} from '@cdo/apps/code-studio/hiddenLessonRedux';
+import {queryParams, updateQueryParam} from '@cdo/apps/code-studio/utils';
 import {getStore, registerReducers} from '@cdo/apps/redux';
+import locales, {setLocaleCode} from '@cdo/apps/redux/localesRedux';
+import mapboxReducer, {setMapboxAccessToken} from '@cdo/apps/redux/mapbox';
+import currentUser from '@cdo/apps/templates/currentUserRedux';
+import ParentalPermissionBanner from '@cdo/apps/templates/policy_compliance/ParentalPermissionBanner';
+import StudentHomepage from '@cdo/apps/templates/studioHomepages/StudentHomepage';
+import TeacherHomepage from '@cdo/apps/templates/studioHomepages/TeacherHomepage';
 import {
   pageTypes,
   setAuthProviders,
   setPageType,
   beginCreatingSection,
-  setShowLockSectionField, // DCDO Flag - show/hide Lock Section field
 } from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
-import currentUser from '@cdo/apps/templates/currentUserRedux';
-import {initializeHiddenScripts} from '@cdo/apps/code-studio/hiddenLessonRedux';
-import {queryParams, updateQueryParam} from '@cdo/apps/code-studio/utils';
-import locales, {setLocaleCode} from '@cdo/apps/redux/localesRedux';
-import mapboxReducer, {setMapboxAccessToken} from '@cdo/apps/redux/mapbox';
+import i18n from '@cdo/locale';
 
 $(document).ready(showHomepage);
 
@@ -29,6 +30,7 @@ function showHomepage() {
   const isEnglish = homepageData.isEnglish;
   const announcementOverride = homepageData.announcement;
   const specialAnnouncement = homepageData.specialAnnouncement;
+  const studentSpecialAnnouncement = homepageData.studentSpecialAnnouncement;
   const query = queryString.parse(window.location.search);
   registerReducers({locales, mapbox: mapboxReducer, currentUser});
   const store = getStore();
@@ -36,9 +38,6 @@ function showHomepage() {
   store.dispatch(initializeHiddenScripts(homepageData.hiddenScripts));
   store.dispatch(setPageType(pageTypes.homepage));
   store.dispatch(setLocaleCode(homepageData.localeCode));
-
-  // DCDO Flag - show/hide Lock Section field
-  store.dispatch(setShowLockSectionField(homepageData.showLockSectionField));
 
   if (homepageData.mapboxAccessToken) {
     store.dispatch(setMapboxAccessToken(homepageData.mapboxAccessToken));
@@ -79,6 +78,12 @@ function showHomepage() {
   }
 
   const announcement = getTeacherAnnouncement(announcementOverride);
+  const parentalPermissionBanner = homepageData.parentalPermissionBanner && (
+    <ParentalPermissionBanner
+      key="parental-permission-banner"
+      {...homepageData.parentalPermissionBanner}
+    />
+  );
 
   ReactDOM.render(
     <Provider store={store}>
@@ -95,8 +100,7 @@ function showHomepage() {
             topPlCourse={homepageData.topPlCourse}
             queryStringOpen={query['open']}
             canViewAdvancedTools={homepageData.canViewAdvancedTools}
-            isEnglish={isEnglish}
-            ncesSchoolId={homepageData.ncesSchoolId}
+            existingSchoolInfo={homepageData.existingSchoolInfo}
             censusQuestion={homepageData.censusQuestion}
             showCensusBanner={homepageData.showCensusBanner}
             showNpsSurvey={homepageData.showNpsSurvey}
@@ -115,9 +119,6 @@ function showHomepage() {
             hasFeedback={homepageData.hasFeedback}
             showIncubatorBanner={homepageData.showIncubatorBanner}
             currentUserId={homepageData.currentUserId}
-            showDeprecatedCalcAndEvalWarning={
-              homepageData.showDeprecatedCalcAndEvalWarning
-            }
           />
         )}
         {!isTeacher && (
@@ -132,9 +133,8 @@ function showHomepage() {
             showVerifiedTeacherWarning={
               homepageData.showStudentAsVerifiedTeacherWarning
             }
-            showDeprecatedCalcAndEvalWarning={
-              homepageData.showDeprecatedCalcAndEvalWarning
-            }
+            specialAnnouncement={studentSpecialAnnouncement}
+            topComponents={[parentalPermissionBanner]}
           />
         )}
       </div>

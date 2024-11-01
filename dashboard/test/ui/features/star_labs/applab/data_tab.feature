@@ -5,7 +5,7 @@ Feature: App Lab Data Tab
   Background:
     # Navigate to data tab from a new Applab project
     Given I start a new Applab project
-    And I wait for the page to fully load
+    And I wait for the lab page to fully load
     Then I click selector "#dataModeButton"
     And I wait until element "#dataTablesBody" is visible
 
@@ -16,7 +16,7 @@ Feature: App Lab Data Tab
     Then I click selector ".uitest-dataset-preview-btn:first-of-type" once I see it
     And I wait until element ".modal h1" is visible
     Then I save the table name from element ".modal h1"
-    Then I click selector ".modal button:first-of-type" once I see it
+    And I press "ui-test-import-table-btn"
     Then I wait until element "#dataTablesBody table tr:eq(2) td:eq(0)" contains the saved table name
 
   Scenario: Data Tables Tab

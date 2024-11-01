@@ -1,9 +1,10 @@
+import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
-import ProjectUpdatedAt from './ProjectUpdatedAt';
+
 import headerVignetteStyles from './HeaderVignette';
-import $ from 'jquery';
+import ProjectUpdatedAt from './ProjectUpdatedAt';
 
 class ScriptName extends React.Component {
   static propTypes = {
@@ -125,16 +126,20 @@ const styles = {
   },
   headerInner: {
     position: 'absolute',
+    display: 'flex',
+    alignItems: 'center',
   },
   scriptLinkWithUpdatedAt: {
     display: 'block',
   },
   outerContainer: {
-    textAlign: 'right',
+    textAlign: 'end',
   },
   containerWithUpdatedAt: {
     verticalAlign: 'bottom',
-    display: 'inline-block',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'end',
   },
 };
 

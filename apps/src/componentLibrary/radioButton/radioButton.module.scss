@@ -4,6 +4,7 @@
   display: flex;
   gap: 10px;
   align-items: center;
+  position: relative;
   margin: 0;
 
   input[type="radio"] {
@@ -14,6 +15,7 @@
   .radioIcon {
     position: relative;
     box-sizing: border-box;
+    flex-shrink: 0;
     margin: 2px;
     font-size: unset;
     line-height: unset;
@@ -64,7 +66,7 @@
   }
 
   // Focus styles
-  input[type="radio"]:focus + .radioIcon {
+  input[type="radio"]:focus-visible + .radioIcon {
     outline: 2px solid $light_primary_500;
     outline-offset: 2px;
   }
@@ -109,8 +111,6 @@
 
 // Sizes
 .radioButton-l {
-  height: 28px;
-
   .radioIcon {
     height: 24px;
     width: 24px;
@@ -123,8 +123,6 @@
 }
 
 .radioButton-m {
-  height: 24px;
-
   .radioIcon {
     height: 20px;
     width: 20px;
@@ -137,8 +135,6 @@
 }
 
 .radioButton-s {
-  height: 22px;
-
   .radioIcon {
     height: 18px;
     width: 18px;
@@ -151,8 +147,6 @@
 }
 
 .radioButton-xs {
-  height: 20px;
-
   .radioIcon {
     height: 16px;
     width: 16px;

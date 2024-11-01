@@ -1,9 +1,11 @@
-import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import Radium from 'radium'; // eslint-disable-line no-restricted-imports
-import color from '../../util/color';
-import FontAwesome from '../FontAwesome';
+import React, {Component} from 'react';
+
 import msg from '@cdo/locale';
+
+import FontAwesome from '../../legacySharedComponents/FontAwesome';
+import color from '../../util/color';
 
 /**
  * A button for toggling the collapse state of instructions in CSF
@@ -31,6 +33,7 @@ class CollapserButton extends Component {
         {this.props.isMinecraft ? (
           <img
             src="/blockly/media/1x1.gif"
+            alt=""
             className={[
               this.props.collapsed ? 'more-btn' : 'less-btn',
               'toggle26',
@@ -80,6 +83,10 @@ const styles = {
     color: color.neutral_dark,
     whiteSpace: 'nowrap',
     ':hover': {
+      backgroundColor: color.neutral_dark20,
+      boxShadow: 'none',
+    },
+    ':focus': {
       backgroundColor: color.neutral_dark20,
       boxShadow: 'none',
     },

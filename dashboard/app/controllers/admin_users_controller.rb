@@ -59,6 +59,17 @@ class AdminUsersController < ApplicationController
     end
   end
 
+  def delete_user
+    user = User.find_by_id(params.require(:user_id))
+    if user
+      user.destroy
+      flash[:alert] = "User (ID: #{params[:user_id]}) Deleted!"
+    else
+      flash[:alert] = "User (ID: #{params[:user_id]}) not found or deleted"
+    end
+    redirect_to :find_students
+  end
+
   def undelete_user
     user = User.only_deleted.find_by_id(params[:user_id])
     if user
@@ -103,7 +114,7 @@ class AdminUsersController < ApplicationController
       level: level
     )
     if user_level.persisted? &&
-      user_level.best_result > ActivityConstants::MAXIMUM_NONOPTIMAL_RESULT
+        user_level.best_result > ActivityConstants::MAXIMUM_NONOPTIMAL_RESULT
       flash[:alert] = "UserLevel (ID: #{user_level.id}) already green"
       redirect_to :manual_pass_form
       return
@@ -174,7 +185,6 @@ class AdminUsersController < ApplicationController
 
     user_id = params[:user_id]
     script_id = params[:script_id]
-    user_storage_id = storage_id_for_user_id(user_id)
 
     FirehoseClient.instance.put_record(
       :analysis,
@@ -190,11 +200,7 @@ class AdminUsersController < ApplicationController
       }
     )
 
-    UserScript.where(user_id: user_id, script_id: script_id).destroy_all
-    UserLevel.where(user_id: user_id, script_id: script_id).destroy_all
-    ChannelToken.where(storage_id: user_storage_id, script_id: script_id).destroy_all unless user_storage_id.nil?
-    TeacherFeedback.where(student_id: user_id, script_id: script_id).destroy_all
-    CodeReview.where(user_id: user_id, script_id: script_id).destroy_all
+    User.delete_progress_for_unit(user_id: user_id, script_id: script_id)
 
     redirect_to user_progress_form_path({user_identifier: user_id}), notice: "Progress deleted."
   end
@@ -219,11 +225,50 @@ class AdminUsersController < ApplicationController
       end
     elsif permission.present?
       @users_with_permission = restricted_users.
-                                 joins(:permissions).
-                                 where(user_permissions: {permission: permission}).
-                                 order(:email)
-      @users_with_permission = @users_with_permission.page(page).per(page_size)
+        joins(:permissions).
+        where(user_permissions: {permission: permission}).
+        order(:email).
+        page(page).
+        per(page_size)
     end
+  end
+
+  # get /admin/permissions/csv
+  def permissions_csv
+    permissions_form
+
+    return render :not_found unless @users_with_permission
+
+    # Create a friendly filename for it
+    start = (page - 1) * page_size
+    final = start + page_size - 1
+
+    start = start.to_s.rjust(8, '0')
+    final = final.to_s.rjust(8, '0')
+
+    date = Time.zone.today
+    date = "#{date.year}-#{date.month}-#{date.day}"
+
+    filename = "#{params[:permission]}-#{date}-#{start}-#{final}.csv"
+
+    headers = ['ID', 'Email', 'Name', 'User Type', 'Recent Sign In', 'Sign In Count', 'Created At']
+    send_data(
+      CSV.generate do |csv|
+        csv << headers
+        @users_with_permission.each do |user|
+          csv << [
+            user.id,
+            user.email,
+            user.name,
+            user.user_type,
+            user.current_sign_in_at.try(:strftime, '%F'),
+            user.sign_in_count,
+            user.created_at.strftime('%F')
+          ]
+        end
+      end,
+      filename: filename
+    )
   end
 
   def grant_permission
@@ -320,12 +365,11 @@ class AdminUsersController < ApplicationController
   end
 
   private def page
-    params[:page] || 1
+    params[:page].to_i || 1
   end
 
   private def page_size
-    return DEFAULT_MANAGE_PAGE_SIZE unless params.key? :page_size
-    params[:page_size] == 'All' ? @users_with_permission.count : params[:page_size]
+    params[:page_size].to_i || DEFAULT_MANAGE_PAGE_SIZE
   end
 
   private def set_target_user_from_identifier(user_identifier)

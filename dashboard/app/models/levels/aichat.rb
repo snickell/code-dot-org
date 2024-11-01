@@ -24,14 +24,12 @@
 #  index_levels_on_name       (name)
 #
 
-# TODO: Update this level to account for the params we actually need.
 class Aichat < Level
   serialized_attrs %w(
-    project_template_level_name
-    start_sources
-    hide_share_and_remix
-    is_project_level
-    submittable
+    system_prompt
+    bot_title
+    bot_description
+    aichat_settings
   )
 
   def self.create_from_level_builder(params, level_params)

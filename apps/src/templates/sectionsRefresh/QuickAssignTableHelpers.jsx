@@ -1,7 +1,10 @@
-import React from 'react';
 import classnames from 'classnames';
-import moduleStyles from './sections-refresh.module.scss';
+import React from 'react';
+
 import {Heading5} from '@cdo/apps/componentLibrary/typography';
+import taImage from '@cdo/apps/templates/rubrics/images/ai-teaching-assistant-assign.png';
+
+import moduleStyles from './sections-refresh.module.scss';
 
 /*
 This is a file to house the shared pieces of both types of Curriculum
@@ -76,6 +79,13 @@ function renderOfferings(
       >
         {course.display_name}
       </label>
+      {course.ai_teaching_assistant_available && (
+        <img
+          src={taImage}
+          className={moduleStyles.taImage}
+          alt="AI Teaching Assistant available"
+        />
+      )}
     </div>
   ));
 }
@@ -100,7 +110,7 @@ function updateSectionCourse(updateCourse, course) {
   if (courseVersionId === undefined) {
     const stableVersions = Object.values(courseVersions)
       .filter(version => version.is_stable)
-      .sort(version => -version.key);
+      .sort((a, b) => b.key - a.key);
     courseVersionId = stableVersions[0]?.id;
   }
 

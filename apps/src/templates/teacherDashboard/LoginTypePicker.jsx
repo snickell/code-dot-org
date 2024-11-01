@@ -7,16 +7,36 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import i18n from '@cdo/locale';
-import {Heading3} from '../../lib/ui/Headings';
-import StylizedBaseDialog from '@cdo/apps/componentLibrary/StylizedBaseDialog';
-import CardContainer from './CardContainer';
-import LoginTypeCard from './LoginTypeCard';
-import Button from '../Button';
-import {OAuthSectionTypes} from '@cdo/apps/lib/ui/accounts/constants';
-import styleConstants from '../../styleConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+
+import {
+  OAuthSectionTypes,
+  LmsLoginTypeNames,
+  LmsLoginInstructionUrls,
+} from '@cdo/apps/accounts/constants';
+import Typography from '@cdo/apps/componentLibrary/typography/Typography';
+import fontConstants from '@cdo/apps/fontConstants';
+import Button from '@cdo/apps/legacySharedComponents/Button';
+import {Heading3} from '@cdo/apps/legacySharedComponents/Headings';
+import {PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants.js';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import {getStore} from '@cdo/apps/redux';
+import StylizedBaseDialog from '@cdo/apps/sharedComponents/StylizedBaseDialog';
 import color from '@cdo/apps/util/color';
+import experiments from '@cdo/apps/util/experiments';
+import {SectionLoginType} from '@cdo/generated-scripts/sharedConstants';
+import i18n from '@cdo/locale';
+
+import styleConstants from '../../styleConstants';
+
+import CardContainer from './CardContainer';
+import LmsInformationalCard from './LmsInformationalCard';
+import {
+  canvasLogo,
+  cleverLogo,
+  googleClassroomLogo,
+  schoologyLogo,
+} from './LmsInformationalCard/assets';
+import LoginTypeCard from './LoginTypeCard';
 
 const LOGIN_TYPE_SELECTED_EVENT = 'Login Type Selected';
 const CANCELLED_EVENT = 'Section Setup Cancelled';
@@ -52,9 +72,13 @@ class LoginTypePicker extends Component {
   };
 
   recordSectionSetupExitEvent = eventName => {
-    analyticsReporter.sendEvent(eventName, {
-      source: SELECT_LOGIN_TYPE,
-    });
+    analyticsReporter.sendEvent(
+      eventName,
+      {
+        source: SELECT_LOGIN_TYPE,
+      },
+      PLATFORMS.BOTH
+    );
   };
 
   openImportDialog = provider => {
@@ -82,7 +106,20 @@ class LoginTypePicker extends Component {
       providers && providers.includes(OAuthSectionTypes.microsoft_classroom);
     const withClever =
       providers && providers.includes(OAuthSectionTypes.clever);
-    const hasThirdParty = withGoogle | withMicrosoft | withClever;
+    const withAllLmsProviders =
+      providers &&
+      [
+        OAuthSectionTypes.google_classroom,
+        OAuthSectionTypes.clever,
+        SectionLoginType.lti_v1,
+      ].every(provider => providers.includes(provider));
+    const currentUser = getStore().getState().currentUser;
+    const inUSA =
+      ['US', 'RD'].includes(currentUser.countryCode) ||
+      !!currentUser.usStateCode;
+    const showStudentsToSectionPermissionWarning =
+      (inUSA && currentUser.isTeacher) ||
+      experiments.isEnabledAllowingQueryString(experiments.CPA_EXPERIENCE);
 
     const style = {
       container: {
@@ -93,6 +130,7 @@ class LoginTypePicker extends Component {
       scroll: {
         overflowX: 'hidden',
         overflowY: 'auto',
+        marginBottom: '16px',
       },
       thirdPartyProviderUpsell: {
         marginBottom: '10px',
@@ -116,15 +154,23 @@ class LoginTypePicker extends Component {
       mediumText: {
         fontSize: '.75em',
         color: color.neutral_dark,
-        fontFamily: '"Gotham 5r", sans-serif',
-      },
-      learnHow: {
-        marginTop: '12px',
+        ...fontConstants['main-font-semi-bold'],
       },
       emailPolicyNote: {
         marginBottom: '31px',
         paddingTop: '8px',
         borderTop: `1px solid ${color.neutral_dark}`,
+      },
+      subheader: {
+        color: color.charcoal,
+      },
+      lmsInfoCardsContainer: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'flex-start',
+        rowGap: '16px',
+        columnGap: '16px',
+        paddingBottom: '16px',
       },
     };
 
@@ -132,7 +178,7 @@ class LoginTypePicker extends Component {
       <div style={style.container}>
         <Heading3 isRebranded>{title}</Heading3>
         <p>{i18n.addStudentsToSectionInstructionsUpdated()}</p>
-        {window.CPA_EXPERIENCE && (
+        {showStudentsToSectionPermissionWarning && (
           <p>
             <span
               className="fa fa-exclamation-triangle"
@@ -164,6 +210,13 @@ class LoginTypePicker extends Component {
             handleClose={() => this.setState({isLearnMoreOpen: false})}
           />
         )}
+        <Typography
+          style={style.subheader}
+          semanticTag={'h6'}
+          visualAppearance={'heading-xs'}
+        >
+          {i18n.loginTypes()}
+        </Typography>
         <div style={style.scroll}>
           <CardContainer>
             {withGoogle && (
@@ -177,23 +230,52 @@ class LoginTypePicker extends Component {
             <WordLoginCard onClick={this.onLoginTypeSelect} />
             <EmailLoginCard onClick={this.onLoginTypeSelect} />
           </CardContainer>
-          {!hasThirdParty && (
-            <p style={{...style.mediumText, ...style.learnHow}}>
-              {i18n.thirdPartyProviderUpsell() + ' '}
-              <a href="https://support.code.org/hc/en-us/articles/115001319312-Setting-up-sections-with-Google-Classroom-or-Clever">
-                {i18n.learnHow()}
-              </a>
-              {' ' + i18n.connectAccountThirdPartyProviders()}
-            </p>
-          )}
         </div>
+        {!withAllLmsProviders && (
+          <>
+            <Typography
+              style={style.subheader}
+              semanticTag={'h6'}
+              visualAppearance={'heading-xs'}
+            >
+              {i18n.lmsIntegrations()}
+            </Typography>
+            <div
+              style={style.lmsInfoCardsContainer}
+              data-testid={'lms-info-cards-container'}
+            >
+              {!withClever && (
+                <LmsInformationalCard
+                  lmsName={LmsLoginTypeNames.clever}
+                  lmsLogo={cleverLogo}
+                  lmsInformationalUrl={LmsLoginInstructionUrls.clever}
+                />
+              )}
+              {!withGoogle && (
+                <LmsInformationalCard
+                  lmsName={LmsLoginTypeNames.google_classroom}
+                  lmsLogo={googleClassroomLogo}
+                  lmsInformationalUrl={LmsLoginInstructionUrls.google_classroom}
+                />
+              )}
+              <LmsInformationalCard
+                lmsName={LmsLoginTypeNames.canvas}
+                lmsLogo={canvasLogo}
+                lmsInformationalUrl={LmsLoginInstructionUrls.canvas}
+              />
+              <LmsInformationalCard
+                lmsName={LmsLoginTypeNames.schoology}
+                lmsLogo={schoologyLogo}
+                lmsInformationalUrl={LmsLoginInstructionUrls.schoology}
+              />
+            </div>
+          </>
+        )}
         <div style={style.footer}>
           <p style={{...style.mediumText, ...style.emailPolicyNote}}>
             {i18n.note()}
             {' ' + i18n.emailAddressPolicy() + ' '}
-            <a href="http://blog.code.org/post/147756946588/codeorgs-new-login-approach-to-student-privacy">
-              {i18n.moreInfo()}
-            </a>
+            <a href="https://code.org/privacy">{i18n.moreInfo()}</a>
           </p>
           <Button
             onClick={this.cancel}
@@ -206,6 +288,7 @@ class LoginTypePicker extends Component {
     );
   }
 }
+
 export const UnconnectedLoginTypePicker = LoginTypePicker;
 export default connect(state => ({
   providers: state.teacherSections.providers,

@@ -13,7 +13,7 @@
 // identical classes for potential use on other elements if needed.
 
 // ----------------------------------------
-// v 2.0.0
+// v 2.0.2
 // ----------------------------------------
 
 // Sizes
@@ -99,14 +99,14 @@
 
 @mixin heading-sm {
   @include heading-common;
-  font-family: $gotham-bold, sans-serif;
+  @include main-font-semi-bold;
   font-size: 1.25rem;
   line-height: 1.40;
 }
 
 @mixin heading-xs {
   @include heading-common;
-  font-family: $gotham-bold, sans-serif;
+  @include main-font-semi-bold;
   font-size: 1rem;
   line-height: 1.48;
 }
@@ -114,7 +114,7 @@
 // Paragraph styles
 @mixin paragraph-common {
   color: $neutral-dark;
-  font-family: $gotham-regular, sans-serif;
+  @include main-font-regular;
   margin-bottom: 1em;
 }
 
@@ -138,14 +138,14 @@
 
 @mixin body-four {
   @include paragraph-common;
-  font-size: 0.75rem;
+  font-size: 0.813rem;
   line-height: 1.64;
 }
 
 // Overline styles
 @mixin overline-common {
   @include paragraph-common;
-  font-family: $gotham-bold, sans-serif;
+  @include main-font-semi-bold;
   text-transform: uppercase;
   letter-spacing: 0.04rem;
 }
@@ -158,32 +158,40 @@
 
 @mixin overline-two {
   @include overline-common;
-  font-size: 0.75rem;
+  font-size: 0.813rem;
   line-height: 1.64;
 }
 
 @mixin overline-three {
   @include overline-common;
-  font-size: 0.625rem;
+  font-size: 0.688rem;
   line-height: 1.76;
 }
 
 // Strong and Em styles
 @mixin strong {
-  font-family: $gotham-bold, sans-serif;
+  @include main-font-semi-bold;
+}
+
+@mixin extra-strong {
+  @include main-font-bold;
 }
 
 @mixin em {
-  font-family: $gotham-italics, sans-serif;
+  @include main-font-regular-italic;
 }
 
 @mixin strong-em {
-  font-family: $gotham-bold-italics, sans-serif;
+  @include main-font-semi-bold-italic;
+}
+
+@mixin extra-strong-em {
+  @include main-font-bold-italic;
 }
 
 // Caption styles
 @mixin figcaption {
-  font-family: $gotham-bold, sans-serif;
+  @include main-font-semi-bold;
   font-size: 0.875rem;
   margin: 0.5em 0 1em;
   line-height: 1.64;
@@ -193,53 +201,105 @@
 
 // Headings
 h1,
-.heading-xxl { @include heading-xxl; }
+.heading-xxl {
+  @include heading-xxl;
+}
+
 h2,
-.heading-xl { @include heading-xl; }
+.heading-xl {
+  @include heading-xl;
+}
+
 h3,
-.heading-lg { @include heading-lg; }
+.heading-lg {
+  @include heading-lg;
+}
+
 h4,
-.heading-md { @include heading-md; }
+.heading-md {
+  @include heading-md;
+}
+
 h5,
-.heading-sm { @include heading-sm; }
+.heading-sm {
+  @include heading-sm;
+}
+
 h6,
-.heading-xs { @include heading-xs; }
+.heading-xs {
+  @include heading-xs;
+}
 
 // Paragraphs
 // Use on larger paragraphs
-.body-one { @include body-one; }
+.body-one {
+  @include body-one;
+}
+
 // Use on default paragraphs
-.body-two { @include body-two; }
+.body-two {
+  @include body-two;
+}
+
 // Use on course block descriptions or anywhere
 // else that needs smaller paragraph text
-.body-three { @include body-three; }
+.body-three {
+  @include body-three;
+}
+
 // Use on smallest paragraph text
-.body-four { @include body-four; }
+.body-four {
+  @include body-four;
+}
 
 // Overlines
 // Use on small uppercase labels or descriptions
 // (Bigger size)
-.overline-one { @include overline-one; }
+.overline-one {
+  @include overline-one;
+}
+
 // (Default size)
-.overline-two { @include overline-two; }
+.overline-two {
+  @include overline-two;
+}
+
 // (Smaller size)
-.overline-three { @include overline-three; }
+.overline-three {
+  @include overline-three;
+}
 
 // Use in paragraphs to bold text
 strong,
-.strong { @include strong; }
+.strong {
+  @include strong;
+}
+
+.extra-strong {
+  @include extra-strong;
+}
+
 // Use in paragraphs to italicize text
 em,
-.em { @include em; }
+.em {
+  @include em;
+}
 
 strong em,
 em strong,
-.em .strong,
-.strong .em {
+em.strong,
+.strong em {
   @include strong-em;
+}
+
+em.extra-strong,
+.extra-strong em {
+  @include extra-strong-em;
 }
 
 // Captions
 // Use on figcaption elements that accompany images or videos
 figcaption,
-.figcaption { @include figcaption; }
+.figcaption {
+  @include figcaption;
+}

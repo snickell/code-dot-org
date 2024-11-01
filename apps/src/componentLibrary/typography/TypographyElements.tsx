@@ -1,6 +1,7 @@
 import React from 'react';
-import Typography from './Typography';
+
 import {SemanticTag, VisualAppearance, TypographyElementProps} from './types';
+import Typography from './Typography';
 
 interface TypographyElementToGenerateTemplate {
   displayName: string;
@@ -80,6 +81,11 @@ const typographyElementsToGenerate: TypographyElementToGenerateTemplate[] = [
     defaultVisualAppearance: 'strong',
   },
   {
+    displayName: 'ExtraStrongText',
+    semanticTag: 'strong',
+    defaultVisualAppearance: 'extra-strong',
+  },
+  {
     displayName: 'Figcaption',
     semanticTag: 'figcaption',
     defaultVisualAppearance: 'figcaption',
@@ -97,7 +103,7 @@ const generateComponents = (
     const TypographyElement: React.FunctionComponent<
       TypographyElementProps
     > = componentProps => {
-      const {visualAppearance, children, className, style} = componentProps;
+      const {visualAppearance, children, className, style, id} = componentProps;
 
       return (
         <Typography
@@ -105,6 +111,7 @@ const generateComponents = (
           visualAppearance={visualAppearance || defaultVisualAppearance}
           className={className}
           style={style}
+          id={id}
         >
           {children}
         </Typography>
@@ -130,5 +137,6 @@ export const {
   OverlineThreeText,
   EmText,
   StrongText,
+  ExtraStrongText,
   Figcaption,
 } = generateComponents(typographyElementsToGenerate);

@@ -140,7 +140,7 @@ class UnitGroupTest < ActiveSupport::TestCase
     assert_equal Curriculum::SharedCourseConstants::PARTICIPANT_AUDIENCE.student, seeded_unit_group.participant_audience
     assert_equal Curriculum::SharedCourseConstants::INSTRUCTOR_AUDIENCE.teacher, seeded_unit_group.instructor_audience
     course_version = seeded_unit_group.course_version
-    assert_not_nil course_version
+    refute_nil course_version
     assert_equal '2021', course_version.key
     assert_equal 'family', course_version.course_offering&.key
     assert_equal Curriculum::SharedCourseConstants::PUBLISHED_STATE.stable, course_version.published_state
@@ -439,7 +439,7 @@ class UnitGroupTest < ActiveSupport::TestCase
       error = assert_raises RuntimeError do
         unit_group1.update_scripts(['unit1', 'unit2'])
       end
-      assert_includes error.message, 'Cannot add units that have resources or vocabulary'
+      assert_includes error.message, 'Cannot add units that have resources or vocabulary: ["unit2"]'
 
       unit_group1.reload
       assert_equal 1, unit_group1.default_unit_group_units.length
@@ -718,9 +718,9 @@ class UnitGroupTest < ActiveSupport::TestCase
 
     [csp_2017, csp_2018, csp_2019, csp_2020].each do |c|
       summary = c.summarize_course_versions(create(:teacher))
-      assert_equal ["Computer Science Principles ('17-'18)", "Computer Science Principles ('18-'19)", "Computer Science Principles ('19-'20)"], summary.values.map {|h| h[:name]}
-      assert_equal [true, true, false], summary.values.map {|h| h[:is_stable]}
-      assert_equal [false, true, false], summary.values.map {|h| h[:is_recommended]}
+      assert_equal(["Computer Science Principles ('17-'18)", "Computer Science Principles ('18-'19)", "Computer Science Principles ('19-'20)"], summary.values.pluck(:name))
+      assert_equal([true, true, false], summary.values.pluck(:is_stable))
+      assert_equal([false, true, false], summary.values.pluck(:is_recommended))
     end
   end
 
@@ -736,9 +736,9 @@ class UnitGroupTest < ActiveSupport::TestCase
 
     [csp_2017, csp_2018, csp_2019, csp_2020].each do |c|
       summary = c.summarize_course_versions(create(:student))
-      assert_equal ["Computer Science Principles ('18-'19)"], summary.values.map {|h| h[:name]}
-      assert_equal [true], summary.values.map {|h| h[:is_stable]}
-      assert_equal [true], summary.values.map {|h| h[:is_recommended]}
+      assert_equal(["Computer Science Principles ('18-'19)"], summary.values.pluck(:name))
+      assert_equal([true], summary.values.pluck(:is_stable))
+      assert_equal([true], summary.values.pluck(:is_recommended))
     end
   end
 
@@ -898,9 +898,11 @@ class UnitGroupTest < ActiveSupport::TestCase
       @plc_reviewer = create :plc_reviewer
 
       @csp_2017 = create(:unit_group, name: 'csp-2017', family_name: 'csp', version_year: '2017', published_state: Curriculum::SharedCourseConstants::PUBLISHED_STATE.stable)
-      @csp1_2017 = create(:script, name: 'csp1-2017')
+      @csp1_2017 = create(:script, name: 'csp1-2017', supported_locales: ['en-US', 'es-MX'])
       create :unit_group_unit, unit_group: @csp_2017, script: @csp1_2017, position: 1
       @csp_2018 = create(:unit_group, name: 'csp-2018', family_name: 'csp', version_year: '2018', published_state: Curriculum::SharedCourseConstants::PUBLISHED_STATE.stable)
+      @csp1_2018 = create(:script, name: 'csp1-2018', supported_locales: ['en-US'])
+      create :unit_group_unit, unit_group: @csp_2018, script: @csp1_2018, position: 1
       create(:unit_group, name: 'csp-2019', family_name: 'csp', version_year: '2019')
 
       @pl_csp_2017 = create(:unit_group, name: 'pl-csp-2017', family_name: 'pl-csp', version_year: '2017', published_state: Curriculum::SharedCourseConstants::PUBLISHED_STATE.stable, instructor_audience: Curriculum::SharedCourseConstants::INSTRUCTOR_AUDIENCE.plc_reviewer, participant_audience: Curriculum::SharedCourseConstants::PARTICIPANT_AUDIENCE.facilitator)
@@ -938,6 +940,12 @@ class UnitGroupTest < ActiveSupport::TestCase
     test 'student can view version if it is the latest version in course family and participant audience is student' do
       assert @csp_2018.can_view_version?(@student)
       refute @csp_2017.can_view_version?(@student)
+    end
+
+    test 'student can view version if it is the latest version in course family in their language and participant audience is student' do
+      assert @csp_2017.can_view_version?(@student, 'es-MX')
+      refute @csp_2017.can_view_version?(@student, 'fr-FR')
+      refute @csp_2017.can_view_version?(@student, 'en-US')
     end
 
     test 'student can not view version if not participant audience' do
@@ -1177,5 +1185,18 @@ class UnitGroupTest < ActiveSupport::TestCase
     filepath = "#{Rails.root}/test/fixtures/#{unit_group_name}.course"
     UnitGroup.load_from_path(filepath)
     assert UnitGroup.find_by_name(unit_group_name)
+  end
+
+  test 'supported_locale_codes' do
+    csx = create(:unit_group, name: 'csx-2050', published_state: Curriculum::SharedCourseConstants::PUBLISHED_STATE.stable)
+    csx1 = create(:script, name: 'csx1', supported_locales: ['it-IT', 'en-GB', 'zh-TW', 'tlh'])
+    csx2 = create(:script, name: 'csx2', supported_locales: ['it-IT', 'tlh', 'zh-TW', 'es-MX'])
+    csx3 = create(:script, name: 'csx3', supported_locales: ['it-IT', 'en-GB', 'zh-TW'])
+
+    create(:unit_group_unit, position: 1, unit_group: csx, script: csx1)
+    create(:unit_group_unit, position: 2, unit_group: csx, script: csx2)
+    create(:unit_group_unit, position: 3, unit_group: csx, script: csx3)
+
+    assert_equal ['en-US', 'it-IT', 'zh-TW'], csx.supported_locale_codes
   end
 end

@@ -14,7 +14,7 @@ module Pd::Application
       assert_nil teacher_application.application_guid
 
       teacher_application.save!
-      assert_not_nil teacher_application.application_guid
+      refute_nil teacher_application.application_guid
     end
 
     test 'existing guid is preserved' do
@@ -180,7 +180,7 @@ module Pd::Application
 
       application.update_user_school_info!
       refute_equal original_user_school_info_id, user.school_info_id
-      assert_not_nil user.school_info_id
+      refute_nil user.school_info_id
     end
 
     test 'update_user_school_info does nothing when user has no school info and does not have enough info for new school' do
@@ -226,7 +226,7 @@ module Pd::Application
         )
       end
 
-      application = create :pd_teacher_application, form_data_hash: (
+      application = create :pd_teacher_application, form_data_hash:
       build(:pd_teacher_application_hash, :with_multiple_workshops,
         regional_partner_workshop_ids: workshops.map(&:id),
         able_to_attend_multiple: (
@@ -236,28 +236,28 @@ module Pd::Application
         end
         )
       )
-      )
+
       assert_equal workshops[1], application.get_first_selected_workshop
     end
 
     test 'get_first_selected_workshop multiple local workshops no selection returns first' do
       workshops = (1..2).map {|i| create :workshop, num_sessions: 2, sessions_from: Time.zone.today + i}
 
-      application = create :pd_teacher_application, form_data_hash: (
+      application = create :pd_teacher_application, form_data_hash:
       build(:pd_teacher_application_hash, :with_multiple_workshops,
         regional_partner_workshop_ids: workshops.map(&:id),
         able_to_attend_multiple: ['Not a workshop', 'Not a workshop 2']
       )
-      )
+
       assert_equal workshops.first, application.get_first_selected_workshop
     end
 
     test 'get_first_selected_workshop with no workshops returns nil' do
-      application = create :pd_teacher_application, form_data_hash: (
+      application = create :pd_teacher_application, form_data_hash:
       build(:pd_teacher_application_hash, :with_multiple_workshops,
         regional_partner_workshop_ids: []
       )
-      )
+
       assert_nil application.get_first_selected_workshop
     end
 
@@ -265,11 +265,10 @@ module Pd::Application
       Pd::Workshop.any_instance.stubs(:process_location)
 
       workshop = create :summer_workshop, location_address: 'Buffalo, NY', sessions_from: Date.new(2020, 1, 1)
-      application = create :pd_teacher_application, form_data_hash: (
+      application = create :pd_teacher_application, form_data_hash:
       build(:pd_teacher_application_hash,
         regional_partner_workshop_ids: [workshop.id],
         able_to_attend_multiple: ['January 1-5, 2020 in Buffalo, NY']
-      )
       )
 
       workshop.destroy
@@ -279,11 +278,10 @@ module Pd::Application
     test 'get_first_selected_workshop ignores deleted workshop from multiple list' do
       workshops = (1..2).map {|i| create :workshop, num_sessions: 2, sessions_from: Time.zone.today + i}
 
-      application = create :pd_teacher_application, form_data_hash: (
+      application = create :pd_teacher_application, form_data_hash:
       build(:pd_teacher_application_hash, :with_multiple_workshops,
         regional_partner_workshop_ids: workshops.map(&:id),
         able_to_attend: [workshops.first.id, workshops.second.id]
-      )
       )
 
       workshops[0].destroy
@@ -299,20 +297,18 @@ module Pd::Application
       workshop_1.update_column(:location_address, 'Location 1')
       workshop_2.update_column(:location_address, 'Location 2')
 
-      application = create :pd_teacher_application, form_data_hash: (
+      application = create :pd_teacher_application, form_data_hash:
       build(:pd_teacher_application_hash, :with_multiple_workshops,
         regional_partner_workshop_ids: [workshop_1.id, workshop_2.id],
         able_to_attend_multiple: ["#{workshop_2.friendly_date_range} in Location 2 hosted by Code.org"]
       )
-      )
 
       assert_equal workshop_2, application.get_first_selected_workshop
 
-      application_2 = create :pd_teacher_application, form_data_hash: (
+      application_2 = create :pd_teacher_application, form_data_hash:
       build(:pd_teacher_application_hash, :with_multiple_workshops,
         regional_partner_workshop_ids: [workshop_1.id, workshop_2.id],
         able_to_attend_multiple: ["#{workshop_2.friendly_date_range} in Location 1 hosted by Code.org"]
-      )
       )
 
       assert_equal workshop_1, application_2.get_first_selected_workshop
@@ -321,7 +317,7 @@ module Pd::Application
     test 'columns_to_remove' do
       ['csp', 'csd'].each do |course|
         columns = TeacherApplication.columns_to_remove(course)
-        columns.keys.each do |k|
+        columns.each_key do |k|
           columns[k].each {|c| refute_includes(c.to_s, course)}
         end
       end
@@ -353,19 +349,19 @@ module Pd::Application
       assert_includes(csv_header_csd, csd_plan_offer_question)
       refute_includes(csv_header_csd, csp_plan_offer_question)
       refute_includes(csv_header_csd, csa_plan_offer_question)
-      assert_equal 90, csv_header_csd.length
+      assert_equal 83, csv_header_csd.length
 
       csv_header_csp = CSV.parse(TeacherApplication.csv_header('csp'))[0]
       refute_includes(csv_header_csp, csd_plan_offer_question)
       assert_includes(csv_header_csp, csp_plan_offer_question)
       refute_includes(csv_header_csp, csa_plan_offer_question)
-      assert_equal 92, csv_header_csp.length
+      assert_equal 85, csv_header_csp.length
 
       csv_header_csa = CSV.parse(TeacherApplication.csv_header('csa'))[0]
       refute_includes(csv_header_csa, csd_plan_offer_question)
       refute_includes(csv_header_csd, csp_plan_offer_question)
       assert_includes(csv_header_csa, csa_plan_offer_question)
-      assert_equal 94, csv_header_csa.length
+      assert_equal 87, csv_header_csa.length
     end
 
     test 'school cache' do
@@ -528,17 +524,18 @@ module Pd::Application
 
       application_hash = build :pd_teacher_application_hash,
         program: Pd::Application::TeacherApplication::PROGRAMS[:csd],
+        will_teach: options[:will_teach].first,
         csd_which_grades: ['6'],
         enough_course_hours: options[:enough_course_hours].first,
         previous_yearlong_cdo_pd: ['CS Principles'],
         committed: options[:committed].first,
         race: options[:race].first(2),
         principal_approval: principal_options[:do_you_approve].first,
-        principal_schedule_confirmed: principal_options[:committed_to_master_schedule].first,
         principal_free_lunch_percent: 50,
         principal_underrepresented_minority_percent: 50
 
       application = create :pd_teacher_application, form_data_hash: application_hash
+      create :census_summary, school_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:NO]
       application.auto_score!
 
       assert_equal(
@@ -549,11 +546,11 @@ module Pd::Application
             committed: YES,
             previous_yearlong_cdo_pd: YES,
             principal_approval: YES,
-            principal_schedule_confirmed: YES,
           },
           meets_scholarship_criteria_scores: {
             free_lunch_percent: YES,
             underrepresented_minority_percent: YES,
+            school_last_census_status: YES,
           },
         }.deep_stringify_keys,
         JSON.parse(application.response_scores)
@@ -566,6 +563,7 @@ module Pd::Application
 
       application_hash = build :pd_teacher_application_hash,
         program: Pd::Application::TeacherApplication::PROGRAMS[:csp],
+        will_teach: options[:will_teach].first,
         csp_which_grades: ['12'],
         enough_course_hours: options[:enough_course_hours].first,
         previous_yearlong_cdo_pd: ['CS Discoveries'],
@@ -573,11 +571,11 @@ module Pd::Application
         committed: options[:committed].first,
         race: options[:race].first(2),
         principal_approval: principal_options[:do_you_approve].first,
-        principal_schedule_confirmed: principal_options[:committed_to_master_schedule].first,
         principal_free_lunch_percent: 50,
         principal_underrepresented_minority_percent: 50
 
       application = create :pd_teacher_application, form_data_hash: application_hash
+      create :census_summary, school_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:NO]
       application.auto_score!
 
       assert_equal(
@@ -588,11 +586,11 @@ module Pd::Application
             committed: YES,
             previous_yearlong_cdo_pd: YES,
             principal_approval: YES,
-            principal_schedule_confirmed: YES,
           },
           meets_scholarship_criteria_scores: {
             free_lunch_percent: YES,
             underrepresented_minority_percent: YES,
+            school_last_census_status: YES,
           },
         }.deep_stringify_keys,
         JSON.parse(application.response_scores)
@@ -605,6 +603,7 @@ module Pd::Application
 
       application_hash = build :pd_teacher_application_hash,
         program: Pd::Application::TeacherApplication::PROGRAMS[:csa],
+        will_teach: options[:will_teach].first,
         csa_already_know: options[:csa_already_know].first,
         csa_phone_screen: options[:csa_phone_screen].first,
         csa_which_grades: ['12'],
@@ -614,11 +613,11 @@ module Pd::Application
         committed: options[:committed].first,
         race: options[:race].first(2),
         principal_approval: principal_options[:do_you_approve].first,
-        principal_schedule_confirmed: principal_options[:committed_to_master_schedule].first,
         principal_free_lunch_percent: 50,
         principal_underrepresented_minority_percent: 50
 
       application = create :pd_teacher_application, form_data_hash: application_hash
+      create :census_summary, school_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:NO]
       application.auto_score!
 
       assert_equal(
@@ -631,11 +630,11 @@ module Pd::Application
             committed: YES,
             previous_yearlong_cdo_pd: YES,
             principal_approval: YES,
-            principal_schedule_confirmed: YES,
           },
           meets_scholarship_criteria_scores: {
             free_lunch_percent: YES,
             underrepresented_minority_percent: YES,
+            school_last_census_status: YES,
           },
         }.deep_stringify_keys,
         JSON.parse(application.response_scores)
@@ -647,6 +646,7 @@ module Pd::Application
 
       application_hash = build :pd_teacher_application_hash,
         program: Pd::Application::TeacherApplication::PROGRAMS[:csp],
+        will_teach: options[:will_teach].first,
         csp_which_grades: ['12'],
         enough_course_hours: options[:enough_course_hours].first,
         previous_yearlong_cdo_pd: ['CS Discoveries'],
@@ -665,7 +665,9 @@ module Pd::Application
             committed: YES,
             previous_yearlong_cdo_pd: YES,
           },
-          meets_scholarship_criteria_scores: {},
+          meets_scholarship_criteria_scores: {
+            school_last_census_status: YES,
+          },
         }.deep_stringify_keys,
         JSON.parse(application.response_scores)
       )
@@ -677,17 +679,18 @@ module Pd::Application
 
       application_hash = build :pd_teacher_application_hash,
         program: Pd::Application::TeacherApplication::PROGRAMS[:csd],
-        csd_which_grades: %w(11 12),
+        will_teach: options[:will_teach].last,
+        csd_which_grades: nil,
         enough_course_hours: options[:enough_course_hours].last,
         previous_yearlong_cdo_pd: ['CS Discoveries'],
         committed: options[:committed].last,
         race: [options[:race].first],
         principal_approval: principal_options[:do_you_approve].last,
-        principal_schedule_confirmed: principal_options[:committed_to_master_schedule].third,
         principal_free_lunch_percent: 49,
         principal_underrepresented_minority_percent: 49
 
       application = create :pd_teacher_application, form_data_hash: application_hash
+      create :census_summary, school_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:YES]
       application.auto_score!
 
       assert_equal(
@@ -698,11 +701,11 @@ module Pd::Application
             committed: NO,
             previous_yearlong_cdo_pd: NO,
             principal_approval: NO,
-            principal_schedule_confirmed: NO,
           },
           meets_scholarship_criteria_scores: {
             free_lunch_percent: NO,
             underrepresented_minority_percent: NO,
+            school_last_census_status: NO,
           },
         }.deep_stringify_keys,
         JSON.parse(application.response_scores)
@@ -715,18 +718,19 @@ module Pd::Application
 
       application_hash = build :pd_teacher_application_hash,
         program: Pd::Application::TeacherApplication::PROGRAMS[:csp],
-        csp_which_grades: [options[:csp_which_grades].last],
+        will_teach: options[:will_teach].last,
+        csp_which_grades: nil,
         enough_course_hours: options[:enough_course_hours].last,
         previous_yearlong_cdo_pd: 'CS Principles',
         csp_how_offer: options[:csp_how_offer].first,
         committed: options[:committed].last,
         race: [options[:race].first],
         principal_approval: principal_options[:do_you_approve].last,
-        principal_schedule_confirmed: principal_options[:committed_to_master_schedule].third,
         principal_free_lunch_percent: 49,
         principal_underrepresented_minority_percent: 49
 
       application = create :pd_teacher_application, form_data_hash: application_hash
+      create :census_summary, school_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:YES]
       application.auto_score!
 
       assert_equal(
@@ -737,11 +741,11 @@ module Pd::Application
             committed: NO,
             previous_yearlong_cdo_pd: NO,
             principal_approval: NO,
-            principal_schedule_confirmed: NO,
           },
           meets_scholarship_criteria_scores: {
             free_lunch_percent: NO,
             underrepresented_minority_percent: NO,
+            school_last_census_status: NO,
           },
         }.deep_stringify_keys,
         JSON.parse(application.response_scores)
@@ -754,20 +758,21 @@ module Pd::Application
 
       application_hash = build :pd_teacher_application_hash,
         program: Pd::Application::TeacherApplication::PROGRAMS[:csa],
+        will_teach: options[:will_teach].last,
         csa_already_know: options[:csa_already_know].last,
         csa_phone_screen: options[:csa_phone_screen].last,
-        csa_which_grades: [options[:csa_which_grades].last],
+        csa_which_grades: nil,
         enough_course_hours: options[:enough_course_hours].last,
         previous_yearlong_cdo_pd: 'Computer Science A (CSA)',
         csa_how_offer: options[:csa_how_offer].first,
         committed: options[:committed].last,
         race: [options[:race].first],
         principal_approval: principal_options[:do_you_approve].last,
-        principal_schedule_confirmed: principal_options[:committed_to_master_schedule].third,
         principal_free_lunch_percent: 49,
         principal_underrepresented_minority_percent: 49
 
       application = create :pd_teacher_application, form_data_hash: application_hash
+      create :census_summary, school_year: application.census_year, school_id: application.school_id, teaches_cs: Census::CensusSummary::TEACHES[:YES]
       application.auto_score!
 
       assert_equal(
@@ -780,11 +785,11 @@ module Pd::Application
             committed: NO,
             previous_yearlong_cdo_pd: NO,
             principal_approval: NO,
-            principal_schedule_confirmed: NO,
           },
           meets_scholarship_criteria_scores: {
             free_lunch_percent: NO,
             underrepresented_minority_percent: NO,
+            school_last_census_status: NO,
           },
         }.deep_stringify_keys,
         JSON.parse(application.response_scores)
@@ -796,16 +801,14 @@ module Pd::Application
 
       application_hash = build :pd_teacher_application_hash,
         program: Pd::Application::TeacherApplication::PROGRAMS[:csp],
-        principal_approval: principal_options[:do_you_approve].first,
-        principal_schedule_confirmed: principal_options[:committed_to_master_schedule].fourth
+        principal_approval: principal_options[:do_you_approve].first
 
       application = create :pd_teacher_application, form_data_hash: application_hash
 
       application.auto_score!
 
       response_scores_hash = application.response_scores_hash
-
-      assert_nil response_scores_hash[:meets_minimum_criteria_scores][:principal_schedule_confirmed]
+      assert_nil response_scores_hash[:meets_minimum_criteria_scores][:free_lunch_percent]
     end
 
     test 'principal_approval_state' do
@@ -841,8 +844,6 @@ module Pd::Application
       principal_options = Pd::Application::PrincipalApprovalApplication.options
       application_hash = build TEACHER_APPLICATION_HASH_FACTORY,
         principal_approval: principal_options[:do_you_approve].first,
-        principal_schedule_confirmed: principal_options[:committed_to_master_schedule].first,
-        principal_wont_replace_existing_course: principal_options[:replace_course].first,
         principal_free_lunch_percent: REGIONAL_PARTNER_DEFAULT_GUARDRAILS[:frl_not_rural] + 1,
         principal_underrepresented_minority_percent: REGIONAL_PARTNER_DEFAULT_GUARDRAILS[:urg] - 1,
         regional_partner_id: regional_partner.id
@@ -862,8 +863,6 @@ module Pd::Application
       principal_options = Pd::Application::PrincipalApprovalApplication.options
       application_hash = build :pd_teacher_application_hash,
         principal_approval: principal_options[:do_you_approve].first,
-        principal_schedule_confirmed: principal_options[:committed_to_master_schedule].first,
-        principal_wont_replace_existing_course: principal_options[:replace_course].first,
         principal_free_lunch_percent: REGIONAL_PARTNER_DEFAULT_GUARDRAILS[:frl_not_rural],
         principal_underrepresented_minority_percent: REGIONAL_PARTNER_DEFAULT_GUARDRAILS[:urg] - 1,
         regional_partner_id: regional_partner.id
@@ -881,8 +880,6 @@ module Pd::Application
       principal_options = Pd::Application::PrincipalApprovalApplication.options
       application_hash = build :pd_teacher_application_hash,
         principal_approval: principal_options[:do_you_approve].first,
-        principal_schedule_confirmed: principal_options[:committed_to_master_schedule].first,
-        principal_wont_replace_existing_course: principal_options[:replace_course].first,
         principal_free_lunch_percent: REGIONAL_PARTNER_DEFAULT_GUARDRAILS[:frl_not_rural],
         principal_underrepresented_minority_percent: REGIONAL_PARTNER_DEFAULT_GUARDRAILS[:urg] - 1
 
@@ -947,19 +944,22 @@ module Pd::Application
     test 'meets_scholarship_criteria' do
       application = create :pd_teacher_application
       test_cases = [
-        {underrepresented_minority_percent: YES, free_lunch_percent: YES, verdict: YES},
-        {underrepresented_minority_percent: YES, free_lunch_percent: nil, verdict: YES},
-        {underrepresented_minority_percent: YES, free_lunch_percent: NO, verdict: YES},
-        {underrepresented_minority_percent: nil, free_lunch_percent: YES, verdict: YES},
-        {underrepresented_minority_percent: nil, free_lunch_percent: nil, verdict: REVIEWING_INCOMPLETE},
-        {underrepresented_minority_percent: nil, free_lunch_percent: NO, verdict: REVIEWING_INCOMPLETE},
-        {underrepresented_minority_percent: NO, free_lunch_percent: YES, verdict: YES},
-        {underrepresented_minority_percent: NO, free_lunch_percent: nil, verdict: REVIEWING_INCOMPLETE},
-        {underrepresented_minority_percent: NO, free_lunch_percent: NO, verdict: NO}
+        {underrepresented_minority_percent: YES, free_lunch_percent: YES, school_last_census_status: YES, verdict: YES},
+        {underrepresented_minority_percent: YES, free_lunch_percent: YES, school_last_census_status: NO, verdict: YES},
+        {underrepresented_minority_percent: YES, free_lunch_percent: NO, school_last_census_status: YES, verdict: YES},
+        {underrepresented_minority_percent: NO, free_lunch_percent: YES, school_last_census_status: YES, verdict: YES},
+        {underrepresented_minority_percent: YES, free_lunch_percent: YES, school_last_census_status: nil, verdict: YES},
+        {underrepresented_minority_percent: YES, free_lunch_percent: nil, school_last_census_status: YES, verdict: YES},
+        {underrepresented_minority_percent: nil, free_lunch_percent: YES, school_last_census_status: YES, verdict: YES},
+        {underrepresented_minority_percent: YES, free_lunch_percent: NO, school_last_census_status: NO, verdict: YES},
+        {underrepresented_minority_percent: nil, free_lunch_percent: nil, school_last_census_status: nil, verdict: REVIEWING_INCOMPLETE},
+        {underrepresented_minority_percent: nil, free_lunch_percent: NO, school_last_census_status: NO, verdict: REVIEWING_INCOMPLETE},
+        {underrepresented_minority_percent: NO, free_lunch_percent: nil, school_last_census_status: NO, verdict: REVIEWING_INCOMPLETE},
+        {underrepresented_minority_percent: NO, free_lunch_percent: NO, school_last_census_status: NO, verdict: NO},
       ]
 
       test_cases.each do |test_case|
-        input = test_case.slice(:underrepresented_minority_percent, :free_lunch_percent)
+        input = test_case.slice(:underrepresented_minority_percent, :free_lunch_percent, :school_last_census_status)
         application.update(response_scores: {meets_scholarship_criteria_scores: input}.to_json)
 
         output = application.meets_scholarship_criteria
@@ -1021,8 +1021,6 @@ module Pd::Application
         assert_equal workshop, application.workshop
       end
     end
-
-    private
 
     test 'test allow_sending_principal_email?' do
       # If we are awaiting_admin_approval, we can send.
@@ -1131,7 +1129,7 @@ module Pd::Application
       assert_equal 1, application.emails.where.not(sent_at: nil).where(email_type: 'admin_approval_teacher_reminder').count
     end
 
-    def assert_status_log(expected, application)
+    private def assert_status_log(expected, application)
       assert_equal JSON.parse(expected.to_json), application.status_log
     end
   end

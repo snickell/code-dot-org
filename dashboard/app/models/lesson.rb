@@ -87,9 +87,11 @@ class Lesson < ApplicationRecord
   # absolute_position of 3 but a relative_position of 1
   acts_as_list scope: :script, column: :absolute_position
 
-  validates_uniqueness_of :key, scope: :script_id, case_sensitive: true, message: ->(object, _data) do
-    "lesson with key #{object.key.inspect} is already taken within unit #{object.script&.name.inspect}"
-  end
+  validates_uniqueness_of(
+    :key, scope: :script_id, case_sensitive: true, message: lambda do |object, _data|
+      "lesson with key #{object.key.inspect} is already taken within unit #{object.script&.name.inspect}"
+    end
+  )
 
   include CodespanOnlyMarkdownHelper
 
@@ -168,7 +170,7 @@ class Lesson < ApplicationRecord
   end
 
   def has_lesson_pdf?
-    return false if Unit.unit_in_category?('csf', script.name) && ['2017', '2018'].include?(script.version_year)
+    return false if script.csf? && ['2017', '2018'].include?(script.version_year)
 
     !!has_lesson_plan
   end
@@ -257,7 +259,7 @@ class Lesson < ApplicationRecord
 
   def student_lesson_plan_pdf_url
     if script.is_migrated && script.include_student_lesson_plans && has_lesson_plan
-      Services::CurriculumPdfs.get_lesson_plan_url(self, true)
+      Services::CurriculumPdfs.get_lesson_plan_url(self, student_facing: true)
     end
   end
 
@@ -298,7 +300,8 @@ class Lesson < ApplicationRecord
         description_teacher: description_teacher,
         unplugged: unplugged,
         lessonEditPath: get_uncached_edit_path,
-        lessonStartUrl: start_url
+        lessonStartUrl: start_url,
+        duration: total_lesson_duration,
       }
       # Use to_a here so that we get access to the cached script_levels.
       # Without it, script_levels.last goes back to the database.
@@ -431,7 +434,8 @@ class Lesson < ApplicationRecord
       standards: lesson_standards.map(&:summarize_for_lesson_edit),
       frameworks: Framework.all.map(&:summarize_for_lesson_edit),
       opportunityStandards: opportunity_standards.map(&:summarize_for_lesson_edit),
-      lessonPath: get_uncached_show_path
+      lessonPath: get_uncached_show_path,
+      rubric: rubric,
     }
   end
 
@@ -480,6 +484,22 @@ class Lesson < ApplicationRecord
     }
   end
 
+  def summarize_for_lesson_materials(user)
+    {
+      id: id,
+      unit: script.summarize_for_lesson_show,
+      position: relative_position,
+      key: key,
+      name: localized_name,
+      resources: resources_for_lesson_plan(user&.verified_instructor?),
+      lessonPlanPdfUrl: lesson_plan_pdf_url,
+      lessonPlanHtmlUrl: lesson_plan_html_url,
+      scriptResourcesPdfUrl: script.get_unit_resources_pdf_url,
+      standardsUrl: standards_script_path(script),
+      vocabularyUrl: vocab_script_path(script),
+    }
+  end
+
   def summarize_for_student_lesson_plan
     all_resources = resources_for_lesson_plan(false)
     {
@@ -504,6 +524,16 @@ class Lesson < ApplicationRecord
       displayName: localized_name,
       link: is_student ? script_lesson_student_path(script, self) : script_lesson_path(script, self),
       position: relative_position
+    }
+  end
+
+  def summarize_for_rubric_edit
+    {
+      id: id,
+      unitName: script.title_for_display,
+      lessonNumber: relative_position,
+      lessonName: name,
+      levels: levels
     }
   end
 
@@ -594,7 +624,7 @@ class Lesson < ApplicationRecord
     end
     next_level = next_level_for_lesson_extras(user)
     next_level ?
-      build_script_level_path(next_level) : script_completion_redirect(script)
+      build_script_level_path(next_level) : script_completion_redirect(user, script)
   end
 
   def next_level_number_for_lesson_extras(user)
@@ -890,7 +920,7 @@ class Lesson < ApplicationRecord
 
   def report_bug_url(request)
     message = "Bug in Lesson #{name}\n#{request.url}\n#{request.user_agent}\n"
-    "https://support.code.org/hc/en-us/requests/new?&description=#{CGI.escape(message)}"
+    "https://support.code.org/hc/en-us/requests/new?&tf_description=#{CGI.escape(message)}"
   end
 
   # Finds the LessonActivity by id, or creates a new one if id is not specified.

@@ -1,6 +1,11 @@
-%h1.control-legend{data: {toggle: "collapse", target: "#level_data"}}
-  Level Data
+%h1.control-legend{data: {toggle: "collapse", target: "#music-level-data-container"}}
+  Music Level Data
 
-#level_data.in.collapse
-  = f.label :music_level_data, 'Level data JSON'
-  = f.text_area :level_data, placeholder: 'Insert JSON Data', rows: 10, style: 'width: 90%', value: JSON.pretty_generate(@level.level_data)
+#music-level-data-container.in.collapse
+  #music-level-data-editor
+
+- content_for :body_scripts do
+  %script{src: webpack_asset_path("js/#{js_locale}/music_locale.js")}
+  %script{src: webpack_asset_path('js/googleblockly.js')}
+  %script{src: webpack_asset_path('js/levels/editors/fields/_music_level_data.js'),
+        data: {musicleveldata: (@level.properties['level_data'] || {}).to_json}}

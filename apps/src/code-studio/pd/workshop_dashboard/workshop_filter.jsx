@@ -2,20 +2,11 @@
  * Workshop Filter.
  * Route: /workshops/filter
  */
-import PropTypes from 'prop-types';
-
-import React from 'react';
-import {connect} from 'react-redux';
 import $ from 'jquery';
 import _ from 'lodash';
-import Select from 'react-select';
-import 'react-select/dist/react-select.css';
-import {SelectStyleProps} from '../constants';
-import ServerSortWorkshopTable from './components/server_sort_workshop_table';
-import DatePicker from './components/date_picker';
-import {DATE_FORMAT} from './workshopConstants';
-import {PermissionPropType, WorkshopAdmin} from './permission';
 import moment from 'moment';
+import PropTypes from 'prop-types';
+import React from 'react';
 /* eslint-disable no-restricted-imports */
 import {
   Grid,
@@ -31,15 +22,26 @@ import {
   Clearfix,
 } from 'react-bootstrap';
 /* eslint-enable no-restricted-imports */
+import {connect} from 'react-redux';
+import Select from 'react-select';
+
+import 'react-select/dist/react-select.css';
 import {
   Courses,
   Subjects,
   LegacySubjects,
   States,
 } from '@cdo/apps/generated/pd/sharedWorkshopConstants';
+
 import RegionalPartnerDropdown, {
   RegionalPartnerPropType,
 } from '../components/regional_partner_dropdown';
+import {SelectStyleProps} from '../constants';
+
+import DatePicker from './components/date_picker';
+import ServerSortWorkshopTable from './components/server_sort_workshop_table';
+import {PermissionPropType, WorkshopAdmin} from './permission';
+import {DATE_FORMAT} from './workshopConstants';
 
 const limitOptions = [
   {value: 25, text: 'first 25'},
@@ -64,6 +66,8 @@ export class WorkshopFilter extends React.Component {
         organizer_id: PropTypes.string,
         teacher_email: PropTypes.string,
         only_attended: PropTypes.string,
+        virtual: PropTypes.bool,
+        facilitator_id: PropTypes.number,
       }),
     }),
     showRegionalPartnerDropdown: PropTypes.bool,
@@ -270,10 +274,7 @@ export class WorkshopFilter extends React.Component {
       state: urlParams.state,
       course: urlParams.course,
       subject: urlParams.subject,
-      // TODO: Add prop types for these fields
-      // eslint-disable-next-line react/prop-types
       virtual: urlParams.virtual,
-      // eslint-disable-next-line react/prop-types
       facilitator_id: urlParams.facilitator_id,
       organizer_id: urlParams.organizer_id,
       teacher_email: urlParams.teacher_email,

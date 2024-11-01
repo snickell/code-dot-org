@@ -11,12 +11,16 @@ class ChatClient
   @@name = CDO.name[0..14]
   @@logger = nil
 
-  def self.log(message, options={})
+  def self.log(message, options = {})
     if ENV['CI']
       CDO.log.info("[#{CDO.slack_log_room}] #{message}")
     else
       message(CDO.slack_log_room, message, options)
     end
+  end
+
+  def self.bold_tags_to_terminal_escapes(input)
+    input.gsub(/<b>(.*?)<\/b>/, "\e[1m\\1\e[22m")
   end
 
   # @param room [String] The room to post to which message should be posted.
@@ -25,12 +29,15 @@ class ChatClient
   # @param options [Hash] An optional hash of options.
   #   color (optional): The color the message should be posted.
   # @return [Boolean] Whether the message was posted successfully.
-  def self.message(room, message, options={})
+  def self.message(room, message, options = {})
+    message = Slack.tag_user_group(message, options[:notify_group]) if options[:notify_group]
+
     unless @@logger
       FileUtils.mkdir_p(deploy_dir('log'))
       @@logger = Logger.new(deploy_dir('log', 'chat_messages.log'))
     end
     @@logger.info("[#{room}] #{message}")
+    puts bold_tags_to_terminal_escapes message
 
     unless CDO.hip_chat_logging
       return
@@ -42,10 +49,6 @@ class ChatClient
       username: @@name,
       color: options[:color]
     )
-  end
-
-  def self.snippet(message)
-    Slack.snippet(CDO.slack_log_room, message)
   end
 
   def self.wrap(name, backtrace: false)

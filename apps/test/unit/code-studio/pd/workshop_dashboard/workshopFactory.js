@@ -1,4 +1,5 @@
 import {Factory} from 'rosie';
+
 import {States} from '@cdo/apps/generated/pd/sharedWorkshopConstants';
 
 /**
@@ -32,6 +33,12 @@ Factory.define('workshop')
   .attr('enrolled_teacher_count', 1)
   .attr('organizer', {name: 'Oscar Organzier', email: 'oscar@code.org'})
   .attr('virtual', false);
+
+Factory.define('workshop multiple sessions')
+  .extend('workshop')
+  .attr('sessions', () => Factory.buildList('session', 3));
+
+Factory.define('virtual workshop').extend('workshop').attr('virtual', true);
 
 Factory.define('csp summer workshop')
   .extend('workshop')

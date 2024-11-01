@@ -35,7 +35,7 @@ module Cdo
       )
 
       defaults = render("#{root}/config.yml.erb").first
-      to_h.keys.each do |key|
+      to_h.each_key do |key|
         raise "Unknown property not in defaults: #{key}" unless defaults.key?(key.to_sym)
       end
       raise "'#{rack_env}' is not known environment." unless rack_envs.include?(rack_env)
@@ -64,8 +64,9 @@ module Cdo
 
       # our HTTPS wildcard certificate only supports *.code.org
       # 'env', 'studio.code.org' over https must resolve to 'env-studio.code.org' for non-prod environments
-      sep = (domain.include?('.code.org')) ? '-' : '.'
-      return "localhost#{sep}#{domain}" if rack_env?(:development)
+      sep = domain.include?('.code.org') ? '-' : '.'
+      # developers and CI servers use localhost
+      return "localhost#{sep}#{domain}" if rack_env?(:development) || ci_webserver?
       return "translate#{sep}#{domain}" if name == 'crowdin'
       "#{rack_env}#{sep}#{domain}"
     end
@@ -80,10 +81,6 @@ module Cdo
 
     def hourofcode_hostname
       canonical_hostname('hourofcode.com')
-    end
-
-    def advocacy_hostname
-      canonical_hostname('advocacy.code.org')
     end
 
     def codeprojects_hostname
@@ -103,7 +100,7 @@ module Cdo
     def site_host(domain)
       host = canonical_hostname(domain)
       if (rack_env?(:development) && !https_development) ||
-        (ENV['CI'] && host.include?('localhost'))
+          (ENV.fetch('CI', nil) && host.include?('localhost'))
         port = ['studio.code.org'].include?(domain) ? dashboard_port : pegasus_port
         host += ":#{port}"
       end
@@ -131,10 +128,6 @@ module Cdo
       site_url('code.org', path, scheme)
     end
 
-    def advocacy_url(path = '', scheme = '')
-      site_url('advocacy.code.org', path, scheme)
-    end
-
     def hourofcode_url(path = '', scheme = '')
       site_url('hourofcode.com', path, scheme)
     end
@@ -151,8 +144,8 @@ module Cdo
         # deployed development instance of Javabuilder, set
         # 'local_javabuilder_stack_name: "your stack name"' in your locals.yml.
         return 'ws://localhost:8080/javabuilder' if CDO.use_localhost_javabuilder
-        stack_name = CDO.local_javabuilder_stack_name || 'javabuilder-test'
-        "wss://#{stack_name}.code.org"
+        javabuilder_stack_name = CDO.local_javabuilder_stack_name || 'javabuilder-test'
+        "wss://#{javabuilder_stack_name}.code.org"
       else
         DCDO.get("javabuilder_websocket_url", 'wss://javabuilder.code.org')
       end
@@ -166,8 +159,8 @@ module Cdo
         # deployed development instance of Javabuilder, set
         # 'local_javabuilder_stack_name: "your stack name"' in your locals.yml.
         return 'http://localhost:8080/javabuilderfiles/seedsources' if CDO.use_localhost_javabuilder
-        stack_name = CDO.local_javabuilder_stack_name || 'javabuilder-test'
-        "https://#{stack_name}-http.code.org/seedsources/sources.json"
+        javabuilder_stack_name = CDO.local_javabuilder_stack_name || 'javabuilder-test'
+        "https://#{javabuilder_stack_name}-http.code.org/seedsources/sources.json"
       else
         http_url = DCDO.get("javabuilder_http_url", 'https://javabuilder-http.code.org')
         http_url + "/seedsources/sources.json"
@@ -224,7 +217,7 @@ module Cdo
       return @@curriculum_languages
     end
 
-    def curriculum_url(locale, uri = '', autocomplete_partial_path = true)
+    def curriculum_url(locale, uri = '', autocomplete_partial_path: true)
       return unless uri
       uri = URI::DEFAULT_PARSER.escape(uri)
       uri = URI::DEFAULT_PARSER.parse(uri)
@@ -250,6 +243,15 @@ module Cdo
       ''
     end
 
+    # Temporary method to allow safe (exception-free) accessing of the
+    # Statsig API key.
+    def safe_statsig_api_client_key
+      CDO.statsig_api_client_key
+    rescue ArgumentError
+      # Return an empty string instead of raising
+      ''
+    end
+
     def dir(*dirs)
       File.join(root_dir, *dirs)
     end
@@ -265,6 +267,21 @@ module Cdo
       rack_env?(:test) && pegasus_hostname == 'test.code.org'
     end
 
+    # Identify whether we are executing within a web application server as most of our Ruby classes and modules
+    # can also be executed in Ruby shell scripts (cron jobs), ActiveJob consumers, or in interactive Ruby tools (irb).
+    # Some components may operate differently within a web application server, such as using a database proxy to
+    # connect to the database. We use the `puma` web application server in most environments, except development, where
+    # we use `thin`.
+    def running_web_application?
+      %w(puma thin).include?(File.basename($0))
+    end
+
+    # Is this code running in a webserver as part of our Continuous Integration
+    # builds?
+    def ci_webserver?
+      running_web_application? && ENV.fetch('CI', nil)
+    end
+
     def shared_image_url(path)
       "/shared/images/#{path}"
     end
@@ -276,7 +293,7 @@ module Cdo
 
     def log
       require 'logger'
-      @@log ||= Logger.new(STDOUT).tap do |l|
+      @@log ||= Logger.new($stdout).tap do |l|
         l.level = Logger::INFO
         l.formatter = proc do |severity, _, _, msg|
           "#{severity == 'INFO' ? '' : "#{severity}: "}#{msg}\n"

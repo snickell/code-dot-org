@@ -306,7 +306,7 @@ module FakeDashboard
   # or provide an explicit way to request certain test-data setups.
   def self.create_fake_dashboard_db
     # rubocop:disable Security/YAMLLoad
-    database = YAML.load(ERB.new(File.new(dashboard_dir('config/database.yml')).read).result) || {}
+    database = YAML.unsafe_load(ERB.new(File.new(dashboard_dir('config/database.yml')).read).result) || {}
     # rubocop:enable Security/YAMLLoad
 
     # Temporary tables aren't shared across multiple database connections.
@@ -315,9 +315,9 @@ module FakeDashboard
     ActiveRecord::Base.configurations = database
     ActiveRecord::Base.establish_connection
     ActiveRecord::Schema.verbose = false
-    ActiveRecord::Base.transaction do
-      require_relative('../../../dashboard/db/schema')
-    end
+    # rubocop:disable CustomCops/DashboardRequires
+    require_relative('../../../dashboard/db/schema')
+    # rubocop:enable CustomCops/DashboardRequires
 
     # Reuse the same connection in Sequel to share access to the temporary tables.
     connection = ActiveRecord::Base.connection.instance_variable_get(:@connection)

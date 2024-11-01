@@ -1,17 +1,20 @@
-import {expect, assert} from 'chai';
-import Simple2Sequencer from '@cdo/apps/music/player/sequencer/Simple2Sequencer';
-import MusicLibrary, {SoundData} from '@cdo/apps/music/player/MusicLibrary';
-import Sinon, {SinonStubbedInstance} from 'sinon';
-import {
-  PatternEventValue,
-  PatternEvent,
-} from '@cdo/apps/music/player/interfaces/PatternEvent';
-import {SoundEvent} from '@cdo/apps/music/player/interfaces/SoundEvent';
+import {expect, assert} from 'chai'; // eslint-disable-line no-restricted-imports
+import Sinon, {SinonStubbedInstance} from 'sinon'; // eslint-disable-line no-restricted-imports
+
 import {DEFAULT_PATTERN_LENGTH} from '@cdo/apps/music/constants';
 import {
   ChordEventValue,
   ChordEvent,
 } from '@cdo/apps/music/player/interfaces/ChordEvent';
+import {
+  InstrumentEvent,
+  InstrumentEventValue,
+} from '@cdo/apps/music/player/interfaces/InstrumentEvent';
+import {SoundEvent} from '@cdo/apps/music/player/interfaces/SoundEvent';
+import MusicLibrary, {SoundData} from '@cdo/apps/music/player/MusicLibrary';
+import Simple2Sequencer from '@cdo/apps/music/player/sequencer/Simple2Sequencer';
+
+import setGoogleBlocklyGlobal from '../../../../util/setupGoogleBlocklyGlobal';
 
 const testSound: SoundData = {
   name: 'name',
@@ -20,6 +23,7 @@ const testSound: SoundData = {
   type: 'bass',
 };
 
+setGoogleBlocklyGlobal();
 describe('Simple2Sequencer', () => {
   let sequencer: Simple2Sequencer;
   let library: SinonStubbedInstance<MusicLibrary>;
@@ -27,8 +31,13 @@ describe('Simple2Sequencer', () => {
   beforeEach(() => {
     library = Sinon.createStubInstance(MusicLibrary);
     library.getSoundForId.returns(testSound);
+    Sinon.stub(MusicLibrary, 'getInstance').returns(library);
 
-    sequencer = new Simple2Sequencer(library);
+    sequencer = new Simple2Sequencer();
+  });
+
+  afterEach(() => {
+    Sinon.restore();
   });
 
   it('starts a new sequence at the given measure', () => {
@@ -72,8 +81,9 @@ describe('Simple2Sequencer', () => {
   });
 
   it('adds a pattern event', () => {
-    const patternValue: PatternEventValue = {
-      kit: 'machine',
+    const patternValue: InstrumentEventValue = {
+      instrument: 'machine',
+      length: 2,
       events: [],
     };
 
@@ -85,13 +95,14 @@ describe('Simple2Sequencer', () => {
     expect(playbackEvents.length).to.equal(1);
 
     const event = playbackEvents[0];
-    expect(event.type).to.equal('pattern');
+    expect(event.type).to.equal('instrument');
     expect(event.id).to.equal(JSON.stringify(patternValue));
     expect(event.blockId).to.equal('blockId');
     expect(event.when).to.equal(1);
-    expect(event.length).to.equal(DEFAULT_PATTERN_LENGTH);
+    expect(event.length).to.equal(2);
     expect(event.triggered).to.be.false;
-    expect((event as PatternEvent).value).to.equal(patternValue);
+    expect((event as InstrumentEvent).instrumentType).to.equal('drums');
+    expect((event as InstrumentEvent).value).to.equal(patternValue);
   });
 
   it('adds a chord event', () => {

@@ -17,9 +17,11 @@ Dashboard::Application.configure do
   config.public_file_server.enabled = true
   config.public_file_server.headers = {'Cache-Control' => "public, max-age=3600, s-maxage=1800"}
 
+  is_ci = !!ENV.fetch('CI', nil)
+
   # test environment should use precompiled, minified, digested assets like production,
   # unless it's being used for unit tests.
-  ci_test = !!(ENV['UNIT_TEST'] || ENV['CI'])
+  ci_test = !!(ENV['UNIT_TEST'] || is_ci)
 
   unless ci_test
     # Compress JavaScripts and CSS.
@@ -29,6 +31,16 @@ Dashboard::Application.configure do
 
     # Version of your assets, change this if you want to expire all your assets.
     config.assets.version = '1.0'
+
+    # Avoid loading all i18n files up front, which can significantly slow down initialization.
+    # Instead, it only loads i18n files that belong to the current locale.
+    config.i18n.backend = Cdo::I18n::LazyLoadableBackend.new(lazy_load: true)
+  end
+
+  # In CI environments (ie, Drone), stub relevant AWS services (currently just SageMaker)
+  # so we can run UI tests for our AI Chat (ie, Generative AI) lab.
+  if is_ci
+    config.stub_aichat_aws_services = true
   end
 
   config.assets.quiet = true
@@ -75,9 +87,16 @@ Dashboard::Application.configure do
   # Set to :debug to see everything in the log.
   config.log_level = :info
 
-  # Whether or not to skip script preloading. Setting this to true
-  # significantly speeds up server startup time.
-  config.skip_script_preload = false
+  if CDO.running_web_application?
+    # Use default logging formatter so that PID and timestamp are not suppressed.
+    config.log_formatter = Logger::Formatter.new
+
+    # Log condensed lines to syslog for centralized logging.
+    config.lograge.enabled = true
+    config.lograge.formatter = Lograge::Formatters::Cee.new
+    require 'syslog/logger'
+    config.logger = Syslog::Logger.new 'dashboard', Syslog::LOG_LOCAL0
+  end
 
   config.experiment_cache_time_seconds = 0
 end

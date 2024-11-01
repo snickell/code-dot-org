@@ -1,8 +1,9 @@
-import React from 'react';
-import i18n from '@cdo/locale';
-import color from '../util/color';
-import trackEvent from '../util/trackEvent';
 import _ from 'lodash';
+import React from 'react';
+
+import i18n from '@cdo/locale';
+
+import color from '../util/color';
 
 /**
  * If the browser supports window.visualViewport, and we detect that the user
@@ -32,17 +33,11 @@ export default class FixZoomHelper extends React.Component {
     const isZoomed = this.isZoomed();
 
     if (this.state.mode !== 'none' && !isZoomed) {
-      const lastMode = this.state.mode;
-
       // If transitioning from zoomed to non-zoomed, then mode goes to "none".
       this.setState({mode: 'none'});
-
-      trackEvent('Research', 'FixZoomHelper', `${lastMode}-to-none`);
     } else if (this.state.mode === 'none' && isZoomed) {
       // If transitioning from non-zoomed to zoomed, then mode goes to "button".
       this.setState({mode: 'button'});
-
-      trackEvent('Research', 'FixZoomHelper', 'none-to-button');
     }
 
     // Also update the viewport information.
@@ -76,14 +71,10 @@ export default class FixZoomHelper extends React.Component {
 
   onButtonClick = () => {
     this.setState({mode: 'helper'});
-
-    trackEvent('Research', 'FixZoomHelper', 'button-to-helper');
   };
 
   onHelperClick = () => {
     this.setState({mode: 'button'});
-
-    trackEvent('Research', 'FixZoomHelper', 'helper-to-button');
   };
 
   render() {

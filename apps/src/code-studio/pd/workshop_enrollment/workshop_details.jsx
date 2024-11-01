@@ -3,6 +3,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import {WorkshopPropType} from './enrollmentConstants';
 
 export default class WorkshopDetails extends React.Component {
@@ -75,6 +76,8 @@ export default class WorkshopDetails extends React.Component {
           {this.workshopCourse()}
           <br />
           {this.props.workshop.subject}
+          <br />
+          {this.props.workshop.module}
         </div>
       </div>
     );

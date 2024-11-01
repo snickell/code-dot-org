@@ -1,17 +1,16 @@
-@import "color.scss";
-@import "font.scss";
-
-// In order to make typography work correctly with em units. (Design system is build for 16px default font size)
-body {
-  font-size: 16px;
-}
+@import 'color.scss';
+@import 'font.scss';
+@import '@cdo/apps/componentLibrary/common/styles/mixins';
 
 .containerWithMarginTop {
   margin-top: 40px;
 }
 
-.withBorderTopAndBottom {
+.withBorderTop {
   border-top: 1px solid $neutral_dark20;
+}
+
+.withBorderBottom {
   border-bottom: 1px solid $neutral_dark20;
 }
 
@@ -25,7 +24,7 @@ input.classNameTextField {
   height: unset;
   border: 1px solid $neutral_dark;
 
-  font-family: $gotham-regular;
+  @include main-font-regular;
   line-height: 1.5;
   font-size: 1em;
 
@@ -36,12 +35,8 @@ input.classNameTextField {
   }
 }
 
-// TODO: once we agree and receive a final approve on what styles of typography
-//  are and the Label styles added to Typography Elements - remove and rewrite labels with typography elements.
-label.typographyLabel {
-  font-family: $gotham-bold;
-  color: $neutral_dark;
-  font-size: 16px;
+label.typographyLabelTwo {
+  @include label-two;
 }
 
 .buttonsContainer {
@@ -162,32 +157,22 @@ label.typographyLabel {
 
 .courseOption {
   margin-top: 20px;
-  align-items: baseline;
+  align-items: center;
 }
 
 .flexDisplay .radio {
-  margin: 0 0 0 0;
+  margin: -2px 0 0 0;
 }
 
 .courseOptionLabel {
-  margin: 0 10px 0 5px;
+  margin: 0 0 0 5px;
 }
 
 .unitDropdown {
+  @include main-font-semi-bold;
+  font-size: 16px;
   margin: 4px 0 0 10px;
-  font-family: "Gotham 5r", sans-serif;
   padding: 0.3em;
-}
-
-.toolTipContainer {
-  display: flex;
-  align-items: center;
-
-  button {
-    .toggle-display {
-      margin-left: 5px;
-    }
-  }
 }
 
 button.advancedSettingsButton {
@@ -229,4 +214,21 @@ button.advancedSettingsButton {
 
 .textPopUp {
   cursor: pointer;
+}
+
+.toolTipContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+
+  button {
+    .toggle-display {
+      margin-left: 5px;
+    }
+  }
+}
+
+.taImage {
+  margin-left: 5px;
+  margin-top: -5px;
 }

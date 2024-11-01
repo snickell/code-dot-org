@@ -1,13 +1,16 @@
-import React, {useState, useEffect, useCallback} from 'react';
 import PropTypes from 'prop-types';
-import Button from '@cdo/apps/templates/Button';
+import React, {useState, useEffect, useCallback} from 'react';
+
+import fontConstants from '@cdo/apps/fontConstants';
+import Button from '@cdo/apps/legacySharedComponents/Button';
+import Spinner from '@cdo/apps/sharedComponents/Spinner';
+import StylizedBaseDialog from '@cdo/apps/sharedComponents/StylizedBaseDialog';
+import CodeReviewGroupsManager from '@cdo/apps/templates/codeReviewGroups/CodeReviewGroupsManager';
 import color from '@cdo/apps/util/color';
 import i18n from '@cdo/locale';
-import Spinner from '@cdo/apps/code-studio/pd/components/spinner';
-import StylizedBaseDialog from '@cdo/apps/componentLibrary/StylizedBaseDialog';
-import {addDroppableIdToGroups} from '../codeReviewGroups/CodeReviewGroupsUtils';
+
 import CodeReviewGroupsStatusToggle from '../codeReviewGroups/CodeReviewGroupsStatusToggle';
-import CodeReviewGroupsManager from '@cdo/apps/templates/codeReviewGroups/CodeReviewGroupsManager';
+import {addDroppableIdToGroups} from '../codeReviewGroups/CodeReviewGroupsUtils';
 
 // Width taken from UI mocks (meant to fit in a minimum screen width of 1024px with some extra space)
 const DIALOG_WIDTH = 934;
@@ -72,7 +75,10 @@ export default function CodeReviewGroupsDialog({
     switch (submitStatus) {
       case SUBMIT_STATES.SUCCESS:
         return (
-          <span style={styles.successMessageContainer}>
+          <span
+            style={styles.successMessageContainer}
+            id="uitest-code-review-groups-save-confirm"
+          >
             <i className={'fa fa-check fa-lg'} style={styles.checkIcon} />
             {i18n.codeReviewGroupsSaveSuccess()}
           </span>
@@ -170,11 +176,11 @@ const styles = {
     padding: 5,
   },
   successMessageContainer: {
-    fontFamily: '"Gotham 5r", sans-serif',
+    ...fontConstants['main-font-semi-bold'],
     color: color.level_perfect,
   },
   errorMessageContainer: {
-    fontFamily: '"Gotham 5r", sans-serif',
+    ...fontConstants['main-font-semi-bold'],
     color: color.red,
   },
   button: {

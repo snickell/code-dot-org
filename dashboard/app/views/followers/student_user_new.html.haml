@@ -7,6 +7,8 @@
 - content_for(:head) do
   %meta{name: "robots", content: "noindex"}/
 
+%script{src: webpack_asset_path('js/followers/student_user_new.js')}
+
 - if current_user || !@section
   %h2= t('join_section.code.title')
   %p= t('join_section.code.instructions')
@@ -28,7 +30,7 @@
     before joining the section.
   %p{style: 'margin-bottom: 30px;'} If you don't have an account at Code.org yet, please fill out the fields below to create an account and join the section.
   - if @user.errors.any?
-    #error_explanation
+    #error_explanation.padded_container
       %ul
         - @user.errors.full_messages.each do |msg|
           %li= msg
@@ -92,7 +94,7 @@
                   = f.label :gender_student_input, t('signup_form.gender')
                   = f.text_field :gender_student_input, maxlength: 50
                 %br/
-            = submit_tag 'Register', class: 'btn btn-primary'
+            = submit_tag 'Register', class: 'btn btn-primary', id: 'create_and_register'
 
         #student-terms
           != t('signup_form.student_terms_markdown', markdown: true)

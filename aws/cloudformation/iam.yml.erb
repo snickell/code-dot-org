@@ -239,37 +239,6 @@ Resources:
         - Key: sqlworkbench-team
           Value: codedotorg
 
-# TODO: Migrate to Engineering_Contributor
-  ContributorRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: Contributor
-      Description: Google-federated AWS Role for contributors, granting minimal access for local development.
-      Path: /engineering/
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal: {Federated: !Sub "arn:aws:iam::${AWS::AccountId}:saml-provider/Google"}
-            Action: sts:AssumeRoleWithSAML
-            Condition:
-              StringEquals:
-                SAML:aud: https://signin.aws.amazon.com/saml
-          - Effect: Allow
-            Principal: {Federated: accounts.google.com}
-            Action: sts:AssumeRoleWithWebIdentity
-            Condition:
-              StringEquals:
-                accounts.google.com:aud: '{{resolve:secretsmanager:admin/google_client_id}}'
-              ForAnyValue:StringEquals:
-                accounts.google.com:sub: !Ref ContributorGoogleIDs
-      ManagedPolicyArns:
-        - !Ref ContributorS3Policy
-        - !Ref ContributorSecretsPolicy
-      Tags:
-        - Key: sqlworkbench-team
-          Value: codedotorg
-
 # TODO: Migrate to Billing_ReadOnly
   BillingRole:
     Type: AWS::IAM::Role
@@ -298,6 +267,8 @@ Resources:
         - arn:aws:iam::aws:policy/AWSBillingReadOnlyAccess
 
 # Console & CLI Roles
+# The term 'FullAccess' means the role has the highest access for it's type, not
+# full access to all resources. It's in comparison to similar 'ReadOnly' roles.
 
 <%
 roles = {
@@ -306,6 +277,8 @@ roles = {
     GoogleIdsSSMParameter: 'DeveloperGoogleIDs',
     ManagedPolicyArns: [
       'arn:aws:iam::aws:policy/ReadOnlyAccess',
+      '!Ref EngineerSecretsPolicy',
+      '!Ref AthenaCloudwatchLogsQueryPolicy',
     ]
   },
   EngineeringFullAccessRole: {
@@ -314,6 +287,8 @@ roles = {
     ManagedPolicyArns: [
       'arn:aws:iam::aws:policy/PowerUserAccess',
       'arn:aws:iam::aws:policy/IAMReadOnlyAccess',
+      '!Ref EngineerSecretsPolicy',
+      '!Ref CloudformationPassRolePolicy',
     ]
   },
   EngineeringContributorRole: {
@@ -322,6 +297,16 @@ roles = {
     ManagedPolicyArns: [
       '!Ref ContributorS3Policy',
       '!Ref ContributorSecretsPolicy',
+      'arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess'
+    ]
+  },
+  TempS3LessEngineerRole: {
+    RoleName: 'Temp_S3less_Engineer',
+    GoogleIdsSSMParameter: 'DeveloperGoogleIDs',
+    ManagedPolicyArns: [
+      'arn:aws:iam::aws:policy/PowerUserAccess',
+      'arn:aws:iam::aws:policy/IAMReadOnlyAccess',
+      '!Ref NoS3ForYouPolicy',
     ]
   },
   EngineeringMusicLabContributorRole: {
@@ -340,11 +325,27 @@ roles = {
       'arn:aws:iam::aws:policy/AmazonRedshiftQueryEditorV2FullAccess',
     ]
   },
+  MarketingReadOnlyRole: {
+    RoleName: 'Marketing_ReadOnly',
+    ManagedPolicyArns: [
+      'arn:aws:iam::aws:policy/ReadOnlyAccess',
+      '!Ref AthenaCloudwatchLogsQueryPolicy',
+    ]
+  },
   BillingReadOnlyRole: {
     RoleName: 'Billing_ReadOnly',
     GoogleIdsSSMParameter: 'BillingGoogleIDs',
     ManagedPolicyArns: [
       'arn:aws:iam::aws:policy/AWSBillingReadOnlyAccess',
+    ]
+  },
+  ProductManagerFullAccessRole: {
+    RoleName: 'ProductManager_FullAccess',
+    GoogleIdsSSMParameter: 'ProductGoogleIDs',
+    ManagedPolicyArns: [
+      'arn:aws:iam::aws:policy/AWSBillingReadOnlyAccess'
+      '!Ref BedrockKnowledgeBaseInvocationPolicy',
+      '!Ref CloudwatchDashboardViewerPolicy',
     ]
   }
 }
@@ -388,6 +389,44 @@ roles.each do |name, config| %>
         - Key: sqlworkbench-team
           Value: codedotorg
 <%- end -%>
+ 
+  CloudformationPassRolePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: CloudformationPassRolePolicy
+      Path: /admin/
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: iam:PassRole
+            Resource: '*'
+            Condition:
+              StringEquals:
+                iam:PassedToService: cloudformation.amazonaws.com
+          # Require CloudFormation Service Role on all stack operations.
+          - Effect: Deny
+            Action:
+              - cloudformation:CreateStack
+              - cloudformation:UpdateStack
+              - cloudformation:DeleteStack
+              - cloudformation:CreateChangeSet
+            NotResource: "arn:aws:cloudformation:*:aws:transform/Serverless-2016-10-31"
+            Condition:
+              StringNotEquals:
+                cloudformation:RoleARN: !Sub "arn:aws:iam::${AWS::AccountId}:role/admin/CloudFormationService"
+
+  NoS3ForYouPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: NoS3ForYouPolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Deny
+            Action:
+              - s3:*
+            Resource: '*'
 
   DataAnalystPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -505,6 +544,7 @@ roles.each do |name, config| %>
               - arn:aws:s3:::cdo-v3-assets
               - arn:aws:s3:::cdo-v3-animations
               - arn:aws:s3:::cdo-v3-files
+              - arn:aws:s3:::cdo-ai
             Condition:
               StringLike: {
                 "s3:prefix": [
@@ -512,7 +552,8 @@ roles.each do |name, config| %>
                     "sources_development/*",
                     "assets_development/*",
                     "animations_development/*",
-                    "files_development/*"
+                    "files_development/*",
+                    "teaching_assistant/*"
                 ]
               }
           - Sid: AllowNeededS3ActionsInCertainBucketFolders
@@ -541,14 +582,16 @@ roles.each do |name, config| %>
               - arn:aws:s3:::cdo-v3-assets/assets_development/*
               - arn:aws:s3:::cdo-v3-animations/animations_development/*
               - arn:aws:s3:::cdo-v3-files/files_development/*
-          - Sid: AllowListingToAnimationLibraryBucket
+              - arn:aws:s3:::cdo-ai/teaching_assistant/*
+          - Sid: AllowListingToLibraryBuckets
             Effect: Allow
             Action:
               - s3:ListBucket
               - s3:ListBucketVersions
             Resource:
               - arn:aws:s3:::cdo-animation-library
-          - Sid: AllowReadOnlyToAnimationLibraryBucket
+              - arn:aws:s3:::cdo-sound-library
+          - Sid: AllowReadOnlyToLibraryBuckets
             Effect: Allow
             Action:
               - s3:GetObject
@@ -559,7 +602,31 @@ roles.each do |name, config| %>
               - s3:GetObjectVersionTagging
             Resource:
               - arn:aws:s3:::cdo-animation-library/*
-  
+              - arn:aws:s3:::cdo-sound-library/*
+
+  EngineerSecretsPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: EngineerSecretsPolicy
+      Path: /engineering/
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Deny
+            Action:
+              - secretsmanager:GetSecretValue
+              - secretsmanager:DeleteSecret
+            Resource:
+              - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:production/cdo/*
+              - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:levelbuilder/cdo/*
+              - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:test/cdo/*
+              - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:CfnStack/*
+          - Effect: Allow
+            Action: secretsmanager:GetSecretValue
+            Resource:
+              - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:development/cdo/*
+              - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:adhoc/cdo/*
+
   ContributorSecretsPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -572,30 +639,44 @@ roles.each do |name, config| %>
             Action: secretsmanager:GetSecretValue
             Resource:
               - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:development/cdo/properties_encryption_key-KUJqKF
+              - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:development/cdo/firebase_secret-ngO5yy
 
   MusicLabS3ReadWritePolicy:
-    Type: 'AWS::IAM::ManagedPolicy'
+    Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyName: 'MusicLabS3ReadWritePolicy'
+      ManagedPolicyName: MusicLabS3ReadWritePolicy
       Path: /engineering/
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
-          - Sid: 'S3BucketAccess'
-            Effect: 'Allow'
+          - Effect: Allow
             Action:
-              - 's3:ListBucket'
-              - 's3:GetBucketLocation'
-            Resource:
-              - 'arn:aws:s3:::cdo-curriculum'
-          - Sid: 'S3ReadWriteAccess'
-            Effect: 'Allow'
+              - s3:ListAllMyBuckets
+            Resource: '*'
+          - Effect: 'Allow'
             Action:
-              - 's3:PutObject'
-              - 's3:GetObject'
-              - 's3:DeleteObject'
+              - s3:ListBucket
+              - s3:GetBucketLocation
+              - s3:GetBucketPublicAccessBlock
+              - s3:GetBucketPolicyStatus
+              - s3:GetBucketAcl
+              - s3:ListAccessPoints
             Resource:
-              - 'arn:aws:s3:::cdo-curriculum/media/musiclab/*'
+              - arn:aws:s3:::cdo-curriculum
+          - Effect: Allow
+            Action:
+              - s3:AbortMultipartUpload
+              - s3:DeleteObject
+              - s3:DeleteObjectVersion
+              - s3:GetObject
+              - s3:GetObjectAcl
+              - s3:GetObjectVersion
+              - s3:GetObjectVersionAcl
+              - s3:PutObject
+              - s3:PutObjectAcl
+              - s3:PutObjectVersionAcl
+            Resource:
+              - arn:aws:s3:::cdo-curriculum/media/musiclab/*
 
   GoogleBillingIDs:
     Type: AWS::SSM::Parameter
@@ -604,6 +685,64 @@ roles.each do |name, config| %>
       Type: StringList
       Value: initial,value
       Description: List of Google IDs of people being granted billing access.
+
+  AthenaCloudwatchLogsQueryPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: AthenaCloudwatchLogsQueryPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - athena:StartQueryExecution
+              - athena:GetQueryExecution
+            Resource: !Sub "arn:aws:athena:${AWS::Region}:${AWS::AccountId}:workgroup/primary"
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+              - s3:ListBucket
+            Resource: 
+              - !Sub "arn:aws:s3:::aws-athena-query-results-${AWS::AccountId}-${AWS::Region}/*"
+              - !Sub "arn:aws:s3:::aws-athena-query-results-${AWS::AccountId}-${AWS::Region}"
+  
+  ProductGoogleIDs:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /IAM/ProductGoogleIDs
+      Type: StringList
+      Value: initial,value
+      Description: List of Google IDs of people being granted product access.
+  
+  BedrockKnowledgeBaseInvocationPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: BedrockKnowledgeBaseInvocationPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - bedrock:InvokeModel
+              - bedrock:Retrieve
+              - bedrock:RetrieveAndGenerate
+            Resource:
+              - !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:knowledge-base/*'
+
+  CloudwatchDashboardViewerPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: CloudwatchDashboardViewerPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - cloudwatch:GetDashboard
+              - cloudwatch:ListDashboards
+              - cloudwatch:GetMetricData
+            Resource: '*'
 
   # Used by FirehoseMicroservice Lambda function.
   # TODO move to Data stack
@@ -683,6 +822,21 @@ roles.each do |name, config| %>
       Path: /
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+  # TODO: Move this to gen_ai_curriculum.yml.erb
+  # Execution role for GenAI Sagemaker Models
+  SagemakerModelExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: SagemakerModelExecutionRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: sagemaker.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AmazonSageMakerFullAccess'
   SessionPermissions:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -737,3 +891,7 @@ Outputs:
     Description: Session Permissions
     Value: !Ref SessionPermissions
     Export: {Name: !Sub "${AWS::StackName}-SessionPermissions"}
+  SagemakerModelExecutionRoleARN:
+    Description: Execution Role for GenAI Sagemaker Models
+    Value: !GetAtt SagemakerModelExecutionRole.Arn
+    Export: {Name: !Sub "${AWS::StackName}-SagemakerExecutionRoleARN"}

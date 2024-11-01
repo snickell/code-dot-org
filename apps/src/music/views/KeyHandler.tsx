@@ -1,11 +1,11 @@
 import React, {useCallback, useContext, useEffect} from 'react';
 import {useDispatch} from 'react-redux';
+
 import {Triggers} from '../constants';
 import {AnalyticsContext} from '../context';
 import {
   advanceInstructionsPosition,
   toggleHeaders,
-  toggleBeatPad,
   toggleInstructions,
   toggleTimelinePosition,
   moveStartPlayheadPositionBackward,
@@ -15,6 +15,8 @@ import {
 interface KeyHandlerProps {
   togglePlaying: () => void;
   playTrigger: (triggerId: string) => void;
+  uiShortcutsEnabled: boolean;
+  disabled?: boolean;
 }
 
 /**
@@ -24,6 +26,8 @@ interface KeyHandlerProps {
 const KeyHandler: React.FunctionComponent<KeyHandlerProps> = ({
   togglePlaying,
   playTrigger,
+  uiShortcutsEnabled,
+  disabled,
 }) => {
   const analyticsReporter = useContext(AnalyticsContext);
   const dispatch = useDispatch();
@@ -42,10 +46,13 @@ const KeyHandler: React.FunctionComponent<KeyHandlerProps> = ({
   const handleKeyUp = useCallback(
     (event: KeyboardEvent) => {
       // Don't handle a keyboard shortcut if the active element is an
-      // input field, since the user is probably trying to type something.
+      // input field or textarea, since the user is probably trying to type something.
       if (
-        document.activeElement &&
-        document.activeElement.tagName.toLowerCase() === 'input'
+        disabled ||
+        (document.activeElement &&
+          ['input', 'textarea'].includes(
+            document.activeElement.tagName.toLowerCase()
+          ))
       ) {
         return;
       }
@@ -54,25 +61,23 @@ const KeyHandler: React.FunctionComponent<KeyHandlerProps> = ({
       // keys are used for Blockly keyboard navigation: A, D, I, S, T, W, X
       // https://developers.google.com/blockly/guides/configure/web/keyboard-nav
       // Also avoid C and V that may be used in copy/paste shortcuts.
-      if (event.key === 'u') {
-        reportKeyPress('toggle-timeline-position');
-        dispatch(toggleTimelinePosition());
-      }
-      if (event.key === 'j') {
-        reportKeyPress('toggle-instructions');
-        dispatch(toggleInstructions());
-      }
-      if (event.key === 'n') {
-        reportKeyPress('advance-instructions-position');
-        dispatch(advanceInstructionsPosition());
-      }
-      if (event.key === 'h') {
-        reportKeyPress('toggle-headers');
-        dispatch(toggleHeaders());
-      }
-      if (event.key === 'b') {
-        reportKeyPress('toggle-beat-pad');
-        dispatch(toggleBeatPad());
+      if (uiShortcutsEnabled) {
+        if (event.key === 'u') {
+          reportKeyPress('toggle-timeline-position');
+          dispatch(toggleTimelinePosition());
+        }
+        if (event.key === 'j') {
+          reportKeyPress('toggle-instructions');
+          dispatch(toggleInstructions());
+        }
+        if (event.key === 'n') {
+          reportKeyPress('advance-instructions-position');
+          dispatch(advanceInstructionsPosition());
+        }
+        if (event.key === 'h') {
+          reportKeyPress('toggle-headers');
+          dispatch(toggleHeaders());
+        }
       }
       if (event.key === ',') {
         dispatch(moveStartPlayheadPositionBackward());
@@ -89,11 +94,21 @@ const KeyHandler: React.FunctionComponent<KeyHandlerProps> = ({
         togglePlaying();
       }
     },
-    [togglePlaying, playTrigger, reportKeyPress, dispatch]
+    [
+      togglePlaying,
+      playTrigger,
+      reportKeyPress,
+      dispatch,
+      uiShortcutsEnabled,
+      disabled,
+    ]
   );
 
   useEffect(() => {
     document.body.addEventListener('keyup', handleKeyUp);
+    return () => {
+      document.body.removeEventListener('keyup', handleKeyUp);
+    };
   }, [handleKeyUp]);
 
   return null;

@@ -2,12 +2,14 @@ import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
+
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {getStore} from '@cdo/apps/redux';
-import CurriculumCatalog from '../../../../templates/curriculumCatalog/CurriculumCatalog';
-import getScriptData from '@cdo/apps/util/getScriptData';
 import {setSections} from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
-import {EVENTS} from '@cdo/apps/lib/util/AnalyticsConstants';
+import getScriptData from '@cdo/apps/util/getScriptData';
+
+import CurriculumCatalog from '../../../../templates/curriculumCatalog/CurriculumCatalog';
 
 $(document).ready(function () {
   const catalogData = getScriptData('catalog');
@@ -19,6 +21,8 @@ $(document).ready(function () {
     sections,
     isSignedOut,
     isTeacher,
+    isInUS,
+    curriculaTaught,
   } = catalogData;
 
   const store = getStore();
@@ -36,6 +40,8 @@ $(document).ready(function () {
         languageNativeName={languageNativeName}
         isSignedOut={isSignedOut}
         isTeacher={isTeacher}
+        isInUS={isInUS}
+        curriculaTaught={curriculaTaught}
       />
     </Provider>,
     document.getElementById('curriculum-catalog-container')

@@ -39,20 +39,22 @@ class UnitGroup < ApplicationRecord
   has_many :student_resources, through: :unit_groups_student_resources, source: :resource
   has_one :course_version, as: :content_root, dependent: :destroy
 
-  scope :with_associated_models, -> do
-    includes(
-      [
-        :plc_course,
-        :default_unit_group_units,
-        :alternate_unit_group_units,
-        {
-          course_version: {
-            course_offering: :course_versions
+  scope(
+    :with_associated_models, lambda do
+      includes(
+        [
+          :plc_course,
+          :default_unit_group_units,
+          :alternate_unit_group_units,
+          {
+            course_version: {
+              course_offering: :course_versions
+            }
           }
-        }
-      ]
-    )
-  end
+        ]
+      )
+    end
+  )
 
   def cached
     return self unless UnitGroup.should_cache?
@@ -104,8 +106,8 @@ class UnitGroup < ApplicationRecord
     published_state == Curriculum::SharedCourseConstants::PUBLISHED_STATE.in_development
   end
 
-  def self.file_path(name)
-    Rails.root.join("config/courses/#{name}.course")
+  def self.file_path(name, root_path = Rails.root)
+    root_path.join("config/courses/#{name}.course")
   end
 
   def self.load_from_path(path)
@@ -221,11 +223,10 @@ class UnitGroup < ApplicationRecord
     unremovable_unit_names = units_to_remove.select(&:prevent_course_version_change?).map(&:name)
     raise "Cannot remove units that have resources or vocabulary: #{unremovable_unit_names}" if unremovable_unit_names.any?
 
-    if new_units_objects.any? do |s|
+    unaddable_unit_names = new_units_objects.select do |s|
       s.unit_group != self && s.prevent_course_version_change?
-    end
-      raise 'Cannot add units that have resources or vocabulary'
-    end
+    end.map(&:name)
+    raise "Cannot add units that have resources or vocabulary: #{unaddable_unit_names}" if unaddable_unit_names.any?
 
     new_units_objects.each_with_index do |unit, index|
       unit_group_unit = UnitGroupUnit.find_or_create_by!(unit_group: self, script: unit) do |ugu|
@@ -460,14 +461,16 @@ class UnitGroup < ApplicationRecord
   end
 
   # @param user [User]
+  # @param locale_code [String] Locale code for user or request. Optional.
   # @return [Boolean] Whether the user can view the course.
-  def can_view_version?(user = nil)
+  def can_view_version?(user = nil, locale_code = 'en-us')
     return false unless Ability.new(user).can?(:read, self)
 
     latest_course_version = UnitGroup.latest_stable_version(family_name)
-    is_latest = latest_course_version == self
+    latest_in_locale = UnitGroup.latest_stable_version(family_name, locale: locale_code)
+    is_latest = latest_course_version == self || latest_in_locale == self
 
-    # All users can see the latest course version.
+    # All users can see the latest course version in English and in their locale.
     return true if is_latest
 
     # Restrictions only apply to participants and logged out users.
@@ -498,6 +501,26 @@ class UnitGroup < ApplicationRecord
         cv.default_unit_group_units.all? {|unit_group_unit| unit_group_unit.script.supported_locales&.include?(locale_str)}
       end
     end
+  end
+
+  def supported_locale_codes
+    locales = default_unit_group_units.first&.script&.supported_locales || []
+    locales = locales.filter do |locale|
+      default_unit_group_units.all? do |unit_group_unit|
+        unit_group_unit.script.supported_locales&.include?(locale)
+      end
+    end
+    locales += ['en-US']
+    locales.sort.uniq
+  end
+
+  def supported_locale_names
+    supported_locale_codes.map {|l| Unit.locale_native_name_map[l] || l}.uniq
+  end
+
+  def self.locale_native_name_map
+    locales = Dashboard::Application::LOCALES.select {|_, data| data.is_a?(Hash)}
+    locales.reduce({}) {|acc, (locale_code, data)| acc.merge({locale_code => data[:native]})}
   end
 
   # @param family_name [String] The family name for a course family.
@@ -670,5 +693,9 @@ class UnitGroup < ApplicationRecord
       student_resources.any? ||
       default_units.any? {|s| s.prevent_course_version_change?}
     # rubocop:enable Style/SymbolProc
+  end
+
+  def duration_in_minutes
+    default_units.sum(&:duration_in_minutes)
   end
 end

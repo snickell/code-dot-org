@@ -145,12 +145,28 @@ class CourseVersion < ApplicationRecord
     end
   end
 
+  def latest_stable_version(family_name, locale_code: 'en-us')
+    latest_stable_unit = Unit.latest_stable_version(family_name, locale: locale_code)
+    latest_stable_unitgroup = UnitGroup.latest_stable_version(family_name, locale: locale_code)
+
+    if latest_stable_unit && !latest_stable_unitgroup
+      return latest_stable_unit
+    elsif !latest_stable_unit && latest_stable_unitgroup
+      return latest_stable_unitgroup
+    elsif latest_stable_unit && latest_stable_unitgroup
+      return latest_stable_unit.version_year >= latest_stable_unitgroup.version_year ? latest_stable_unit : latest_stable_unitgroup
+    end
+
+    nil
+  end
+
   def recommended?(locale_code = 'en-us')
     return false unless stable?
     return true if course_offering.course_versions.length == 1
 
     family_name = course_offering.key
-    latest_stable_version = content_root_type == 'UnitGroup' ? UnitGroup.latest_stable_version(family_name, locale: locale_code) : Unit.latest_stable_version(family_name, locale: locale_code)
+
+    latest_stable_version = latest_stable_version(family_name, locale_code: locale_code)
 
     latest_stable_version == content_root
   end
@@ -180,7 +196,7 @@ class CourseVersion < ApplicationRecord
         type: content_root_type,
         is_stable: stable?,
         is_recommended: recommended?(locale_code),
-        locales: content_root_type == 'UnitGroup' ? ['English'] : content_root.supported_locale_names,
+        locales: content_root.supported_locale_names,
         units: units.select {|u| u.course_assignable?(user)}.map(&:summarize_for_assignment_dropdown).to_h
       }
     ]
@@ -196,6 +212,7 @@ class CourseVersion < ApplicationRecord
 
   def summarize_for_unit_selector
     {
+      id: id,
       display_name: content_root.launched? ? content_root.localized_title : content_root.localized_title + ' *',
       units: units.map(&:summarize_for_unit_selector).sort_by {|u| u[:position]}
     }

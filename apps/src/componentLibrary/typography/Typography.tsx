@@ -1,5 +1,6 @@
-import React, {memo} from 'react';
 import classnames from 'classnames';
+import React, {memo} from 'react';
+
 import {SemanticTag, VisualAppearance} from './types';
 
 import moduleStyles from './typography.module.scss';
@@ -15,6 +16,7 @@ interface TypographyProps {
   style?: React.CSSProperties;
   // Text or other elements to render inside the typography element
   children: React.ReactNode;
+  id?: string;
 }
 
 const Typography: React.FunctionComponent<TypographyProps> = ({
@@ -23,12 +25,14 @@ const Typography: React.FunctionComponent<TypographyProps> = ({
   children,
   className,
   style,
+  id,
   ...props
 }) => {
   const Tag = semanticTag;
 
   return (
     <Tag
+      id={id}
       className={classnames(moduleStyles[visualAppearance], className)}
       style={style}
       {...props}

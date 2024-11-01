@@ -1,11 +1,11 @@
-import React, {memo, ChangeEvent} from 'react';
 import classnames from 'classnames';
+import React, {memo, ChangeEvent} from 'react';
 
-import Typography from '@cdo/apps/componentLibrary/typography';
+import {componentSizeToBodyTextSizeMap} from '@cdo/apps/componentLibrary/common/constants';
 import {ComponentSizeXSToL} from '@cdo/apps/componentLibrary/common/types';
+import Typography from '@cdo/apps/componentLibrary/typography';
 
 import moduleStyles from './radioButton.module.scss';
-import {componentSizeToBodyTextSizeMap} from '@cdo/apps/componentLibrary/common/constants';
 
 export interface RadioButtonProps {
   /** Radio Button checked state */
@@ -13,9 +13,9 @@ export interface RadioButtonProps {
   /** Radio Button onChange handler*/
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   /** The name attribute specifies the name of an input element.
-   The name attribute is used to reference elements in a JavaScript,
-   or to reference form data after a form is submitted.
-   Note: Only form elements with a name attribute will have their values passed when submitting a form. */
+     The name attribute is used to reference elements in a JavaScript,
+     or to reference form data after a form is submitted.
+     Note: Only form elements with a name attribute will have their values passed when submitting a form. */
   name: string;
   /** The value attribute specifies the value of an input element. */
   value: string;
@@ -25,6 +25,10 @@ export interface RadioButtonProps {
   disabled?: boolean;
   /** Size of Radio Button */
   size?: ComponentSizeXSToL;
+  /** Custom className */
+  className?: string;
+  /** Children (Radio Button custom content) */
+  children?: React.ReactNode;
 }
 
 const RadioButton: React.FunctionComponent<RadioButtonProps> = ({
@@ -35,6 +39,8 @@ const RadioButton: React.FunctionComponent<RadioButtonProps> = ({
   value,
   disabled = false,
   size = 'm',
+  className,
+  children,
 }) => {
   const bodyTextSize = componentSizeToBodyTextSizeMap[size];
 
@@ -42,7 +48,8 @@ const RadioButton: React.FunctionComponent<RadioButtonProps> = ({
     <label
       className={classnames(
         moduleStyles.radioButton,
-        moduleStyles[`radioButton-${size}`]
+        moduleStyles[`radioButton-${size}`],
+        className
       )}
     >
       <input
@@ -63,6 +70,8 @@ const RadioButton: React.FunctionComponent<RadioButtonProps> = ({
           {label}
         </Typography>
       )}
+      {/** Custom content is rendered here if needed */}
+      {children}
     </label>
   );
 };
@@ -71,7 +80,8 @@ const RadioButton: React.FunctionComponent<RadioButtonProps> = ({
  * ### Production-ready Checklist:
  * * (✔) implementation of component approved by design team;
  * * (✔) has storybook, covered with stories and documentation;
- * * (✘) has tests: test every prop, every state and every interaction that's js related;
+ * * (✔) has tests: test every prop, every state and every interaction that's js related;
+ * * (see apps/test/unit/componentLibrary/RadioButtonTest.jsx, apps/test/unit/componentLibrary/RadioButtonsGroupTest.jsx)
  * * (?) passes accessibility checks;
  *
  * ###  Status: ```Ready for dev```

@@ -1,7 +1,6 @@
 {
   "key": "self-paced-pl-csd",
   "display_name": "Teaching CS Discoveries",
-  "category": "pl_self_paced",
   "is_featured": false,
   "assignable": true,
   "curriculum_type": "Professional Learning",
@@ -13,8 +12,9 @@
   "school_subject": null,
   "device_compatibility": null,
   "description": null,
-  "self_paced_professional_learning": null,
   "professional_learning_program": null,
   "video": null,
-  "published_date": null
+  "published_date": null,
+  "self_paced_pl_course_offering_key": "self-paced-pl-csd",
+  "ai_teaching_assistant_available": false
 }

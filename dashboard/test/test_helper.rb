@@ -1,4 +1,5 @@
 require 'test_reporter'
+require 'faker'
 
 if defined? ActiveRecord
   ActiveRecord::Migration&.check_pending!
@@ -11,7 +12,7 @@ Minitest.extensions.unshift('rails')
 
 reporters = [CowReporter.new]
 if ENV['CIRCLECI']
-  reporters << Minitest::Reporters::JUnitReporter.new("#{ENV['CIRCLE_TEST_REPORTS']}/dashboard")
+  reporters << Minitest::Reporters::JUnitReporter.new("#{ENV.fetch('CIRCLE_TEST_REPORTS', nil)}/dashboard")
 end
 # Skip this if the tests are run in RubyMine
 Minitest::Reporters.use! reporters unless ENV['RM_INFO']
@@ -29,7 +30,7 @@ ENV['TZ'] = 'UTC'
 require 'mocha/mini_test'
 
 CDO.stubs(:rack_env).returns(:test) if defined? CDO
-Rails.application.reload_routes! if defined?(Rails) && defined?(Rails.application)
+Rails.application&.reload_routes! if defined?(Rails) && defined?(Rails.application)
 
 require File.expand_path('../../config/environment', __FILE__)
 I18n.load_path += Dir[Rails.root.join('test', 'en.yml')]
@@ -52,7 +53,9 @@ require 'dynamic_config/dcdo'
 require 'testing/setup_all_and_teardown_all'
 require 'testing/lock_thread'
 require 'testing/transactional_test_case'
+require 'testing/spec_syntax'
 require 'testing/capture_queries'
+require 'testing/rspec_mocks'
 
 require 'parallel_tests/test/runtime_logger'
 
@@ -88,13 +91,22 @@ class ActiveSupport::TestCase
     CDO.stubs(:optimize_webpack_assets).returns(false)
     CDO.stubs(:use_my_apps).returns(true)
 
+    # Don't attempt to make actual AWS API calls, either, for the same reason
     AWS::S3.stubs(:cached_exists_in_bucket?).returns(true)
+    AWS::S3.stubs(:exists_in_bucket).returns(true)
   end
 
   teardown do
     Dashboard::Application.config.action_controller.perform_caching = false
     I18n.locale = I18n.default_locale
     set_env :test
+  end
+
+  def after_teardown
+    super
+  ensure
+    # Ensures the time for the next tests is unfrozen.
+    Timecop.return if Timecop.frozen?
   end
 
   def panda_panda
@@ -128,9 +140,10 @@ class ActiveSupport::TestCase
   include FactoryBot::Syntax::Methods
   include ActiveSupport::Testing::SetupAllAndTeardownAll
   include ActiveSupport::Testing::TransactionalTestCase
+  include ActiveSupport::Testing::SpecSyntax
   include CaptureQueries
 
-  setup_all do
+  def seed_deprecated_unit_fixtures
     # Some of the functionality we're testing here relies on Scripts with
     # certain hardcoded names. In the old fixture-based model, this data was
     # all provided; in the new factory-based model, we need to do a little
@@ -171,30 +184,22 @@ class ActiveSupport::TestCase
     end
   end
 
-  def assert_creates(*args)
-    assert_difference(args.collect(&:to_s).collect {|class_name| "#{class_name}.count"}) do
-      yield
-    end
+  def assert_creates(*args, &block)
+    assert_difference(args.collect(&:to_s).collect {|class_name| "#{class_name}.count"}, &block)
   end
 
-  def assert_does_not_create(*args)
-    assert_no_difference(args.collect(&:to_s).collect {|class_name| "#{class_name}.count"}) do
-      yield
-    end
+  def assert_does_not_create(*args, &block)
+    assert_no_difference(args.collect(&:to_s).collect {|class_name| "#{class_name}.count"}, &block)
   end
   alias refute_creates assert_does_not_create
   alias refute_creates_or_destroys assert_does_not_create
 
-  def assert_destroys(*args)
-    assert_difference(args.collect(&:to_s).collect {|class_name| "#{class_name}.count"}, -1) do
-      yield
-    end
+  def assert_destroys(*args, &block)
+    assert_difference(args.collect(&:to_s).collect {|class_name| "#{class_name}.count"}, -1, &block)
   end
 
-  def assert_does_not_destroy(*args)
-    assert_no_difference(args.collect(&:to_s).collect {|class_name| "#{class_name}.count"}) do
-      yield
-    end
+  def assert_does_not_destroy(*args, &block)
+    assert_no_difference(args.collect(&:to_s).collect {|class_name| "#{class_name}.count"}, &block)
   end
 
   #
@@ -271,7 +276,7 @@ class ActiveSupport::TestCase
 
     exps = expressions.map do |e|
       # rubocop:disable Security/Eval
-      e.respond_to?(:call) ? e : lambda {eval(e, block.binding)}
+      e.respond_to?(:call) ? e : -> {eval(e, block.binding)}
       # rubocop:enable Security/Eval
     end
     before = exps.map(&:call)
@@ -281,7 +286,7 @@ class ActiveSupport::TestCase
     expressions.zip(exps).each_with_index do |(code, e), i|
       error  = "#{code.inspect} didn't change"
       error  = "#{message}.\n#{error}" if message
-      assert_not_equal(before[i], e.call, error)
+      refute_equal(before[i], e.call, error)
     end
   end
 
@@ -292,7 +297,7 @@ class ActiveSupport::TestCase
 
     exps = expressions.map do |e|
       # rubocop:disable Security/Eval
-      e.respond_to?(:call) ? e : lambda {eval(e, block.binding)}
+      e.respond_to?(:call) ? e : -> {eval(e, block.binding)}
       # rubocop:enable Security/Eval
     end
     before = exps.map(&:call)
@@ -353,7 +358,7 @@ class ActiveSupport::TestCase
   #   class MyTest < ActiveSupport::TestCase
   #     freeze_time
   #     #...
-  def self.freeze_time(time=nil)
+  def self.freeze_time(time = nil)
     time ||= Time.now.utc.to_date + 9.hours
     setup do
       Timecop.freeze time
@@ -530,7 +535,7 @@ class ActionController::TestCase
     end
   end
 
-  def assert_sharing_meta_tags(opts={})
+  def assert_sharing_meta_tags(opts = {})
     # example:
     # <meta content="500177453358606" property="fb:app_id" />
     # <meta content="article" property="og:type" />
@@ -592,6 +597,7 @@ class ActionController::TestCase
 end
 
 class ActionDispatch::IntegrationTest
+  include ActiveJob::TestHelper
   include Devise::Test::IntegrationHelpers
 
   setup do

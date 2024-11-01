@@ -5,9 +5,9 @@ class SectionsController < ApplicationController
   authorize_resource :section, only: [:new]
 
   def new
-    redirect_to '/home' unless params[:loginType] && params[:participantType]
-
-    @is_users_first_section = current_user.sections.empty?
+    redirect_to home_path unless params[:loginType] && params[:participantType]
+    @user_country = helpers.country_code(current_user, request)
+    @is_users_first_section = current_user.sections_instructed.empty?
   end
 
   def edit
@@ -21,6 +21,14 @@ class SectionsController < ApplicationController
       course_offering_id: existing_section.unit_group ? existing_section.unit_group&.course_version&.course_offering&.id : existing_section.script&.course_version&.course_offering&.id,
       version_id: existing_section.unit_group ? existing_section.unit_group&.course_version&.id : existing_section.script&.course_version&.id,
       unit_id: existing_section.unit_group ? existing_section.script_id : nil
+    }
+
+    @section['sectionInstructors'] = ActiveModelSerializers::SerializableResource.new(existing_section.section_instructors, each_serializer: Api::V1::SectionInstructorInfoSerializer).as_json
+
+    @section['primaryInstructor'] = {
+      email: existing_section.teacher.email,
+      name: existing_section.teacher.name,
+      lti_roster_sync_enabled: existing_section.teacher&.properties&.[]("lti_roster_sync_enabled")
     }
 
     @section = @section.to_json.camelize
@@ -39,6 +47,17 @@ class SectionsController < ApplicationController
     else
       flash[:alert] = I18n.t('signinsection.invalid_login')
       redirect_to section_path(id: @section.code)
+    end
+  end
+
+  def section_instructors_verified
+    new_params = params.transform_keys(&:underscore)
+    teachers = User.find_by(id: new_params[:user_id]).teachers
+
+    if teachers.any?(&:verified_teacher?)
+      render json: {verified: true}
+    else
+      render json: {verified: false}
     end
   end
 

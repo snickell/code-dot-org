@@ -5,6 +5,7 @@ require 'cdo/aws/s3'
 require 'cdo/chat_client'
 require 'digest'
 require 'parallel'
+require 'cdo/python_venv'
 
 module RakeUtils
   def self.system__(command)
@@ -44,7 +45,7 @@ module RakeUtils
 
   def self.system_with_chat_logging(*args)
     command = command_(*args)
-    ChatClient.log "#{ENV['USER']}@#{CDO.rack_env}:#{Dir.pwd}$ #{command}"
+    ChatClient.log "#{ENV.fetch('USER', nil)}@#{CDO.rack_env}:#{Dir.pwd}$ #{command}"
     system_ command
   end
 
@@ -60,13 +61,13 @@ module RakeUtils
     status
   end
 
-  # Alternate version of RakeUtils.rake which always streams STDOUT to the shell
+  # Alternate version of RakeUtils.rake which always streams $stdout to the shell
   # during execution.
   def self.rake_stream_output(*args, &block)
     system_stream_output "RAILS_ENV=#{rack_env}", "RACK_ENV=#{rack_env}", 'bundle', 'exec', 'rake', *args, &block
   end
 
-  # Alternate version of RakeUtils.system which always streams STDOUT to the
+  # Alternate version of RakeUtils.system which always streams $stdout to the
   # shell during execution.
   def self.system_stream_output(*args, &block)
     command = command_(*args)
@@ -129,6 +130,10 @@ module RakeUtils
     else
       system('bundle', *args)
     end
+  end
+
+  def self.python_venv_install
+    PythonVenv.install
   end
 
   def self.git_add(*args)
@@ -213,11 +218,11 @@ module RakeUtils
   end
 
   def self.npm_install(*args)
-    run_packages_with('npm install', ENV['CI'] && '--frozen-lockfile', *args)
+    run_packages_with('npm install', ENV.fetch('CI', nil) && '--frozen-lockfile', *args)
   end
 
   def self.yarn_install(*args)
-    run_packages_with('yarn', ENV['CI'] && '--frozen-lockfile', *args)
+    run_packages_with('yarn', ENV.fetch('CI', nil) && '--frozen-lockfile', *args)
   end
 
   def self.npm_rebuild(*args)
@@ -266,14 +271,14 @@ module RakeUtils
   end
 
   # Uploads local file to S3, leaving a .fetch file pointing to it at the given path, and removes original file
-  def self.replace_file_with_s3_backed_fetch_file(local_file, destination_local_path, params={})
+  def self.replace_file_with_s3_backed_fetch_file(local_file, destination_local_path, params = {})
     new_fetchable_url = upload_file_to_s3_bucket_and_create_fetch_file(local_file, destination_local_path, params)
     FileUtils.remove_file(local_file)
     new_fetchable_url
   end
 
   # Uploads local file to S3, leaving a corresponding .fetch file pointing to the remote copy
-  def self.upload_file_to_s3_bucket_and_create_fetch_file(local_file, destination_local_path, params={})
+  def self.upload_file_to_s3_bucket_and_create_fetch_file(local_file, destination_local_path, params = {})
     raise 'Need to specify bucket' unless params[:bucket]
 
     s3_filename = AWS::S3.upload_to_bucket(params[:bucket], File.basename(local_file), File.open(local_file), acl: 'public-read')
@@ -306,14 +311,14 @@ module RakeUtils
   end
 
   # Captures all stdout and stderr within a block, including subprocesses:
-  # - redirect STDOUT and STDERR streams to a pipe
+  # - redirect $stdout and $stderr streams to a pipe
   # - have a background thread read from the pipe
   # - store data in a StringIO
   # - execute the block
   # - revert streams to original pipes and return output
   def self.capture(&block)
-    old_stdout = STDOUT.clone
-    old_stderr = STDERR.clone
+    old_stdout = $stdout.clone
+    old_stderr = $stderr.clone
     pipe_r, pipe_w = IO.pipe
     pipe_r.sync = true
     output = StringIO.new('', 'w')
@@ -324,12 +329,12 @@ module RakeUtils
     rescue EOFError
       # Do nothing.
     end
-    STDOUT.reopen(pipe_w)
-    STDERR.reopen(pipe_w)
+    $stdout.reopen(pipe_w)
+    $stderr.reopen(pipe_w)
     yield
   ensure
-    STDOUT.reopen(old_stdout)
-    STDERR.reopen(old_stderr)
+    $stdout.reopen(old_stdout)
+    $stderr.reopen(old_stderr)
     pipe_w.close
     reader.join
     pipe_r.close
@@ -340,17 +345,15 @@ module RakeUtils
   # threaded_each provide a simple way to process an array of elements using multiple threads.
   # create_threads is a helper for threaded_each.
   #
-  def self.create_threads(count)
+  def self.create_threads(count, &block)
     [].tap do |threads|
       count.times do
-        threads << Thread.new do
-          yield
-        end
+        threads << Thread.new(&block)
       end
     end
   end
 
-  def self.threaded_each(array, thread_count=2)
+  def self.threaded_each(array, thread_count = 2)
     # NOTE: Queue is used here because it is threadsafe - it is the ONLY threadsafe datatype in base ruby!
     #   Without Queue, the array would need to be protected using a Mutex.
     queue = Queue.new.tap do |q|
@@ -361,7 +364,11 @@ module RakeUtils
 
     threads = create_threads(thread_count) do
       until queue.empty?
-        next unless item = queue.pop(true) rescue nil
+        next unless item = begin
+          queue.pop(true)
+        rescue
+          nil
+        end
         yield item if block_given?
       end
     end

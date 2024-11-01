@@ -1,9 +1,9 @@
-import React from 'react';
-import Foorm from '@cdo/apps/code-studio/pd/foorm/Foorm';
-import Button, {ButtonColor} from '@cdo/apps/templates/Button';
-import color from '@cdo/apps/util/color';
-import trackEvent from '@cdo/apps/util/trackEvent';
 import $ from 'jquery';
+import React from 'react';
+
+import Foorm from '@cdo/apps/code-studio/pd/foorm/Foorm';
+import Button, {ButtonColor} from '@cdo/apps/legacySharedComponents/Button';
+import color from '@cdo/apps/util/color';
 
 // Additonal styles for this component can be found in NpsSurveyBlock.scss
 
@@ -60,7 +60,6 @@ export default class NpsSurveyBlock extends React.Component {
   }
 
   onComplete(data) {
-    trackEvent('survey', 'nps', parseInt(data.nps_value));
     this.setState({submitted: true});
   }
 

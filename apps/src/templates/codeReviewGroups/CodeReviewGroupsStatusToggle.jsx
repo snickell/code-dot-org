@@ -1,15 +1,15 @@
-import React, {useState} from 'react';
 import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {connect} from 'react-redux';
-import i18n from '@cdo/locale';
-import CodeReviewGroupsDataApi from './CodeReviewGroupsDataApi';
-import Spinner from '@cdo/apps/code-studio/pd/components/spinner';
-import ToggleSwitch from '@cdo/apps/code-studio/components/ToggleSwitch';
+
+import Toggle from '@cdo/apps/componentLibrary/toggle/Toggle';
+import Spinner from '@cdo/apps/sharedComponents/Spinner';
+import {setSectionCodeReviewExpiresAt} from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
+import {selectedSectionSelector} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
 import color from '@cdo/apps/util/color';
-import {
-  setSectionCodeReviewExpiresAt,
-  selectedSection,
-} from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
+import i18n from '@cdo/locale';
+
+import CodeReviewGroupsDataApi from './CodeReviewGroupsDataApi';
 
 function CodeReviewGroupsStatusToggle({
   codeReviewExpiresAt,
@@ -49,9 +49,11 @@ function CodeReviewGroupsStatusToggle({
   return (
     <div>
       <div style={styles.toggleAndError}>
-        <ToggleSwitch
-          isToggledOn={isToggledOn}
-          onToggle={toggleEnableCodeReview}
+        <Toggle
+          id="uitest-code-review-groups-toggle"
+          name="enableCodeReviewToggle"
+          checked={isToggledOn}
+          onChange={toggleEnableCodeReview}
           label={i18n.enableCodeReview()}
         />
         {saveInProgress && <Spinner style={styles.spinner} size="medium" />}
@@ -67,6 +69,7 @@ function CodeReviewGroupsStatusToggle({
       {isToggledOn && (
         <p
           style={styles.enabledMessage}
+          name="enabledCodeReviewMessage"
           id="uitest-code-review-groups-status-message"
         >
           {i18n.codeReviewAutoDisableMessage({daysLeft})}
@@ -87,8 +90,8 @@ export const UnconnectedCodeReviewGroupsStatusToggle =
 
 export default connect(
   state => ({
-    codeReviewExpiresAt: selectedSection(state).codeReviewExpiresAt,
-    sectionId: selectedSection(state).id,
+    codeReviewExpiresAt: selectedSectionSelector(state).codeReviewExpiresAt,
+    sectionId: selectedSectionSelector(state).id,
   }),
   dispatch => ({
     setCodeReviewExpiration: (sectionId, expiration) =>

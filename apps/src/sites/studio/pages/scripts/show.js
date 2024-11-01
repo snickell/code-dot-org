@@ -1,21 +1,27 @@
 import $ from 'jquery';
-
-import {Provider} from 'react-redux';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {Provider} from 'react-redux';
+
 import announcementsReducer, {
   addAnnouncement,
 } from '@cdo/apps/code-studio/announcementsRedux';
+import UnitOverview from '@cdo/apps/code-studio/components/progress/UnitOverview.jsx';
+import {initializeHiddenScripts} from '@cdo/apps/code-studio/hiddenLessonRedux';
 import plcHeaderReducer, {
   setPlcHeader,
 } from '@cdo/apps/code-studio/plc/plcHeaderRedux';
+import {initViewAs, initCourseProgress} from '@cdo/apps/code-studio/progress';
+import {setStudentDefaultsSummaryView} from '@cdo/apps/code-studio/progressRedux';
 import {getStore} from '@cdo/apps/code-studio/redux';
-import {registerReducers} from '@cdo/apps/redux';
+import {updateQueryParam, queryParams} from '@cdo/apps/code-studio/utils';
 import {
   setVerified,
   setVerifiedResources,
 } from '@cdo/apps/code-studio/verifiedInstructorRedux';
-import {tooltipifyVocabulary} from '@cdo/apps/utils';
+import DCDO from '@cdo/apps/dcdo';
+import {registerReducers} from '@cdo/apps/redux';
+import ParentalPermissionBanner from '@cdo/apps/templates/policy_compliance/ParentalPermissionBanner';
 import googlePlatformApi, {
   loadGooglePlatformApi,
 } from '@cdo/apps/templates/progress/googlePlatformApiRedux';
@@ -25,11 +31,8 @@ import {
   setPageType,
   pageTypes,
 } from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
-import {initializeHiddenScripts} from '@cdo/apps/code-studio/hiddenLessonRedux';
-import progress from '@cdo/apps/code-studio/progress';
-import UnitOverview from '@cdo/apps/code-studio/components/progress/UnitOverview.jsx';
-import {setStudentDefaultsSummaryView} from '@cdo/apps/code-studio/progressRedux';
-import {updateQueryParam, queryParams} from '@cdo/apps/code-studio/utils';
+import experiments from '@cdo/apps/util/experiments';
+import {tooltipifyVocabulary} from '@cdo/apps/utils';
 
 import locales, {setLocaleCode} from '../../../../redux/localesRedux';
 
@@ -38,6 +41,9 @@ $(document).ready(initPage);
 function initPage() {
   const script = document.querySelector('script[data-scriptoverview]');
   const config = JSON.parse(script.dataset.scriptoverview);
+  const parentalPermissionBannerData = JSON.parse(
+    script.dataset.parentalPermissionBanner
+  );
 
   const {scriptData, plcBreadcrumb} = config;
   const store = getStore();
@@ -76,18 +82,19 @@ function initPage() {
   if (scriptData.student_detail_progress_view) {
     store.dispatch(setStudentDefaultsSummaryView(false));
   }
-  progress.initViewAs(
-    store,
-    scriptData.user_id !== null,
-    scriptData.is_instructor
-  );
+  initViewAs(store, scriptData.user_id !== null, scriptData.is_instructor);
   if (scriptData.is_instructor) {
     initializeStoreWithSections(store, scriptData.sections, scriptData.section);
   }
   store.dispatch(initializeHiddenScripts(scriptData.section_hidden_unit_info));
   store.dispatch(setPageType(pageTypes.scriptOverview));
 
-  progress.initCourseProgress(scriptData);
+  const v2TeacherDashboardEnabled =
+    DCDO.get('teacher-local-nav-v2', false) ||
+    experiments.isEnabled('teacher-local-nav-v2');
+
+  // Don't show the teacher panel if v2 dashboard is enabled
+  initCourseProgress(scriptData, !v2TeacherDashboardEnabled);
 
   const mountPoint = document.createElement('div');
   $('.user-stats-block').prepend(mountPoint);
@@ -97,8 +104,20 @@ function initPage() {
   // rendered on this page
   updateQueryParam('completedLessonNumber', undefined);
 
+  const unitHasLevels = scriptData.lessons.reduce(
+    (n, {levels}) => n || !!levels?.length,
+    false
+  );
+
+  const showAiAssessmentsAnnouncement =
+    scriptData.showAiAssessmentsAnnouncement;
+
   ReactDOM.render(
     <Provider store={store}>
+      {parentalPermissionBannerData && (
+        <ParentalPermissionBanner {...parentalPermissionBannerData} />
+      )}
+
       <UnitOverview
         id={scriptData.id}
         courseId={scriptData.course_id}
@@ -125,16 +144,15 @@ function initPage() {
         showCalendar={scriptData.showCalendar}
         weeklyInstructionalMinutes={scriptData.weeklyInstructionalMinutes}
         unitCalendarLessons={scriptData.calendarLessons}
+        unitHasLevels={unitHasLevels}
         isMigrated={scriptData.is_migrated}
         scriptOverviewPdfUrl={scriptData.scriptOverviewPdfUrl}
         scriptResourcesPdfUrl={scriptData.scriptResourcesPdfUrl}
-        showUnversionedRedirectWarning={
-          scriptData.show_unversioned_redirect_warning
-        }
         isCsdOrCsp={scriptData.isCsd || scriptData.isCsp}
         completedLessonNumber={completedLessonNumber}
         publishedState={scriptData.publishedState}
         participantAudience={scriptData.participantAudience}
+        showAiAssessmentsAnnouncement={showAiAssessmentsAnnouncement}
       />
     </Provider>,
     mountPoint

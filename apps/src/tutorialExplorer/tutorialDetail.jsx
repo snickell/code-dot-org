@@ -1,13 +1,20 @@
 /* A pop-up modal displaying information about a single tutorial in TutorialExplorer.
  */
 
+import FocusTrap from 'focus-trap-react';
 import PropTypes from 'prop-types';
 import React from 'react';
+
+import fontConstants from '@cdo/apps/fontConstants';
+import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
+import trackEvent from '@cdo/apps/util/trackEvent';
+import i18n from '@cdo/tutorialExplorer/locale';
+
+import analyticsReporter from '../metrics/AnalyticsReporter';
+
+import Image from './image';
 import shapes from './shapes';
 import {getTagString, getTutorialDetailString, DoNotShow} from './util';
-import Image from './image';
-import i18n from '@cdo/tutorialExplorer/locale';
-import FocusTrap from 'focus-trap-react';
 
 export default class TutorialDetail extends React.Component {
   static propTypes = {
@@ -43,9 +50,20 @@ export default class TutorialDetail extends React.Component {
   };
 
   startTutorialClicked = () => {
+    // Send event to Google Analytics.
     const shortCode = this.props.item.short_code;
-    ga('send', 'event', 'learn', 'start', shortCode);
-    ga('send', 'event', 'learn', `start-${this.props.grade}`, shortCode);
+    trackEvent('learn', 'learn_start', {value: shortCode});
+    trackEvent('learn', `learn_start_${this.props.grade}`, {value: shortCode});
+
+    // Send event to Statsig.
+    const activityUrl = this.props.item.url;
+    analyticsReporter.sendEvent(
+      EVENTS.HOC_ACTIVITY_START_BUTTON_CLICKED,
+      {
+        activityUrl: activityUrl,
+      },
+      PLATFORMS.STATSIG
+    );
   };
 
   render() {
@@ -366,25 +384,25 @@ const styles = {
     marginTop: 20,
   },
   tutorialDetailName: {
-    fontFamily: '"Gotham 5r", sans-serif',
+    ...fontConstants['main-font-semi-bold'],
     fontSize: 22,
     paddingBottom: 4,
   },
   tutorialDetailPublisher: {
-    fontFamily: '"Gotham 4r", sans-serif',
+    ...fontConstants['main-font-regular'],
     fontSize: 16,
   },
   tutorialDetailSub: {
-    fontFamily: '"Gotham 4r", sans-serif',
+    ...fontConstants['main-font-regular'],
     fontSize: 12,
     paddingBottom: 20,
   },
   tutorialDetailDescription: {
-    fontFamily: '"Gotham 4r", sans-serif',
+    ...fontConstants['main-font-regular'],
     fontSize: 14,
   },
   tutorialDetailDisabled: {
-    fontFamily: '"Gotham 5r", sans-serif',
+    ...fontConstants['main-font-semi-bold'],
     fontSize: 16,
     paddingTop: 40,
   },
@@ -398,7 +416,7 @@ const styles = {
   tutorialDetailsTableTitle: {
     padding: 5,
     width: '40%',
-    fontFamily: '"Gotham 5r", sans-serif',
+    ...fontConstants['main-font-semi-bold'],
     border: '1px solid lightgrey',
   },
   tutorialDetailsTableBody: {

@@ -1,13 +1,19 @@
 import $ from 'jquery';
-import trackEvent from '../util/trackEvent';
+import _ from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import FallbackPlayerCaptionDialogLink from '../templates/FallbackPlayerCaptionDialogLink';
 import videojs from 'video.js';
-var testImageAccess = require('./url_test');
-var clientState = require('./clientState');
+
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import i18n from '@cdo/locale';
-import _ from 'lodash';
+
+import FallbackPlayerCaptionDialogLink from '../templates/FallbackPlayerCaptionDialogLink';
+
+import youTubeAvailabilityEndpointURL from './youTubeAvailabilityEndpointURL';
+
+var clientState = require('./clientState');
+var testImageAccess = require('./url_test');
 
 const TAB_NAV_CLASS = '.ui-tabs-nav';
 const MODAL_CLASS_NAME = 'video-modal';
@@ -47,11 +53,37 @@ function onVideoEnded() {
 }
 
 var currentVideoOptions;
-function onYouTubeIframeAPIReady() {
+// YouTube's API requires this function to be in a global window context,
+// and (I think) due to call order inside of the `createVideoWithFallback` function, it
+// doesn't actually exist until after the first video load if it's defined here as `function onYouTubeIframeReady`.
+// But if we define it directly onto the window object, it will properly exist the first time the video is opened.
+
+// This is a good candidate to circle back to and refactor.
+window.onYouTubeIframeAPIReady = function () {
   // requires there be an iframe#video present on the page
-  new YT.Player('video', {
+  const player = new YT.Player('video', {
     events: {
+      onReady: function (event) {
+        analyticsReporter.sendEvent(EVENTS.VIDEO_LOADED, {
+          url: location.href,
+          video: player.getVideoUrl(),
+        });
+      },
       onStateChange: function (state) {
+        const amplitudeEventMap = {
+          [YT.PlayerState.PLAYING]: EVENTS.VIDEO_STARTED,
+          [YT.PlayerState.PAUSED]: EVENTS.VIDEO_PAUSED,
+          [YT.PlayerState.ENDED]: EVENTS.VIDEO_ENDED,
+        };
+
+        const amplitudeEvent = amplitudeEventMap[state.data];
+        if (amplitudeEvent) {
+          analyticsReporter.sendEvent(amplitudeEvent, {
+            url: location.href,
+            video: player.getVideoUrl(),
+          });
+        }
+
         if (state.data === YT.PlayerState.ENDED) {
           onVideoEnded();
         }
@@ -64,7 +96,7 @@ function onYouTubeIframeAPIReady() {
       },
     },
   });
-}
+};
 
 function createVideo(options) {
   const videoDiv = $('<iframe id="video"/>').addClass('video-player').attr({
@@ -192,12 +224,7 @@ videos.showVideoDialog = function (options, forceShowVideo) {
     .append($('<i class="fa fa-download" />'))
     .addClass('download-video btn')
     .css('float', 'left')
-    .attr('href', options.download)
-    .click(function () {
-      // track download in Google Analytics
-      trackEvent('downloadvideo', 'startdownloadvideo', options.key);
-      return true;
-    });
+    .attr('href', options.download);
   if (document.dir === 'rtl') {
     download.css('float', 'right');
   }
@@ -229,7 +256,7 @@ videos.showVideoDialog = function (options, forceShowVideo) {
 
   currentVideoOptions = options;
   if (window.YT && window.YT.loaded) {
-    onYouTubeIframeAPIReady();
+    window.onYouTubeIframeAPIReady();
   } else {
     // Use the official YouTube IFrame Player API to load the YouTube video.
     // Ref: https://developers.google.com/youtube/iframe_api_reference#Getting_Started
@@ -359,8 +386,6 @@ function setupVideoFallback(
 
 // This is exported (and placed on window) because it gets accessed externally for our video test page.
 videos.onYouTubeBlocked = function (youTubeBlockedCallback, videoInfo) {
-  var key = videoInfo ? videoInfo.key : undefined;
-
   // Handle URLs with either youtube.com or youtube-nocookie.com.
   var noCookie = videoInfo
     ? videoInfo.src.indexOf('youtube-nocookie.com') !== -1
@@ -369,40 +394,26 @@ videos.onYouTubeBlocked = function (youTubeBlockedCallback, videoInfo) {
   testImageAccess(
     youTubeAvailabilityEndpointURL(noCookie) + '?' + Math.random(),
     // Called when YouTube availability check succeeds.
-    function () {
-      // Track event in Google Analytics.
-      trackEvent('showvideo', 'startVideoYouTube', key);
-    },
-
+    function () {},
     // Called when YouTube availability check fails.
     function () {
-      // Track event in Google Analytics.
-      trackEvent('showvideo', 'startVideoFallback', key);
       youTubeBlockedCallback();
     }
   );
 };
 
-function youTubeAvailabilityEndpointURL(noCookie) {
-  const url = window.document.URL.toString();
-  if (url.indexOf('force_youtube_fallback') >= 0) {
-    return 'https://unreachable-test-subdomain.example.com/favicon.ico';
-  } else if (url.indexOf('force_youtube_player') >= 0) {
-    return 'https://code.org/images/favicon.ico';
-  }
-
-  if (noCookie) {
-    return 'https://www.youtube-nocookie.com/favicon.ico';
-  } else {
-    return 'https://www.youtube.com/favicon.ico';
-  }
-}
-
 // Precondition: $('#video') must exist on the DOM before this function is called.
 function addFallbackVideoPlayer(videoInfo, playerWidth, playerHeight) {
   // Append `?force_youtube_fallback=1` to a url in order to use the fallback
   // player
+
   var fallbackPlayerID = 'fallbackPlayer' + Date.now();
+
+  analyticsReporter.sendEvent(EVENTS.VIDEO_FALLBACK_LOADED, {
+    url: location.href,
+    forced: !!videoInfo.force_fallback,
+    video: videoInfo.download,
+  });
 
   // If we have want the video player to be at 100% width & 100% height, then
   // let's assume we are attaching to a container that is relative, and we want
@@ -486,7 +497,26 @@ function addFallbackVideoPlayer(videoInfo, playerWidth, playerHeight) {
     }
   );
 
-  videoPlayer.on('ended', onVideoEnded);
+  const analyticsData = {
+    url: location.href,
+    video: videoInfo.download,
+    fallback: 'code.org',
+  };
+
+  videoPlayer.on('ready', () =>
+    analyticsReporter.sendEvent(EVENTS.VIDEO_LOADED, analyticsData)
+  );
+  videoPlayer.on('play', () =>
+    analyticsReporter.sendEvent(EVENTS.VIDEO_STARTED, analyticsData)
+  );
+  videoPlayer.on('pause', () =>
+    analyticsReporter.sendEvent(EVENTS.VIDEO_PAUSED, analyticsData)
+  );
+
+  videoPlayer.on('ended', () => {
+    analyticsReporter.sendEvent(EVENTS.VIDEO_ENDED, analyticsData);
+    onVideoEnded();
+  });
   showFallbackPlayerCaptionLink(videoInfo.inDialog);
 }
 

@@ -1,33 +1,37 @@
-import $ from 'jquery';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import trackEvent from '../../util/trackEvent';
-var studioApp = require('../../StudioApp').singleton;
-var craftMsg = require('../locale');
-import CustomMarshalingInterpreter from '../../lib/tools/jsinterpreter/CustomMarshalingInterpreter';
 import {
   GameController,
   EventType,
   utils as CraftUtils,
 } from '@code-dot-org/craft';
-import {handlePlayerSelection} from '@cdo/apps/craft/utils';
-var dom = require('../../dom');
-import {trySetLocalStorage} from '@cdo/apps/utils';
-var houseLevels = require('./houseLevels');
-var levelbuilderOverrides = require('./levelbuilderOverrides');
-var MusicController = require('../../MusicController');
-var Provider = require('react-redux').Provider;
-import AppView from '../../templates/AppView';
-var CraftVisualizationColumn = require('./CraftVisualizationColumn');
-import {getStore} from '../../redux';
-import Sounds from '../../Sounds';
+import $ from 'jquery';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-import {TestResults} from '../../constants';
-import {captureThumbnailFromCanvas} from '../../util/thumbnail';
-import {SignInState} from '@cdo/apps/templates/currentUserRedux';
+import {getCodeBlocks} from '@cdo/apps/blockly/utils';
 import PlayerSelectionDialog from '@cdo/apps/craft/PlayerSelectionDialog';
 import reducers from '@cdo/apps/craft/redux';
+import {handlePlayerSelection} from '@cdo/apps/craft/utils';
+import {SignInState} from '@cdo/apps/templates/currentUserRedux';
+import {trySetLocalStorage} from '@cdo/apps/utils';
+
+import {TestResults} from '../../constants';
+import CustomMarshalingInterpreter from '../../lib/tools/jsinterpreter/CustomMarshalingInterpreter';
+import {getStore} from '../../redux';
+import Sounds from '../../Sounds';
+import AppView from '../../templates/AppView';
 import {muteCookieWithLevel} from '../../util/muteCookieHelpers';
+import {captureThumbnailFromCanvas} from '../../util/thumbnail';
+
+var Provider = require('react-redux').Provider;
+
+var dom = require('../../dom');
+var MusicController = require('../../MusicController');
+var studioApp = require('../../StudioApp').singleton;
+var craftMsg = require('../locale');
+
+var CraftVisualizationColumn = require('./CraftVisualizationColumn');
+var houseLevels = require('./houseLevels');
+var levelbuilderOverrides = require('./levelbuilderOverrides');
 
 var MEDIA_URL = '/blockly/media/craft/';
 
@@ -151,7 +155,6 @@ Craft.init = function (config) {
         handlePlayerSelection(DEFAULT_CHARACTER, onPlayerSelected);
       } else if (config.level.showPopupOnLoad === 'houseLayoutSelection') {
         Craft.showHouseSelectionPopup(function (selectedHouse) {
-          trackEvent('Minecraft', 'ChoseHouse', selectedHouse);
           if (!levelConfig.edit_blocks) {
             Object.assign(config.level, houseLevels[selectedHouse]);
 
@@ -486,7 +489,6 @@ Craft.getCurrentCharacter = function () {
 };
 
 Craft.setCurrentCharacter = function (name) {
-  trackEvent('Minecraft', 'ChoseCharacter', name);
   Craft.clearPlayerState();
   trySetLocalStorage('craftSelectedPlayer', name);
   Craft.updateUIForCharacter(name);
@@ -529,7 +531,6 @@ Craft.showHouseSelectionPopup = function (onSelectedCallback) {
     $('#choose-house-a')[0],
     function () {
       selectedHouse = 'houseA';
-      trackEvent('Minecraft', 'ClickedHouse', selectedHouse);
       popupDialog.hide();
     }.bind(this)
   );
@@ -537,7 +538,6 @@ Craft.showHouseSelectionPopup = function (onSelectedCallback) {
     $('#choose-house-b')[0],
     function () {
       selectedHouse = 'houseB';
-      trackEvent('Minecraft', 'ClickedHouse', selectedHouse);
       popupDialog.hide();
     }.bind(this)
   );
@@ -545,7 +545,6 @@ Craft.showHouseSelectionPopup = function (onSelectedCallback) {
     $('#choose-house-c')[0],
     function () {
       selectedHouse = 'houseC';
-      trackEvent('Minecraft', 'ClickedHouse', selectedHouse);
       popupDialog.hide();
     }.bind(this)
   );
@@ -686,11 +685,7 @@ Craft.reset = function (first) {
 };
 
 Craft.phaserLoaded = function () {
-  return (
-    Craft.gameController &&
-    Craft.gameController.game &&
-    !Craft.gameController.game.load.isLoading
-  );
+  return !!Craft.gameController?.game?.load;
 };
 
 /**
@@ -769,13 +764,14 @@ Craft.executeUserCode = function () {
   });
 
   // Run user generated code, calling appCodeOrgAPI
-  var code = '';
-  let codeBlocks = Blockly.mainBlockSpace.getTopBlocks(true);
+  let code = '';
+  let codeBlocks = getCodeBlocks();
   if (studioApp().initializationBlocks) {
     codeBlocks = studioApp().initializationBlocks.concat(codeBlocks);
   }
 
   code = Blockly.Generator.blocksToCode('JavaScript', codeBlocks);
+
   CustomMarshalingInterpreter.evalWith(
     code,
     {

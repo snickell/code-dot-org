@@ -1,32 +1,30 @@
-import Lab2MetricsReporter from '@cdo/apps/lab2/Lab2MetricsReporter';
-import {DEFAULT_CHORD_LENGTH, DEFAULT_PATTERN_LENGTH} from '../../constants';
+import LabMetricsReporter from '@cdo/apps/lab2/Lab2MetricsReporter';
+import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
+
+import {findParentStatementInputTypes} from '../../blockly/blockUtils';
+import {
+  DEFAULT_CHORD_LENGTH,
+  DEFAULT_PATTERN_LENGTH,
+  DEFAULT_TUNE_LENGTH,
+} from '../../constants';
 import {ChordEvent, ChordEventValue} from '../interfaces/ChordEvent';
 import {Effects, EffectValue} from '../interfaces/Effects';
-import {PatternEvent, PatternEventValue} from '../interfaces/PatternEvent';
+import {FunctionEvents} from '../interfaces/FunctionEvents';
+import {
+  InstrumentEvent,
+  InstrumentEventValue,
+} from '../interfaces/InstrumentEvent';
 import {PlaybackEvent} from '../interfaces/PlaybackEvent';
 import {SkipContext} from '../interfaces/SkipContext';
 import {SoundEvent} from '../interfaces/SoundEvent';
 import MusicLibrary from '../MusicLibrary';
+
 import Sequencer from './Sequencer';
 
 interface SequenceFrame {
   measure: number;
   together: boolean;
   lastMeasures: number[];
-}
-
-/**
- * This is very similar to {@link FunctionContext}, but also contains
- * all playback events that occur in the function. This model will be
- * useful for timeline rendering, but as of now is only used within this
- * class.
- */
-interface FunctionEvents {
-  name: string;
-  uniqueInvocationId: number;
-  playbackEvents: PlaybackEvent[];
-  startMeasure: number;
-  endMeasure: number;
 }
 
 interface SkipFrame {
@@ -49,7 +47,9 @@ export default class Simple2Sequencer extends Sequencer {
   private startMeasure: number;
   private inTrigger: boolean;
 
-  constructor(private readonly library: MusicLibrary) {
+  constructor(
+    private readonly metricsReporter: LabMetricsReporter = Lab2Registry.getInstance().getMetricsReporter()
+  ) {
     super();
     this.sequenceStack = [];
     this.functionStack = [];
@@ -128,6 +128,7 @@ export default class Simple2Sequencer extends Sequencer {
       startMeasure: this.getCurrentMeasure(),
       endMeasure: this.getCurrentMeasure(),
       playbackEvents: [],
+      calledFunctionIds: [],
     };
 
     this.functionStack.push(uniqueId);
@@ -145,6 +146,13 @@ export default class Simple2Sequencer extends Sequencer {
     const lastFunctionId = this.functionStack.pop();
     if (lastFunctionId !== undefined) {
       this.functionMap[lastFunctionId].endMeasure = this.getCurrentMeasure();
+
+      if (this.functionStack.length > 0) {
+        // Add the called function to the list of functions that its caller called.
+        this.functionMap[
+          this.functionStack[this.functionStack.length - 1]
+        ].calledFunctionIds.push(lastFunctionId);
+      }
     }
 
     this.effectsStack.pop();
@@ -171,7 +179,7 @@ export default class Simple2Sequencer extends Sequencer {
   // Move to the next child of a play_random block.
   nextRandom() {
     if (this.randomStack.length === 0) {
-      Lab2MetricsReporter.logWarning(
+      this.metricsReporter.logWarning(
         'Invalid state; tried to call nextRandom() without active random context'
       );
       return;
@@ -202,9 +210,9 @@ export default class Simple2Sequencer extends Sequencer {
    * Play a sound at the current location.
    */
   playSound(id: string, blockId: string) {
-    const soundData = this.library.getSoundForId(id);
-    if (soundData === null) {
-      Lab2MetricsReporter.logWarning('Could not find sound with ID: ' + id);
+    const soundData = MusicLibrary.getInstance()?.getSoundForId(id);
+    if (!soundData) {
+      this.metricsReporter.logWarning('Could not find sound with ID: ' + id);
       return;
     }
 
@@ -214,21 +222,24 @@ export default class Simple2Sequencer extends Sequencer {
       length: soundData.length,
       soundType: soundData.type,
       blockId,
-      ...this.getCommonEventFields(),
+      ...this.getCommonEventFields(blockId),
     });
   }
 
   /**
    * Play a pattern event at the current location.
    */
-  playPattern(value: PatternEventValue, blockId: string) {
-    this.addNewEvent<PatternEvent>({
-      type: 'pattern',
+  playPattern(value: InstrumentEventValue, blockId: string) {
+    const length = value.length || DEFAULT_PATTERN_LENGTH;
+
+    this.addNewEvent<InstrumentEvent>({
+      type: 'instrument',
+      instrumentType: 'drums',
       id: JSON.stringify(value),
       value,
       blockId,
-      length: DEFAULT_PATTERN_LENGTH,
-      ...this.getCommonEventFields(),
+      length,
+      ...this.getCommonEventFields(blockId),
     });
   }
 
@@ -242,7 +253,22 @@ export default class Simple2Sequencer extends Sequencer {
       value,
       length: DEFAULT_CHORD_LENGTH,
       blockId,
-      ...this.getCommonEventFields(),
+      ...this.getCommonEventFields(blockId),
+    });
+  }
+
+  /**
+   * Play a tune event at the current location.
+   */
+  playTune(value: InstrumentEventValue, blockId: string) {
+    this.addNewEvent<InstrumentEvent>({
+      type: 'instrument',
+      instrumentType: 'melodic',
+      id: JSON.stringify(value),
+      value,
+      length: value.length || DEFAULT_TUNE_LENGTH,
+      blockId,
+      ...this.getCommonEventFields(blockId),
     });
   }
 
@@ -277,7 +303,7 @@ export default class Simple2Sequencer extends Sequencer {
       .flat();
   }
 
-  private getCommonEventFields() {
+  private getCommonEventFields(blockId: string) {
     const effects = this.getCurrentEffects();
     return {
       triggered: this.inTrigger,
@@ -285,13 +311,16 @@ export default class Simple2Sequencer extends Sequencer {
       // Snapshot the current value of effects
       effects: effects ? {...effects} : undefined,
       skipContext: this.getCurrentSkipContext(),
+      validationInfo: {
+        parentControlTypes: findParentStatementInputTypes(blockId),
+      },
     };
   }
 
   private addNewEvent<T extends PlaybackEvent>(event: T) {
     const currentFunctionId = this.getCurrentFunctionId();
     if (currentFunctionId === null) {
-      Lab2MetricsReporter.logWarning('Invalid state: no current function ID');
+      this.metricsReporter.logWarning('Invalid state: no current function ID');
       return;
     }
     const currentFunction = this.functionMap[currentFunctionId];

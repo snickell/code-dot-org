@@ -1,11 +1,11 @@
+import {shallow} from 'enzyme'; // eslint-disable-line no-restricted-imports
 import React from 'react';
-import {shallow} from 'enzyme';
-import {expect} from '../../../util/reconfiguredChai';
-import TopInstructionsHeader from '@cdo/apps/templates/instructions/TopInstructionsHeader';
-import {TabType} from '@cdo/apps/templates/instructions/TopInstructions';
-import InlineAudio from '@cdo/apps/templates/instructions/InlineAudio';
-import {PaneButton} from '@cdo/apps/templates/PaneHeader';
+
 import CollapserIcon from '@cdo/apps/templates/CollapserIcon';
+import InlineAudio from '@cdo/apps/templates/instructions/InlineAudio';
+import {TabType} from '@cdo/apps/templates/instructions/TopInstructions';
+import TopInstructionsHeader from '@cdo/apps/templates/instructions/TopInstructionsHeader';
+import {PaneButton} from '@cdo/apps/templates/PaneHeader';
 import i18n from '@cdo/locale';
 
 const DEFAULT_PROPS = {
@@ -14,7 +14,7 @@ const DEFAULT_PROPS = {
   isCSDorCSP: true,
   displayHelpTab: true,
   displayFeedback: true,
-  levelHasRubric: false,
+  levelHasMiniRubric: false,
   isViewingAsTeacher: false,
   isViewingAsInstructorInTraining: false,
   hasBackgroundMusic: false,
@@ -27,6 +27,7 @@ const DEFAULT_PROPS = {
   handleDocumentationTabClick: () => {},
   handleReviewTabClick: () => {},
   handleTeacherOnlyTabClick: () => {},
+  handleTaRubricTabClick: () => {},
   handleClickCollapser: () => {},
   isMinecraft: false,
   ttsLongInstructionsUrl: '',
@@ -51,7 +52,7 @@ describe('TopInstructionsHeader', () => {
       ttsLongInstructionsUrl: 'some-url',
       isCSDorCSP: true,
     });
-    expect(wrapper.find(InlineAudio)).to.have.length(1);
+    expect(wrapper.find(InlineAudio)).toHaveLength(1);
   });
 
   it('on the instructions tab selects the instructions tab', () => {
@@ -59,14 +60,14 @@ describe('TopInstructionsHeader', () => {
       tabSelected: TabType.INSTRUCTIONS,
     });
     const instructionsTab = wrapper.find('.uitest-instructionsTab');
-    expect(instructionsTab.props().selected).to.be.true;
+    expect(instructionsTab.props().selected).toBe(true);
   });
 
   it('on the comments tab does not display the PaneButton', () => {
     const wrapper = setUp({
       tabSelected: TabType.COMMENTS,
     });
-    expect(wrapper.find(PaneButton)).to.have.length(0);
+    expect(wrapper.find(PaneButton)).toHaveLength(0);
   });
 
   it('on the comments tab selects and displays the comment tab when displayFeedback is true', () => {
@@ -75,27 +76,27 @@ describe('TopInstructionsHeader', () => {
       tabSelected: TabType.COMMENTS,
     });
     const commentTab = wrapper.find('.uitest-feedback');
-    expect(commentTab.props().selected).to.be.true;
+    expect(commentTab.props().selected).toBe(true);
   });
 
-  it('on the comments tab selects when displayFeedback and levelHasRubric text is rubric', () => {
+  it('on the comments tab selects when displayFeedback and levelHasMiniRubric text is rubric', () => {
     const wrapper = setUp({
-      levelHasRubric: true,
+      levelHasMiniRubric: true,
       displayFeedback: true,
       tabSelected: TabType.COMMENTS,
     });
     const commentTab = wrapper.find('.uitest-feedback');
-    expect(commentTab.props().text).to.equal(i18n.rubric());
+    expect(commentTab.props().text).toBe(i18n.rubric());
   });
 
-  it('on the comments tab selects when displayFeedback and levelHasRubric = false text is feedback', () => {
+  it('on the comments tab selects when displayFeedback and levelHasMiniRubric = false text is feedback', () => {
     const wrapper = setUp({
-      levelHasRubric: false,
+      levelHasMiniRubric: false,
       displayFeedback: true,
       tabSelected: TabType.COMMENTS,
     });
     const commentTab = wrapper.find('.uitest-feedback');
-    expect(commentTab.props().text).to.equal(i18n.feedback());
+    expect(commentTab.props().text).toBe(i18n.feedback());
   });
 
   it('hides comment tab when displayFeedback is false', () => {
@@ -103,21 +104,30 @@ describe('TopInstructionsHeader', () => {
       displayFeedback: false,
       tabSelected: TabType.COMMENTS,
     });
-    expect(wrapper.find('.uitest-feedback')).to.have.length(0);
+    expect(wrapper.find('.uitest-feedback')).toHaveLength(0);
+  });
+
+  it('shows comments tab for elementary-level lessons', () => {
+    const wrapper = setUp({
+      displayFeedback: true,
+      isCSDorCSP: false,
+      tabSelected: TabType.COMMENTS,
+    });
+    expect(wrapper.find('.uitest-feedback')).toHaveLength(1);
   });
 
   it('does not show mute button when hasBackgroundMusic is false', () => {
     const wrapper = setUp({
       hasBackgroundMusic: false,
     });
-    expect(wrapper.find('.uitest-mute-music-button')).to.have.length(0);
+    expect(wrapper.find('.uitest-mute-music-button')).toHaveLength(0);
   });
 
   it('shows mute button when hasBackgroundMusic is true', () => {
     const wrapper = setUp({
       hasBackgroundMusic: true,
     });
-    expect(wrapper.find('.uitest-mute-music-button')).to.have.length(1);
+    expect(wrapper.find('.uitest-mute-music-button')).toHaveLength(1);
   });
 
   it('on the resources tab selects the resources tab', () => {
@@ -125,7 +135,7 @@ describe('TopInstructionsHeader', () => {
       tabSelected: TabType.RESOURCES,
     });
     const resourcesTab = wrapper.find('.uitest-helpTab');
-    expect(resourcesTab.props().selected).to.be.true;
+    expect(resourcesTab.props().selected).toBe(true);
   });
 
   it('hides the teacher only tab if not viewing as teacher of instructor in training level', () => {
@@ -134,14 +144,14 @@ describe('TopInstructionsHeader', () => {
       isViewingAsInstructorInTraining: false,
       teacherMarkdown: 'teacher markdown',
     });
-    expect(wrapper.find('.uitest-teacherOnlyTab')).to.have.length(0);
+    expect(wrapper.find('.uitest-teacherOnlyTab')).toHaveLength(0);
   });
 
   it('does not display CollapserIcon in embed view', () => {
     const wrapper = setUp({
       isEmbedView: true,
     });
-    expect(wrapper.find(CollapserIcon)).to.have.length(0);
+    expect(wrapper.find(CollapserIcon)).toHaveLength(0);
   });
 
   describe('viewing as teacher', () => {
@@ -151,7 +161,7 @@ describe('TopInstructionsHeader', () => {
         teacherMarkdown: 'teacher markdown',
         exampleSolutions: [],
       });
-      expect(wrapper.find('.uitest-teacherOnlyTab')).to.have.length(1);
+      expect(wrapper.find('.uitest-teacherOnlyTab')).toHaveLength(1);
     });
 
     it('shows the teacher only tab if example solutions exists', () => {
@@ -160,7 +170,7 @@ describe('TopInstructionsHeader', () => {
         teacherMarkdown: null,
         exampleSolutions: ['link/1', 'link/2'],
       });
-      expect(wrapper.find('.uitest-teacherOnlyTab')).to.have.length(1);
+      expect(wrapper.find('.uitest-teacherOnlyTab')).toHaveLength(1);
     });
 
     it('hides the teacher only tab if no teacher markdown or example solutions', () => {
@@ -169,7 +179,7 @@ describe('TopInstructionsHeader', () => {
         teacherMarkdown: null,
         exampleSolutions: [],
       });
-      expect(wrapper.find('.uitest-teacherOnlyTab')).to.have.length(0);
+      expect(wrapper.find('.uitest-teacherOnlyTab')).toHaveLength(0);
     });
   });
 
@@ -180,7 +190,7 @@ describe('TopInstructionsHeader', () => {
         teacherMarkdown: null,
         exampleSolutions: ['link/1', 'link/2'],
       });
-      expect(wrapper.find('.uitest-teacherOnlyTab')).to.have.length(1);
+      expect(wrapper.find('.uitest-teacherOnlyTab')).toHaveLength(1);
     });
 
     it('shows the teacher only tab if teacher markdown exists', () => {
@@ -189,7 +199,7 @@ describe('TopInstructionsHeader', () => {
         teacherMarkdown: 'teacher markdown',
         exampleSolutions: [],
       });
-      expect(wrapper.find('.uitest-teacherOnlyTab')).to.have.length(1);
+      expect(wrapper.find('.uitest-teacherOnlyTab')).toHaveLength(1);
     });
 
     it('hides the teacher only tab if no teacher markdown or example solutions', () => {
@@ -198,7 +208,7 @@ describe('TopInstructionsHeader', () => {
         teacherMarkdown: null,
         exampleSolutions: [],
       });
-      expect(wrapper.find('.uitest-teacherOnlyTab')).to.have.length(0);
+      expect(wrapper.find('.uitest-teacherOnlyTab')).toHaveLength(0);
     });
   });
 });

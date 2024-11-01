@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
+
+import TwoColumnActionBlock from '@cdo/apps/templates/studioHomepages/TwoColumnActionBlock';
+import i18n from '@cdo/locale';
+
 import HeaderBanner from '../HeaderBanner';
-import {TwoColumnActionBlock} from '@cdo/apps/templates/studioHomepages/TwoColumnActionBlock';
 
 class Incubator extends Component {
   render() {
@@ -11,7 +14,7 @@ class Incubator extends Component {
           subHeadingText="Try something new"
           backgroundUrl="/shared/images/banners/banner-incubator.png"
           imageUrl="/shared/images/banners/banner-incubator-image.png"
-          short={true}
+          imgStyling={{maxHeight: '160px'}}
         />
         <div className="main" style={{maxWidth: 970, margin: '0 auto'}}>
           <div style={{margin: '40px 0'}}>
@@ -34,17 +37,22 @@ class Incubator extends Component {
           </div>
 
           <TwoColumnActionBlock
-            imageUrl={
-              '/shared/images/teacher-announcement/incubator-projectbeats.png'
-            }
-            subHeading={'Project Beats'}
+            imageUrl="/shared/images/teacher-announcement/incubator-rubrics-pilot-graphic.png"
+            subHeading={i18n.incubator_aiRubric_title()}
             description={
-              'Make music with code! Try mixing and matching beats, bass, and other sounds to make your own songs.'
+              <span>
+                {i18n.incubator_aiRubric_desc1()}{' '}
+                <a href="https://www.edweek.org/technology/this-ai-tool-cut-one-teachers-grading-time-in-half-how-it-works/2024/04">
+                  {i18n.incubator_aiRubric_descLink()}
+                </a>{' '}
+                {i18n.incubator_aiRubric_desc2()}
+              </span>
             }
+            marginBottom="20px"
             buttons={[
               {
-                url: '/projectbeats',
-                text: 'Try it out!',
+                url: 'https://code.org/ai/teaching-assistant',
+                text: 'Learn More',
               },
             ]}
           />

@@ -11,9 +11,8 @@
   font-family: "Barlow Semi Condensed Semibold";
   font-style: normal;
   font-weight: 600;
-  src:
-    url("/fonts/barlowSemiCondensed/BarlowSemiCondensed-SemiBold.ttf") format("truetype"),
-    local("?");
+  src: url("/fonts/barlowSemiCondensed/BarlowSemiCondensed-SemiBold.ttf") format("truetype"),
+  local("?");
 }
 
 @font-face {
@@ -36,7 +35,7 @@ html {
 // identical classes for potential use on other elements if needed.
 
 // ----------------------------------------
-// v 2.0.0
+// v 2.0.2
 // ----------------------------------------
 
 // Sizes
@@ -122,22 +121,22 @@ html {
 
 @mixin heading-sm {
   @include heading-common;
-  font-family: $gotham-bold, sans-serif;
+  @include main-font-semi-bold;
   font-size: 1.25rem;
   line-height: 1.40;
 }
 
 @mixin heading-xs {
   @include heading-common;
-  font-family: $gotham-bold, sans-serif;
+  @include main-font-semi-bold;
   font-size: 1rem;
   line-height: 1.48;
 }
 
 // Paragraph styles
 @mixin paragraph-common {
+  @include main-font-regular;
   color: $neutral-dark;
-  font-family: $gotham-regular, sans-serif;
   margin-bottom: 1em;
 }
 
@@ -161,14 +160,14 @@ html {
 
 @mixin body-four {
   @include paragraph-common;
-  font-size: 0.75rem;
+  font-size: 0.813rem;
   line-height: 1.64;
 }
 
 // Overline styles
 @mixin overline-common {
   @include paragraph-common;
-  font-family: $gotham-bold, sans-serif;
+  @include main-font-semi-bold;
   text-transform: uppercase;
   letter-spacing: 0.04rem;
 }
@@ -181,33 +180,41 @@ html {
 
 @mixin overline-two {
   @include overline-common;
-  font-size: 0.75rem;
+  font-size: 0.813rem;
   line-height: 1.64;
 }
 
 @mixin overline-three {
   @include overline-common;
-  font-size: 0.625rem;
+  font-size: 0.688rem;
   line-height: 1.76;
 }
 
 // Strong and Em styles
 @mixin strong {
-  font-family: $gotham-bold, sans-serif;
+  @include main-font-semi-bold;
+}
+
+@mixin extra-strong {
+  @include main-font-bold;
 }
 
 @mixin em {
-  font-family: $gotham-italics, sans-serif;
+  @include main-font-regular-italic;
 }
 
 @mixin strong-em {
-  font-family: $gotham-bold-italics, sans-serif;
+  @include main-font-semi-bold-italic;
+}
+
+@mixin extra-strong-em {
+  @include main-font-bold-italic;
 }
 
 // Caption styles
 @mixin figcaption {
-  font-family: $gotham-regular, sans-serif;
-  font-size: 0.75rem;
+  @include main-font-regular;
+  font-size: 0.813rem;
   margin: 0.5em 0 1em;
   line-height: 1.64;
 }
@@ -215,39 +222,85 @@ html {
 // ----------------------------------------
 
 // Headings
-.heading-xxl { @include heading-xxl; }
-.heading-xl { @include heading-xl; }
-.heading-lg { @include heading-lg; }
-.heading-md { @include heading-md; }
-.heading-sm { @include heading-sm; }
-.heading-xs { @include heading-xs; }
+.heading-xxl {
+  @include heading-xxl;
+}
+
+.heading-xl {
+  @include heading-xl;
+}
+
+.heading-lg {
+  @include heading-lg;
+}
+
+.heading-md {
+  @include heading-md;
+}
+
+.heading-sm {
+  @include heading-sm;
+}
+
+.heading-xs {
+  @include heading-xs;
+}
 
 // Paragraphs
 // Use on larger paragraphs
-.body-one { @include body-one; }
+.body-one {
+  @include body-one;
+}
+
 // Use on default paragraphs
-.body-two { @include body-two; }
+.body-two {
+  @include body-two;
+}
+
 // Use on course block descriptions or anywhere
 // else that needs smaller paragraph text
-.body-three { @include body-three; }
+.body-three {
+  @include body-three;
+}
+
 // Use on smallest paragraph text
-.body-four { @include body-four; }
+.body-four {
+  @include body-four;
+}
 
 // Overlines
 // Use on small uppercase labels or descriptions
 // (Bigger size)
-.overline-one { @include overline-one; }
+.overline-one {
+  @include overline-one;
+}
+
 // (Default size)
-.overline-two { @include overline-two; }
+.overline-two {
+  @include overline-two;
+}
+
 // (Smaller size)
-.overline-three { @include overline-three; }
+.overline-three {
+  @include overline-three;
+}
 
 // Use in paragraphs to bold text
 strong,
-.strong { @include strong; }
+.strong {
+  @include strong;
+}
+
 // Use in paragraphs to italicize text
+
+.extra-strong {
+  @include extra-strong;
+}
+
 em,
-.em { @include em; }
+.em {
+  @include em;
+}
 
 strong em,
 em strong,
@@ -256,7 +309,16 @@ em strong,
   @include strong-em;
 }
 
+.em .extra-strong,
+.extra-strong .em,
+em .extra-strong,
+.extra-strong em {
+  @include extra-strong-em;
+}
+
 // Captions
 // Use on figcaption elements that accompany images or videos
 figcaption,
-.figcaption { @include figcaption; }
+.figcaption {
+  @include figcaption;
+}

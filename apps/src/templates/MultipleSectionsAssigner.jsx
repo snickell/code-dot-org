@@ -1,24 +1,22 @@
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {connect} from 'react-redux';
-import classnames from 'classnames';
 
-import i18n from '@cdo/locale';
-import Button from '@cdo/apps/templates/Button';
-import {sectionForDropdownShape} from '@cdo/apps/templates/teacherDashboard/shapes';
-import {
-  assignToSection,
-  unassignSection,
-} from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
 import {updateHiddenScript} from '@cdo/apps/code-studio/hiddenLessonRedux';
-import AccessibleDialog from '@cdo/apps/templates/AccessibleDialog';
-
+import Checkbox from '@cdo/apps/componentLibrary/checkbox';
 import {
   Heading3,
   Heading5,
   BodyTwoText,
 } from '@cdo/apps/componentLibrary/typography';
-import Checkbox from '@cdo/apps/componentLibrary/checkbox';
+import Button from '@cdo/apps/legacySharedComponents/Button';
+import AccessibleDialog from '@cdo/apps/sharedComponents/AccessibleDialog';
+import {sectionForDropdownShape} from '@cdo/apps/templates/teacherDashboard/shapes';
+import {
+  assignToSection,
+  unassignSection,
+} from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
+import i18n from '@cdo/locale';
 
 import moduleStyle from './multiple-sections-assigner.module.scss';
 
@@ -194,45 +192,48 @@ const MultipleSectionsAssigner = ({
   };
 
   return (
-    <AccessibleDialog onClose={onClose}>
-      <div tabIndex="0" className={moduleStyle.modalHeader}>
-        <Heading3>{i18n.chooseSectionsPrompt({assignmentName})}</Heading3>
-      </div>
-      <div className={moduleStyle.sectionsDirections}>
-        <BodyTwoText>{sectionDirections}</BodyTwoText>
-      </div>
-      <div className={moduleStyle.sectionList}>
-        <Heading5>{i18n.yourSectionsList()}</Heading5>
-        <div className={moduleStyle.sectionListOptionsContainer}>
-          {sections &&
-            sections.map(
-              section =>
-                isAssignableToSection(section.participantType) && (
-                  <Checkbox
-                    key={section.id}
-                    checked={
-                      !!currentSectionsAssigned.some(
-                        s => s.code === section.code
-                      )
-                    }
-                    onChange={() => handleChangedCheckbox(section)} // this function should update the state of multiple section assigner
-                    name={section.id}
-                    label={section.name}
-                  />
-                )
-            )}
+    <AccessibleDialog className={moduleStyle.popUpContainer} onClose={onClose}>
+      <div
+        role="region"
+        aria-label={i18n.directionsForAssigningSections()}
+        className={moduleStyle.information}
+      >
+        <div className={moduleStyle.modalHeader}>
+          <Heading3>{i18n.chooseSectionsPrompt({assignmentName})}</Heading3>
         </div>
-        <a
-          className={classnames(
-            moduleStyle.selectAllOptions,
-            'select-all-sections'
-          )}
-          onClick={selectAllHandler}
-        >
-          {i18n.selectAll()}
-        </a>
+        <div className={moduleStyle.sectionsDirections}>
+          <BodyTwoText>{sectionDirections}</BodyTwoText>
+        </div>
+        <div className={moduleStyle.sectionList}>
+          <Heading5>{i18n.yourSectionsList()}</Heading5>
+          <div className={moduleStyle.sectionListOptionsContainer}>
+            {sections &&
+              sections.map(
+                section =>
+                  isAssignableToSection(section.participantType) && (
+                    <Checkbox
+                      key={section.id}
+                      checked={
+                        !!currentSectionsAssigned.some(
+                          s => s.code === section.code
+                        )
+                      }
+                      onChange={() => handleChangedCheckbox(section)} // this function should update the state of multiple section assigner
+                      name={section.id}
+                      label={section.name}
+                    />
+                  )
+              )}
+          </div>
+          <Button
+            id="select-all-sections"
+            text={i18n.selectAll()}
+            onClick={selectAllHandler}
+            styleAsText
+            color={Button.ButtonColor.brandSecondaryDefault}
+          />
+        </div>
       </div>
-
       <div className={moduleStyle.buttonContainer}>
         <Button
           text={i18n.dialogCancel()}

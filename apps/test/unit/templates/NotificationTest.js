@@ -1,19 +1,19 @@
+import {mount} from 'enzyme'; // eslint-disable-line no-restricted-imports
 import React from 'react';
 import {Provider} from 'react-redux';
-import {mount} from 'enzyme';
-import {expect} from '../../util/reconfiguredChai';
-import Notification from '@cdo/apps/templates/Notification';
-import Button from '@cdo/apps/templates//Button';
-import FontAwesome from '@cdo/apps/templates/FontAwesome';
 import {combineReducers, createStore} from 'redux';
+
 import isRtl from '@cdo/apps/code-studio/isRtlRedux';
+import Button from '@cdo/apps/legacySharedComponents/Button';
+import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
+import Notification from '@cdo/apps/sharedComponents/Notification';
 
 const announcement = {
   heading: 'Go beyond an Hour of Code',
   buttonText: 'Go Beyond',
   description:
     "Go Beyond an Hour of Code and explore computer science concepts with your students every week. Code.org offers curriculum, lesson plans, high quality professional learning programs, and tons of great tools for all grade levels - and it's free. No experience required - find the next step that's right for your classroom.",
-  link: 'http://teacherblog.code.org/post/160703303174/coming-soon-access-your-top-resources-with-the',
+  link: 'https://hourofcode.com/beyond',
 };
 
 const announcementNoLink = {
@@ -28,6 +28,7 @@ const information = {
   details:
     "Seriously, Kansas. Earth's greatest hero is from a tiny called Smallville, if you can believe it.",
   dismissible: true,
+  tooltip: 'Kansas is a state in the United States of America.',
 };
 
 const success = {
@@ -49,6 +50,11 @@ const warning = {
   details:
     'Now is probably not the best time to be in Gotham City. Watch your back.',
   dismissible: true,
+};
+
+const collaborate = {
+  notice: 'Batman invited Superman to collab',
+  details: 'Will the Justice League join forces again?',
 };
 
 const findCourse = {
@@ -98,10 +104,8 @@ describe('Notification', () => {
               </div>
               <div>
                 <Button
-                  __useDeprecatedTag
                   href={announcement.link}
                   text={announcement.buttonText}
-                  target="_blank"
                 />
               </div>
             </div>
@@ -281,12 +285,7 @@ describe('Notification', () => {
                 <div>{findCourse.details}</div>
               </div>
               <div>
-                <Button
-                  __useDeprecatedTag
-                  href={findCourse.link}
-                  text={findCourse.buttonText}
-                  target="_blank"
-                />
+                <Button href={findCourse.link} text={findCourse.buttonText} />
               </div>
             </div>
           </div>
@@ -294,6 +293,20 @@ describe('Notification', () => {
         </div>
       )
     );
+  });
+  it('renders a collaborate notification', () => {
+    const wrapper = wrapped(
+      <Notification
+        type="collaborate"
+        notice={collaborate.notice}
+        details={collaborate.details}
+        dismissible={false}
+      />
+    );
+    expect(wrapper.find('FontAwesome').length).toBe(1);
+    expect(wrapper.find('FontAwesome').at(0).props().icon).toBe('users');
+    expect(wrapper.text()).toContain(collaborate.notice);
+    expect(wrapper.text()).toContain(collaborate.details);
   });
   it('renders a dismissible notification', () => {
     const wrapper = wrapped(
@@ -304,10 +317,26 @@ describe('Notification', () => {
         dismissible={true}
       />
     );
-    expect(wrapper.find('FontAwesome').length).to.equal(2);
-    expect(wrapper.find('FontAwesome').at(0).props().icon).to.equal(
-      'info-circle'
+    expect(wrapper.find('FontAwesome').length).toBe(2);
+    expect(wrapper.find('FontAwesome').at(0).props().icon).toBe('info-circle');
+    expect(wrapper.find('FontAwesome').at(1).props().icon).toBe('times');
+  });
+  it('renders a tooltip', () => {
+    const wrapper = wrapped(
+      <Notification
+        type="information"
+        notice={information.notice}
+        details={information.details}
+        dismissible={false}
+        tooltipText={information.tooltip}
+      />
     );
-    expect(wrapper.find('FontAwesome').at(1).props().icon).to.equal('times');
+    expect(wrapper.find('FontAwesome').length).toBe(2);
+    expect(wrapper.find('FontAwesome').at(0).props().icon).toBe('info-circle');
+    expect(wrapper.find('FontAwesome').at(1).props().icon).toBe('info-circle');
+
+    expect(wrapper.text()).toContain(information.notice);
+    expect(wrapper.text()).toContain(information.details);
+    expect(wrapper.text()).toContain(information.tooltip);
   });
 });

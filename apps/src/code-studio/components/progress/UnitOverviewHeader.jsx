@@ -2,46 +2,31 @@ import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
-import ProtectedStatefulDiv from '@cdo/apps/templates/ProtectedStatefulDiv';
+
+import {announcementShape} from '@cdo/apps/code-studio/announcementsRedux';
 import PlcHeader from '@cdo/apps/code-studio/plc/header';
 import {ViewType} from '@cdo/apps/code-studio/viewAsRedux';
+import fontConstants from '@cdo/apps/fontConstants';
+import Notification, {
+  NotificationType,
+} from '@cdo/apps/sharedComponents/Notification';
+import VerifiedResourcesNotification from '@cdo/apps/templates/courseOverview/VerifiedResourcesNotification';
 import {SignInState} from '@cdo/apps/templates/currentUserRedux';
-import Announcements from './Announcements';
-import {announcementShape} from '@cdo/apps/code-studio/announcementsRedux';
-import Notification, {NotificationType} from '@cdo/apps/templates/Notification';
-import i18n from '@cdo/locale';
+import ParticipantFeedbackNotification from '@cdo/apps/templates/feedback/ParticipantFeedbackNotification';
+import ProtectedStatefulDiv from '@cdo/apps/templates/ProtectedStatefulDiv';
+import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
+import AssignmentVersionSelector from '@cdo/apps/templates/teacherDashboard/AssignmentVersionSelector';
+import {assignmentCourseVersionShape} from '@cdo/apps/templates/teacherDashboard/shapes';
 import color from '@cdo/apps/util/color';
 import {
   dismissedRedirectWarning,
   onDismissRedirectWarning,
 } from '@cdo/apps/util/dismissVersionRedirect';
-import AssignmentVersionSelector from '@cdo/apps/templates/teacherDashboard/AssignmentVersionSelector';
-import {assignmentCourseVersionShape} from '@cdo/apps/templates/teacherDashboard/shapes';
-import ParticipantFeedbackNotification from '@cdo/apps/templates/feedback/ParticipantFeedbackNotification';
-import VerifiedResourcesNotification from '@cdo/apps/templates/courseOverview/VerifiedResourcesNotification';
-import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
-import {pegasus, studio} from '../../../lib/util/urlHelpers';
+import i18n from '@cdo/locale';
+
+import Announcements from './Announcements';
 
 const SCRIPT_OVERVIEW_WIDTH = 1100;
-// Scripts that users will be warned are outdated and have been succeeded by others.
-// This object in the form of {scriptName : description of warning}.
-const OUTDATED_SCRIPT_NAMES_AND_DESC = {
-  course1: i18n.outdatedCourseWarningDescCourses1To4({
-    csFundCourseLink: pegasus('/educate/curriculum/csf-transition-guide'),
-  }),
-  course2: i18n.outdatedCourseWarningDescCourses1To4({
-    csFundCourseLink: pegasus('/educate/curriculum/csf-transition-guide'),
-  }),
-  course3: i18n.outdatedCourseWarningDescCourses1To4({
-    csFundCourseLink: pegasus('/educate/curriculum/csf-transition-guide'),
-  }),
-  course4: i18n.outdatedCourseWarningDescCourses1To4({
-    csFundCourseLink: pegasus('/educate/curriculum/csf-transition-guide'),
-  }),
-  '20-hour': i18n.outdatedCourseWarningDescCoursesAccelCourse({
-    expressCourseLink: studio('/s/express'),
-  }),
-};
 
 /**
  * This component takes some of the HAML generated content on the script overview
@@ -134,10 +119,6 @@ class UnitOverviewHeader extends Component {
       showRedirectWarning &&
       !dismissedRedirectWarning(courseName || scriptName);
 
-    // Detect if the user is using an outdated script
-    const displayOutdatedCourseWarning =
-      !!OUTDATED_SCRIPT_NAMES_AND_DESC[scriptName];
-
     let versionWarningDetails;
     if (showCourseUnitVersionWarning) {
       versionWarningDetails = i18n.wrongUnitVersionWarningDetails();
@@ -167,19 +148,6 @@ class UnitOverviewHeader extends Component {
         {userId && <ParticipantFeedbackNotification studentId={userId} />}
         {displayVerifiedResources && (
           <VerifiedResourcesNotification width={SCRIPT_OVERVIEW_WIDTH} />
-        )}
-        {displayOutdatedCourseWarning && (
-          <Notification
-            type={NotificationType.warning}
-            notice={i18n.outdatedCourseWarningTitle()}
-            details={
-              <SafeMarkdown
-                markdown={OUTDATED_SCRIPT_NAMES_AND_DESC[scriptName]}
-              />
-            }
-            dismissible={true}
-            width={SCRIPT_OVERVIEW_WIDTH}
-          />
         )}
         {displayVersionWarning && (
           <Notification
@@ -242,7 +210,9 @@ class UnitOverviewHeader extends Component {
               />
             )}
           </div>
-          <ProtectedStatefulDiv ref={element => (this.protected = element)} />
+          {!location.pathname.includes('teacher_dashboard') && (
+            <ProtectedStatefulDiv ref={element => (this.protected = element)} />
+          )}
         </div>
       </div>
     );
@@ -266,7 +236,7 @@ const styles = {
     alignItems: 'baseline',
   },
   versionLabel: {
-    fontFamily: '"Gotham 5r", sans-serif',
+    ...fontConstants['main-font-semi-bold'],
     fontSize: 15,
     color: color.charcoal,
   },

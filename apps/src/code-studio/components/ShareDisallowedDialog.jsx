@@ -1,10 +1,13 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+
+import fontConstants from '@cdo/apps/fontConstants';
+import Button from '@cdo/apps/legacySharedComponents/Button';
 import BaseDialog from '@cdo/apps/templates/BaseDialog';
 import color from '@cdo/apps/util/color';
-import Button from '@cdo/apps/templates/Button';
 import i18n from '@cdo/locale';
+
 import {hideShareDialog} from './shareDialogRedux';
 
 class ShareDisallowedDialog extends Component {
@@ -12,6 +15,7 @@ class ShareDisallowedDialog extends Component {
     isOpen: PropTypes.bool.isRequired,
     hideShareDialog: PropTypes.func.isRequired,
   };
+
   render() {
     return (
       <BaseDialog
@@ -35,7 +39,7 @@ class ShareDisallowedDialog extends Component {
               __useDeprecatedTag
               href={`/users/sign_up?user_return_to=${location.pathname}`}
               text={i18n.createAccount()}
-              color={Button.ButtonColor.orange}
+              color={Button.ButtonColor.brandSecondaryDefault}
             />
           </div>
         </div>
@@ -51,7 +55,7 @@ const styles = {
   },
   heading: {
     fontSize: 16,
-    fontFamily: "'Gotham 5r', sans-serif",
+    ...fontConstants['main-font-semi-bold'],
   },
   middle: {
     marginTop: 20,

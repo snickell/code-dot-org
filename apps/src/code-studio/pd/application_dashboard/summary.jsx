@@ -2,19 +2,21 @@
  * Application Dashboard summary view.
  * Route: /summary
  */
+import $ from 'jquery';
+import {mapValues, omit} from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {connect} from 'react-redux';
-import SummaryTable from './summary_table';
 import {Row, Col} from 'react-bootstrap'; // eslint-disable-line no-restricted-imports
-import {mapValues, omit} from 'lodash';
+import {connect} from 'react-redux';
+
+import Spinner from '../../../sharedComponents/Spinner';
 import RegionalPartnerDropdown, {
   RegionalPartnerPropType,
 } from '../components/regional_partner_dropdown';
-import ApplicantSearch from './applicant_search';
+
 import AdminNavigationButtons from './admin_navigation_buttons';
-import Spinner from '../components/spinner';
-import $ from 'jquery';
+import ApplicantSearch from './applicant_search';
+import SummaryTable from './summary_table';
 
 export const removeIncompleteApplications = data =>
   mapValues(data, data_by_status => omit(data_by_status, ['incomplete']));
@@ -22,7 +24,6 @@ export const removeIncompleteApplications = data =>
 export class Summary extends React.Component {
   static propTypes = {
     regionalPartnerFilter: RegionalPartnerPropType.isRequired,
-    showRegionalPartnerDropdown: PropTypes.bool,
     isWorkshopAdmin: PropTypes.bool,
   };
 
@@ -59,12 +60,9 @@ export class Summary extends React.Component {
     this.abortLoad();
     this.setState({loading: true});
 
-    let url = '/api/v1/pd/applications';
-    if (this.props.showRegionalPartnerDropdown) {
-      url += `?${$.param({
-        regional_partner_value: regionalPartnerFilter.value,
-      })}`;
-    }
+    let url = `/api/v1/pd/applications?${$.param({
+      regional_partner_value: regionalPartnerFilter.value,
+    })}`;
 
     this.loadRequest = $.ajax({
       method: 'GET',
@@ -88,7 +86,7 @@ export class Summary extends React.Component {
       <div>
         <ApplicantSearch />
         {this.props.isWorkshopAdmin && <AdminNavigationButtons />}
-        {this.props.showRegionalPartnerDropdown && <RegionalPartnerDropdown />}
+        <RegionalPartnerDropdown />
         <h1>{this.props.regionalPartnerFilter.label}</h1>
         <Row>
           <Col sm={6}>
@@ -130,7 +128,5 @@ export default connect(state => {
   return {
     regionalPartnerFilter: state.regionalPartners.regionalPartnerFilter,
     isWorkshopAdmin,
-    showRegionalPartnerDropdown:
-      isWorkshopAdmin || state.regionalPartners.regionalPartners.length > 1,
   };
 })(Summary);

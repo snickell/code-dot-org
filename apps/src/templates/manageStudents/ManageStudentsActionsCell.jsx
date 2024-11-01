@@ -1,11 +1,24 @@
+import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
-import $ from 'jquery';
-import QuickActionsCell from '../tables/QuickActionsCell';
-import PopUpMenu, {MenuBreak} from '@cdo/apps/lib/ui/PopUpMenu';
+import {connect} from 'react-redux';
+
+import Button from '@cdo/apps/legacySharedComponents/Button';
+import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import firehoseClient from '@cdo/apps/metrics/firehose';
+import PopUpMenu, {MenuBreak} from '@cdo/apps/sharedComponents/PopUpMenu';
+import {asyncLoadSectionData} from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
+import {teacherDashboardUrl} from '@cdo/apps/templates/teacherDashboard/urlHelpers';
+import {navigateToHref} from '@cdo/apps/utils';
+import {SectionLoginType} from '@cdo/generated-scripts/sharedConstants';
+import i18n from '@cdo/locale';
+
+import FontAwesome from '../../legacySharedComponents/FontAwesome';
 import color from '../../util/color';
-import FontAwesome from '../FontAwesome';
-import Button from '../Button';
+import QuickActionsCell from '../tables/QuickActionsCell';
+
+import ConfirmRemoveStudentDialog from './ConfirmRemoveStudentDialog';
 import {
   startEditingStudent,
   cancelEditingStudent,
@@ -14,14 +27,6 @@ import {
   addStudents,
   RowType,
 } from './manageStudentsRedux';
-import {connect} from 'react-redux';
-import {SectionLoginType} from '@cdo/apps/util/sharedConstants';
-import ConfirmRemoveStudentDialog from './ConfirmRemoveStudentDialog';
-import {asyncLoadSectionData} from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
-import i18n from '@cdo/locale';
-import {navigateToHref} from '@cdo/apps/utils';
-import {teacherDashboardUrl} from '@cdo/apps/templates/teacherDashboard/urlHelpers';
-import firehoseClient from '@cdo/apps/lib/util/firehose';
 
 class ManageStudentsActionsCell extends Component {
   static propTypes = {
@@ -36,6 +41,7 @@ class ManageStudentsActionsCell extends Component {
     hasEverSignedIn: PropTypes.bool,
     dependsOnThisSectionForLogin: PropTypes.bool,
     canEdit: PropTypes.bool,
+    rowData: PropTypes.object,
 
     // Provided by redux
     startEditingStudent: PropTypes.func,
@@ -49,6 +55,19 @@ class ManageStudentsActionsCell extends Component {
   state = {
     deleting: false,
     requestInProgress: false,
+  };
+
+  reportEvent = (eventName, payload = {}) => {
+    analyticsReporter.sendEvent(
+      eventName,
+      {
+        sectionId: this.props.sectionId,
+        sectionLoginType: this.props.loginType,
+        selectedUsState: this.props.rowData?.editingData?.usState,
+        ...payload,
+      },
+      PLATFORMS.STATSIG
+    );
   };
 
   onConfirmDelete = () => {
@@ -146,6 +165,10 @@ class ManageStudentsActionsCell extends Component {
         },
         {includeUserId: true}
       );
+      this.reportEvent(EVENTS.SECTION_STUDENTS_TABLE_SAVE_ROW_CLICKED, {
+        studentId: this.props.id || null,
+        originalUsState: this.props.rowData?.usState,
+      });
     }
   };
 
@@ -164,6 +187,7 @@ class ManageStudentsActionsCell extends Component {
       },
       {includeUserId: true}
     );
+    this.reportEvent(EVENTS.SECTION_STUDENTS_TABLE_ADD_ROW_CLICKED);
   };
 
   onPrintLoginInfo = () => {
@@ -216,7 +240,7 @@ class ManageStudentsActionsCell extends Component {
 
     return (
       <div>
-        {!isEditing && (
+        {!isEditing && loginType !== SectionLoginType.lti_v1 && (
           <QuickActionsCell>
             {this.props.canEdit && (
               <PopUpMenu.Item onClick={this.onEdit}>
@@ -244,7 +268,7 @@ class ManageStudentsActionsCell extends Component {
           <div>
             <Button
               onClick={this.onSave}
-              color={Button.ButtonColor.orange}
+              color={Button.ButtonColor.brandSecondaryDefault}
               text={i18n.save()}
               disabled={this.props.isSaving || this.props.disableSaving}
               style={styles.saveButton}

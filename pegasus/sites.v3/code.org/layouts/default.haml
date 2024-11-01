@@ -2,7 +2,10 @@
 
 .wrapper
   = view :unsupported_browser
-  -if request.site == 'code.org'
+
+  -if request.path.include?('/global/fa')
+    = view :"global/fa/farsiheader"
+  -elsif request.site == 'code.org'
     = view :header
   -elsif @header['theme'] == 'responsive'
     #desktop-header.desktop-feature
@@ -33,7 +36,7 @@
     -if @header['theme'] == 'responsive' || 'responsive_full_width'
       -if @header['nav']
         %div
-          .col-80-right
+          %main.col-80-right
             =body
           .left-nav.desktop-feature
             -if @header['nav'].nil? || @header['nav'] == 'blank'
@@ -41,7 +44,8 @@
             -else
               = view(@header['nav'])
       -else
-        =body
+        %main
+          =body
 
       #clearboth{:style=>"clear:both"}
       .desktop-feature
@@ -80,7 +84,9 @@
       %br/
   .push
 
--if @header['theme'] == 'responsive' || 'responsive_full_width'
+- if request.path.include?('/global/fa')
+  = view :"global/fa/farsifooter"
+-elsif @header['theme'] == 'responsive' || 'responsive_full_width'
   .desktop-feature
     -if @header['footer'] == 'donor_footer'
       = view :donor_slider

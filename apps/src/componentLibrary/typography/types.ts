@@ -28,6 +28,7 @@ type VisualAppearance =
   | 'overline-two'
   | 'overline-three'
   | 'strong'
+  | 'extra-strong'
   | 'em'
   | 'figcaption';
 
@@ -40,6 +41,7 @@ interface TypographyElementProps {
   style?: React.CSSProperties;
   // Text or other elements to render inside the typography element
   children: React.ReactNode;
+  id?: string;
 }
 
 export {SemanticTag, VisualAppearance, TypographyElementProps};

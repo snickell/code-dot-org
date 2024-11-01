@@ -89,6 +89,33 @@ class Blockly < Level
   # DCDO key for turning this feature on or off.
   BLOCKLY_I18N_IN_TEXT_DCDO_KEY = 'blockly_i18n_in_text'.freeze
 
+  def self.migrated_skins
+    [
+      # Star Wars
+      "hoc2015", "hoc2015x",
+      # Maze
+      "birds", "pvz", "scrat",
+      # Karel
+      "farmer", "farmer_night", "bee", "bee_night", "collector", "harvester", "planter",
+      # Spelling Bee
+      "letters",
+      # Artist
+      "artist", "artist_zombie", "elsa", "anna"
+    ]
+  end
+
+  def uses_google_blockly?
+    skin = properties['skin']
+    self.class.migrated_skins.include?(skin)
+  end
+
+  def summarize_for_lab2_properties(script, script_level = nil, current_user = nil)
+    level_properties = super
+    level_properties[:sharedBlocks] = localized_blockly_level_options(script)["sharedBlocks"]
+    level_properties[:levelData] = localized_blockly_level_options_for_lab2(script)["levelData"]
+    level_properties
+  end
+
   def self.field_or_title(xml_doc)
     num_fields = xml_doc.xpath('//field').count
     num_titles = xml_doc.xpath('//title').count
@@ -102,7 +129,7 @@ class Blockly < Level
     %w(initialization_blocks start_blocks toolbox_blocks required_blocks recommended_blocks solution_blocks)
   end
 
-  def to_xml(options={})
+  def to_xml(options = {})
     xml_node = Nokogiri::XML(super(options))
     Nokogiri::XML::Builder.with(xml_node.at(type)) do |xml|
       xml.blocks do
@@ -322,11 +349,7 @@ class Blockly < Level
 
         set_unless_nil(level_options, 'longInstructions', localized_long_instructions)
         set_unless_nil(level_options, 'failureMessageOverride', localized_failure_message_override)
-
-        # We are not localizing startHtml content until platform team addresses issues that break
-        # current curriculum for students. For more details see Jira P20-102.
-        # https://codedotorg.atlassian.net/browse/P20-102
-        # set_unless_nil(level_options, 'startHtml', localized_start_html(level_options['startHtml']))
+        set_unless_nil(level_options, 'startLibraries', localized_start_libraries(level_options['startLibraries']))
 
         # Unintuitively, it is completely possible for a Blockly level to use
         # Droplet, so we need to confirm the editor style before assuming that
@@ -354,7 +377,33 @@ class Blockly < Level
 
       level_options
     end
+    options.freeze
+  end
 
+  def localized_blockly_level_options_for_lab2(script)
+    options = Rails.cache.fetch("#{cache_key}/#{script.try(:cache_key)}/#{I18n.locale}/localized_blockly_level_options_for_lab2", force: !Unit.should_cache?) do
+      level_options = blockly_level_options.dup
+
+      functions = level_options.
+        dig("levelData", "startSources", "blocks", "blocks")&.
+        filter {|block| block["type"] == "procedures_defnoreturn"}
+
+      functions&.each do |function|
+        function_name = function.dig("fields", "NAME")
+        next unless function_name
+
+        localized_name = I18n.t(
+          "name",
+          scope: [:data, :function_definitions, name, function_name],
+          default: function_name,
+          smart: true
+        )
+
+        function["fields"]["NAME"] = localized_name
+      end
+
+      level_options
+    end
     options.freeze
   end
 
@@ -377,7 +426,7 @@ class Blockly < Level
         success_condition: 'fn_successCondition',
         failure_condition: 'fn_failureCondition',
       }
-      properties.keys.each do |dashboard|
+      properties.each_key do |dashboard|
         blockly = overrides[dashboard.to_sym] || dashboard.camelize(:lower)
         # Select value from properties json
         # Don't override existing valid (non-nil/empty) values
@@ -400,6 +449,7 @@ class Blockly < Level
 
       if is_a? Applab
         level_prop['startHtml'] = try(:project_template_level).try(:start_html) || start_html
+        level_prop['startLibraries'] = try(:project_template_level).try(:start_libraries) || start_libraries
         level_prop['dataTables'] = try(:project_template_level).try(:data_tables) || data_tables
         level_prop['dataProperties'] = try(:project_template_level).try(:data_properties) || data_properties
         level_prop['name'] = name
@@ -427,9 +477,9 @@ class Blockly < Level
 
       # Blockly requires these fields to be objects not strings
       %w(map initialDirt serializedMaze goal softButtons inputOutputTable scale).
-          concat(NetSim.json_object_attrs).
-          concat(Craft.json_object_attrs).
-          each do |x|
+        concat(NetSim.json_object_attrs).
+        concat(Craft.json_object_attrs).
+        each do |x|
         level_prop[x] = JSON.parse(level_prop[x]) if level_prop[x].is_a? String
       end
 
@@ -451,49 +501,46 @@ class Blockly < Level
     options.freeze
   end
 
-  # FND-985 Create shared API to get localized level properties.
-  def get_localized_property(property_name)
-    if should_localize? && try(property_name)
-      I18n.t(
-        name,
-        scope: [:data, property_name.pluralize],
-        default: nil,
-        smart: true
-      )
-    end
-  end
-
   def localized_failure_message_override
-    get_localized_property("failure_message_overrides")
+    get_localized_property('failure_message_override')
   end
 
+  # Retrieve the localized property for "long_instructions",
+  # @return [String] the localized long_instructions property
   def localized_long_instructions
     localized_long_instructions = get_localized_property("long_instructions")
-    localized_blockly_in_text(localized_long_instructions)
+    unescaped_codeblocks = unescape_codeblocks(localized_long_instructions)
+    localized_blockly_in_text(unescaped_codeblocks)
   end
 
-  def localized_start_html(start_html)
-    return unless start_html
-    start_html_doc = Nokogiri::HTML(start_html, &:noblanks)
+  # Processes and localizes the TRANSLATIONTEXT from i18n start libraries content.
+  # @param start_libraries [String] JSON-encoded string representing an array of library objects.
+  # Each library object should contain a name and source field.
+  # @return [String] JSON-encoded string representing the localized start libraries.
+  def localized_start_libraries(start_libraries)
+    return unless start_libraries
+    level_libraries = JSON.parse(start_libraries)
+    level_libraries.each_with_index do |library, index|
+      library_name = library["name"]
+      next unless /^i18n_/i.match?(library_name)
 
-    # match any element that contains text
-    start_html_doc.xpath('//*[text()[normalize-space()]]').each do |element|
-      localized_text = I18n.t(
-        element.text,
-        scope: [:data, :start_html, name],
-        default: nil,
+      library_source = library["source"]
+      translation_text = library_source[/var TRANSLATIONTEXT = (\{[^}]*});/m, 1]
+      translation_json = JSON.parse(translation_text)
+      next if translation_json.blank?
+
+      translations = I18n.t(
+        library_name,
+        scope: [:data, :start_libraries, name],
+        default: translation_json,
         smart: true
       )
-      element.content = localized_text if localized_text
-    end
 
-    # returning the children of body removes extra <html><body> tags added by parsing with ::HTML
-    # the save_with option prevents the to_html method from pretty printing and adding newlines
-    # see: https://github.com/premailer/premailer/issues/345
-    start_html_doc.xpath("//body").children.to_html(
-      encoding: 'UTF-8',
-      save_with: Nokogiri::XML::Node::SaveOptions::DEFAULT_HTML ^ Nokogiri::XML::Node::SaveOptions::FORMAT
-    )
+      localized_json = translation_json.merge(translations.stringify_keys)
+      library_source.gsub!(translation_text, JSON.pretty_generate(localized_json))
+      level_libraries[index] = library
+    end
+    JSON.generate(level_libraries)
   end
 
   def localized_authored_hints
@@ -668,26 +715,23 @@ class Blockly < Level
     block_xml.xpath("//block[@type=\"gamelab_behavior_get\"]").each do |behavior|
       behavior_name = behavior.at_xpath("./#{tag}[@name=\"VAR\"]")
       next unless behavior_name
-      localized_name = I18n.t(
-        behavior_name.content,
-        scope: [:data, :behavior_names, name],
-        default: nil,
-        smart: true
-      )
-      behavior_name.content = localized_name if localized_name
-    end
-    block_xml.xpath("//block[@type=\"behavior_definition\"]").each do |behavior|
-      behavior_name = behavior.at_xpath("./#{tag}[@name=\"NAME\"]")
-      next unless behavior_name
-      localized_name = I18n.t(
-        behavior_name.content,
-        scope: [:data, :behavior_names, name],
-        default: nil,
-        smart: true
-      )
+      localized_name =
+        I18n.t(
+          behavior_name.content,
+          scope: [:data, :shared_functions],
+          default: nil,
+          smart: true
+        ) ||
+        I18n.t(
+          behavior_name.content,
+          scope: [:data, :behavior_names, name],
+          default: nil,
+          smart: true
+        )
       behavior_name.content = localized_name if localized_name
     end
 
+    # localize_behaviors handles localizing behavior definitions.
     localize_behaviors(block_xml)
     block_xml
   end
@@ -773,6 +817,7 @@ class Blockly < Level
       studio_ask
       math_change
       gamelab_textVariableJoin
+      gamelab_ifVarEquals
     ]
 
     # Localize each 'catch-all' block type.
@@ -780,7 +825,7 @@ class Blockly < Level
       block_xml.xpath("//block[@type=\"#{block_type}\"]").each do |block|
         # Find all <title/field name="VAR" /> blocks and maybe update their
         # content if there exists a localization key for them.
-        block.xpath("./#{tag}[@name=\"VAR\"]").each do |var|
+        block.xpath("./#{tag}[@name=\"VAR\" or @name=\"NUM\"]").each do |var|
           localized_name = I18n.t(
             var.content,
             scope: [:data, :variable_names],
@@ -852,7 +897,7 @@ class Blockly < Level
 
   def self.asset_host_prefix
     host = ActionController::Base.asset_host
-    (host.blank?) ? "" : "//#{host}"
+    host.blank? ? "" : "//#{host}"
   end
 
   # If true, don't autoplay videos before this level (but do keep them in the
@@ -912,7 +957,19 @@ class Blockly < Level
       end
 
       behavior.xpath(".//#{tag}[@name=\"NAME\"]").each do |name_element|
-        localized_name = I18n.t(name_element.content, scope: [:data, :shared_functions], default: nil, smart: true)
+        localized_name =
+          I18n.t(
+            name_element.content,
+            scope: [:data, :shared_functions],
+            default: nil,
+            smart: true
+          ) ||
+          I18n.t(
+            name_element.content,
+            scope: [:data, :behavior_names, name],
+            default: nil,
+            smart: true
+          )
         name_element.content = localized_name if localized_name
 
         mutation.xpath('.//description').each do |description|
@@ -993,5 +1050,13 @@ class Blockly < Level
         skin: skin
       }
     )
+  end
+
+  # Unescapes the backticks used to format codeblocks in the given text.
+  # @param text [String] the text to unescape.
+  # @return [String] the text with unescaped backticks. If the text is nil or empty, it will be returned as is.
+  private def unescape_codeblocks(text)
+    return text if text.blank?
+    text.gsub('\\`', '`')
   end
 end

@@ -1,23 +1,20 @@
+import {shallow, mount} from 'enzyme'; // eslint-disable-line no-restricted-imports
 import React from 'react';
 import {Provider} from 'react-redux';
+
+import isRtl from '@cdo/apps/code-studio/isRtlRedux';
 import {
   getStore,
   registerReducers,
   stubRedux,
   restoreRedux,
 } from '@cdo/apps/redux';
-import i18n from '@cdo/locale';
-import {expect} from '../../../util/deprecatedChai';
-import {shallow, mount} from 'enzyme';
-import ManageStudentsTable, {
-  UnconnectedManageStudentsTable,
-  sortRows,
-} from '@cdo/apps/templates/manageStudents/ManageStudentsTable';
+import unitSelection from '@cdo/apps/redux/unitSelectionRedux';
 import CodeReviewGroupsDialog from '@cdo/apps/templates/manageStudents/CodeReviewGroupsDialog';
 import ManageStudentsActionsCell from '@cdo/apps/templates/manageStudents/ManageStudentsActionsCell';
-import ManageStudentNameCell from '@cdo/apps/templates/manageStudents/ManageStudentsNameCell';
+import ManageStudentFamilyNameCell from '@cdo/apps/templates/manageStudents/ManageStudentsFamilyNameCell';
 import ManageStudentsGenderCell from '@cdo/apps/templates/manageStudents/ManageStudentsGenderCell';
-import {SectionLoginType} from '@cdo/apps/util/sharedConstants';
+import ManageStudentNameCell from '@cdo/apps/templates/manageStudents/ManageStudentsNameCell';
 import manageStudents, {
   RowType,
   setLoginType,
@@ -32,14 +29,21 @@ import manageStudents, {
   TransferStatus,
   TransferType,
 } from '@cdo/apps/templates/manageStudents/manageStudentsRedux';
+import NoSectionCodeDialog from '@cdo/apps/templates/manageStudents/NoSectionCodeDialog';
+import ManageStudentsTable, {
+  UnconnectedManageStudentsTable,
+  sortRows,
+  ManageStudentsNotificationFull,
+} from '@cdo/apps/templates/manageStudents/Table';
 import teacherSections, {
   setSections,
   selectSection,
 } from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
-import unitSelection from '@cdo/apps/redux/unitSelectionRedux';
-import isRtl from '@cdo/apps/code-studio/isRtlRedux';
-import NoSectionCodeDialog from '@cdo/apps/templates/manageStudents/NoSectionCodeDialog';
-import {ManageStudentsNotificationFull} from '../../../../src/templates/manageStudents/ManageStudentsTable';
+import experiments from '@cdo/apps/util/experiments';
+import {SectionLoginType} from '@cdo/generated-scripts/sharedConstants';
+import i18n from '@cdo/locale';
+
+import {expect} from '../../../util/deprecatedChai'; // eslint-disable-line no-restricted-imports
 import {allowConsoleWarnings} from '../../../util/throwOnConsole';
 
 describe('ManageStudentsTable', () => {
@@ -133,6 +137,7 @@ describe('ManageStudentsTable', () => {
       location: '/v2/sections/101',
       name: 'My Section',
       login_type: SectionLoginType.picture,
+      participant_type: 'student',
       grade: '2',
       code: 'PMTKVH',
       lesson_extras: false,
@@ -186,12 +191,12 @@ describe('ManageStudentsTable', () => {
     });
 
     describe('Gender field feature flag', () => {
-      before(() => {
-        window.GENDER_FEATURE_ENABLED = 'true';
+      beforeAll(() => {
+        experiments.setEnabled(experiments.GENDER_FEATURE_ENABLED, true);
       });
 
-      after(() => {
-        window.GENDER_FEATURE_ENABLED = undefined;
+      afterAll(() => {
+        experiments.setEnabled(experiments.GENDER_FEATURE_ENABLED, false);
       });
 
       it('does render the gender column if loginType is secret picture', () => {
@@ -278,6 +283,62 @@ describe('ManageStudentsTable', () => {
 
       // Expect the input box value to have changed
       expect(nameInput().prop('value')).to.equal(fakeStudent.name + 'z');
+    });
+
+    it('renders an editable family name field in student sections', async () => {
+      const wrapper = mount(
+        <Provider store={getStore()}>
+          <ManageStudentsTable />
+        </Provider>
+      );
+      // Begin editing the student
+      // (Using redux directly to do this requires us to trigger a manual update)
+      getStore().dispatch(startEditingStudent(fakeStudent.id));
+      wrapper.update();
+
+      const manageStudentFamilyNameCell = () =>
+        wrapper
+          .find(ManageStudentFamilyNameCell)
+          .findWhere(w => w.prop('id') === fakeStudent.id)
+          .first();
+
+      // Check for a family name cell with expecting initial editing props
+      expect(manageStudentFamilyNameCell().exists()).to.be.true;
+      expect(manageStudentFamilyNameCell().prop('isEditing')).to.be.true;
+
+      // Find the family name input
+      const nameInput = () =>
+        manageStudentFamilyNameCell().find('input').first();
+      expect(nameInput().prop('value')).to.equal('');
+
+      // Simulate a family name change
+      nameInput().simulate('change', {target: {value: 'z'}});
+
+      // Expect the input box value to have changed
+      expect(nameInput().prop('value')).to.equal('z');
+    });
+
+    it('does not render a family name field in PL sections', async () => {
+      const plSection = {...fakeSection, participant_type: 'teacher'};
+      getStore().dispatch(setSections([plSection]));
+      const wrapper = mount(
+        <Provider store={getStore()}>
+          <ManageStudentsTable />
+        </Provider>
+      );
+      // Begin editing the student
+      // (Using redux directly to do this requires us to trigger a manual update)
+      getStore().dispatch(startEditingStudent(fakeStudent.id));
+      wrapper.update();
+
+      const manageStudentFamilyNameCell = () =>
+        wrapper
+          .find(ManageStudentFamilyNameCell)
+          .findWhere(w => w.prop('id') === fakeStudent.id)
+          .first();
+
+      // Check for a family name cell with expecting initial editing props
+      expect(manageStudentFamilyNameCell().exists()).to.be.false;
     });
 
     it('renders correctly if loginType is picture', () => {

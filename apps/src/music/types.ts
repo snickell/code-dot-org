@@ -1,23 +1,31 @@
-// TODO: Ideally this type would only contain keys present in
-// translated string JSON files (ex. apps/i18n/music/en_us.json).
-// However, this requires depending on files outside of apps/src,
-// so this approach is still being investigated. For now, this type
-// is an object whose keys are all functions which return strings,
-
 import {ProjectLevelData} from '../lab2/types';
+import {ValueOf} from '../types/utils';
 
-// matching what we expect for a locale object.
-export type MusicLocale = {
-  [key: string]: (replaceMap?: {[key: string]: string}) => string;
-};
+import {ToolboxData} from './blockly/toolbox/types';
+import {BlockMode} from './constants';
+import {Sounds} from './player/MusicLibrary';
 
 // TODO: Use this interface when converting MusicView to TypeScript
 export interface MusicLevelData extends ProjectLevelData {
-  toolbox?: {
-    [key: string]: string[];
-  };
-  sounds?: {
-    [key: string]: string[];
-  };
+  toolbox?: ToolboxData;
+  sounds?: Sounds;
   library?: string;
+  packId?: string;
+  showSoundFilters?: boolean;
+  blockMode?: ValueOf<typeof BlockMode>;
+  hideAiTemperature?: boolean;
+  showAiTemperatureExplanation?: boolean;
+  allowChangeStartingPlayheadPosition?: boolean;
 }
+
+export type LoadFinishedCallback = (
+  loadTimeMs: number,
+  soundsLoaded: number
+) => void;
+
+export type UpdateLoadProgressCallback = (progress: number) => void;
+
+export type SoundLoadCallbacks = {
+  onLoadFinished?: LoadFinishedCallback;
+  updateLoadProgress?: UpdateLoadProgressCallback;
+};

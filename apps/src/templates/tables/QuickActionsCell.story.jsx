@@ -1,9 +1,10 @@
 import React from 'react';
+
+import PopUpMenu, {MenuBreak} from '@cdo/apps/sharedComponents/PopUpMenu';
+
 import QuickActionsCell from './QuickActionsCell';
-import PopUpMenu, {MenuBreak} from '@cdo/apps/lib/ui/PopUpMenu';
 
 export default {
-  title: 'QuickActionsCell',
   component: QuickActionsCell,
 };
 

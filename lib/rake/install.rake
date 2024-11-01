@@ -8,10 +8,8 @@ namespace :install do
   timed_task_with_logging :hooks do
     files = %w(
       pre-commit
-      post-commit
       post-checkout
       post-merge
-      pre-push
     )
     git_path = ".git/hooks"
 
@@ -44,6 +42,8 @@ namespace :install do
     if RakeUtils.local_environment?
       Dir.chdir(dashboard_dir) do
         RakeUtils.bundle_install
+        RakeUtils.python_venv_install
+
         puts CDO.dashboard_db_writer
         if ENV['CI']
           # Prepare for dashboard unit tests to run. We can't seed UI test data

@@ -1,7 +1,4 @@
 import React from 'react';
-import {LOCAL_STORAGE, REMOTE_STORAGE} from '../music/constants';
-
-const baseUrl = window.location.origin + '/musiclab';
 
 const optionsList = [
   {
@@ -36,40 +33,97 @@ const optionsList = [
     ],
   },
   {
+    name: 'base-asset-url',
+    type: 'string',
+    description: 'Use a specific base asset URL.',
+  },
+  {
     name: 'library',
     type: 'string',
     description: 'Use a specific music library file.',
   },
   {
-    name: 'show-upload',
+    name: 'show-sound-filters',
     type: 'radio',
     values: [
-      {value: 'false', description: "Don't show upload option."},
-      {value: 'true', description: 'Show upload option.'},
+      {value: 'false', description: 'Hide sound filters.'},
+      {value: 'true', description: 'Show sound filters.'},
     ],
   },
   {
-    name: 'show-instructions',
+    name: 'pack-dialog-1',
     type: 'radio',
     values: [
-      {value: 'false', description: "Don't show instructions."},
-      {value: 'true', description: 'Show instructions.'},
+      {value: 'false', description: 'Use pack dialog 2 (default).'},
+      {value: 'true', description: 'Use older pack dialog.'},
     ],
   },
   {
-    name: 'show-video',
+    name: 'show-tts',
     type: 'radio',
     values: [
-      {value: 'false', description: "Don't show video."},
-      {value: 'true', description: 'Show video.'},
+      {value: 'false', description: 'Hide text to speech.'},
+      {value: 'true', description: 'Show text to speech.'},
     ],
   },
   {
-    name: 'storage-type',
+    name: 'tts-play-pause',
     type: 'radio',
     values: [
-      {value: LOCAL_STORAGE, description: 'Save to local storage.'},
-      {value: REMOTE_STORAGE, description: 'Save to remote storage (default).'},
+      {
+        value: 'false',
+        description:
+          'Disable play/pause functionality for text to speech (default).',
+      },
+      {
+        value: 'true',
+        description: 'Enable play/pause functionality for text to speech.',
+      },
+    ],
+  },
+  {
+    name: 'tts-play-icon',
+    type: 'string',
+    description: 'Use a specific icon for text to speech play button.',
+  },
+  {
+    name: 'tts-stop-icon',
+    type: 'string',
+    description: 'Use a specific icon for text to speech stop button.',
+  },
+  {
+    name: 'play-tune-block',
+    type: 'radio',
+    values: [
+      {value: 'false', description: 'Hide play tune block (default).'},
+      {value: 'true', description: 'Show play tune block.'},
+    ],
+  },
+  {
+    name: 'play-pattern-ai-block',
+    type: 'radio',
+    values: [
+      {value: 'false', description: 'Hide play pattern AI block (default).'},
+      {value: 'true', description: 'Show play pattern AI block.'},
+    ],
+  },
+  {
+    name: 'hide-ai-temperature',
+    type: 'radio',
+    values: [
+      {value: 'false', description: 'Show AI temperature (default).'},
+      {value: 'true', description: 'Hide AI temperature.'},
+    ],
+  },
+  {
+    name: 'show-ai-temperature-explanation',
+    type: 'radio',
+    values: [
+      {
+        value: 'false',
+        description: 'Hide AI temperature explanation (default).',
+      },
+      {value: 'true', description: 'Show AI temperature.'},
     ],
   },
   {
@@ -91,11 +145,75 @@ const optionsList = [
     ],
   },
   {
-    name: 'keyboard-shortcuts-enabled',
+    name: 'ui-keyboard-shortcuts-enabled',
     type: 'radio',
     values: [
       {value: 'false', description: 'Disable keyboard shortcuts.'},
       {value: 'true', description: 'Enable keyboard shortcuts.'},
+    ],
+  },
+  {
+    name: 'player',
+    type: 'radio',
+    values: [
+      {value: 'sample', description: 'Use the sample player (legacy).'},
+      {value: 'tonejs', description: 'Use the ToneJS player (default).'},
+    ],
+  },
+  {
+    name: 'allow-change-starting-playhead-position',
+    type: 'radio',
+    values: [
+      {
+        value: 'false',
+        description: "Don't allow change starting playhead position (default).",
+      },
+      {value: 'true', description: 'Allow change starting playhead position.'},
+    ],
+  },
+  {
+    name: 'use-secondary-finish-button',
+    type: 'radio',
+    values: [
+      {
+        value: 'false',
+        description: "Don't use secondary finish button (default).",
+      },
+      {value: 'true', description: 'Use secondary finish button.'},
+    ],
+  },
+  {
+    name: 'show-secondary-finish-button-question',
+    type: 'radio',
+    values: [
+      {
+        value: 'false',
+        description: "Don't show secondary finish button question (default).",
+      },
+      {value: 'true', description: 'Show secondary finish button question.'},
+    ],
+  },
+  {
+    name: 'advanced-controls-enabled',
+    type: 'radio',
+    values: [
+      {
+        value: 'false',
+        description:
+          'Disable advanced controls for the ToneJS player (default).',
+      },
+      {
+        value: 'true',
+        description: 'Enable advanced controls for the ToneJS player.',
+      },
+    ],
+  },
+  {
+    name: 'timeline-original-layout',
+    type: 'radio',
+    values: [
+      {value: 'false', description: 'New timeline (default).'},
+      {value: 'true', description: 'Original timeline.'},
     ],
   },
 ];
@@ -189,7 +307,7 @@ export default class MusicMenu extends React.Component {
           userSelect: 'all',
         }}
       >
-        {baseUrl}?
+        ?
         {optionsList
           .map(option => {
             return (

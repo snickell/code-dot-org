@@ -1,12 +1,14 @@
+import {shallow} from 'enzyme'; // eslint-disable-line no-restricted-imports
 import React from 'react';
-import {shallow} from 'enzyme';
-import {expect, assert} from '../../../util/reconfiguredChai';
+import sinon from 'sinon'; // eslint-disable-line no-restricted-imports
+
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import ProgressTableView from '@cdo/apps/templates/sectionProgress/progressTables/ProgressTableView';
 import {UnconnectedSectionProgress} from '@cdo/apps/templates/sectionProgress/SectionProgress';
 import {ViewType} from '@cdo/apps/templates/sectionProgress/sectionProgressConstants';
-import sinon from 'sinon';
 import * as progressLoader from '@cdo/apps/templates/sectionProgress/sectionProgressLoader';
-import ProgressTableView from '@cdo/apps/templates/sectionProgress/progressTables/ProgressTableView';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+
+import {expect, assert} from '../../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
 
 const studentData = [
   {id: 1, name: 'studentb'},
@@ -18,7 +20,7 @@ describe('SectionProgress', () => {
   let DEFAULT_PROPS;
 
   beforeEach(() => {
-    sinon.stub(progressLoader, 'loadScriptProgress');
+    sinon.stub(progressLoader, 'loadUnitProgress');
     DEFAULT_PROPS = {
       setLessonOfInterest: () => {},
       setCurrentView: () => {},
@@ -29,7 +31,6 @@ describe('SectionProgress', () => {
         script: {id: 123},
         students: studentData,
       },
-      coursesWithProgress: [],
       currentView: ViewType.SUMMARY,
       scriptData: {
         id: 123,
@@ -53,7 +54,7 @@ describe('SectionProgress', () => {
   });
 
   afterEach(() => {
-    progressLoader.loadScriptProgress.restore();
+    progressLoader.loadUnitProgress.restore();
   });
 
   const setUp = (overrideProps = {}) => {

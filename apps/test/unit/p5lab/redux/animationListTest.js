@@ -1,5 +1,9 @@
+import _ from 'lodash';
 import {combineReducers} from 'redux';
-import sinon from 'sinon';
+import sinon from 'sinon'; // eslint-disable-line no-restricted-imports
+
+import * as assetPrefix from '@cdo/apps/assetManagement/assetPrefix';
+import {EMPTY_IMAGE} from '@cdo/apps/p5lab/constants';
 import reducer, {
   START_LOADING_FROM_SOURCE,
   DONE_LOADING_FROM_SOURCE,
@@ -16,22 +20,41 @@ import reducer, {
   saveAnimation,
 } from '@cdo/apps/p5lab/redux/animationList';
 import animationTab from '@cdo/apps/p5lab/redux/animationTab';
-import {EMPTY_IMAGE} from '@cdo/apps/p5lab/constants';
-import {createStore} from '../../../util/redux';
-import {expect} from '../../../util/reconfiguredChai';
-import {setExternalGlobals} from '../../../util/testUtils';
+import {
+  getStore,
+  registerReducers,
+  stubRedux,
+  restoreRedux,
+} from '@cdo/apps/redux';
 import commonReducers from '@cdo/apps/redux/commonReducers';
-import {setPageConstants} from '@cdo/apps/redux/pageConstants';
+import pageConstantsReducer, {
+  setPageConstants,
+} from '@cdo/apps/redux/pageConstants';
+
+import {expect} from '../../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
+import {createStore} from '../../../util/redux';
+import {setExternalGlobals} from '../../../util/testUtils';
+
 const project = require('@cdo/apps/code-studio/initApp/project');
-import * as assetPrefix from '@cdo/apps/assetManagement/assetPrefix';
-import _ from 'lodash';
 
 describe('animationList', function () {
   setExternalGlobals(beforeEach, afterEach);
+  beforeEach(() => {
+    stubRedux();
+    registerReducers({pageConstants: pageConstantsReducer});
+    getStore().dispatch(
+      setPageConstants({
+        isCurriculumLevel: true,
+      })
+    );
+  });
+  afterEach(() => {
+    restoreRedux();
+  });
   describe('animationSourceUrl', function () {
     const key = 'foo';
 
-    before(() => assetPrefix.init({}));
+    beforeAll(() => assetPrefix.init({}));
 
     it(`returns the sourceUrl from props if it exists and is not an uploaded image`, function () {
       const props = {sourceUrl: 'bar'};

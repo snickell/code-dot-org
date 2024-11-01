@@ -1,9 +1,14 @@
+import * as GoogleBlockly from 'blockly/core';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import SoundsPanel from '../views/SoundsPanel';
-import GoogleBlockly from 'blockly/core';
-import experiments from '@cdo/apps/util/experiments';
+
 import color from '@cdo/apps/util/color';
+import experiments from '@cdo/apps/util/experiments';
+
+import MusicRegistry from '../MusicRegistry';
+import MusicLibrary from '../player/MusicLibrary';
+import SoundStyle from '../utils/SoundStyle';
+import SoundsPanel from '../views/SoundsPanel';
 
 const FIELD_HEIGHT = 20;
 const FIELD_PADDING = 2;
@@ -15,7 +20,7 @@ const FIELD_PADDING = 2;
 class FieldSounds extends GoogleBlockly.Field {
   constructor(options) {
     const currentValue =
-      options.currentValue || options.getLibrary().getDefaultSound();
+      options.currentValue || MusicLibrary.getInstance().getDefaultSound();
 
     super(currentValue);
 
@@ -25,6 +30,7 @@ class FieldSounds extends GoogleBlockly.Field {
     this.CURSOR = 'default';
     this.backgroundElement = null;
     this.currentFieldWidth = 0;
+    this.showingEditor = false;
   }
 
   saveState() {
@@ -69,6 +75,10 @@ class FieldSounds extends GoogleBlockly.Field {
   }
 
   showEditor_() {
+    if (this.showingEditor) {
+      return;
+    }
+
     super.showEditor_();
 
     const editor = this.dropdownCreate_();
@@ -83,6 +93,8 @@ class FieldSounds extends GoogleBlockly.Field {
       this,
       this.dropdownDispose_.bind(this)
     );
+
+    this.showingEditor = true;
   }
 
   dropdownCreate_() {
@@ -91,10 +103,9 @@ class FieldSounds extends GoogleBlockly.Field {
     this.renderContent();
 
     this.newDiv_.style.color = color.neutral_light;
-    this.newDiv_.style.width = '300px';
+    this.newDiv_.style.width = '600px';
     this.newDiv_.style.backgroundColor = color.dark_black;
     this.newDiv_.style.padding = '5px';
-    this.newDiv_.style.cursor = 'pointer';
 
     return this.newDiv_;
   }
@@ -106,14 +117,15 @@ class FieldSounds extends GoogleBlockly.Field {
 
     ReactDOM.render(
       <SoundsPanel
-        library={this.options.getLibrary()}
+        library={MusicLibrary.getInstance()}
         currentValue={this.getValue()}
         playingPreview={this.playingPreview}
+        showSoundFilters={MusicRegistry.showSoundFilters}
         onPreview={value => {
           this.playingPreview = value;
           this.renderContent();
 
-          this.options.playPreview(value, () => {
+          MusicRegistry.player.previewSound(value, () => {
             // If the user starts another preview while one is
             // already playing, it will have started playing before
             // we get this stop event.  We want to wait until the
@@ -126,17 +138,17 @@ class FieldSounds extends GoogleBlockly.Field {
             this.renderContent();
           });
         }}
-        onSelect={value => {
-          this.setValue(value);
-          this.hide_();
-        }}
+        onSelect={value => this.setValue(value)}
       />,
       this.newDiv_
     );
   }
 
   dropdownDispose_() {
+    MusicRegistry.player.cancelPreviews();
+
     this.newDiv_ = null;
+    this.showingEditor = false;
   }
 
   hide_() {
@@ -156,11 +168,19 @@ class FieldSounds extends GoogleBlockly.Field {
     // Create the text element so we can measure it.
     const textElement = GoogleBlockly.utils.dom.createSvgElement('text', {
       fill: color.neutral_light,
-      x: 25,
+      x: 27,
       y: 16,
       width: 100,
       height: 20,
     });
+
+    const soundType = MusicLibrary.getInstance().getSoundForId(
+      this.getValue()
+    )?.type;
+
+    if (soundType === 'vocal') {
+      textElement.setAttribute('font-style', 'italic');
+    }
 
     // Attach the actual text.
     textElement.appendChild(document.createTextNode(fieldText));
@@ -176,9 +196,9 @@ class FieldSounds extends GoogleBlockly.Field {
       constants.FIELD_TEXT_FONTFAMILY
     );
 
-    // The full width comprises:
-    // 5px left margin, 15px image, 4px gap, text width, 5px right margin.
-    this.currentFieldWidth = 5 + 15 + 4 + textWidth + 5;
+    // The full width essentially comprises:
+    // 5px left margin, 17px image, 4px gap, text width, 5px right margin.
+    this.currentFieldWidth = 5 + 17 + 4 + textWidth + 5;
 
     // Create the background rectangle and attach it to the background
     // parent.
@@ -195,25 +215,35 @@ class FieldSounds extends GoogleBlockly.Field {
       this.backgroundElement
     );
 
-    // Add an image for the sound type.
-    const soundType = this.options
-      .getLibrary()
-      .getSoundForId(this.getValue()).type;
+    let iconElement;
 
-    GoogleBlockly.utils.dom.createSvgElement(
-      'image',
-      {
-        x: 6,
-        y: 3,
-        width: 15,
-        href: `/blockly/media/music/icon-${soundType}.png`,
-      },
-      this.backgroundElement
-    );
+    // Add an icon for the sound type.
+    if (soundType) {
+      iconElement = GoogleBlockly.utils.dom.createSvgElement('text', {
+        fill: color.neutral_light,
+        x: 5 + SoundStyle[soundType].marginLeft,
+        y: 16,
+        width: 20,
+        height: 20,
+      });
+
+      iconElement.setAttribute('style', 'font-family: "Font Awesome 6 Pro"');
+      iconElement.classList.add(SoundStyle[soundType].classNameFill);
+
+      // Attach the actual text.
+      iconElement.appendChild(
+        document.createTextNode(SoundStyle[soundType].iconCode)
+      );
+    }
 
     // Now attach the text element to the background parent.  It will
     // render on top of the background rectangle.
     this.backgroundElement.appendChild(textElement);
+
+    // Similarly, add the icon text element to the background parent.
+    if (iconElement) {
+      this.backgroundElement.appendChild(iconElement);
+    }
 
     // Update the field size.
     this.updateSize_();
@@ -223,7 +253,9 @@ class FieldSounds extends GoogleBlockly.Field {
   }
 
   getText() {
-    return this.options.getLibrary().getSoundForId(this.getValue()).name;
+    return (
+      MusicLibrary.getInstance().getSoundForId(this.getValue())?.name || ''
+    );
   }
 
   updateSize_() {

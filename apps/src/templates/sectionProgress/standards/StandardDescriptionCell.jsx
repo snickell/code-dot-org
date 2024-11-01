@@ -1,9 +1,12 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import ReactTooltip from 'react-tooltip';
+
+import fontConstants from '@cdo/apps/fontConstants';
+import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import i18n from '@cdo/locale';
+
 import ProgressBoxForLessonNumber from './ProgressBoxForLessonNumber';
-import FontAwesome from '@cdo/apps/templates/FontAwesome';
 import {LessonIcons} from './standardsConstants';
 
 class StandardDescriptionCell extends Component {
@@ -112,7 +115,7 @@ const styles = {
     textAlign: 'center',
   },
   tooltipLessonName: {
-    fontFamily: '"Gotham 7r", sans-serif',
+    ...fontConstants['main-font-bold'],
   },
 };
 
