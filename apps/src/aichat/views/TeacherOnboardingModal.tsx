@@ -47,27 +47,38 @@ const TeacherOnboardingModal: React.FunctionComponent<
           <ul>
             <li>
               <BodyTwoText>
-                <StrongText>Instructions</StrongText>: Clear directions and
-                goals for each level.
+                <StrongText>
+                  {aichatI18n.teacherOnboardingModal_instructionsBulletTitleText()}
+                </StrongText>
+                {aichatI18n.teacherOnboardingModal_instructionsBulletBodyText()}
               </BodyTwoText>
             </li>
             <BodyTwoText>
-              <StrongText>Model Customizations </StrongText>
-              <EmText>(optional)</EmText>: Clear directions and goals for each
-              level.
+              <StrongText>
+                {aichatI18n.teacherOnboardingModal_modelCustomizationBulletTitleText()}
+              </StrongText>
+              <EmText>
+                {aichatI18n.teacherOnboardingModal_optionalSuffixTag()}
+              </EmText>
+              {aichatI18n.teacherOnboardingModal_modelCustomizationBulletBodyText()}
             </BodyTwoText>
             <li>
               <BodyTwoText>
-                <StrongText>AI Chat</StrongText>: The area where students can
-                interact directly with the chatbot they've created.
+                <StrongText>
+                  {aichatI18n.teacherOnboardingModal_aiChatBulletTitleText()}
+                </StrongText>
+                {aichatI18n.teacherOnboardingModal_aiChatBulletBodyText()}
               </BodyTwoText>
             </li>
             <li>
               <BodyTwoText>
-                <StrongText>User View </StrongText>
-                <EmText>(optional)</EmText>: Allows students to use their
-                chatbot as a user, without the instructions or customization
-                visible.
+                <StrongText>
+                  {aichatI18n.teacherOnboardingModal_userViewBulletTitleText()}{' '}
+                </StrongText>
+                <EmText>
+                  {aichatI18n.teacherOnboardingModal_optionalSuffixTag()}
+                </EmText>
+                {aichatI18n.teacherOnboardingModal_userViewBulletBodyText()}
               </BodyTwoText>
             </li>
           </ul>
