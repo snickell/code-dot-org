@@ -15,6 +15,7 @@ import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 import {tryGetLocalStorage, trySetLocalStorage} from '@cdo/apps/utils';
 
 import {ModalTypes} from '../constants';
+import aichatI18n from '../locale';
 import {getShortName} from '../utils';
 
 import ChatEventsList from './ChatEventsList';
@@ -108,6 +109,8 @@ const ChatWorkspace: React.FunctionComponent<ChatWorkspaceProps> = ({
     {
       value: 'viewStudentChatHistory',
       text:
+        // TODO: Seems multiple tabs share a hidden "view only" functionality
+        // Investigate if it makes sense to use a common localization function for this
         `${selectedStudentName}'s chat history` +
         (selectedTab === WorkspaceTeacherViewTab.STUDENT_CHAT_HISTORY
           ? ' (view only)'
@@ -120,7 +123,7 @@ const ChatWorkspace: React.FunctionComponent<ChatWorkspaceProps> = ({
     },
     {
       value: 'testStudentModel',
-      text: 'Test student model',
+      text: aichatI18n.testStudentModel(),
       tabContent: <ChatEventsList events={visibleItems} />,
     },
   ];
@@ -184,7 +187,7 @@ const ChatWorkspace: React.FunctionComponent<ChatWorkspaceProps> = ({
         )}
         <div className={moduleStyles.buttonRow}>
           <Button
-            text="Clear chat"
+            text={aichatI18n.clearChatButtonText()}
             disabled={!canChatWithModel}
             iconLeft={eraserIcon}
             size="s"

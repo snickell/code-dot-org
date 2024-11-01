@@ -61,7 +61,7 @@ const WaitingAnimation: React.FunctionComponent<{shouldDisplay: boolean}> = ({
     return (
       <img
         src="/blockly/media/aichat/typing-animation.gif"
-        alt={'Waiting for response'}
+        alt={'Waiting for response'} // do we translate alt text?
         className={moduleStyles.waitingForResponse}
       />
     );
