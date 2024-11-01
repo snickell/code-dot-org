@@ -36,6 +36,7 @@ class ApplicationJobTest < ActiveJob::TestCase
     end
     Delayed::Job.expects(:select).returns([job_counts_mock])
 
+    # Splitting this into two assertions because 'includes_metrics' can't match multiple metrics with the same name.
     Cdo::Metrics.expects(:push).with(
       ApplicationJob::METRICS_NAMESPACE,
       all_of(
