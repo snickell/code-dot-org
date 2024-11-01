@@ -1,5 +1,6 @@
 import {modelDescriptions} from '@cdo/apps/aichat/constants';
 
+import aichatI18n from '../../locale';
 import {
   AiCustomizations,
   LevelAichatSettings,
@@ -119,11 +120,11 @@ export const DEFAULT_LEVEL_AICHAT_SETTINGS: LevelAichatSettings = {
 export const AI_CUSTOMIZATIONS_LABELS: {
   [key in keyof AiCustomizations]: string;
 } = {
-  selectedModelId: 'Selected model',
-  temperature: 'Temperature',
-  systemPrompt: 'System prompt',
-  retrievalContexts: 'Retrieval',
-  modelCardInfo: 'Model card information',
+  selectedModelId: aichatI18n.aiCustomizations_selectedModel(),
+  temperature: aichatI18n.aiCustomizations_temperature(),
+  systemPrompt: aichatI18n.aiCustomizations_systemPrompt(),
+  retrievalContexts: aichatI18n.aiCustomizations_retrieval(),
+  modelCardInfo: aichatI18n.aiCustomizations_modelCardInfo(),
 };
 
 // Model customization fields that are checked for toxicity before updating.
