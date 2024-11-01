@@ -68,6 +68,7 @@ describe('LoginTypePicker', () => {
       />
     );
 
+    // eslint-disable-next-line no-restricted-properties
     const lmsCards = screen.getByTestId('lms-info-cards-container');
     expect(lmsCards.children).toHaveLength(4);
   });
@@ -87,6 +88,7 @@ describe('LoginTypePicker', () => {
       />
     );
 
+    // eslint-disable-next-line no-restricted-properties
     const lmsCards = screen.getByTestId('lms-info-cards-container');
     expect(lmsCards.children).toHaveLength(4);
   });
@@ -106,6 +108,7 @@ describe('LoginTypePicker', () => {
       />
     );
 
+    // eslint-disable-next-line no-restricted-properties
     const lmsCards = screen.getByTestId('lms-info-cards-container');
     expect(lmsCards.children).toHaveLength(3);
     expect(
@@ -128,6 +131,7 @@ describe('LoginTypePicker', () => {
       />
     );
 
+    // eslint-disable-next-line no-restricted-properties
     const lmsCards = screen.getByTestId('lms-info-cards-container');
     expect(lmsCards.children).toHaveLength(3);
     expect(within(lmsCards).queryByText(LmsLoginTypeNames.clever)).toBeNull();

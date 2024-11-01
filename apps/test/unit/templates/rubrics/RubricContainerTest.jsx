@@ -891,6 +891,7 @@ describe('RubricContainer', () => {
     // Perform fetches
     await wait();
 
+    // eslint-disable-next-line no-restricted-properties
     expect(screen.queryByTestId('info-alert')).not.toBeInTheDocument();
     const button = screen.getByRole('button', {
       name: 'Run AI Assessment for Project',

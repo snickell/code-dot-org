@@ -94,8 +94,9 @@ describe('SectionProgressSelector', () => {
     renderDefault();
     store.dispatch(setShowProgressTableV2(true));
 
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
-
+    // eslint-disable-next-line no-restricted-properties
     expect(screen.queryByTestId(V2_TEST_ID)).toBeFalsy();
   });
 
@@ -103,9 +104,10 @@ describe('SectionProgressSelector', () => {
     renderDefault();
 
     screen.getByText(V1_PAGE_LINK_TEXT);
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
-
     expect(screen.queryByText(V2_PAGE_LINK_TEXT)).toBeFalsy();
+    // eslint-disable-next-line no-restricted-properties
     expect(screen.queryByTestId(V2_TEST_ID)).toBeFalsy();
   });
 
@@ -114,9 +116,10 @@ describe('SectionProgressSelector', () => {
     store.dispatch(setShowProgressTableV2(true));
 
     screen.getByText(V2_PAGE_LINK_TEXT);
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V2_TEST_ID);
-
     expect(screen.queryByText(V1_PAGE_LINK_TEXT)).toBeFalsy();
+    // eslint-disable-next-line no-restricted-properties
     expect(screen.queryByTestId(V1_TEST_ID)).toBeFalsy();
   });
 
@@ -125,9 +128,10 @@ describe('SectionProgressSelector', () => {
     store.dispatch(setShowProgressTableV2(undefined));
 
     screen.getByText(V1_PAGE_LINK_TEXT);
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
-
     expect(screen.queryByText(V2_PAGE_LINK_TEXT)).toBeFalsy();
+    // eslint-disable-next-line no-restricted-properties
     expect(screen.queryByTestId(V2_TEST_ID)).toBeFalsy();
   });
 
@@ -137,9 +141,10 @@ describe('SectionProgressSelector', () => {
     renderDefault();
 
     screen.getByText(V2_PAGE_LINK_TEXT);
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V2_TEST_ID);
-
     expect(screen.queryByText(V1_PAGE_LINK_TEXT)).toBeFalsy();
+    // eslint-disable-next-line no-restricted-properties
     expect(screen.queryByTestId(V1_TEST_ID)).toBeFalsy();
   });
 
@@ -165,7 +170,9 @@ describe('SectionProgressSelector', () => {
     expect(screen.queryByText(V1_PAGE_LINK_TEXT)).toBeFalsy();
     expect(screen.queryByText(V2_PAGE_LINK_TEXT)).toBeFalsy();
 
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
+    // eslint-disable-next-line no-restricted-properties
     expect(screen.queryByTestId(V2_TEST_ID)).toBeFalsy();
   });
 
@@ -177,7 +184,9 @@ describe('SectionProgressSelector', () => {
 
     screen.getByText(V1_PAGE_LINK_TEXT);
 
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
+    // eslint-disable-next-line no-restricted-properties
     expect(screen.queryByTestId(V2_TEST_ID)).toBeFalsy();
   });
 
@@ -187,9 +196,10 @@ describe('SectionProgressSelector', () => {
     renderDefault();
 
     screen.getByText(V1_PAGE_LINK_TEXT);
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
-
     expect(screen.queryByText(V2_PAGE_LINK_TEXT)).toBeFalsy();
+    // eslint-disable-next-line no-restricted-properties
     expect(screen.queryByTestId(V2_TEST_ID)).toBeFalsy();
   });
 
@@ -217,8 +227,8 @@ describe('SectionProgressSelector', () => {
     renderDefault();
 
     screen.getByText(V1_PAGE_LINK_TEXT);
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
-
     expect(screen.queryByText(i18n.progressTrackingAnnouncement())).toBeFalsy();
   });
 
@@ -239,8 +249,8 @@ describe('SectionProgressSelector', () => {
 
     // Check that the modal is not shown.
     screen.getByText(V1_PAGE_LINK_TEXT);
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
-
     expect(screen.queryByText(i18n.progressTrackingAnnouncement())).toBeFalsy();
   });
 });

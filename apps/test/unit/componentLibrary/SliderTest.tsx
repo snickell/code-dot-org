@@ -65,8 +65,8 @@ describe('Slider Component', () => {
   //   expect(slider).toHaveAttribute('value', '50');
   //
   //   // Check that the center mark is rendered correctly
-  //   const centerMark = screen.getByTestId('slider-center-mark');
-  //   expect(centerMark).toBeInTheDocument();
+  // eslint-disable-next-line no-restricted-properties
+  //   const centerMark = screen.getByTestId('slider-center-mark');  //   expect(centerMark).toBeInTheDocument();
   //   expect(centerMark).toHaveStyle('left: calc(50% - 1px)');
   // });
 
@@ -141,7 +141,7 @@ describe('Slider Component', () => {
   // it('renders correctly with step marks when steps are provided', () => {
   //   renderComponent({steps: [0, 25, 50, 75, 100], value: 50});
   //
-  //   const stepMarks = screen.getAllByTestId('step-mark');
-  //   expect(stepMarks.length).toBe(5); // Should render 5 step marks
+  // eslint-disable-next-line no-restricted-properties
+  //   const stepMarks = screen.getAllByTestId('step-mark');  //   expect(stepMarks.length).toBe(5); // Should render 5 step marks
   // });
 });
