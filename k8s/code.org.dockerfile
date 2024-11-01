@@ -38,6 +38,7 @@ RUN <<EOF
     curl \
     gdb \
     git \
+    git-lfs \
     imagemagick \
     libffi-dev \
     libgdbm6 \
@@ -50,11 +51,12 @@ RUN <<EOF
     libssl-dev \
     libyaml-dev \
     lsof \
-    mariadb-client \
+    mysql-client \
     node-pre-gyp \
     nodejs \
     npm \
     parallel \
+    python3-pip \
     rbenv \
     rsync \
     sudo \
@@ -152,6 +154,25 @@ RUN <<EOF
   #
   # Setup rbenv & ruby-build
   echo 'eval "$(rbenv init -)"' | tee -a ${HOME}/.bashrc ${HOME}/.zshrc
+  #
+  # install pdm for managing our python dependencies
+  pip install --system --prefix=/usr/local pdm
+  #
+  # Install Sauce Connect Proxy
+  mkdir sauce_connect
+  cd sauce_connect
+  if [ $(uname -m) = "aarch64" ]; then
+    curl -s "https://saucelabs.com/downloads/sauce-connect/5.2.1/sauce-connect-5.2.1_linux.aarch64.tar.gz" -o "sauce-connect.tar.gz";
+  else
+    curl -s "https://saucelabs.com/downloads/sauce-connect/5.2.1/sauce-connect-5.2.1_linux.x86_64.tar.gz" -o "sauce-connect.tar.gz";
+  fi
+  tar -xzf sauce-connect.tar.gz
+  cp sc /usr/local/bin
+  cd ..
+  rm -rf sauce_connect
+  #
+  # Enable Git LFS in ~/.gitconfig
+  git lfs install
 EOF
 
 WORKDIR ${SRC}
@@ -242,9 +263,9 @@ COPY --chown=${UID} --link ./ ./
 # SETUP SOME HACK WORKAROUNDS FOR APPLE SILICON
 # These are only required for installing Apple Silicon hack workarounds from code.org-rbenv
 #
-COPY --chown=${UID} --from=code.org-rbenv ${SRC}/.bundle ${SRC}/.bundle
-COPY --chown=${UID} --from=code.org-rbenv ${SRC}/.bundle ${SRC}/dashboard/.bundle
-COPY --chown=${UID} --from=code.org-rbenv ${SRC}/Gemfile ${SRC}/Gemfile
+# COPY --chown=${UID} --from=code.org-rbenv ${SRC}/.bundle ${SRC}/.bundle
+# COPY --chown=${UID} --from=code.org-rbenv ${SRC}/.bundle ${SRC}/dashboard/.bundle
+# COPY --chown=${UID} --from=code.org-rbenv ${SRC}/Gemfile ${SRC}/Gemfile
 #
 # DONE HACK WORKAROUNDS FOR APPLE SILICON
 
