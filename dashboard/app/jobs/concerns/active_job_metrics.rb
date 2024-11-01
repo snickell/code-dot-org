@@ -32,6 +32,7 @@ module ActiveJobMetrics
 
   def report_job_count
     # Single database query to get all counts in one go, modified for MySQL syntax
+    # When updating this query, make sure to update the query in "bin/cron/report_activejob_metrics"
     job_counts = Delayed::Job.
       select(
         "COUNT(IF(failed_at IS NOT NULL, 1, NULL)) AS failed_count",

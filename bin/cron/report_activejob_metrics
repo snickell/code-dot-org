@@ -7,40 +7,42 @@ require_relative '../../dashboard/config/environment'
 METRICS_NAMESPACE = 'code-dot-org/ActiveJob'
 
 def push_queue_length_metrics
-  Cdo::Metrics.push(METRICS_NAMESPACE,
-    # Same metrics as "dashboard/app/jobs/application_job.rb"
-    [
-      {
-        metric_name: 'PendingJobCount',
-        value: Delayed::Job.where(failed_at: nil).count,
-        unit: 'Count',
-        timestamp: Time.now,
-        dimensions: [
-          {
-            name: 'Environment', value: CDO.rack_env
-          }
-        ]
-      },
-      {
-        metric_name: 'FailedJobCount',
-        value: Delayed::Job.where.not(failed_at: nil).count,
-        unit: 'Count',
-        timestamp: Time.now,
-        dimensions: [
-          {name: 'Environment', value: CDO.rack_env},
-        ],
-      },
-      {
-        metric_name: 'WorkableJobCount',
-        value: Delayed::Job.where(failed_at: nil, locked_at: nil).where('run_at <= ?', Time.now).count,
-        unit: 'Count',
-        timestamp: Time.now,
-        dimensions: [
-          {name: 'Environment', value: CDO.rack_env},
-        ],
-      }
-    ]
-  )
+  # Single database query to get all counts in one go, modified for MySQL syntax
+  # When updating this query, make sure to update the query in "dashboard/app/jobs/concerns/active_job_metrics.rb"
+  job_counts = Delayed::Job.
+    select(
+      "COUNT(IF(failed_at IS NOT NULL, 1, NULL)) AS failed_count",
+      "COUNT(IF(failed_at IS NULL AND locked_at IS NULL AND run_at <= CURRENT_TIMESTAMP, 1, NULL)) AS workable_count",
+      "COUNT(IF(failed_at IS NULL, 1, NULL)) AS pending_count"
+    ).
+    take
+
+  # Generic Metrics
+  generic_metrics = [
+    {
+      metric_name: 'PendingJobCount',
+      value: job_counts.pending_count,
+      unit: 'Count',
+      timestamp: Time.now,
+      dimensions: [{name: 'Environment', value: CDO.rack_env}]
+    },
+    {
+      metric_name: 'FailedJobCount',
+      value: job_counts.failed_count,
+      unit: 'Count',
+      timestamp: Time.now,
+      dimensions: [{name: 'Environment', value: CDO.rack_env}]
+    },
+    {
+      metric_name: 'WorkableJobCount',
+      value: job_counts.workable_count,
+      unit: 'Count',
+      timestamp: Time.now,
+      dimensions: [{name: 'Environment', value: CDO.rack_env}]
+    }
+  ]
+
+  Cdo::Metrics.push(METRICS_NAMESPACE, generic_metrics)
 end
 
 def main
