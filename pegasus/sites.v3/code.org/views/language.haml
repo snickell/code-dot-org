@@ -1,4 +1,5 @@
 - require 'cdo/i18n'
+- require 'varnish_environment'
 
 %select{onchange: 'setLocale(this.value);', style: 'color: black; width: 100%; max-width: 162.5px;'}
   - selected = Cdo::I18n.current_locale_option(I18n.locale, request.ge_region)
