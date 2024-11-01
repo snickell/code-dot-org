@@ -31,7 +31,7 @@ module ActiveJobMetrics
   end
 
   def report_job_count
-    # Single database query to get all counts in one go, modified for MySQL syntax
+    # Single database query to get all counts in one go
     # When updating this query, make sure to update the query in "bin/cron/report_activejob_metrics"
     job_counts = Delayed::Job.
       select(
