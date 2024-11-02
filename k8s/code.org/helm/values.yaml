@@ -5,5 +5,5 @@ autoscaling:
   enabled: false
   minReplicas: 1
   maxReplicas: 10
-
-
+development:
+  localHomeDir: placeholder # ~ on  your local dev box, set automatically by skaffold

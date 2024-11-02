@@ -1,0 +1,32 @@
+{{- if eq .Values.environment "development" }}
+apiVersion: v1 
+kind: PersistentVolumeClaim 
+metadata:   
+  name: dot-aws
+  labels:
+    app: dashboard
+spec:
+  resources:
+    requests:
+      storage: 5Mi  
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: dot-aws
+  labels:
+    app: dashboard
+spec:
+  capacity:
+    storage: 5Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: {{ .Values.development.localHomeDir }}/.aws
+  claimRef:
+    name: dot-aws
+    namespace: default
+{{- end }}
