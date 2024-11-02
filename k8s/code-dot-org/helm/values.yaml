@@ -1,4 +1,5 @@
 image: code-dot-org:latest
+command: ["bin/dashboard-server"]
 environment: development
 user:
   username: code-dot-org

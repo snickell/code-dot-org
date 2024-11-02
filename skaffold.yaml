@@ -93,6 +93,13 @@ profiles:
             development.hostPaths.home: '{{ cmd "sh" "-c" "echo $HOME" }}'
             development.hostPaths.skaffoldStorage: '{{ cmd "sh" "-c" "echo $PWD/skaffoldStorage" }}'
 
+- name: seed
+  patches:
+    - op: add
+      path: /deploy/helm/releases/0/setValueTemplates/command
+      value: ["rake", "install"]
+
+
 portForward:
 - resourceType: Service
   resourceName: dashboard

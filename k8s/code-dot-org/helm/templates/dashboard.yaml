@@ -32,8 +32,8 @@ spec:
       containers:
       - name: dashboard
         image: "{{.Values.image}}"
-        # command: ["bin/dashboard-server"]
-        command: ["zsh"]
+        command: {{ .Values.command | toJson }}
+        # command: ["zsh"]
         env:
           - name: RAILS_ENV
             value: {{ .Values.environment }}
