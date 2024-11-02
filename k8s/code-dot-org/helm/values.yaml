@@ -1,4 +1,4 @@
-image: code.org:latest
+image: code-dot-org:latest
 environment: development
 replicaCount: 1
 autoscaling:

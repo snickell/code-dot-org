@@ -37,7 +37,7 @@ spec:
         # - name: MYSQL_ROOT_PASSWORD
         #   value: secret
         - name: MYSQL_USER
-          value: code.org
+          value: code-dot-org
         - name: MYSQL_PASSWORD
           value: FIXME_WITH_REAL_PASSWORD
         - name: MYSQL_DATABASE

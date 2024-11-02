@@ -2,18 +2,18 @@
 
 # Pull in the static assets and db seed layers
 # built from separate dockerfiles by skaffold
-ARG CODE_ORG_STATIC
-ARG CODE_ORG_DB_SEED
+ARG CODE_DOT_ORG_STATIC
+ARG CODE_DOT_ORG_DB_SEED
 
-FROM $CODE_ORG_STATIC as code.org-static
-FROM $CODE_ORG_DB_SEED as code.org-db-seed
+FROM $CODE_DOT_ORG_STATIC as code-dot-org-static
+FROM $CODE_DOT_ORG_DB_SEED as code-dot-org-db-seed
 
 ################################################################################
-FROM ubuntu:22.04 as code.org-base
+FROM ubuntu:22.04 as code-dot-org-base
 ################################################################################
 
 ARG \
-  USERNAME=code.org \
+  USERNAME=code-dot-org \
   UID=1000 \
   GID=1000 \
   NODE_VERSION=20.18.0 \
@@ -71,7 +71,7 @@ RUN <<EOF
   apt-get install -y nodejs
   corepack enable # corepack required for yarn support
   # 
-  # Setup 'code.org' user and group
+  # Setup 'code-dot-org' user and group
   echo "${USERNAME} ALL=NOPASSWD: ALL" >> /etc/sudoers
   groupadd -g ${UID} ${USERNAME}
   useradd --system --create-home --no-log-init -s /bin/zsh -u ${UID} -g ${UID} ${USERNAME}
@@ -88,7 +88,7 @@ ENV HOME=/home/${USERNAME}
 WORKDIR ${SRC}
 
 ################################################################################
-FROM code.org-base as code.org-rbenv
+FROM code-dot-org-base as code-dot-org-rbenv
 ################################################################################
 
 SHELL [ "/bin/sh", "-euxc" ]
@@ -120,7 +120,7 @@ RUN --mount=type=cache,sharing=locked,uid=1000,gid=1000,target=${SRC}/vendor/cac
 EOF
 
 ################################################################################
-FROM code.org-base as code.org-user-utils
+FROM code-dot-org-base as code-dot-org-user-utils
 ################################################################################
 
 ARG RAILS_ENV=development
@@ -172,7 +172,7 @@ EOF
 WORKDIR ${SRC}
 
 ################################################################################
-FROM code.org-user-utils as code.org-node_modules
+FROM code-dot-org-user-utils as code-dot-org-node_modules
 ################################################################################
 
 COPY --chown=${UID} \
@@ -203,7 +203,7 @@ RUN \
 EOF
 
 ################################################################################
-FROM code.org-user-utils
+FROM code-dot-org-user-utils
 ################################################################################
 
 RUN \
@@ -238,33 +238,33 @@ RUN \
 
 # Link in large static assets built in a separate dockerfile
 COPY --chown=${UID} --link \
-  --from=code.org-static / \
+  --from=code-dot-org-static / \
   ./
 
 # Link in levels and other db seed data built in a separate dockerfile
 COPY --chown=${UID} --link \
-  --from=code.org-db-seed  / \
+  --from=code-dot-org-db-seed  / \
   ./
 
 # Copy in apps/node_modules (built in parallel)
 COPY --chown=${UID} --link \
-  --from=code.org-node_modules ${SRC}/apps/node_modules \
+  --from=code-dot-org-node_modules ${SRC}/apps/node_modules \
   ./apps/node_modules
 
 # Copy in ~/.rbenv (built in parallel)
 COPY --chown=${UID} --link \
-  --from=code.org-rbenv ${HOME}/.rbenv \
+  --from=code-dot-org-rbenv ${HOME}/.rbenv \
   ${HOME}/.rbenv
 
 # Copy in the rest of the source code
 COPY --chown=${UID} --link ./ ./
 
 # SETUP SOME HACK WORKAROUNDS FOR APPLE SILICON
-# These are only required for installing Apple Silicon hack workarounds from code.org-rbenv
+# These are only required for installing Apple Silicon hack workarounds from code-dot-org-rbenv
 #
-# COPY --chown=${UID} --from=code.org-rbenv ${SRC}/.bundle ${SRC}/.bundle
-# COPY --chown=${UID} --from=code.org-rbenv ${SRC}/.bundle ${SRC}/dashboard/.bundle
-# COPY --chown=${UID} --from=code.org-rbenv ${SRC}/Gemfile ${SRC}/Gemfile
+# COPY --chown=${UID} --from=code-dot-org-rbenv ${SRC}/.bundle ${SRC}/.bundle
+# COPY --chown=${UID} --from=code-dot-org-rbenv ${SRC}/.bundle ${SRC}/dashboard/.bundle
+# COPY --chown=${UID} --from=code-dot-org-rbenv ${SRC}/Gemfile ${SRC}/Gemfile
 #
 # DONE HACK WORKAROUNDS FOR APPLE SILICON
 

@@ -3,7 +3,7 @@ skaffold.yaml
 k8s
 
 ##########################################################################
-# THESE LARGE STATIC FILES ARE INJECTED USING code.org-static.dockerfile #
+# THESE LARGE STATIC FILES ARE INJECTED USING code-dot-org-static.dockerfile #
 ##########################################################################
 dashboard/app/assets
 dashboard/public
@@ -19,7 +19,7 @@ pegasus/sites
 ##########################################################################
 
 ##########################################################################
-# MYRIAD DB SEED FILES ARE INJECTED USING code.org-db-seed.dockerfile    #
+# MYRIAD DB SEED FILES ARE INJECTED USING code-dot-org-db-seed.dockerfile    #
 ##########################################################################
 dashboard/config/scripts
 dashboard/config/scripts_json
@@ -137,7 +137,6 @@ npm-debug.log
 /i18n/locales/*/standards/
 /i18n/locales/*/docs/
 .pdm-python
-k8s/code.org/persistent/aws-config.yaml
 
 
 

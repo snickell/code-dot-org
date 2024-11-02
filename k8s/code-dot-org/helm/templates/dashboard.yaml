@@ -37,7 +37,7 @@ spec:
         tty: true # dashboard stdout logging assumes a tty
         volumeMounts:
         {{- if eq .Values.environment "development" }}
-        - mountPath: /home/code.org/.aws
+        - mountPath: /home/code-dot-org/.aws
           name: dot-aws
         {{- end }}
         - mountPath: /code-dot-org/locals.yml
@@ -59,7 +59,7 @@ spec:
             name: dashboard-locals
             
       securityContext:
-        # these should match the UID/GID defined in code.org.dockerfile
+        # these should match the UID/GID defined in code-dot-org.dockerfile
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000

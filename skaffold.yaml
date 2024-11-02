@@ -2,7 +2,7 @@ apiVersion: skaffold/v4beta11
 kind: Config
 build:
   artifacts:
-  - image: code.org
+  - image: code-dot-org
     sync:
       infer:
       # rerun watching
@@ -14,26 +14,26 @@ build:
       - '**/*.jsx'
       - '**/*.json'
     docker:
-      dockerfile: ./k8s/code.org.dockerfile
+      dockerfile: ./k8s/code-dot-org.dockerfile
       cacheFrom:
-      - code.org
+      - code-dot-org
       # - 475661607190.dkr.ecr.us-east-1.amazonaws.com/code.org:staging
     requires:
-    - image: code.org-static
-      alias: CODE_ORG_STATIC
-    - image: code.org-db-seed
-      alias: CODE_ORG_DB_SEED
-  - image: code.org-static
+    - image: code-dot-org-static
+      alias: CODE_DOT_ORG_STATIC
+    - image: code-dot-org-db-seed
+      alias: CODE_DOT_ORG_DB_SEED
+  - image: code-dot-org-static
     docker:
-      dockerfile: ./k8s/code.org-static.dockerfile
+      dockerfile: ./k8s/code-dot-org-static.dockerfile
       cacheFrom:
-      - code.org-static
+      - code-dot-org-static
       # - 475661607190.dkr.ecr.us-east-1.amazonaws.com/code.org-static:staging
-  - image: code.org-db-seed
+  - image: code-dot-org-db-seed
     docker:
-      dockerfile: ./k8s/code.org-db-seed.dockerfile
+      dockerfile: ./k8s/code-dot-org-db-seed.dockerfile
       cacheFrom:
-      - code.org-db-seed
+      - code-dot-org-db-seed
       # - 475661607190.dkr.ecr.us-east-1.amazonaws.com/code.org-db-seed:staging
   local:
     useBuildkit: true # required for caching layers, see https://github.com/moby/moby/issues/34715#issuecomment-589655390
@@ -44,29 +44,7 @@ profiles:
     - command: dev
     - kubeContext: docker-desktop
 
-- name: dev-raw
-  manifests:
-    rawYaml:
-    - ./k8s/code.org/raw/*.yaml
-  deploy:
-    kubectl:
-      hooks:
-        before:
-          - host:
-              # we create the storage objects in k8s/code.org/persistent-storage using
-              # a pre-deploy hook, so they aren't destroyed when `skaffold dev` quits
-              command: [
-                "sh", "-c", 
-                "kubectl apply -f k8s/code.org/raw/persistent --context=$SKAFFOLD_KUBE_CONTEXT --namespace=$SKAFFOLD_NAMESPACES"
-              ]
-
-- name: dev-kustomize
-  manifests:
-    kustomize:
-      paths:
-      - ./k8s/code.org/kustomize/development
-
-- name: dev-helm
+- name: development
   deploy:
     helm:
       releases:

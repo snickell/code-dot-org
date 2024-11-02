@@ -103,6 +103,3 @@ npm-debug.log
 
 # Specifies the user-specific path to the venv for pdm
 .pdm-python
-
-# Containers
-k8s/code.org/persistent/aws-config.yaml
