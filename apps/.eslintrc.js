@@ -18,7 +18,7 @@ const rulesToEventuallyReenable = {
 const noDataTestIdMessage =
   'Attribute data-testid is not accessible. Tests should resemble how the user interacts with the application and should not rely on technical details, see https://testing-library.com/docs/queries/about/#priority';
 
-const noByTestIdMessage =
+const noRestrictedQueriesMessage =
   'Tests should resemble how the user interacts with the application and should not rely on technical details, see https://testing-library.com/docs/queries/about/#priority';
 
 // This config defines globals available especially in apps,
@@ -181,31 +181,45 @@ module.exports = {
     ],
     'no-restricted-properties': [
       'error',
-      {object: 'screen', property: 'getByTestId', message: noByTestIdMessage},
+      {
+        object: 'screen',
+        property: 'getByTestId',
+        message: noRestrictedQueriesMessage,
+      },
       {
         object: 'screen',
         property: 'queryByTestId',
-        message: noByTestIdMessage,
+        message: noRestrictedQueriesMessage,
       },
       {
         object: 'screen',
         property: 'getAllByTestId',
-        message: noByTestIdMessage,
+        message: noRestrictedQueriesMessage,
       },
       {
         object: 'screen',
         property: 'queryAllByTestId',
-        message: noByTestIdMessage,
+        message: noRestrictedQueriesMessage,
       },
       {
         object: 'screen',
         property: 'findByTestId',
-        message: noByTestIdMessage,
+        message: noRestrictedQueriesMessage,
       },
       {
         object: 'screen',
         property: 'findAllByTestId',
-        message: noByTestIdMessage,
+        message: noRestrictedQueriesMessage,
+      },
+      {
+        object: 'container',
+        property: 'querySelector',
+        message: noRestrictedQueriesMessage,
+      },
+      {
+        object: 'container',
+        property: 'querySelectorAll',
+        message: noRestrictedQueriesMessage,
       },
     ],
     'react/forbid-dom-props': [
