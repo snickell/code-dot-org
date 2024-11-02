@@ -33,10 +33,10 @@ spec:
         - containerPort: 3306
         env:
         - name: MYSQL_ALLOW_EMPTY_PASSWORD
-          value: yes
-        # volumeMounts:
-        # - name: mysql-data
-        #   mountPath: /var/lib/mysql/
+          value: "yes"
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql/
   volumeClaimTemplates:
   - metadata:
       name: mysql-data
@@ -45,22 +45,3 @@ spec:
       resources:
         requests:
           storage: 1Gi
----
-{{- if eq .Values.environment "development" }}
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: mysql-data
-  labels:
-    app: dashboard
-spec:
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: {{ .Values.development.hostPaths.skaffoldStorage }}/mysql-data
-  claimRef:
-    name: mysql-data-{{ include "dashboard.fullname" . }}-db-0
-    namespace: {{ .Release.Namespace }}
-{{- end }}
