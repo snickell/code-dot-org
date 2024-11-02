@@ -48,7 +48,8 @@ dashboard/config/schools.tsv
 # 4mb... is this needed?
 # dashboard/config/colombianSchoolData.json
 
-
+**/.venv
+**/__pycache__
 
 
 ##### COPY PASTED FROM /.gitignore #####
