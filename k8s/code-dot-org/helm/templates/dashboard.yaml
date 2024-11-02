@@ -44,8 +44,11 @@ spec:
         tty: true # dashboard stdout logging assumes a tty
         volumeMounts:
         {{- if eq .Values.environment "development" }}
+        # These allow us to re-use our aws / aws-google login from our local machine.
         - mountPath: {{ .Values.user.home }}/.aws
           name: dot-aws
+        - mountPath: {{ .Values.user.home }}/.config/gcloud
+          name: dot-config-gcloud
         {{- end }}
         - mountPath: /code-dot-org/locals.yml
           name: dashboard-locals
@@ -61,6 +64,9 @@ spec:
         - name: dot-aws
           persistentVolumeClaim:
             claimName: dot-aws
+        - name: dot-config-gcloud
+          persistentVolumeClaim:
+            claimName: dot-config-gcloud
         {{- end }}
             
       securityContext:
