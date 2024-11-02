@@ -179,49 +179,6 @@ module.exports = {
         ],
       },
     ],
-    'no-restricted-properties': [
-      'error',
-      {
-        object: 'screen',
-        property: 'getByTestId',
-        message: noRestrictedQueriesMessage,
-      },
-      {
-        object: 'screen',
-        property: 'queryByTestId',
-        message: noRestrictedQueriesMessage,
-      },
-      {
-        object: 'screen',
-        property: 'getAllByTestId',
-        message: noRestrictedQueriesMessage,
-      },
-      {
-        object: 'screen',
-        property: 'queryAllByTestId',
-        message: noRestrictedQueriesMessage,
-      },
-      {
-        object: 'screen',
-        property: 'findByTestId',
-        message: noRestrictedQueriesMessage,
-      },
-      {
-        object: 'screen',
-        property: 'findAllByTestId',
-        message: noRestrictedQueriesMessage,
-      },
-      {
-        object: 'container',
-        property: 'querySelector',
-        message: noRestrictedQueriesMessage,
-      },
-      {
-        object: 'container',
-        property: 'querySelectorAll',
-        message: noRestrictedQueriesMessage,
-      },
-    ],
     'react/forbid-dom-props': [
       'error',
       {
@@ -256,6 +213,54 @@ module.exports = {
       files: ['*.story.@(ts|tsx|js|jsx)'],
       rules: {
         'storybook/no-title-property-in-meta': 'error',
+      },
+    },
+    {
+      files: ['test/unit/**'],
+      rules: {
+        'no-restricted-properties': [
+          'error',
+          {
+            object: 'screen',
+            property: 'getByTestId',
+            message: noRestrictedQueriesMessage,
+          },
+          {
+            object: 'screen',
+            property: 'queryByTestId',
+            message: noRestrictedQueriesMessage,
+          },
+          {
+            object: 'screen',
+            property: 'getAllByTestId',
+            message: noRestrictedQueriesMessage,
+          },
+          {
+            object: 'screen',
+            property: 'queryAllByTestId',
+            message: noRestrictedQueriesMessage,
+          },
+          {
+            object: 'screen',
+            property: 'findByTestId',
+            message: noRestrictedQueriesMessage,
+          },
+          {
+            object: 'screen',
+            property: 'findAllByTestId',
+            message: noRestrictedQueriesMessage,
+          },
+          {
+            object: 'container',
+            property: 'querySelector',
+            message: noRestrictedQueriesMessage,
+          },
+          {
+            object: 'container',
+            property: 'querySelectorAll',
+            message: noRestrictedQueriesMessage,
+          },
+        ],
       },
     },
   ],
