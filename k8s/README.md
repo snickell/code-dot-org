@@ -1,6 +1,12 @@
 # Build & Run code-dot-org under Kubernetes using skaffold
 
-We use [skaffold](https://skaffold.dev/) to make local dev on kubernetes a lot easier.
+We use [skaffold](https://skaffold.dev/) to make local dev on kubernetes a lot easier. Skaffold
+allows us to use a single almost-identical toolchain to both do "docker-compose" style local
+dev (a little slower because our massive source tree is baked into the docker image), as well
+as deploy real production/test/etc instances to a k8s cluster.
+
+This makes debugging your production infra setup really easy: its just like what you're running
+locally.
 
 ## Running dashboard using skaffold
 
