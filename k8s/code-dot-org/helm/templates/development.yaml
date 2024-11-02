@@ -10,7 +10,7 @@ spec:
     requests:
       storage: 5Mi  
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   storageClassName: hostpath
 ---
 apiVersion: v1
@@ -23,7 +23,7 @@ spec:
   capacity:
     storage: 5Mi
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   hostPath:
     path: {{ .Values.development.localHomeDir }}/.aws
   claimRef:
