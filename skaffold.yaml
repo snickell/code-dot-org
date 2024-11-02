@@ -97,8 +97,19 @@ profiles:
   patches:
     - op: add
       path: /deploy/helm/releases/0/setValueTemplates/command
-      value: ["rake", "install"]
+      value: ["rake", "dashboard:setup_db"]
 
+- name: build
+  patches:
+    - op: add
+      path: /deploy/helm/releases/0/setValueTemplates/command
+      value: ["rake", "build"]
+
+- name: zsh
+  patches:
+    - op: add
+      path: /deploy/helm/releases/0/setValueTemplates/command
+      value: ["zsh"]
 
 portForward:
 - resourceType: Service
