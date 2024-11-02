@@ -42,6 +42,7 @@ describe('LoginTypePicker', () => {
     const realSendEvent = analyticsReporter.sendEvent;
     analyticsReporter.sendEvent = jest.fn();
 
+    // eslint-disable-next-line no-restricted-properties
     const pictureLoginCard = container.querySelector('.uitest-pictureLogin');
     fireEvent.click(pictureLoginCard);
 

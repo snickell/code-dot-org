@@ -74,6 +74,7 @@ describe('CurriculumCatalogExpandedCard', () => {
     const {container} = renderCurriculumExpandedCard();
 
     screen.getByText(defaultProps.gradeRange);
+    // eslint-disable-next-line no-restricted-properties
     expect(container.querySelectorAll('i[class*=user]')).toHaveLength(1);
   });
 
@@ -85,6 +86,7 @@ describe('CurriculumCatalogExpandedCard', () => {
     });
 
     screen.getByText(grade);
+    // eslint-disable-next-line no-restricted-properties
     expect(container.querySelectorAll('i[class*=user]')).toHaveLength(1);
   });
 
@@ -96,6 +98,7 @@ describe('CurriculumCatalogExpandedCard', () => {
     });
 
     screen.getByText(duration);
+    // eslint-disable-next-line no-restricted-properties
     expect(container.querySelectorAll('i[class*=clock]')).toHaveLength(1);
   });
 
@@ -105,6 +108,7 @@ describe('CurriculumCatalogExpandedCard', () => {
     screen.getByText(
       new RegExp(`Topic: ${defaultProps.subjectsAndTopics.join(', ')}`)
     );
+    // eslint-disable-next-line no-restricted-properties
     expect(container.querySelectorAll('i[class*=book]')).toHaveLength(1);
   });
 
@@ -157,6 +161,7 @@ describe('CurriculumCatalogExpandedCard', () => {
     });
 
     //Checks for correct amount of Horizontal dividers
+    // eslint-disable-next-line no-restricted-properties
     expect(availableResourcesContainer.querySelectorAll('hr')).toHaveLength(
       Object.keys(availableResources).length
     );

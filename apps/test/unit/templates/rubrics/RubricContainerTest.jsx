@@ -306,7 +306,9 @@ describe('RubricContainer', () => {
     // approach is difficult because jest-dom can't see the styles in our
     // CSS modules which control element visibility.
 
+    // eslint-disable-next-line no-restricted-properties
     let settings = container.querySelector('.uitest-rubric-settings');
+    // eslint-disable-next-line no-restricted-properties
     let content = container.querySelector('#uitest-rubric-content');
 
     expect(content).toHaveClass('visibleRubricContent');

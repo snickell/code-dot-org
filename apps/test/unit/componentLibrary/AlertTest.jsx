@@ -84,6 +84,7 @@ describe('Design System - Alert', () => {
       />
     );
 
+    // eslint-disable-next-line no-restricted-properties
     const iconElement = container.querySelector('.fa-check-circle');
 
     expect(screen.getByText('Full Alert')).toBeDefined();
