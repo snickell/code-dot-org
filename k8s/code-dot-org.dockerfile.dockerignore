@@ -31,6 +31,7 @@ dashboard/config/locales
 ##########################################################################
 dashboard/config/scripts
 dashboard/config/scripts_json
+dashboard/config/levels
 ##########################################################################
 
 
