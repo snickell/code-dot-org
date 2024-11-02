@@ -63,7 +63,8 @@ const FontAwesomeV6Icon: React.FunctionComponent<FontAwesomeV6IconProps> = ({
   ...HTMLAttributes
 }) => (
   <i
-    data-testid="font-awesome-v6-icon" // eslint-disable-line react/forbid-dom-props
+    // eslint-disable-next-line react/forbid-dom-props
+    data-testid="font-awesome-v6-icon"
     className={classNames(
       iconFamily && `fa-${iconFamily}`,
       iconStyle && `fa-${iconStyle}`,

@@ -178,7 +178,8 @@ export const InfoAlert = ({text, dismissable}) => {
         [style.infoAlert]: !closed,
         [style.infoAlertClosed]: !!closed,
       })}
-      data-testid="info-alert" // eslint-disable-line react/forbid-dom-props
+      // eslint-disable-next-line react/forbid-dom-props
+      data-testid="info-alert"
     >
       <div className={style.infoAlertLeft}>
         <FontAwesome

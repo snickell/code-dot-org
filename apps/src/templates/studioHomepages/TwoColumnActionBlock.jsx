@@ -25,7 +25,8 @@ export default function TwoColumnActionBlock({
     <div
       id={id}
       className={styles.container}
-      data-testid="two-column-action-block" // eslint-disable-line react/forbid-dom-props
+      // eslint-disable-next-line react/forbid-dom-props
+      data-testid="two-column-action-block"
     >
       {heading && <Heading2>{heading}</Heading2>}
       <div
@@ -36,7 +37,8 @@ export default function TwoColumnActionBlock({
           src={imageUrl}
           alt=""
           className={styles.image}
-          data-testid="two-column-action-block-img" // eslint-disable-line react/forbid-dom-props
+          // eslint-disable-next-line react/forbid-dom-props
+          data-testid="two-column-action-block-img"
         />
         <div className={styles.contentWrapper}>
           {subHeading && (

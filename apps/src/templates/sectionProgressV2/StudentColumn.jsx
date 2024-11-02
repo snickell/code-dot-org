@@ -29,7 +29,8 @@ const skeletonCell = key => (
         styles.gridBoxSkeleton
       )}
       style={{width: _.random(30, 90) + '%'}}
-      data-testid="skeleton-cell" // eslint-disable-line react/forbid-dom-props
+      // eslint-disable-next-line react/forbid-dom-props
+      data-testid="skeleton-cell"
     />
   </div>
 );

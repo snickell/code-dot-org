@@ -44,7 +44,8 @@ const Breadcrumbs: React.FunctionComponent<BreadcrumbsProps> = ({
         moduleStyles[`breadcrumbs-${size}`],
         className
       )}
-      data-testid={`breadcrumbs-${name}`} // eslint-disable-line react/forbid-dom-props
+      // eslint-disable-next-line react/forbid-dom-props
+      data-testid={`breadcrumbs-${name}`}
     >
       {breadcrumbs.map(({text, href, ...rest}, i) => (
         <React.Fragment key={`${text}-${href}`}>

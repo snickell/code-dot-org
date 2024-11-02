@@ -80,7 +80,8 @@ const LtiNewAccountCard = () => {
         })}
 
         <form
-          data-testid={'new-account-form'} // eslint-disable-line react/forbid-dom-props
+          // eslint-disable-next-line react/forbid-dom-props
+          data-testid={'new-account-form'}
           action={newAccountUrl}
           ref={finishSignupFormRef}
           method="post"

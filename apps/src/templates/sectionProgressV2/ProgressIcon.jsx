@@ -14,7 +14,8 @@ export default function ProgressIcon({itemType}) {
     <div
       className={classNames(styles.needsFeedback, styles.cornerBox)}
       aria-label={itemType['title']}
-      data-testid="needs-feedback-triangle" // eslint-disable-line react/forbid-dom-props
+      // eslint-disable-next-line react/forbid-dom-props
+      data-testid="needs-feedback-triangle"
     />
   );
 
@@ -22,7 +23,8 @@ export default function ProgressIcon({itemType}) {
     <div
       className={classNames(styles.feedbackGiven, styles.cornerBox)}
       aria-label={itemType['title']}
-      data-testid="feedback-given-triangle" // eslint-disable-line react/forbid-dom-props
+      // eslint-disable-next-line react/forbid-dom-props
+      data-testid="feedback-given-triangle"
     />
   );
 

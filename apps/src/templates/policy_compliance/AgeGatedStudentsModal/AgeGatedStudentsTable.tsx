@@ -142,7 +142,8 @@ const AgeGatedStudentsTable: React.FC<Props> = ({studentData}) => {
         <Table.Provider
           columns={columns}
           style={tableLayoutStyles.table}
-          data-testid="uitest-age-gated-students-table" // eslint-disable-line react/forbid-dom-props
+          // eslint-disable-next-line react/forbid-dom-props
+          data-testid="uitest-age-gated-students-table"
         >
           <Table.Header />
           <Table.Body rows={studentData} rowKey="id" />
