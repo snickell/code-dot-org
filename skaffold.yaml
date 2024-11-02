@@ -49,10 +49,11 @@ profiles:
     helm:
       releases:
       - name: dashboard
-        chartPath: ./k8s/code.org/helm
+        chartPath: ./k8s/code-dot-org/helm
         setValueTemplates:
           image: "{{.IMAGE_FULLY_QUALIFIED}}"
-          development.localHomeDir: '{{ cmd "sh" "-c" "echo $HOME" }}'
+          development.hostPaths.home: '{{ cmd "sh" "-c" "echo $HOME" }}'
+          development.hostPaths.skaffoldStorage: '{{ cmd "sh" "-c" "echo $PWD/skaffoldStorage" }}'
 
 portForward:
 - resourceType: Service

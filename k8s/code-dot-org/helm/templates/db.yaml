@@ -52,4 +52,23 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 500M
+          storage: 1Gi
+---
+{{- if eq .Values.environment "development" }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-data
+  labels:
+    app: dashboard
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: {{ .Values.development.hostPaths.skaffoldStorage }}/mysql-data
+  claimRef:
+    name: mysql-data-{{ include "dashboard.fullname" . }}-db-0
+    namespace: {{ .Release.Namespace }}
+{{- end }}

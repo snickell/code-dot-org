@@ -25,8 +25,8 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: {{ .Values.development.localHomeDir }}/.aws
+    path: {{ .Values.development.hostPaths.home }}/.aws
   claimRef:
     name: dot-aws
-    namespace: default
+    namespace: {{ .Release.Namespace }}
 {{- end }}
