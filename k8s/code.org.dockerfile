@@ -16,8 +16,8 @@ ARG \
   USERNAME=code.org \
   UID=1000 \
   GID=1000 \
-  NODE_VERSION=18.16.0 \
-  YARN_VERSION=1.22.19 \
+  NODE_VERSION=20.18.0 \
+  YARN_VERSION=1.22.22 \
   SRC="/code-dot-org"
 
 ENV \
@@ -199,7 +199,8 @@ RUN \
   #
   # Install apps/node_modules using yarn
   cd apps
-  yarn install --frozen-lockfile --ignore-scripts
+  # yarn install --frozen-lockfile --ignore-scripts
+  yarn install --ignore-scripts
   ls -lA | grep node
 EOF
 
