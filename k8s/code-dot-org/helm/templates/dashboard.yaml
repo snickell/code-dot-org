@@ -44,28 +44,26 @@ spec:
         tty: true # dashboard stdout logging assumes a tty
         volumeMounts:
         {{- if eq .Values.environment "development" }}
-        - mountPath: /home/code-dot-org/.aws
+        - mountPath: {{ .Values.user.home }}/.aws
           name: dot-aws
         {{- end }}
         - mountPath: /code-dot-org/locals.yml
           name: dashboard-locals
           subPath: locals.yml
         securityContext:
-          {{- if eq .Values.environment "development" }}
-          allowPrivilegeEscalation: true
-          {{- end }}
+          allowPrivilegeEscalation: {{ if eq .Values.environment "development" }}true{{ else }}false{{ end }}
  
       volumes:
+        - name: dashboard-locals
+          configMap:
+            name: dashboard-locals
         {{- if eq .Values.environment "development" }}
         - name: dot-aws
           persistentVolumeClaim:
             claimName: dot-aws
         {{- end }}
-        - name: dashboard-locals
-          configMap:
-            name: dashboard-locals
             
       securityContext:
-        runAsUser: {{ .Values.uid }}
-        runAsGroup: {{ .Values.gid }}
-        fsGroup: {{ .Values.gid }}
+        runAsUser: {{ .Values.user.uid }}
+        runAsGroup: {{ .Values.user.gid }}
+        fsGroup: {{ .Values.user.gid }}

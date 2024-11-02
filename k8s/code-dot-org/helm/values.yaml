@@ -1,7 +1,10 @@
 image: code-dot-org:latest
 environment: development
-uid: 1000
-gid: 1000
+user:
+  username: code-dot-org
+  uid: 1000
+  gid: 1000
+  home: /home/code-dot-org
 autoscaling:
   enabled: false
   minReplicas: 1

@@ -56,27 +56,29 @@ RUN <<EOF
     # surpress noisy dpkg install/setup lines (errors & warnings still show)
     > /dev/null
 
-  # install node, based on instructions at https://github.com/nodesource/distributions#using-ubuntu-1
-  curl -sL https://deb.nodesource.com/setup_20.x | bash -
-  apt-get install -y nodejs
-  corepack enable # corepack required for yarn support
-
-  # Setup 'code-dot-org' user and group
-  echo "${USERNAME} ALL=NOPASSWD: ALL" >> /etc/sudoers
-  groupadd -g ${UID} ${USERNAME} && true
-  useradd --system --create-home --no-log-init -s /bin/zsh -u ${UID} -g ${UID} ${USERNAME} && true
+  if [ "$USERNAME" = "root" ]; then
+    # Change root homedir from /root to /home/root, the consistency makes
+    # Dockerfile easier and makes k8s volume binding easier
+    sed -i 's#/root#/home/root#g' /etc/passwd
+    mv /root /home/
+  else
+    echo "${USERNAME} ALL=NOPASSWD: ALL" >> /etc/sudoers
+    groupadd -g ${UID} ${USERNAME}
+    useradd --system --create-home --no-log-init -s /bin/zsh -u ${UID} -g ${UID} ${USERNAME}
+  fi
 
   # Create ${SRC} directory
   mkdir -p ${SRC}
   chown ${UID}:${GID} ${SRC}
 EOF
 
+ENV HOME=/home/${USERNAME}
+
 ################################################################################
 FROM code-dot-org-base AS code-dot-org-rbenv
 ################################################################################
 
 USER ${USERNAME}
-ENV HOME=/home/${USERNAME}
 WORKDIR ${SRC}
 
 SHELL [ "/bin/sh", "-euxc" ]
@@ -97,7 +99,13 @@ FROM code-dot-org-base AS code-dot-org-user-utils
 
 WORKDIR /tmp
 
+# Set things up as root
 RUN <<EOF
+  # install node, based on instructions at https://github.com/nodesource/distributions#using-ubuntu-1
+  curl -sL https://deb.nodesource.com/setup_20.x | bash -
+  apt-get install -y nodejs
+  corepack enable # corepack required for yarn support
+
   # Install AWSCLI
   if [ $(uname -m) = "aarch64" ]; then
     curl -s "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip";
@@ -130,10 +138,9 @@ FROM code-dot-org-user-utils AS code-dot-org-core
 ################################################################################
 
 USER ${USERNAME}
-ENV HOME=/home/${USERNAME}
 WORKDIR ${SRC}
 
-# Run as ${USERNAME}, just the commands that use ${HOME}:
+# Set things up as ${USERNAME}
 RUN <<EOF
   # Install oh-my-zsh
   sh +x -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"

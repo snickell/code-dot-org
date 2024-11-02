@@ -94,8 +94,10 @@ profiles:
           chartPath: ./k8s/code-dot-org/helm
           setValueTemplates:
             image: "{{.IMAGE_FULLY_QUALIFIED}}"
-            uid: 0
-            gid: 0
+            user.username: root
+            user.uid: 0
+            user.gid: 0
+            user.home: /home/root
             environment: development
             development.hostPaths.home: '{{ cmd "sh" "-c" "echo $HOME" }}'
             development.hostPaths.skaffoldStorage: '{{ cmd "sh" "-c" "echo $PWD/skaffoldStorage" }}'
