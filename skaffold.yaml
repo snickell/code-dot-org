@@ -19,10 +19,18 @@ build:
       - code-dot-org
       # - 475661607190.dkr.ecr.us-east-1.amazonaws.com/code.org:staging
     requires:
-    - image: code-dot-org-static
-      alias: CODE_DOT_ORG_STATIC
+    - image: code-dot-org-core
+      alias: CODE_DOT_ORG_CORE
     - image: code-dot-org-db-seed
       alias: CODE_DOT_ORG_DB_SEED
+    - image: code-dot-org-static
+      alias: CODE_DOT_ORG_STATIC
+  - image: code-dot-org-core
+    docker:
+      dockerfile: ./k8s/code-dot-org-core.dockerfile
+      cacheFrom:
+      - code-dot-org-core
+      # - 475661607190.dkr.ecr.us-east-1.amazonaws.com/code.org-core:staging
   - image: code-dot-org-static
     docker:
       dockerfile: ./k8s/code-dot-org-static.dockerfile
