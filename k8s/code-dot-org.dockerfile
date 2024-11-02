@@ -193,7 +193,7 @@ RUN \
   #
   # Instuct Docker to maintain a build cache for yarn package downloads
   # so we don't have to re-download npms whenever package.json changes
-  # --mount=type=cache,sharing=locked,uid=1000,gid=1000,target=${HOME}/.cache/yarn \
+  --mount=type=cache,sharing=locked,uid=1000,gid=1000,target=${SRC}/apps/.yarn/cache \
 <<EOF
   #
   # Install apps/node_modules using yarn
