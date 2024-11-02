@@ -19,7 +19,7 @@ metadata:
     {{- include "dashboard.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.autoscaling.replicasWhenAutoscaleDisabled }}
   {{- end }}
   selector:
     matchLabels:
@@ -32,8 +32,13 @@ spec:
       containers:
       - name: dashboard
         image: "{{.Values.image}}"
-        command: ["bin/dashboard-server"]
-        # command: ["zsh"]
+        # command: ["bin/dashboard-server"]
+        command: ["zsh"]
+        env:
+          - name: RAILS_ENV
+            value: {{ .Values.environment }}
+          - name: RACK_ENV
+            value: {{ .Values.environment }}
         ports:
         - containerPort: 3000
         tty: true # dashboard stdout logging assumes a tty
@@ -61,7 +66,6 @@ spec:
             name: dashboard-locals
             
       securityContext:
-        # these should match the UID/GID defined in code-dot-org.dockerfile
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
+        runAsUser: {{ .Values.uid }}
+        runAsGroup: {{ .Values.gid }}
+        fsGroup: {{ .Values.gid }}

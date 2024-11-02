@@ -5,14 +5,14 @@ build:
   - image: code-dot-org
     sync:
       infer:
-      # rerun watching
-      # /app/src/lib, /app/src/shared/middleware, /app/src/dashboard/legacy, /app/src/pegasus for **/*.{rb,ru,yml} (ignoring **/migrations/*.rb,test/**/*.rb)
-      - '**/*.rb'
-      - '**/*.ru'
-      - '**/*.yml'
-      - '**/*.js'
-      - '**/*.jsx'
-      - '**/*.json'
+        # rerun watching
+        # /app/src/lib, /app/src/shared/middleware, /app/src/dashboard/legacy, /app/src/pegasus for **/*.{rb,ru,yml} (ignoring **/migrations/*.rb,test/**/*.rb)\
+        - '**/*.rb'
+        - '**/*.ru'
+        - '**/*.yml'
+        - '**/*.js'
+        - '**/*.jsx'
+        - '**/*.json'
     docker:
       dockerfile: ./k8s/code-dot-org.dockerfile
       cacheFrom:
@@ -28,6 +28,10 @@ build:
   - image: code-dot-org-core
     docker:
       dockerfile: ./k8s/code-dot-org-core.dockerfile
+      buildArgs:
+        USERNAME: code-dot-org
+        UID: "1000"
+        GID: "1000"
       cacheFrom:
       - code-dot-org-core
       # - 475661607190.dkr.ecr.us-east-1.amazonaws.com/code.org-core:staging
@@ -46,22 +50,55 @@ build:
   local:
     useBuildkit: true # required for caching layers, see https://github.com/moby/moby/issues/34715#issuecomment-589655390
 
+# We're setting this in profiles for now:
+# deploy:
+#   helm:
+#     releases:
+#     - name: dashboard
+#       chartPath: ./k8s/code-dot-org/helm
+#       setValueTemplates:
+#         image: "{{.IMAGE_FULLY_QUALIFIED}}"
+
 profiles:
+
+- name: production
+  deploy:
+    helm:
+      releases:
+        - name: dashboard
+          chartPath: ./k8s/code-dot-org/helm
+          setValueTemplates:
+            image: "{{.IMAGE_FULLY_QUALIFIED}}"
+            environment: production
+            autoscaling.enabled: true
+            autoscaling.minReplicas: 1
+            autoscaling.maxReplicas: 10
+
 - name: development
   activation:
     - command: dev
     - kubeContext: docker-desktop
-
-- name: development
+  patches:
+    # skaffold sync only works when the user is root:
+    # https://github.com/GoogleContainerTools/skaffold/issues/2479
+    - op: replace
+      path: /build/artifacts/1/docker/buildArgs
+      value:
+        USERNAME: root
+        UID: "0"
+        GID: "0"
   deploy:
     helm:
       releases:
-      - name: dashboard
-        chartPath: ./k8s/code-dot-org/helm
-        setValueTemplates:
-          image: "{{.IMAGE_FULLY_QUALIFIED}}"
-          development.hostPaths.home: '{{ cmd "sh" "-c" "echo $HOME" }}'
-          development.hostPaths.skaffoldStorage: '{{ cmd "sh" "-c" "echo $PWD/skaffoldStorage" }}'
+        - name: dashboard
+          chartPath: ./k8s/code-dot-org/helm
+          setValueTemplates:
+            image: "{{.IMAGE_FULLY_QUALIFIED}}"
+            uid: 0
+            gid: 0
+            environment: development
+            development.hostPaths.home: '{{ cmd "sh" "-c" "echo $HOME" }}'
+            development.hostPaths.skaffoldStorage: '{{ cmd "sh" "-c" "echo $PWD/skaffoldStorage" }}'
 
 portForward:
 - resourceType: Service

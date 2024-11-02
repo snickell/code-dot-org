@@ -55,31 +55,29 @@ RUN <<EOF
     zsh \
     # surpress noisy dpkg install/setup lines (errors & warnings still show)
     > /dev/null
-  #
+
   # install node, based on instructions at https://github.com/nodesource/distributions#using-ubuntu-1
   curl -sL https://deb.nodesource.com/setup_20.x | bash -
   apt-get install -y nodejs
   corepack enable # corepack required for yarn support
-  # 
+
   # Setup 'code-dot-org' user and group
   echo "${USERNAME} ALL=NOPASSWD: ALL" >> /etc/sudoers
-  groupadd -g ${UID} ${USERNAME}
-  useradd --system --create-home --no-log-init -s /bin/zsh -u ${UID} -g ${UID} ${USERNAME}
-  # FIXME: why did I do this?
-  chown -R ${USERNAME} /usr/local
-  #
+  groupadd -g ${UID} ${USERNAME} && true
+  useradd --system --create-home --no-log-init -s /bin/zsh -u ${UID} -g ${UID} ${USERNAME} && true
+
   # Create ${SRC} directory
   mkdir -p ${SRC}
   chown ${UID}:${GID} ${SRC}
 EOF
 
-USER ${USERNAME}
-ENV HOME=/home/${USERNAME}
-WORKDIR ${SRC}
-
 ################################################################################
 FROM code-dot-org-base AS code-dot-org-rbenv
 ################################################################################
+
+USER ${USERNAME}
+ENV HOME=/home/${USERNAME}
+WORKDIR ${SRC}
 
 SHELL [ "/bin/sh", "-euxc" ]
 
@@ -97,16 +95,9 @@ EOF
 FROM code-dot-org-base AS code-dot-org-user-utils
 ################################################################################
 
-ARG RAILS_ENV=development
-ENV RAILS_ENV=${RAILS_ENV}
-
-WORKDIR ${HOME}
+WORKDIR /tmp
 
 RUN <<EOF
-  #
-  # Install oh-my-zsh
-  sh +x -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-  #
   # Install AWSCLI
   if [ $(uname -m) = "aarch64" ]; then
     curl -s "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip";
@@ -116,16 +107,10 @@ RUN <<EOF
   unzip -qq awscliv2.zip
   ./aws/install
   rm awscliv2.zip
-  #
-  # Add CHROME_BIN env var to bashrc
-  echo '# Chromium Binary\nexport CHROME_BIN=/usr/bin/chromium-browser' | tee -a ${HOME}/.bashrc ${HOME}/.zshrc
-  #
-  # Setup rbenv & ruby-build
-  echo 'eval "$(rbenv init -)"' | tee -a ${HOME}/.bashrc ${HOME}/.zshrc
-  #
+
   # install pdm for managing our python dependencies
   pip install pdm
-  #
+
   # Install Sauce Connect Proxy
   mkdir sauce_connect
   cd sauce_connect
@@ -138,16 +123,30 @@ RUN <<EOF
   cp sc /usr/local/bin
   cd ..
   rm -rf sauce_connect
-  #
+EOF
+
+################################################################################
+FROM code-dot-org-user-utils AS code-dot-org-core
+################################################################################
+
+USER ${USERNAME}
+ENV HOME=/home/${USERNAME}
+WORKDIR ${SRC}
+
+# Run as ${USERNAME}, just the commands that use ${HOME}:
+RUN <<EOF
+  # Install oh-my-zsh
+  sh +x -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+  # Add CHROME_BIN env var to bashrc
+  echo '# Chromium Binary\nexport CHROME_BIN=/usr/bin/chromium-browser' | tee -a ${HOME}/.bashrc ${HOME}/.zshrc
+
+  # Setup rbenv & ruby-build
+  echo 'eval "$(rbenv init -)"' | tee -a ${HOME}/.bashrc ${HOME}/.zshrc
+
   # Enable Git LFS in ~/.gitconfig
   git lfs install
 EOF
-
-WORKDIR ${SRC}
-
-################################################################################
-FROM code-dot-org-user-utils
-################################################################################
 
 ENV \
   USERNAME=${USERNAME} \
@@ -162,5 +161,3 @@ COPY --chown=${UID} --link \
 # `kubectl exec` skips entrypoint (!), so this is the easiest way to
 # accomplish `eval $(rbenv init -)` that works for kubectl exec.
 ENV PATH=${HOME}/.rbenv/shims:${PATH}
-
-WORKDIR ${SRC}

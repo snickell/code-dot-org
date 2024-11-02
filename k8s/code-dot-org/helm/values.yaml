@@ -1,10 +1,12 @@
 image: code-dot-org:latest
 environment: development
-replicaCount: 1
+uid: 1000
+gid: 1000
 autoscaling:
   enabled: false
   minReplicas: 1
-  maxReplicas: 10
+  maxReplicas: 1
+  replicasWhenAutoscaleDisabled: 1
 development:
   hostPaths:
     home: # ~ on  your local dev box, set automatically by skaffold
