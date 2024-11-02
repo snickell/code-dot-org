@@ -12,7 +12,6 @@ data:
     netsim_redis_groups:
     - master: redis://redis:6379
 
-    # FIXME: do these default to these values already? remove if so
-    dashboard_enable_pegasus: true
+    dashboard_enable_pegasus: false
     build_apps: true
     use_my_apps: true

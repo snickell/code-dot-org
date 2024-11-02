@@ -2,6 +2,16 @@
 skaffold.yaml
 k8s
 
+# We have disabled pegasus, its just too large, and makes skaffold unwieldy
+pegasus/
+
+# We have disabled /i18n
+i18n/
+
+# We have disabled dashboard/config/locales EXCEPT for *en.yml
+dashboard/config/locales
+!dashboard/config/locales/*en.yml
+
 ##########################################################################
 # THESE LARGE STATIC FILES ARE INJECTED USING code-dot-org-static.dockerfile #
 ##########################################################################
@@ -14,8 +24,6 @@ apps/i18n
 i18n/locales
 dashboard/config/locales
 
-pegasus/sites.v3
-pegasus/sites
 ##########################################################################
 
 ##########################################################################
