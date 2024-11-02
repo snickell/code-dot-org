@@ -73,7 +73,7 @@ const Chips: React.FunctionComponent<ChipsProps> = ({
         moduleStyles[`chips-${size}`],
         className
       )}
-      data-testid={`chips-${name}`}
+      data-testid={`chips-${name}`} // eslint-disable-line react/forbid-dom-props
     >
       <fieldset>
         {label && <label className={moduleStyles.groupLabel}>{label}</label>}

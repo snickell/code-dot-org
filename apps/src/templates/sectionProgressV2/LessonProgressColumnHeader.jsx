@@ -44,7 +44,7 @@ const getSkeletonLessonHeader = lessonId => (
     key={lessonId}
   >
     <div
-      data-testid={'skeletonize-content'}
+      data-testid={'skeletonize-content'} // eslint-disable-line react/forbid-dom-props
       className={classNames(
         styles.lessonSkeletonHeaderCell,
         skeletonizeContent.skeletonizeContent

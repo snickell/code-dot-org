@@ -26,7 +26,7 @@ const ResourceIcon: React.FC<ResourceIconProps> = ({
 
   return (
     <div
-      data-testid={'resource-icon-' + iconType.icon}
+      data-testid={'resource-icon-' + iconType.icon} // eslint-disable-line react/forbid-dom-props
       className={classNames(styles.resourceIconContainer, iconType.class)}
     >
       <FontAwesomeV6Icon iconName={iconType.icon} className={styles.icon} />

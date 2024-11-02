@@ -40,7 +40,7 @@ const Tags: React.FunctionComponent<TagsProps> = ({
       moduleStyles[`tags-${size}`],
       className
     )}
-    data-testid="tags"
+    data-testid="tags" // eslint-disable-line react/forbid-dom-props
   >
     {tagsList.map(({tooltipId, label, tooltipContent, ariaLabel, icon}) => (
       <Tag

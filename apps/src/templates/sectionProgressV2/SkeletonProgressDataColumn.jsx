@@ -23,7 +23,7 @@ const getSkeletonCell = (id, key = undefined) => (
   <div
     className={classNames(styles.gridBox, styles.gridBoxLesson)}
     key={key}
-    data-testid={'lesson-skeleton-cell-' + id}
+    data-testid={'lesson-skeleton-cell-' + id} // eslint-disable-line react/forbid-dom-props
   >
     {skeletonContent}
   </div>
@@ -34,13 +34,13 @@ const getMetadataExpandedSkeletonCell = id => (
     {getSkeletonCell(id)}
     <div
       className={classNames(styles.gridBox, styles.gridBoxMetadata)}
-      data-testid={'lesson-skeleton-cell-' + id + '-time-spent'}
+      data-testid={'lesson-skeleton-cell-' + id + '-time-spent'} // eslint-disable-line react/forbid-dom-props
     >
       {skeletonContent}
     </div>
     <div
       className={classNames(styles.gridBox, styles.gridBoxMetadata)}
-      data-testid={'lesson-skeleton-cell-' + id + '-last-updated'}
+      data-testid={'lesson-skeleton-cell-' + id + '-last-updated'} // eslint-disable-line react/forbid-dom-props
     >
       {skeletonContent}
     </div>

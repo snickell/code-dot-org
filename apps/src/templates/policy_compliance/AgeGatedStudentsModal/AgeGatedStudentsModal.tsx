@@ -71,7 +71,7 @@ const AgeGatedStudentsModal: React.FC<Props> = ({
     >
       <div
         className={styles.modalContainer}
-        data-testid="age-gated-students-modal"
+        data-testid="age-gated-students-modal" // eslint-disable-line react/forbid-dom-props
         id="uitest-age-gated-students-modal"
       >
         <div>

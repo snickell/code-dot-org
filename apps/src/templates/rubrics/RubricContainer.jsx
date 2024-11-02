@@ -267,7 +267,7 @@ function RubricContainer({
       handle=".ai-rubric-handle"
     >
       <div
-        data-testid="draggable-test-id"
+        data-testid="draggable-test-id" // eslint-disable-line react/forbid-dom-props
         id="draggable-id"
         className={style.rubricContainer}
         style={open ? null : {display: 'none'}}
@@ -294,7 +294,7 @@ function RubricContainer({
         />
         <div
           className={classnames(style.rubricHeaderRedesign, 'ai-rubric-handle')}
-          data-testid="ai-rubric-handle-test-id"
+          data-testid="ai-rubric-handle-test-id" // eslint-disable-line react/forbid-dom-props
         >
           <div className={style.rubricHeaderLeftSide}>
             <img

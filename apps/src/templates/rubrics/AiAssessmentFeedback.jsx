@@ -130,7 +130,7 @@ export default function AiAssessmentFeedback({aiEvalInfo, aiFeedbackId}) {
                   setAIOtherContent(e.target.value);
                 }}
                 type="text"
-                data-testid="ai-assessment-feedback-textarea"
+                data-testid="ai-assessment-feedback-textarea" // eslint-disable-line react/forbid-dom-props
               />
             </div>
           )}

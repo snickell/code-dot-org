@@ -84,7 +84,7 @@ export const courseLinkFormatter = function (course, {rowData}) {
       ) : (
         <span
           className={skeletonizeContent.skeletonizeContent}
-          data-testid={'skeletonize-content'}
+          data-testid={'skeletonize-content'} // eslint-disable-line react/forbid-dom-props
           style={{width: random(30, 90) + '%'}}
         />
       )}

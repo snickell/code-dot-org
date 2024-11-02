@@ -189,7 +189,7 @@ class SectionProgress extends Component {
             ? navigationStyles.widthLockedPage
             : dashboardStyles.dashboardPage
         }
-        data-testid="section-progress-v1"
+        data-testid="section-progress-v1" // eslint-disable-line react/forbid-dom-props
       >
         <div style={styles.topRowContainer}>
           <div>

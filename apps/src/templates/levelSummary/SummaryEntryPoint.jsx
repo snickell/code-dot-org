@@ -44,7 +44,7 @@ const SummaryEntryPoint = ({scriptData, students, selectedSection}) => {
           </div>
           <div
             className={styles.responseCounter}
-            data-testid={'response-counter'}
+            data-testid={'response-counter'} // eslint-disable-line react/forbid-dom-props
           >
             <p>
               <span className={styles.counter}>

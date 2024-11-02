@@ -62,7 +62,9 @@ const LtiNewAccountCard = () => {
   };
 
   return (
+    // eslint-disable-next-line react/forbid-dom-props
     <Card data-testid={'new-account-card'}>
+      {' '}
       <CardHeader
         title={i18n.ltiLinkAccountNewAccountCardHeaderLabel()}
         icon={
@@ -78,7 +80,7 @@ const LtiNewAccountCard = () => {
         })}
 
         <form
-          data-testid={'new-account-form'}
+          data-testid={'new-account-form'} // eslint-disable-line react/forbid-dom-props
           action={newAccountUrl}
           ref={finishSignupFormRef}
           method="post"
