@@ -27,7 +27,7 @@ RUN <<EOF
   eval "$(rbenv init -)"
   gem install bundler -v 2.3.22
   rbenv rehash
-  bundle install --quiet
+  bundle install --jobs 8
 EOF
 
 ################################################################################
