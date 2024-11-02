@@ -80,9 +80,9 @@ RUN \
   ls -l | grep node_modules
 EOF
 
-################################################################################
+# ################################################################################
 FROM code-dot-org-core
-################################################################################
+# ################################################################################
 
 RUN \
   #
@@ -143,6 +143,11 @@ COPY --chown=${UID} --link \
 COPY --chown=${UID} --link \
   --from=code-dot-org-node_modules ${SRC}/apps/node_modules \
   ./apps/node_modules
+
+# Copy in corepack cache (ugh, but this keeps it from prompting the first time we run yarn)
+COPY --chown=${UID} --link \
+  --from=code-dot-org-node_modules ${HOME}/.cache/node \
+  ${HOME}/.cache/node 
 
 # Copy in the rest of the source code
 COPY --chown=${UID} --link ./ ./
