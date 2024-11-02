@@ -32,19 +32,11 @@ spec:
         ports:
         - containerPort: 3306
         env:
-        - name: MYSQL_ALLOW_EMPTY_ROOT_PASSWORD
-          value: "1"
-        # - name: MYSQL_ROOT_PASSWORD
-        #   value: secret
-        - name: MYSQL_USER
-          value: code-dot-org
-        - name: MYSQL_PASSWORD
-          value: FIXME_WITH_REAL_PASSWORD
-        - name: MYSQL_DATABASE
-          value: codeorg_db
-        volumeMounts:
-        - name: mysql-data
-          mountPath: /var/lib/mysql/
+        - name: MYSQL_ALLOW_EMPTY_PASSWORD
+          value: yes
+        # volumeMounts:
+        # - name: mysql-data
+        #   mountPath: /var/lib/mysql/
   volumeClaimTemplates:
   - metadata:
       name: mysql-data
