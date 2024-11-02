@@ -50,15 +50,6 @@ build:
   local:
     useBuildkit: true # required for caching layers, see https://github.com/moby/moby/issues/34715#issuecomment-589655390
 
-# We're setting this in profiles for now:
-# deploy:
-#   helm:
-#     releases:
-#     - name: dashboard
-#       chartPath: ./k8s/code-dot-org/helm
-#       setValueTemplates:
-#         image: "{{.IMAGE_FULLY_QUALIFIED}}"
-
 profiles:
 
 - name: production
@@ -68,7 +59,7 @@ profiles:
         - name: dashboard
           chartPath: ./k8s/code-dot-org/helm
           setValueTemplates:
-            image: "{{.IMAGE_FULLY_QUALIFIED}}"
+            image: "{{.IMAGE_FULLY_QUALIFIED_code_dot_org}}"
             environment: production
             autoscaling.enabled: true
             autoscaling.minReplicas: 1
@@ -93,7 +84,7 @@ profiles:
         - name: dashboard
           chartPath: ./k8s/code-dot-org/helm
           setValueTemplates:
-            image: "{{.IMAGE_FULLY_QUALIFIED}}"
+            image: "{{.IMAGE_FULLY_QUALIFIED_code_dot_org}}"
             user.username: root
             user.uid: 0
             user.gid: 0
