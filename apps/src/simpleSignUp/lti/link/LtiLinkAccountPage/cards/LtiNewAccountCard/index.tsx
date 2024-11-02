@@ -64,7 +64,6 @@ const LtiNewAccountCard = () => {
   return (
     // eslint-disable-next-line react/forbid-dom-props
     <Card data-testid={'new-account-card'}>
-      {' '}
       <CardHeader
         title={i18n.ltiLinkAccountNewAccountCardHeaderLabel()}
         icon={

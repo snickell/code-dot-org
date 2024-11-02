@@ -23,7 +23,6 @@ export const UserSignupCard: Story = {
   render: () => (
     // eslint-disable-next-line react/forbid-dom-props
     <Card data-testid={'existing-account-card'}>
-      {' '}
       <CardHeader title={i18n.ltiLinkAccountExistingAccountCardHeaderLabel()} />
       <CardContent className={cardStyles.cardContent}>
         {i18n.ltiLinkAccountExistingAccountCardContent({

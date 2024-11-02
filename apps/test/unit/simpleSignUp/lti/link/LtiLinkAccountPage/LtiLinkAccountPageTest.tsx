@@ -88,6 +88,7 @@ describe('LTI Link Account Page Tests', () => {
       const newAccountForm: HTMLFormElement =
         // eslint-disable-next-line no-restricted-properties
         screen.getByTestId('new-account-form');
+
       const formValues = new FormData(newAccountForm);
 
       expect(formValues.get('user[email]')).toEqual(

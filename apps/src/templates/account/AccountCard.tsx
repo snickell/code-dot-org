@@ -40,7 +40,6 @@ const AccountCard: React.FunctionComponent<{
 }) => (
   // eslint-disable-next-line react/forbid-dom-props
   <Card data-testid={id}>
-    {' '}
     <div className={styles.contentWrapper}>
       <CardHeader
         title={title}

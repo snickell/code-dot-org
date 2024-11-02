@@ -518,6 +518,7 @@ describe('LearningGoals - React Testing Library', () => {
 
       // eslint-disable-next-line no-restricted-properties
       screen.getByTestId('thumbs-down');
+
       const expectedBody = JSON.stringify({
         learningGoalAiEvaluationId: 2,
         aiFeedbackApproval: THUMBS_DOWN,

@@ -106,6 +106,7 @@ describe('SectionProgressSelector', () => {
     screen.getByText(V1_PAGE_LINK_TEXT);
     // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
+
     expect(screen.queryByText(V2_PAGE_LINK_TEXT)).toBeFalsy();
     // eslint-disable-next-line no-restricted-properties
     expect(screen.queryByTestId(V2_TEST_ID)).toBeFalsy();
@@ -118,6 +119,7 @@ describe('SectionProgressSelector', () => {
     screen.getByText(V2_PAGE_LINK_TEXT);
     // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V2_TEST_ID);
+
     expect(screen.queryByText(V1_PAGE_LINK_TEXT)).toBeFalsy();
     // eslint-disable-next-line no-restricted-properties
     expect(screen.queryByTestId(V1_TEST_ID)).toBeFalsy();
@@ -130,6 +132,7 @@ describe('SectionProgressSelector', () => {
     screen.getByText(V1_PAGE_LINK_TEXT);
     // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
+
     expect(screen.queryByText(V2_PAGE_LINK_TEXT)).toBeFalsy();
     // eslint-disable-next-line no-restricted-properties
     expect(screen.queryByTestId(V2_TEST_ID)).toBeFalsy();
@@ -143,6 +146,7 @@ describe('SectionProgressSelector', () => {
     screen.getByText(V2_PAGE_LINK_TEXT);
     // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V2_TEST_ID);
+
     expect(screen.queryByText(V1_PAGE_LINK_TEXT)).toBeFalsy();
     // eslint-disable-next-line no-restricted-properties
     expect(screen.queryByTestId(V1_TEST_ID)).toBeFalsy();
@@ -198,6 +202,7 @@ describe('SectionProgressSelector', () => {
     screen.getByText(V1_PAGE_LINK_TEXT);
     // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
+
     expect(screen.queryByText(V2_PAGE_LINK_TEXT)).toBeFalsy();
     // eslint-disable-next-line no-restricted-properties
     expect(screen.queryByTestId(V2_TEST_ID)).toBeFalsy();
@@ -229,6 +234,7 @@ describe('SectionProgressSelector', () => {
     screen.getByText(V1_PAGE_LINK_TEXT);
     // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
+
     expect(screen.queryByText(i18n.progressTrackingAnnouncement())).toBeFalsy();
   });
 
@@ -251,6 +257,7 @@ describe('SectionProgressSelector', () => {
     screen.getByText(V1_PAGE_LINK_TEXT);
     // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
+
     expect(screen.queryByText(i18n.progressTrackingAnnouncement())).toBeFalsy();
   });
 });

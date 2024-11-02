@@ -111,7 +111,7 @@ describe('SkeletonProgressDataColumn', () => {
     // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(getTestId(LESSON.id, STUDENT_1.id));
     // eslint-disable-next-line no-restricted-properties
-    screen.getByTestId(getTestId(LESSON.id, STUDENT_1.id, '-last-updated')); // eslint-disable-next-line no-restricted-properties
+    screen.getByTestId(getTestId(LESSON.id, STUDENT_1.id, '-last-updated'));
     // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(getTestId(LESSON.id, STUDENT_1.id, '-time-spent'));
     // eslint-disable-next-line no-restricted-properties

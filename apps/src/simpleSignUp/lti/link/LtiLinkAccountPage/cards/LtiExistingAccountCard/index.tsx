@@ -50,7 +50,6 @@ const LtiExistingAccountCard = () => {
   return (
     // eslint-disable-next-line react/forbid-dom-props
     <Card data-testid={'existing-account-card'}>
-      {' '}
       <CardHeader
         title={i18n.ltiLinkAccountExistingAccountCardHeaderLabel()}
         icon={
