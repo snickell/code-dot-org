@@ -52,9 +52,6 @@ RUN <<EOF
     libyaml-dev \
     lsof \
     mysql-client \
-    node-pre-gyp \
-    nodejs \
-    npm \
     parallel \
     python3-pip \
     rbenv \
@@ -68,6 +65,11 @@ RUN <<EOF
     zsh \
     # surpress noisy dpkg install/setup lines (errors & warnings still show)
     > /dev/null
+  #
+  # install node, based on instructions at https://github.com/nodesource/distributions#using-ubuntu-1
+  curl -sL https://deb.nodesource.com/setup_20.x | bash -
+  apt-get install -y nodejs
+  corepack enable # corepack required for yarn support
   # 
   # Setup 'code.org' user and group
   echo "${USERNAME} ALL=NOPASSWD: ALL" >> /etc/sudoers
@@ -128,14 +130,6 @@ WORKDIR ${HOME}
 
 RUN <<EOF
   #
-  # Install Node
-  npm install -g n
-  n ${NODE_VERSION}
-  hash -r
-  #
-  # Install yarn
-  npm install -g yarn@${YARN_VERSION}
-  #
   # Install oh-my-zsh
   sh +x -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
   #
@@ -184,7 +178,12 @@ FROM code.org-user-utils as code.org-node_modules
 COPY --chown=${UID} \
   ./apps/package.json \
   ./apps/yarn.lock \
+  ./apps/.yarnrc.yml \
   ./apps/
+
+COPY --chown=${UID} \
+  ./apps/.yarn \
+  ./apps/.yarn/
 
 COPY --chown=${UID} \
   ./apps/eslint \
@@ -194,14 +193,13 @@ RUN \
   #
   # Instuct Docker to maintain a build cache for yarn package downloads
   # so we don't have to re-download npms whenever package.json changes
-  --mount=type=cache,sharing=locked,uid=1000,gid=1000,target=${HOME}/.cache/yarn \
+  # --mount=type=cache,sharing=locked,uid=1000,gid=1000,target=${HOME}/.cache/yarn \
 <<EOF
   #
   # Install apps/node_modules using yarn
   cd apps
-  # yarn install --frozen-lockfile --ignore-scripts
-  yarn install --ignore-scripts
-  ls -lA | grep node
+  yarn install --frozen-lockfile
+  ls -l | grep node_modules
 EOF
 
 ################################################################################
