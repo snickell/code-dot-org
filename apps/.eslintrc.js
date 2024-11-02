@@ -101,6 +101,7 @@ module.exports = {
     Turtle: 'readonly',
     YT: 'readonly',
   },
+  reportUnusedDisableDirectives: true,
   rules: {
     ...rulesToEventuallyReenable,
     'babel/semi': 'error', // autofixable
