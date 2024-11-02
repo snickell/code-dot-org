@@ -55,7 +55,6 @@ spec:
           subPath: locals.yml
         securityContext:
           allowPrivilegeEscalation: {{ if eq .Values.environment "development" }}true{{ else }}false{{ end }}
- 
       volumes:
         - name: dashboard-locals
           configMap:
