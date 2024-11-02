@@ -150,7 +150,7 @@ RUN <<EOF
   echo 'eval "$(rbenv init -)"' | tee -a ${HOME}/.bashrc ${HOME}/.zshrc
   #
   # install pdm for managing our python dependencies
-  pip install --prefix=/usr/local pdm
+  pip install pdm
   #
   # Install Sauce Connect Proxy
   mkdir sauce_connect
