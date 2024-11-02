@@ -311,19 +311,25 @@ describe('RubricContainer', () => {
     // eslint-disable-next-line no-restricted-properties
     let content = container.querySelector('#uitest-rubric-content');
 
+    // eslint-disable-next-line no-restricted-properties
     expect(content).toHaveClass('visibleRubricContent');
+    // eslint-disable-next-line no-restricted-properties
     expect(settings).toHaveClass('settingsHidden');
 
     fireEvent.click(screen.getByText(i18n.rubricTabClassManagement()));
 
+    // eslint-disable-next-line no-restricted-properties
     expect(content).toHaveClass('hiddenRubricContent');
+    // eslint-disable-next-line no-restricted-properties
     expect(settings).toHaveClass('settingsVisible');
 
     fireEvent.click(
       screen.getAllByRole('button', {name: i18n.rubricTabStudent()})[0]
     );
 
+    // eslint-disable-next-line no-restricted-properties
     expect(content).toHaveClass('visibleRubricContent');
+    // eslint-disable-next-line no-restricted-properties
     expect(settings).toHaveClass('settingsHidden');
   });
 

@@ -48,6 +48,7 @@ describe('Breadcrumbs Component', () => {
 
     // eslint-disable-next-line no-restricted-properties
     const container = screen.getByTestId('breadcrumbs-test-breadcrumbs');
+    // eslint-disable-next-line no-restricted-properties
     expect(container).toHaveClass(customClass);
   });
 

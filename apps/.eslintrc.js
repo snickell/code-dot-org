@@ -261,6 +261,10 @@ module.exports = {
             property: 'querySelectorAll',
             message: noRestrictedQueriesMessage,
           },
+          {
+            property: 'toHaveClass',
+            message: noRestrictedQueriesMessage,
+          },
         ],
       },
     },
