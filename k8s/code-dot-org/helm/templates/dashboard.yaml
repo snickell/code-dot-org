@@ -32,6 +32,8 @@ spec:
       containers:
       - name: dashboard
         image: "{{.Values.image}}"
+        command: ["bin/dashboard-server"]
+        # command: ["zsh"]
         ports:
         - containerPort: 3000
         tty: true # dashboard stdout logging assumes a tty

@@ -6,9 +6,9 @@ ARG CODE_DOT_ORG_STATIC
 ARG CODE_DOT_ORG_DB_SEED
 ARG CODE_DOT_ORG_CORE
 
-FROM $CODE_DOT_ORG_STATIC as code-dot-org-static
-FROM $CODE_DOT_ORG_DB_SEED as code-dot-org-db-seed
-FROM $CODE_DOT_ORG_CORE as code-dot-org-core
+FROM $CODE_DOT_ORG_STATIC AS code-dot-org-static
+FROM $CODE_DOT_ORG_DB_SEED AS code-dot-org-db-seed
+FROM $CODE_DOT_ORG_CORE AS code-dot-org-core
 
 ################################################################################
 FROM code-dot-org-core AS code-dot-org-bundle-install
@@ -122,4 +122,4 @@ COPY --chown=${UID} --link ./ ./
 # accomplish `eval $(rbenv init -)` that works for kubectl exec.
 ENV PATH=${HOME}/.rbenv/shims:${PATH}
 
-CMD [ "./bin/dashboard-server" ]
+ENTRYPOINT [ "/usr/bin/zsh" ]
