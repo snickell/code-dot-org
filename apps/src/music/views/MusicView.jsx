@@ -139,7 +139,8 @@ class UnconnectedMusicView extends React.Component {
       this.getPlaybackEvents,
       this.getValidationTimeout,
       this.player,
-      this.getPlayingTriggers
+      this.getPlayingTriggers,
+      this.getCurrentBlocks
     );
 
     // Set shared shared objects in the MusicRegistry so views outside of this
@@ -411,6 +412,10 @@ class UnconnectedMusicView extends React.Component {
 
   getPlayingTriggers = () => {
     return this.playingTriggers;
+  };
+
+  getCurrentBlocks = () => {
+    return this.musicBlocklyWorkspace.getAllBlocks().map(block => block.type);
   };
 
   getCurrentPlayheadPosition = () => {

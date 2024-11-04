@@ -46,6 +46,8 @@ export default class PythonValidator extends Validator {
     return true;
   }
 
+  onLevelChange() {}
+
   clear(): void {
     this.pythonValidationTracker.reset();
   }

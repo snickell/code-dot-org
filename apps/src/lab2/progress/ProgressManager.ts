@@ -11,6 +11,7 @@ export abstract class Validator {
   abstract checkConditions(): void;
   abstract conditionsMet(conditions: Condition[]): boolean;
   abstract clear(): void;
+  abstract onLevelChange(): void;
   abstract getValidationResults(): ValidationResult[] | undefined;
 }
 
@@ -64,6 +65,12 @@ export default class ProgressManager {
    */
   onLevelChange(validations?: Validation[]) {
     this.currentValidations = validations;
+
+    if (this.validator) {
+      // Give the lab the chance to clear anything level-specific.
+      this.validator.onLevelChange();
+    }
+
     this.resetValidation();
   }
 
@@ -95,7 +102,10 @@ export default class ProgressManager {
     // Go through each validation to see if we have a match.
     for (const validation of this.currentValidations) {
       // If it's a non-successful validation (i.e. validation.next is false), then
-      // make sure the lab-specific validator is ready for it.
+      // make sure the lab-specific validator is ready for it.  Sometimes a lab
+      // only wants to deliver success validations early on (allowing a user to
+      // move to the next level immediately), while it waits longer to start evaluating
+      // remaining validations.
       if (this.validator.shouldCheckNextConditionsOnly() && !validation.next) {
         continue;
       }

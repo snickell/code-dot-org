@@ -22,22 +22,49 @@ import MusicPlayer from '../player/MusicPlayer';
 
 import {MusicConditions} from './MusicConditions';
 
+// A list of block types that could have a tip when first used.
+const tipFirstUseBlockTypes: BlockTypes[] = [
+  BlockTypes.TRIGGERED_AT_SIMPLE2,
+  BlockTypes.REPEAT_SIMPLE2,
+  BlockTypes.PLAY_SOUNDS_SEQUENTIAL,
+  BlockTypes.PLAY_SOUNDS_RANDOM,
+  BlockTypes.PLAY_PATTERN_AT_CURRENT_LOCATION_SIMPLE2,
+  BlockTypes.PLAY_CHORD_AT_CURRENT_LOCATION_SIMPLE2,
+  BlockTypes.SET_VOLUME_EFFECT_AT_CURRENT_LOCATION_SIMPLE2,
+  BlockTypes.SET_FILTER_EFFECT_AT_CURRENT_LOCATION_SIMPLE2,
+  BlockTypes.SET_DELAY_EFFECT_AT_CURRENT_LOCATION_SIMPLE2,
+  BlockTypes.PLAY_REST_AT_CURRENT_LOCATION_SIMPLE2,
+];
+
 export interface ConditionNames {
   [key: string]: ConditionType;
 }
 
 export default class MusicValidator extends Validator {
+  // An accumulated set of blocks we've seen.
+  // When beginning a level, this is undefined.
+  private blocksSeen?: BlockTypes[];
+
+  // We choose to show one block's "first use" tip.
+  private currentBlockFirstUse?: BlockTypes;
+
   constructor(
     private readonly getIsPlaying: () => boolean,
     private readonly getPlaybackEvents: () => PlaybackEvent[],
     private readonly getValidationTimeout: () => number,
     private readonly player: MusicPlayer,
     private readonly getPlayingTriggers: () => PlayingTrigger[],
+    private readonly getCurrentBlocks: () => BlockTypes[],
     private readonly conditionsChecker: ConditionsChecker = new ConditionsChecker(
-      Object.values(MusicConditions).map(condition => condition.name)
+      [
+        ...Object.values(MusicConditions).map(condition => condition.name),
+        ...tipFirstUseBlockTypes.map(blockType => `tip--${blockType}`),
+      ]
     )
   ) {
     super();
+    this.blocksSeen = undefined;
+    this.currentBlockFirstUse = undefined;
   }
 
   shouldCheckConditions() {
@@ -319,6 +346,29 @@ export default class MusicValidator extends Validator {
         parseInt(trigger.id.replace('trigger', ''))
       );
     });
+
+    const currentBlocks = this.getCurrentBlocks();
+
+    if (this.blocksSeen === undefined) {
+      // First run, so just capture blocks encountered without
+      // choosing one for a "first use" tip.
+      this.blocksSeen = currentBlocks;
+    } else {
+      // Any new blocks that appear are cadidates for a "first use" tip.
+      //  We'll just show a tip for the first that is encountered in this run.
+      for (const blockType of tipFirstUseBlockTypes) {
+        if (
+          !this.blocksSeen?.includes(blockType) &&
+          currentBlocks.includes(blockType)
+        ) {
+          this.conditionsChecker.addSatisfiedCondition({
+            name: `tip--${blockType}`,
+          });
+          this.currentBlockFirstUse = blockType;
+          break;
+        }
+      }
+    }
   }
 
   // Check for PLAYED_DIFFERENT_SOUNDS_TOGETHER_MULTIPLE_TIMES.
@@ -376,8 +426,18 @@ export default class MusicValidator extends Validator {
     return this.conditionsChecker.checkRequirementConditions(conditions);
   }
 
+  onLevelChange() {
+    this.blocksSeen = undefined;
+    this.currentBlockFirstUse = undefined;
+  }
+
   clear() {
     this.conditionsChecker.clear();
+
+    // A block got its "first use" tip, but that won't happen again.
+    if (this.blocksSeen && this.currentBlockFirstUse) {
+      this.blocksSeen.push(this.currentBlockFirstUse);
+    }
   }
 
   setSatisfiedCondition(name: string, value: string | number) {

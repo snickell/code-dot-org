@@ -162,15 +162,15 @@ const InstructionsPanel: React.FunctionComponent<InstructionsPanelProps> = ({
 
   const showSecondaryFinishButton = useSecondaryFinishButton && !hasNextLevel;
 
-  const useMessage =
-    showSecondaryFinishButton &&
-    queryParams('show-secondary-finish-button-question') === 'true'
-      ? commonI18n.finishMessage()
-      : message;
-
   // The secondary finish button avoids a reappearance animation by not using
   // the unique index.
   const useMessageIndex = useSecondaryFinishButton ? undefined : messageIndex;
+
+  // The secondary finish button can have its own optional message.
+  const secondaryFinishButtonMessage =
+    showSecondaryFinishButton &&
+    queryParams('show-secondary-finish-button-question') === 'true' &&
+    commonI18n.finishMessage();
 
   return (
     <div
@@ -215,30 +215,25 @@ const InstructionsPanel: React.FunctionComponent<InstructionsPanelProps> = ({
             </div>
           </div>
         )}
-        {(useMessage || canShowNextButton) && (
+        {(message || (!showSecondaryFinishButton && canShowNextButton)) && (
           <div
-            key={useMessageIndex + ' - ' + useMessage}
+            key={useMessageIndex + ' - ' + message}
             id="instructions-feedback"
-            className={classNames(
-              moduleStyles.feedback,
-              showSecondaryFinishButton && moduleStyles.feedbackBottom
-            )}
+            className={moduleStyles.feedback}
           >
             <div
               id="instructions-feedback-message"
               className={moduleStyles['message-' + theme]}
             >
-              {offerBrowserTts && useMessage && (
-                <TextToSpeech text={useMessage} />
-              )}
-              {useMessage && (
+              {offerBrowserTts && message && <TextToSpeech text={message} />}
+              {message && (
                 <EnhancedSafeMarkdown
-                  markdown={useMessage}
+                  markdown={message}
                   className={moduleStyles.markdownText}
                   handleInstructionsTextClick={handleInstructionsTextClick}
                 />
               )}
-              {canShowNextButton && (
+              {canShowNextButton && !showSecondaryFinishButton && (
                 <Button
                   id="instructions-continue-button"
                   text={
@@ -246,10 +241,43 @@ const InstructionsPanel: React.FunctionComponent<InstructionsPanelProps> = ({
                   }
                   onClick={onContinueOrFinish}
                   className={moduleStyles.buttonInstruction}
-                  type={showSecondaryFinishButton ? 'secondary' : 'primary'}
-                  color={showSecondaryFinishButton ? 'black' : 'purple'}
+                  type={'primary'}
+                  color={'purple'}
                 />
               )}
+            </div>
+          </div>
+        )}
+        {showSecondaryFinishButton && (
+          <div
+            id="secondary-finish"
+            className={classNames(
+              moduleStyles.feedback,
+              moduleStyles.feedbackBottom
+            )}
+          >
+            <div
+              id="instructions-feedback-message"
+              className={moduleStyles['message-' + theme]}
+            >
+              {offerBrowserTts && secondaryFinishButtonMessage && (
+                <TextToSpeech text={secondaryFinishButtonMessage} />
+              )}
+              {secondaryFinishButtonMessage && (
+                <EnhancedSafeMarkdown
+                  markdown={secondaryFinishButtonMessage}
+                  className={moduleStyles.markdownText}
+                  handleInstructionsTextClick={handleInstructionsTextClick}
+                />
+              )}
+              <Button
+                id="instructions-continue-button"
+                text={commonI18n.finish()}
+                onClick={onContinueOrFinish}
+                className={moduleStyles.buttonInstruction}
+                type={'secondary'}
+                color={'black'}
+              />
             </div>
           </div>
         )}
