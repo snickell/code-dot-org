@@ -6,22 +6,13 @@
   display: flex;
   position: absolute;
   bottom: 7px;
-  right: 7px;
+  inset-inline-end: 7px;
   opacity: 35%;
   cursor: pointer;
   transition: opacity 0.2s ease;
 
-  html[dir="rtl"] & {
-    right: initial;
-    left: 6px;
-  }
-
   &Playing {
     opacity: 100%;
-  }
-
-  &Higher {
-    bottom: 59px;
   }
 
   &:hover {
