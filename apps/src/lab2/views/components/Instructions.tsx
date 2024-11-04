@@ -229,7 +229,7 @@ const InstructionsPanel: React.FunctionComponent<InstructionsPanelProps> = ({
               className={moduleStyles['message-' + theme]}
             >
               {offerBrowserTts && useMessage && (
-                <TextToSpeech text={useMessage} />
+                <TextToSpeech text={useMessage} higher={canShowNextButton} />
               )}
               {useMessage && (
                 <EnhancedSafeMarkdown
