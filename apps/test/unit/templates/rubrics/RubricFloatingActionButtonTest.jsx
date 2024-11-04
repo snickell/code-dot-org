@@ -99,6 +99,25 @@ describe('RubricFloatingActionButton', () => {
       expect(fab.classList.contains('unittest-fab-pulse')).toBe(true);
     });
 
+    it('does not render pulse animation before student status loads', () => {
+      render(
+        <Provider store={store}>
+          <RubricFloatingActionButton {...defaultProps} />
+        </Provider>
+      );
+
+      const fabImage = screen.getByRole('img', {name: 'AI bot'});
+      fireEvent.load(fabImage);
+
+      const taImage = screen.getByRole('img', {name: 'TA overlay'});
+      fireEvent.load(taImage);
+
+      const fab = screen.getByRole('button', {
+        name: i18n.openOrCloseTeachingAssistant(),
+      });
+      expect(fab.classList.contains('unittest-fab-pulse')).toBe(false);
+    });
+
     it('does not render pulse animation when open state is present in session storage', () => {
       store.dispatch(setLoadedStudentStatusForTest());
       sessionStorage.setItem('RubricFabOpenStateKey', 'false');
