@@ -185,6 +185,12 @@ module.exports = {
         forbid: [{propName: 'data-testid', message: noDataTestIdMessage}],
       },
     ],
+    'react/forbid-component-props': [
+      'error',
+      {
+        forbid: [{propName: 'data-testid', message: noDataTestIdMessage}],
+      },
+    ],
   },
   settings: {
     react: {
