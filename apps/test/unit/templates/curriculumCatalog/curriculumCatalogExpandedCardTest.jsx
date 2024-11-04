@@ -161,7 +161,6 @@ describe('CurriculumCatalogExpandedCard', () => {
     });
 
     //Checks for correct amount of Horizontal dividers
-    // eslint-disable-next-line no-restricted-properties
     expect(availableResourcesContainer.querySelectorAll('hr')).toHaveLength(
       Object.keys(availableResources).length
     );
