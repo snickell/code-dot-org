@@ -2,8 +2,9 @@
 @import 'font';
 
 #global-edition-region-switch-confirm {
-  max-width: 34rem;
-  padding: 4rem 2.5rem;
+  width: auto;
+  max-width: 40rem;
+  padding: 4rem;
   text-align: center;
 
   & > *:not(:last-child) {
