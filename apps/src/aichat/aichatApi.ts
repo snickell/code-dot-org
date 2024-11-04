@@ -206,7 +206,12 @@ async function postChatCompletionAsyncPolling(
   }
 
   return {
-    messages: getUpdatedMessages(newMessage, modelResponse, executionStatus),
+    messages: getUpdatedMessages(
+      newMessage,
+      modelResponse,
+      executionStatus,
+      requestId
+    ),
   };
 }
 
@@ -216,7 +221,8 @@ async function postChatCompletionAsyncPolling(
 function getUpdatedMessages(
   userMessage: ChatMessage,
   modelResponse: string,
-  executionStatus: ValueOf<typeof AiRequestExecutionStatus>
+  executionStatus: ValueOf<typeof AiRequestExecutionStatus>,
+  requestId: number
 ): ChatMessage[] {
   switch (executionStatus) {
     case AiRequestExecutionStatus.SUCCESS:
@@ -224,12 +230,14 @@ function getUpdatedMessages(
         {
           ...userMessage,
           status: AiInteractionStatus.OK,
+          requestId,
         },
         {
           chatMessageText: modelResponse,
           role: Role.ASSISTANT,
           timestamp: Date.now(),
           status: AiInteractionStatus.OK,
+          requestId,
         },
       ];
     case AiRequestExecutionStatus.USER_PROFANITY:
