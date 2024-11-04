@@ -165,12 +165,28 @@ module.exports = {
             message: 'Use jest matchers instead of chai',
           },
           {
-            name: 'sinon',
-            message: 'Use jest spys and stubs instead of sinon',
+            name: 'enzyme',
+            message: 'Use react-testing-library instead of enzyme',
+          },
+          {
+            name: 'radium',
+            message: 'Use css modules instead of radium',
+          },
+          {
+            name: 'react-bootstrap',
+            message: 'Use design system components instead of react-bootstrap',
           },
           {
             name: 'react-router',
             message: 'Use react-router-dom instead of react-router',
+          },
+          {
+            name: 'sinon',
+            message: 'Use jest spys and stubs instead of sinon',
+          },
+          {
+            name: 'sinon-chai',
+            message: 'Use jest matchers instead of chai',
           },
         ],
         patterns: [
