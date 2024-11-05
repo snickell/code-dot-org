@@ -83,7 +83,7 @@
   padding: 0 2px;
 
   color: var(--light-white, #FFF);
-  font-feature-settings: 'liga' off, 'clig' off;
+  font-variant-ligatures: no-common-ligatures;
 }
 
 .rubricContainer {
