@@ -3897,6 +3897,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@code-dot-org/ui-poc@npm:*":
+  version: 0.0.6
+  resolution: "@code-dot-org/ui-poc@npm:0.0.6::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40code-dot-org%2Fui-poc%2F0.0.6%2Fc048c760cf592301faaefabe0ddb65d10823ac12"
+  dependencies:
+    classnames: ^2.5.1
+    react-bootstrap-2: ^10.1.0
+  peerDependencies:
+    react: ">=16"
+    react-dom: ">=16"
+  checksum: 04323231531029dc1cecb91837244453e275059f624eff24d1e05dab6f5b3d0ae6f32c510e3ea6928f338a59952f888616ec1f9ddbe164025a802fa88ce42042
+  languageName: node
+  linkType: hard
+
 "@codemirror/autocomplete@npm:^6.0.0, @codemirror/autocomplete@npm:^6.11.1, @codemirror/autocomplete@npm:^6.3.2":
   version: 6.12.0
   resolution: "@codemirror/autocomplete@npm:6.12.0"
@@ -9816,6 +9829,7 @@ __metadata:
     "@code-dot-org/piskel": 0.13.0-cdo.13
     "@code-dot-org/redactable-markdown": ^0.10.0
     "@code-dot-org/remark-plugins": ^2.0.0
+    "@code-dot-org/ui-poc": "*"
     "@codemirror/autocomplete": ^6.11.1
     "@codemirror/commands": ^6.3.2
     "@codemirror/lang-css": ^6.2.1
@@ -10920,6 +10934,13 @@ canvg@gabelerner/canvg:
   version: 2.3.2
   resolution: "classnames@npm:2.3.2"
   checksum: 2c62199789618d95545c872787137262e741f9db13328e216b093eea91c85ef2bfb152c1f9e63027204e2559a006a92eb74147d46c800a9f96297ae1d9f96f4e
+  languageName: node
+  linkType: hard
+
+"classnames@npm:^2.5.1":
+  version: 2.5.1
+  resolution: "classnames@npm:2.5.1"
+  checksum: da424a8a6f3a96a2e87d01a432ba19315503294ac7e025f9fece656db6b6a0f7b5003bb1fbb51cbb0d9624d964f1b9bb35a51c73af9b2434c7b292c42231c1e5
   languageName: node
   linkType: hard
 
@@ -22976,6 +22997,13 @@ es6-shim@latest:
     react: ^16.8.5 || ^17.0.0
     react-dom: ^16.8.5 || ^17.0.0
   checksum: 12b7e9fbe872783e0f899e03f2e80deee085aa1e2cec3d556c1d06bdbafbda7a3c9cf7a3a6b26544617eb2e50d0e3518001bd8300370704bf5a8c9c21f54ec90
+  languageName: node
+  linkType: hard
+
+"react-bootstrap-2@npm:^10.1.0":
+  version: 10.1.0
+  resolution: "react-bootstrap-2@npm:10.1.0"
+  checksum: cac678dbe48c132e81138063bf8ae17f05eb23bd5b088b8359f604aed1a05133cf394f3e613084b9db1b3ff0382adc6a77cd3aac7fbef74dfddc48d85f742d7d
   languageName: node
   linkType: hard
 
