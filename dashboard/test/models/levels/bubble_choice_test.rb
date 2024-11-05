@@ -289,13 +289,6 @@ class BubbleChoiceTest < ActiveSupport::TestCase
         uses_lab2: false
       }
     ]
-
-    puts "EXPECTED SUMMARY"
-    pp expected_summary
-    puts
-    puts "SUBLEVEL SUMMARY"
-    pp sublevel_summary
-
     assert_equal expected_summary, sublevel_summary
   end
 
