@@ -154,6 +154,7 @@ module Dashboard
     config.assets.gzip = false # cloudfront gzips everything for us on the fly.
     config.assets.paths << Rails.root.join('./public/blockly')
     config.assets.paths << Rails.root.join('../shared/css')
+    config.assets.paths << Rails.root.join('../apps/node_modules/@code-dot-org/css-poc')
     config.assets.paths << Rails.root.join('../shared/js')
 
     # Whether to fallback to assets pipeline if a precompiled asset is missed.

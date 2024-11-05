@@ -22,6 +22,8 @@ def inline_css(css)
   else
     path = resolve_static('public', "css/#{css}")
     path ||= shared_dir('css', css)
+    path ||= shared_dir('css', css)
+    path ||= apps_dir('node_modules', '@code-dot-org', 'css-poc')
     unless File.file?(path)
       Sass::Plugin.check_for_updates
       path = pegasus_dir('cache', 'css', css)
