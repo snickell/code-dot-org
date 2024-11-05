@@ -51,6 +51,7 @@ $ai-rubric-cyan-hover: #37e1db;
   display: flex;
   justify-content: space-around;
   height: 100%;
+  background-color: $neutral_dark;
 
   &Generating {
     pointer-events: none;
@@ -69,27 +70,54 @@ $ai-rubric-cyan-hover: #37e1db;
     display: flex;
     align-items: center;
   }
+
+  .editArea {
+    display: flex;
+  }
+
+  .drumArea {
+    margin-top: 11px;
+  }
+
+  .patternArea {
+    background-color: $dark_black;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: solid 1px $neutral_dark40;
+  }
 }
 
 .select {
   margin-bottom: 0;
+  width: 110px;
+}
+
+.previewControls {
+  width: 110px;
+  margin-left: 17px;
+
+  .controlsRow {
+    margin: 0;
+  }
 }
 
 .row {
   display: flex;
   align-items: center;
+  height: 23px;
 
   &:hover {
-    background-color: rgba($light_gray_950, 0.2);
-    border-radius: 4px;
+    //background-color: rgba($light_gray_950, 0.2);
+    //border-radius: 4px;
   }
 }
 
 .nameContainer {
   display: inline-block;
-  width: 120px;
-  vertical-align: middle;
+  width: 105px;
   padding-left: 3px;
+  padding-right: 5px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

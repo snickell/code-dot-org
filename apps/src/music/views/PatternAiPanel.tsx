@@ -79,7 +79,7 @@ const Help: React.FunctionComponent<HelpProps> = ({
   ][eventsLength];
 
   return (
-    <div>
+    <>
       {userCompletedTask === 'none' && (
         <div className={styles.helpContainer}>
           <div className={classNames(styles.help, styles.helpDrawDrums)}>
@@ -193,7 +193,7 @@ const Help: React.FunctionComponent<HelpProps> = ({
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
@@ -505,55 +505,67 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
               ))}
             </select>
 
-            <PreviewControls
-              enabled={currentValue.events.length > 0}
-              playPreview={playPreview}
-              onClickClear={onClear}
-              cancelPreviews={stopPreview}
-              isPlayingPreview={currentPreviewTick > 0}
-            />
+            <div className={styles.previewControls}>
+              <PreviewControls
+                enabled={currentValue.events.length > 0}
+                playPreview={playPreview}
+                onClickClear={onClear}
+                cancelPreviews={stopPreview}
+                isPlayingPreview={currentPreviewTick > 0}
+              />
+            </div>
           </div>
 
-          <div className={styles.patternArea}>
-            {currentFolder.sounds.map(({name, note}, index) => {
-              return (
-                <div className={styles.row} key={note}>
-                  <div className={styles.nameContainer}>
-                    <span
-                      className={styles.name}
-                      onClick={() =>
-                        MusicRegistry.player.previewNote(
-                          note || index,
-                          currentValue.instrument
-                        )
-                      }
-                    >
-                      {name}
-                    </span>
+          <div className={styles.editArea}>
+            <div className={styles.drumArea}>
+              {currentFolder.sounds.map(({name, note}, index) => {
+                return (
+                  <div className={styles.row} key={note}>
+                    <div className={styles.nameContainer}>
+                      <span
+                        className={styles.name}
+                        onClick={() =>
+                          MusicRegistry.player.previewNote(
+                            note || index,
+                            currentValue.instrument
+                          )
+                        }
+                      >
+                        {name}
+                      </span>
+                    </div>
                   </div>
-                  {arrayOfTicks
-                    .filter(
-                      tick =>
-                        (userCompletedTask === 'generated' &&
-                          generateState === 'none') ||
-                        tick < 9
-                    )
-                    .map(tick => {
-                      return (
-                        <div
-                          className={getOuterCellClasses(tick)}
-                          onClick={() => toggleEvent(tick, index)}
-                          key={tick}
-                        >
+                );
+              })}
+            </div>
+            <div className={styles.patternArea}>
+              {currentFolder.sounds.map(({name, note}, index) => {
+                return (
+                  <div className={styles.row} key={note}>
+                    {arrayOfTicks
+                      .filter(
+                        tick =>
+                          (userCompletedTask === 'generated' &&
+                            generateState === 'none') ||
+                          tick < 9
+                      )
+                      .map(tick => {
+                        return (
                           <div
-                            className={getCellClasses(note || index, tick)}
-                          />
-                        </div>
-                      );
-                    })}
-                </div>
-              );
-            })}
+                            className={getOuterCellClasses(tick)}
+                            onClick={() => toggleEvent(tick, index)}
+                            key={tick}
+                          >
+                            <div
+                              className={getCellClasses(note || index, tick)}
+                            />
+                          </div>
+                        );
+                      })}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
