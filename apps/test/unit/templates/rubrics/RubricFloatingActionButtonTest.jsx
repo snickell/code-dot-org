@@ -21,8 +21,16 @@ import teacherRubric, {
 import teacherSections, {
   setStudentsForCurrentSection,
 } from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
-import {LevelStatus} from '@cdo/generated-scripts/sharedConstants';
 import i18n from '@cdo/locale';
+
+import {
+  defaultRubric,
+  studentAlice,
+  levelNotTried,
+  notAttemptedJsonAll,
+  successJsonAll,
+  noEvals,
+} from './rubricTestHelper';
 
 async function wait() {
   for (let _ = 0; _ < 10; _++) {
@@ -42,42 +50,11 @@ fetch.mockIf(/\/rubrics\/.*/, JSON.stringify(''));
 
 const sectionId = 999;
 const defaultProps = {
-  rubric: {
-    id: 1,
-    level: {
-      name: 'test-level',
-    },
-    learningGoals: [
-      {
-        id: 1,
-        key: 'abc',
-        learningGoal: 'Learning Goal 1',
-        aiEnabled: true,
-        evidenceLevels: [
-          {id: 1, understanding: 1, teacherDescription: 'lg level 1'},
-        ],
-        tips: 'Tips',
-      },
-    ],
-  },
-  currentLevelName: 'test-level',
+  rubric: defaultRubric,
+  currentLevelName: 'test_level',
   studentLevelInfo: null,
 };
 
-const studentAlice = {id: 11, name: 'Alice'};
-const studentBob = {id: 22, name: 'Bob'};
-const levelNotTried = {
-  id: '123',
-  assessment: null,
-  contained: false,
-  paired: false,
-  partnerNames: null,
-  partnerCount: null,
-  isConceptLevel: false,
-  levelNumber: 4,
-  passed: false,
-  status: LevelStatus.not_tried,
-};
 describe('RubricFloatingActionButton', () => {
   let sendEventSpy;
   let store;
@@ -104,44 +81,6 @@ describe('RubricFloatingActionButton', () => {
       }
     });
   }
-
-  const levelsWithProgress = [
-    {...levelNotTried, userId: studentAlice.id},
-    {...levelNotTried, userId: studentBob.id},
-  ];
-
-  const notAttemptedStatusAll = {
-    attemptedCount: 0,
-    attemptedUnevaluatedCount: 0,
-    csrfToken: 'abcdef',
-    aiEvalStatusMap: {
-      11: 'NOT_STARTED',
-      22: 'NOT_STARTED',
-    },
-  };
-
-  const readyStatusAll = {
-    attemptedCount: 2,
-    attemptedUnevaluatedCount: 0,
-    csrfToken: 'abcdef',
-    aiEvalStatusMap: {
-      11: 'READY_TO_REVIEW',
-      22: 'READY_TO_REVIEW',
-    },
-  };
-
-  const noEvals = [
-    {
-      user_name: 'Alice',
-      user_id: 11,
-      eval: [],
-    },
-    {
-      user_name: 'Bob',
-      user_id: 22,
-      eval: [],
-    },
-  ];
 
   beforeEach(() => {
     stubRedux();
@@ -236,16 +175,15 @@ describe('RubricFloatingActionButton', () => {
 
   describe('TA icon bubble', () => {
     beforeEach(() => {
+      const levelsWithProgress = [{...levelNotTried, userId: studentAlice.id}];
       store.dispatch(setLevelsWithProgress(levelsWithProgress));
       store.dispatch(setLoadedLevelsWithProgressForTest());
-      store.dispatch(
-        setStudentsForCurrentSection(sectionId, [studentAlice, studentBob])
-      );
+      store.dispatch(setStudentsForCurrentSection(sectionId, [studentAlice]));
     });
 
     it('renders TA overlay when there are no students to review', async () => {
       stubFetch({
-        evalStatusForAll: notAttemptedStatusAll,
+        evalStatusForAll: notAttemptedJsonAll,
         teacherEvals: noEvals,
       });
 
@@ -265,7 +203,7 @@ describe('RubricFloatingActionButton', () => {
 
     it('renders count bubble when there are students to review', async () => {
       stubFetch({
-        evalStatusForAll: readyStatusAll,
+        evalStatusForAll: successJsonAll,
         teacherEvals: noEvals,
       });
 
@@ -282,7 +220,7 @@ describe('RubricFloatingActionButton', () => {
       ).not.toBeInTheDocument();
       const countBubble = screen.getByLabelText(i18n.aiEvaluationsToReview());
       expect(countBubble).toBeVisible();
-      expect(countBubble.textContent).toBe('2');
+      expect(countBubble.textContent).toBe('1');
     });
   });
 
