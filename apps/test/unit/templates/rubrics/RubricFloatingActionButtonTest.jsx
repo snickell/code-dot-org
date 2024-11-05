@@ -1,8 +1,11 @@
-import {render, screen, fireEvent} from '@testing-library/react';
+import {act, render, screen, fireEvent} from '@testing-library/react';
 import React from 'react';
 import {Provider} from 'react-redux';
 
-import teacherPanel from '@cdo/apps/code-studio/teacherPanelRedux';
+import teacherPanel, {
+  setLevelsWithProgress,
+  setLoadedLevelsWithProgressForTest,
+} from '@cdo/apps/code-studio/teacherPanelRedux';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {
@@ -15,8 +18,19 @@ import {UnconnectedRubricFloatingActionButton as RubricFloatingActionButton} fro
 import teacherRubric, {
   setLoadedStudentStatusForTest,
 } from '@cdo/apps/templates/rubrics/teacherRubricRedux';
-import teacherSections from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
+import teacherSections, {
+  setStudentsForCurrentSection,
+} from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
+import {LevelStatus} from '@cdo/generated-scripts/sharedConstants';
 import i18n from '@cdo/locale';
+
+async function wait() {
+  for (let _ = 0; _ < 10; _++) {
+    await act(async () => {
+      await Promise.resolve();
+    });
+  }
+}
 
 jest.mock('@cdo/apps/util/HttpClient', () => ({
   post: jest.fn().mockResolvedValue({
@@ -26,8 +40,10 @@ jest.mock('@cdo/apps/util/HttpClient', () => ({
 
 fetch.mockIf(/\/rubrics\/.*/, JSON.stringify(''));
 
+const sectionId = 999;
 const defaultProps = {
   rubric: {
+    id: 1,
     level: {
       name: 'test-level',
     },
@@ -48,9 +64,84 @@ const defaultProps = {
   studentLevelInfo: null,
 };
 
+const studentAlice = {id: 11, name: 'Alice'};
+const studentBob = {id: 22, name: 'Bob'};
+const levelNotTried = {
+  id: '123',
+  assessment: null,
+  contained: false,
+  paired: false,
+  partnerNames: null,
+  partnerCount: null,
+  isConceptLevel: false,
+  levelNumber: 4,
+  passed: false,
+  status: LevelStatus.not_tried,
+};
 describe('RubricFloatingActionButton', () => {
   let sendEventSpy;
   let store;
+  let fetchStub;
+
+  function stubFetch({
+    evalStatusForAll = {},
+    teacherEvals = [],
+    tourStatus = {seen: true},
+  }) {
+    fetchStub.mockImplementation(url => {
+      // Stubs out getting the overall AI status, which is part of RubricSettings but
+      // useful to track alongside the user status, here
+      if (/rubrics\/\d+\/ai_evaluation_status_for_all.*/.test(url)) {
+        return Promise.resolve(new Response(JSON.stringify(evalStatusForAll)));
+      }
+
+      if (/rubrics\/\d+\/get_teacher_evaluations_for_all.*/.test(url)) {
+        return Promise.resolve(new Response(JSON.stringify(teacherEvals)));
+      }
+
+      if (/rubrics\/\w+\/get_ai_rubrics_tour_seen/.test(url)) {
+        return Promise.resolve(new Response(JSON.stringify(tourStatus)));
+      }
+    });
+  }
+
+  const levelsWithProgress = [
+    {...levelNotTried, userId: studentAlice.id},
+    {...levelNotTried, userId: studentBob.id},
+  ];
+
+  const notAttemptedStatusAll = {
+    attemptedCount: 0,
+    attemptedUnevaluatedCount: 0,
+    csrfToken: 'abcdef',
+    aiEvalStatusMap: {
+      11: 'NOT_STARTED',
+      22: 'NOT_STARTED',
+    },
+  };
+
+  const readyStatusAll = {
+    attemptedCount: 2,
+    attemptedUnevaluatedCount: 0,
+    csrfToken: 'abcdef',
+    aiEvalStatusMap: {
+      11: 'READY_TO_REVIEW',
+      22: 'READY_TO_REVIEW',
+    },
+  };
+
+  const noEvals = [
+    {
+      user_name: 'Alice',
+      user_id: 11,
+      eval: [],
+    },
+    {
+      user_name: 'Bob',
+      user_id: 22,
+      eval: [],
+    },
+  ];
 
   beforeEach(() => {
     stubRedux();
@@ -61,6 +152,7 @@ describe('RubricFloatingActionButton', () => {
     });
     store = getStore();
     sendEventSpy = jest.spyOn(analyticsReporter, 'sendEvent');
+    fetchStub = jest.spyOn(window, 'fetch');
     sessionStorage.clear();
   });
 
@@ -139,6 +231,58 @@ describe('RubricFloatingActionButton', () => {
         name: i18n.openOrCloseTeachingAssistant(),
       });
       expect(fab.classList.contains('unittest-fab-pulse')).toBe(false);
+    });
+  });
+
+  describe('TA icon bubble', () => {
+    beforeEach(() => {
+      store.dispatch(setLevelsWithProgress(levelsWithProgress));
+      store.dispatch(setLoadedLevelsWithProgressForTest());
+      store.dispatch(
+        setStudentsForCurrentSection(sectionId, [studentAlice, studentBob])
+      );
+    });
+
+    it('renders TA overlay when there are no students to review', async () => {
+      stubFetch({
+        evalStatusForAll: notAttemptedStatusAll,
+        teacherEvals: noEvals,
+      });
+
+      render(
+        <Provider store={store}>
+          <RubricFloatingActionButton {...defaultProps} sectionId={sectionId} />
+        </Provider>
+      );
+
+      await wait();
+
+      expect(screen.getByRole('img', {name: 'TA overlay'})).toBeVisible();
+      expect(
+        screen.queryByLabelText(i18n.aiEvaluationsToReview())
+      ).not.toBeInTheDocument();
+    });
+
+    it('renders count bubble when there are students to review', async () => {
+      stubFetch({
+        evalStatusForAll: readyStatusAll,
+        teacherEvals: noEvals,
+      });
+
+      render(
+        <Provider store={store}>
+          <RubricFloatingActionButton {...defaultProps} sectionId={sectionId} />
+        </Provider>
+      );
+
+      await wait();
+
+      expect(
+        screen.queryByRole('img', {name: 'TA overlay'})
+      ).not.toBeInTheDocument();
+      const countBubble = screen.getByLabelText(i18n.aiEvaluationsToReview());
+      expect(countBubble).toBeVisible();
+      expect(countBubble.textContent).toBe('2');
     });
   });
 

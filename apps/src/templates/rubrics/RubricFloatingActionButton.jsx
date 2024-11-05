@@ -183,7 +183,11 @@ function RubricFloatingActionButton({
       {showCountBubble ? (
         <div className={style.countOverlay}>
           <BodyFourText className={style.countText}>
-            <StrongText>{readyStudentCount}</StrongText>
+            <StrongText>
+              <span aria-label={i18n.aiEvaluationsToReview()}>
+                {readyStudentCount}
+              </span>
+            </StrongText>
           </BodyFourText>
         </div>
       ) : (
