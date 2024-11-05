@@ -21,6 +21,7 @@
     .right{style: 'float: right; width: 30%; text-align: right;'}
       .language-dropdown
         =view :language
-      .return-to-full-site
-        %a{id: 'return-to-full-site', class: 'link-button small secondary white', href: Cdo::GlobalEdition.region_change_url(request.fullpath)}
-          = I18n.t(:global_edition_region_reset_button)
+      .global-edition-region-reset
+        %form{method: :post, action: Cdo::GlobalEdition.region_change_url(request.fullpath)}
+          %button#global-edition-region-reset.small.secondary.white
+            = I18n.t(:global_edition_region_reset_button)

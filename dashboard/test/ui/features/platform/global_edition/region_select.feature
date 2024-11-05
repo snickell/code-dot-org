@@ -12,22 +12,22 @@ Feature: Global Edition - Region Select
     And element ".language-dropdown:visible optgroup[label='Farsi']" has escaped text "\nفارسی\nEnglish\n"
     And element "#selectLanguage optgroup[label='Farsi'] option:contains(English)" is not checked
     And element ".language-dropdown:visible optgroup[label='Farsi'] option:contains(English)" is not checked
-    And element "#pagefooter #return-to-full-site" does not exist
+    And element "#pagefooter #global-edition-region-reset" does not exist
 
     When I select the "فارسی" option in dropdown with class "language-dropdown select" to load a new page
     Then check that I am on "http://code.org/"
     And element ".language-dropdown:visible option:contains(فارسی)" is checked
     And element ".language-dropdown:visible optgroup[label='Farsi']" has escaped text "\nفارسی\nEnglish\n"
     And element ".language-dropdown:visible optgroup[label='Farsi'] option:contains(فارسی)" is not checked
-    And element "#pagefooter #return-to-full-site" does not exist
+    And element "#pagefooter #global-edition-region-reset" does not exist
 
     And I select the "English" option withing the "Farsi" group in dropdown ".language-dropdown select" to load a new page
     And I get redirected away from "http://code.org"
     Then check that I am on "http://code.org/global/fa"
     And element ".language-dropdown:visible select" has escaped text "\nفارسی\nEnglish\n"
     And element ".language-dropdown:visible option:contains(English)" is checked
-    And element "#pagefooter #return-to-full-site" is visible
-    And element "#pagefooter #return-to-full-site" contains text "Return to Full Site"
+    And element "#pagefooter #global-edition-region-reset" is visible
+    And element "#pagefooter #global-edition-region-reset" contains text "Return to Full Site"
 
     When I am on "http://studio.code.org/users/sign_in"
     Then I get redirected away from "http://studio.code.org/users/sign_in"
@@ -39,7 +39,7 @@ Feature: Global Edition - Region Select
     Then check that I am on "http://code.org/global/fa"
     And element ".language-dropdown:visible select" has escaped text "\nفارسی\nEnglish\n"
     And element ".language-dropdown:visible option:contains(فارسی)" is checked
-    And element "#pagefooter #return-to-full-site" is visible
+    And element "#pagefooter #global-edition-region-reset" is visible
 
     When I am on "http://studio.code.org/users/sign_in"
     Then I get redirected away from "http://studio.code.org/users/sign_in"
@@ -47,7 +47,7 @@ Feature: Global Edition - Region Select
     And element "#locale optgroup[label='Farsi'] option:contains(فارسی)" is checked
 
     When I am on "http://code.org"
-    And I click selector "#pagefooter #return-to-full-site" once I see it to load a new page
+    And I click selector "#pagefooter #global-edition-region-reset" once I see it to load a new page
     Then I get redirected away from "http://code.org/global/fa"
     And check that I am on "http://code.org/"
     And element ".language-dropdown:visible option:contains(فارسی)" is checked
@@ -136,17 +136,17 @@ Feature: Global Edition - Region Select
     When I am on "http://code.org/global/fa"
     And element ".language-dropdown:visible option:contains(فارسی)" is checked
     And element "#ge-region-languages" is visible
-    And element "#ge-region-languages" has escaped text "\n\n\nView in English\n\n\n"
+    And element "#ge-region-languages" has escaped text "\n\n\n\nView in English\n\n\n\n"
     Then I click selector "#ge-region-languages a:contains(View in English)" to load a new page
     And I get redirected away from "http://code.org/global/fa"
     And check that I am on "http://code.org/global/fa"
     And element ".language-dropdown:visible option:contains(English)" is checked
     And element "#ge-region-languages" is visible
-    And element "#ge-region-languages" has escaped text "\n\n\nView in فارسی\n\n\n"
+    And element "#ge-region-languages" has escaped text "\n\n\n\nView in فارسی\n\n\n\n"
 
     When I click selector "#ge-region-languages a:contains(View in فارسی)" to load a new page
     Then I get redirected away from "http://code.org/global/fa"
     And check that I am on "http://code.org/global/fa"
     And element ".language-dropdown:visible option:contains(فارسی)" is checked
     And element "#ge-region-languages" is visible
-    And element "#ge-region-languages" has escaped text "\n\n\nView in English\n\n\n"
+    And element "#ge-region-languages" has escaped text "\n\n\n\nView in English\n\n\n\n"

@@ -44,7 +44,8 @@
     %ul#ge-region-languages
       - (Cdo::GlobalEdition.region_locales(ge_region).to_a - [I18n.locale.to_s]).each do |locale|
         %li
-          %a.headerlink{href: Cdo::I18n.language_change_url(request.fullpath, locale, ge_region)}
-            = I18n.t(:global_edition_region_language_switch, language: Cdo::I18n.language_name(locale) || locale)
+          %form{method: :post, action: Cdo::I18n.language_change_url(request.fullpath, locale, ge_region)}
+            %a.headerlink{href: '#', onclick: 'this.parentNode.submit();'}
+              = I18n.t(:global_edition_region_language_switch, language: Cdo::I18n.language_name(locale) || locale)
     = view :sign_in_or_user
     = view :hamburger, hamburger_options
