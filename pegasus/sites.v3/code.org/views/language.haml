@@ -1,27 +1,16 @@
 - require 'cdo/i18n'
 - require 'varnish_environment'
 
-%select{onchange: 'setLocale(this.value);', style: 'color: black; width: 100%; max-width: 162.5px;'}
-  - selected = Cdo::I18n.current_locale_option(I18n.locale, request.ge_region)
+%form{method: :post, action: request.fullpath, 'accept-charset': 'UTF-8'}
+  %select{name: VarnishEnvironment::LOCALE_PARAM_KEY, onchange: 'this.form.submit();', class: 'default', style: 'color: black; width: 100%; max-width: 162.5px;'}
+    - selected = Cdo::I18n.current_locale_option(I18n.locale, request.ge_region)
 
-  - options = request.ge_region ? Cdo::I18n.ge_region_locale_options(request.ge_region) : Cdo::I18n.locale_options
-  - options.each do |name, value|
-    %option{value: value, selected: value == selected}= name
+    - options = request.ge_region ? Cdo::I18n.ge_region_locale_options(request.ge_region) : Cdo::I18n.locale_options
+    - options.each do |name, value|
+      %option{value: value, selected: value == selected}= name
 
-  - unless request.ge_region
-    - Cdo::I18n.grouped_ge_regions_locale_options.each do |region_name, region_options|
-      %optgroup{label: region_name}
-        - region_options.each do |name, value|
-          %option{value: value, selected: value == selected}= name
-
-:javascript
-  function setLocale(locale)
-  {
-    var url = new URL(window.location.href);
-
-    var params = new URLSearchParams(url.search);
-    params.set("#{VarnishEnvironment::LOCALE_PARAM_KEY}", locale);
-    url.search = params.toString();
-
-    window.location.replace(url);
-  }
+    - unless request.ge_region
+      - Cdo::I18n.grouped_ge_regions_locale_options.each do |region_name, region_options|
+        %optgroup{label: region_name}
+          - region_options.each do |name, value|
+            %option{value: value, selected: value == selected}= name
