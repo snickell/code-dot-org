@@ -260,7 +260,11 @@ function createFolderIfNotExists(
 }
 
 function getFileEncoding(filePath: string) {
-  if (filePath.endsWith('jpg')) {
+  if (
+    filePath.endsWith('jpg') ||
+    filePath.endsWith('png') ||
+    filePath.endsWith('jpeg')
+  ) {
     return 'binary';
   } else {
     return 'utf8';
