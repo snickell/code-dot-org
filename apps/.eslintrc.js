@@ -15,11 +15,12 @@ const rulesToEventuallyReenable = {
   'jsx-a11y/tabindex-no-positive': 'off',
 };
 
-const noDataTestIdMessage =
-  'Attribute data-testid is not accessible. Tests should resemble how the user interacts with the application and should not rely on technical details, see https://testing-library.com/docs/queries/about/#priority';
-
-const noRestrictedQueriesMessage =
+const accessibilityTestingMessage =
   'Tests should resemble how the user interacts with the application and should not rely on technical details, see https://testing-library.com/docs/queries/about/#priority';
+
+const noDataTestIdMessage =
+  'Attribute data-testid does not meet accessibility guidelines. ' +
+  accessibilityTestingMessage;
 
 // This config defines globals available especially in apps,
 // enables es6, and enables apps-specific plugins and rules.
@@ -229,46 +230,46 @@ module.exports = {
           {
             object: 'screen',
             property: 'getByTestId',
-            message: noRestrictedQueriesMessage,
+            message: accessibilityTestingMessage,
           },
           {
             object: 'screen',
             property: 'queryByTestId',
-            message: noRestrictedQueriesMessage,
+            message: accessibilityTestingMessage,
           },
           {
             object: 'screen',
             property: 'getAllByTestId',
-            message: noRestrictedQueriesMessage,
+            message: accessibilityTestingMessage,
           },
           {
             object: 'screen',
             property: 'queryAllByTestId',
-            message: noRestrictedQueriesMessage,
+            message: accessibilityTestingMessage,
           },
           {
             object: 'screen',
             property: 'findByTestId',
-            message: noRestrictedQueriesMessage,
+            message: accessibilityTestingMessage,
           },
           {
             object: 'screen',
             property: 'findAllByTestId',
-            message: noRestrictedQueriesMessage,
+            message: accessibilityTestingMessage,
           },
           {
             object: 'container',
             property: 'querySelector',
-            message: noRestrictedQueriesMessage,
+            message: accessibilityTestingMessage,
           },
           {
             object: 'container',
             property: 'querySelectorAll',
-            message: noRestrictedQueriesMessage,
+            message: accessibilityTestingMessage,
           },
           {
             property: 'toHaveClass',
-            message: noRestrictedQueriesMessage,
+            message: accessibilityTestingMessage,
           },
         ],
       },
