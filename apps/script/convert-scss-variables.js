@@ -6,7 +6,7 @@ var convertScssToJs = require(path.resolve(
 ));
 
 convertScssToJs(
-  path.resolve('../shared/css/color.scss'),
+  require.resolve('@code-dot-org/css-poc/color.scss'),
   path.resolve('./src/util/color.js')
 );
 convertScssToJs(
@@ -14,6 +14,6 @@ convertScssToJs(
   path.resolve('./src/styleConstants.js')
 );
 convertScssToJs(
-  path.resolve('../shared/css/font.scss'),
+  require.resolve('@code-dot-org/css-poc/font.scss'),
   path.resolve('./src/fontConstants.js')
 );

@@ -3745,6 +3745,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@code-dot-org/css-poc@npm:*":
+  version: 0.0.0
+  resolution: "@code-dot-org/css-poc@npm:0.0.0::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40code-dot-org%2Fcss-poc%2F0.0.0%2Fcc6a6f966b06bb3f45b583cd16f1e39751323427"
+  checksum: 568d3f1260c7186e3e0e3b18f42d77495643d10ea66e32b65ae7e0116b46d9a0f02009865577e82ca4d7e1a0769b4496081c50cab3e5ab1e4c1c72ef423e7931
+  languageName: node
+  linkType: hard
+
 "@code-dot-org/dance-party@npm:2.0.0":
   version: 2.0.0
   resolution: "@code-dot-org/dance-party@npm:2.0.0"
@@ -9818,6 +9825,7 @@ __metadata:
     "@code-dot-org/artist": 0.2.1
     "@code-dot-org/blockly": 4.0.14
     "@code-dot-org/craft": 0.2.2
+    "@code-dot-org/css-poc": "*"
     "@code-dot-org/dance-party": 2.0.0
     "@code-dot-org/johnny-five": 2.1.0-cdo.3
     "@code-dot-org/js-interpreter": 1.3.13

@@ -269,7 +269,7 @@ module.exports = function (grunt) {
         // Compression currently occurs at the ../dashboard sprockets layer.
         // dart-sass: Only the "expanded" and "compressed" values of outputStyle are supported.
         outputStyle: 'expanded',
-        includePaths: ['node_modules', '../shared/css/'],
+        includePaths: ['node_modules', '../shared/css/', 'node_modules/@code-dot-org/css-poc'],
         implementation: sass,
         quietDeps: true,
       },
