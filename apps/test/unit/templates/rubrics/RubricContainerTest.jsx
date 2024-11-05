@@ -23,12 +23,27 @@ import teacherRubric from '@cdo/apps/templates/rubrics/teacherRubricRedux';
 import teacherSections, {
   setStudentsForCurrentSection,
 } from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
-import {
-  RubricAiEvaluationLimits,
-  RubricAiEvaluationStatus,
-  LevelStatus,
-} from '@cdo/generated-scripts/sharedConstants';
+import {RubricAiEvaluationLimits} from '@cdo/generated-scripts/sharedConstants';
 import i18n from '@cdo/locale';
+
+import {
+  studentAlice,
+  levelNotTried,
+  levelSubmitted,
+  notAttemptedJson,
+  notAttemptedJsonAll,
+  readyJson,
+  readyJsonAll,
+  pendingJson,
+  runningJson,
+  successJson,
+  successJsonAll,
+  defaultRubric,
+  noEvals,
+  oneEval,
+  defaultStudentInfo,
+  mockAiEvaluations,
+} from './rubricTestHelper';
 
 jest.mock('@cdo/apps/util/HttpClient', () => ({
   post: jest.fn().mockResolvedValue({
@@ -38,24 +53,7 @@ jest.mock('@cdo/apps/util/HttpClient', () => ({
 
 fetch.mockIf(/\/rubrics\/.*/, JSON.stringify(''));
 
-const studentAlice = {id: 11, name: 'Alice'};
 const sectionId = 999;
-const levelNotTried = {
-  id: '123',
-  assessment: null,
-  contained: false,
-  paired: false,
-  partnerNames: null,
-  partnerCount: null,
-  isConceptLevel: false,
-  levelNumber: 4,
-  passed: false,
-  status: LevelStatus.not_tried,
-};
-const levelSubmitted = {
-  ...levelNotTried,
-  status: LevelStatus.submitted,
-};
 
 describe('RubricContainer', () => {
   let store;
@@ -150,134 +148,6 @@ describe('RubricContainer', () => {
     restoreRedux();
     jest.restoreAllMocks();
   });
-
-  const notAttemptedJson = {
-    status: null,
-    attempted: false,
-    lastAttemptEvaluated: false,
-    csrfToken: 'abcdef',
-  };
-
-  const notAttemptedJsonAll = {
-    attemptedCount: 0,
-    attemptedUnevaluatedCount: 1,
-    csrfToken: 'abcdef',
-    aiEvalStatusMap: {
-      11: 'NOT_STARTED',
-    },
-  };
-
-  const readyJson = {
-    status: null,
-    attempted: true,
-    lastAttemptEvaluated: false,
-    csrfToken: 'abcdef',
-  };
-
-  const readyJsonAll = {
-    attemptedCount: 1,
-    attemptedUnevaluatedCount: 1,
-    csrfToken: 'abcdef',
-    aiEvalStatusMap: {
-      11: 'IN_PROGRESS',
-    },
-  };
-
-  const pendingJson = {
-    attempted: true,
-    lastAttemptEvaluated: false,
-    csrfToken: 'abcdef',
-    status: RubricAiEvaluationStatus.QUEUED,
-  };
-
-  const runningJson = {
-    attempted: true,
-    lastAttemptEvaluated: false,
-    csrfToken: 'abcdef',
-    status: RubricAiEvaluationStatus.RUNNING,
-  };
-
-  const successJson = {
-    attempted: true,
-    lastAttemptEvaluated: true,
-    csrfToken: 'abcdef',
-    status: RubricAiEvaluationStatus.SUCCESS,
-  };
-
-  const successJsonAll = {
-    attemptedCount: 1,
-    attemptedUnevaluatedCount: 0,
-    csrfToken: 'abcdef',
-    aiEvalStatusMap: {
-      11: 'READY_TO_REVIEW',
-    },
-  };
-
-  const defaultRubric = {
-    id: 1,
-    learningGoals: [
-      {
-        id: 1,
-        key: '1',
-        learningGoal: 'goal 1',
-        aiEnabled: false,
-        evidenceLevels: [{understanding: 1, id: 1, teacherDescription: 'test'}],
-      },
-      {
-        id: 2,
-        key: '2',
-        learningGoal: 'goal 2',
-        aiEnabled: true,
-        evidenceLevels: [{understanding: 1, id: 2, teacherDescription: 'test'}],
-      },
-    ],
-    script: {
-      id: 42,
-    },
-    lesson: {
-      position: 3,
-      name: 'Data Structures',
-    },
-    level: {
-      id: 107,
-      name: 'test_level',
-      position: 7,
-    },
-  };
-
-  const noEvals = [
-    {
-      user_name: 'Stilgar',
-      user_id: 1,
-      eval: [],
-    },
-    {
-      user_name: 'Chani',
-      user_id: 1,
-      eval: [],
-    },
-  ];
-
-  const oneEval = [
-    {
-      user_name: studentAlice.name,
-      user_id: studentAlice.id,
-      eval: [
-        {
-          feedback: '',
-          id: studentAlice.id,
-          learning_goal_id: 1587,
-          understanding: 0,
-        },
-      ],
-    },
-  ];
-
-  const defaultStudentInfo = {user_id: 11, name: 'Alice'};
-
-  const mockAiEvaluations = [
-    {id: 2, learning_goal_id: 2, understanding: 0, aiConfidencePassFail: 2},
-  ];
 
   it('switches components when tabs are clicked', async () => {
     stubFetch({
