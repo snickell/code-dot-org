@@ -263,7 +263,8 @@ function getFileEncoding(filePath: string) {
   if (
     filePath.endsWith('jpg') ||
     filePath.endsWith('png') ||
-    filePath.endsWith('jpeg')
+    filePath.endsWith('jpeg') ||
+    filePath.endsWith('ttf')
   ) {
     return 'binary';
   } else {
