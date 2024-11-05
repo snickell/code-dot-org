@@ -24,6 +24,7 @@ import teacherSections, {
 import i18n from '@cdo/locale';
 
 import {
+  stubFetch,
   defaultRubric,
   studentAlice,
   levelNotTried,
@@ -58,29 +59,6 @@ const defaultProps = {
 describe('RubricFloatingActionButton', () => {
   let sendEventSpy;
   let store;
-  let fetchStub;
-
-  function stubFetch({
-    evalStatusForAll = {},
-    teacherEvals = [],
-    tourStatus = {seen: true},
-  }) {
-    fetchStub.mockImplementation(url => {
-      // Stubs out getting the overall AI status, which is part of RubricSettings but
-      // useful to track alongside the user status, here
-      if (/rubrics\/\d+\/ai_evaluation_status_for_all.*/.test(url)) {
-        return Promise.resolve(new Response(JSON.stringify(evalStatusForAll)));
-      }
-
-      if (/rubrics\/\d+\/get_teacher_evaluations_for_all.*/.test(url)) {
-        return Promise.resolve(new Response(JSON.stringify(teacherEvals)));
-      }
-
-      if (/rubrics\/\w+\/get_ai_rubrics_tour_seen/.test(url)) {
-        return Promise.resolve(new Response(JSON.stringify(tourStatus)));
-      }
-    });
-  }
 
   beforeEach(() => {
     stubRedux();
@@ -91,7 +69,7 @@ describe('RubricFloatingActionButton', () => {
     });
     store = getStore();
     sendEventSpy = jest.spyOn(analyticsReporter, 'sendEvent');
-    fetchStub = jest.spyOn(window, 'fetch');
+    jest.spyOn(window, 'fetch');
     sessionStorage.clear();
   });
 

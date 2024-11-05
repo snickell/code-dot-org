@@ -27,6 +27,7 @@ import {RubricAiEvaluationLimits} from '@cdo/generated-scripts/sharedConstants';
 import i18n from '@cdo/locale';
 
 import {
+  stubFetch,
   studentAlice,
   levelNotTried,
   levelSubmitted,
@@ -67,49 +68,6 @@ describe('RubricContainer', () => {
         await Promise.resolve();
       });
     }
-  }
-
-  function stubFetch({
-    evalStatusForUser = {},
-    evalStatusForAll = {},
-    aiEvals = [],
-    teacherEvals = [],
-    tourStatus = {},
-    updateTourStatus = {},
-  }) {
-    fetchStub.mockImplementation(url => {
-      // Stubs out getting the AI status for a particular user
-      if (/rubrics\/\d+\/ai_evaluation_status_for_user.*/.test(url)) {
-        return Promise.resolve(new Response(JSON.stringify(evalStatusForUser)));
-      }
-
-      // Stubs out getting the overall AI status, which is part of RubricSettings but
-      // useful to track alongside the user status, here
-      if (/rubrics\/\d+\/ai_evaluation_status_for_all.*/.test(url)) {
-        return Promise.resolve(new Response(JSON.stringify(evalStatusForAll)));
-      }
-
-      // This stubs out polling the AI evaluation list which can be provided by 'data'
-      if (/rubrics\/\d+\/get_ai_evaluations.*/.test(url)) {
-        return Promise.resolve(new Response(JSON.stringify(aiEvals)));
-      }
-
-      if (/rubrics\/\d+\/get_teacher_evaluations_for_all.*/.test(url)) {
-        return Promise.resolve(new Response(JSON.stringify(teacherEvals)));
-      }
-
-      if (/rubrics\/\w+\/get_ai_rubrics_tour_seen/.test(url)) {
-        return Promise.resolve(new Response(JSON.stringify(tourStatus)));
-      }
-
-      if (/rubrics\/\w+\/update_ai_rubrics_tour_seen/.test(url)) {
-        return Promise.resolve(new Response(JSON.stringify(updateTourStatus)));
-      }
-
-      if (/rubrics\/\d+\/run_ai_evaluations_for_user$/.test(url)) {
-        return Promise.resolve(new Response(JSON.stringify({})));
-      }
-    });
   }
 
   beforeEach(() => {
@@ -404,7 +362,10 @@ describe('RubricContainer', () => {
     // 2. User clicks button to run analysis
 
     // Stub out running the assessment and have it return pending status when asked next
-    stubFetch({evalStatusForUser: pendingJson, tourStatus: {seen: true}});
+    fetchStub = stubFetch({
+      evalStatusForUser: pendingJson,
+      tourStatus: {seen: true},
+    });
 
     fireEvent.click(button);
 
