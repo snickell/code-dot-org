@@ -335,6 +335,10 @@ class UnconnectedMusicView extends React.Component {
       levelData?.showAiTemperatureExplanation ||
       AppConfig.getValue('show-ai-temperature-explanation') === 'true';
 
+    MusicRegistry.showAiGenerateAgainHelp =
+      levelData?.showAiGenerateAgainHelp ||
+      AppConfig.getValue('show-ai-generate-again-help') === 'true';
+
     this.props.setStartingPlayheadPosition(1);
 
     Lab2Registry.getInstance()
@@ -675,7 +679,7 @@ class UnconnectedMusicView extends React.Component {
     this.player.stopSong();
     this.playingTriggers = [];
 
-    MusicBlocklyWorkspace.hideChaff();
+    this.musicBlocklyWorkspace?.hideChaff();
 
     this.compileSong();
 
@@ -734,6 +738,10 @@ class UnconnectedMusicView extends React.Component {
           playTrigger={this.playTrigger}
           uiShortcutsEnabled={
             AppConfig.getValue('ui-keyboard-shortcuts-enabled') === 'true'
+          }
+          disabled={
+            this.props.levelProperties?.appName !== 'music' ||
+            this.props.isPlayView
           }
         />
         <MusicLabView
