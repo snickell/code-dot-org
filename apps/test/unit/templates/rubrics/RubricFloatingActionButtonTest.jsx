@@ -70,7 +70,7 @@ describe('RubricFloatingActionButton', () => {
     });
     store = getStore();
     sendEventSpy = jest.spyOn(analyticsReporter, 'sendEvent');
-    jest.spyOn(window, 'fetch');
+    stubFetch({});
     sessionStorage.clear();
   });
 
