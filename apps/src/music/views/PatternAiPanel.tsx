@@ -296,7 +296,7 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
   };
 
   const getCellClasses = (note: number, tick: number) => {
-    const isSeed = tick < 9;
+    const isSeed = tick <= PATTERN_AI_NUM_SEED_EVENTS;
     const isHighlighted = (tick - 1) % 4 === 0;
     const isActive = hasEvent(note, tick);
     const isPlaying = isActive && tick === currentPreviewTick;
@@ -410,14 +410,22 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
   };
 
   const handleAiClick = useCallback(async () => {
-    stopPreview();
     const seedEvents = currentValue.events.filter(
       event => event.tick <= PATTERN_AI_NUM_SEED_EVENTS
     );
+
     const onError = (e: Error) => {
       console.error(e);
       setGenerateState('error');
     };
+
+    stopPreview();
+
+    currentValue.events = currentValue.events.filter(
+      event => event.tick <= PATTERN_AI_NUM_SEED_EVENTS
+    );
+    onChange(currentValue);
+
     const startTime = Date.now();
     generatePattern(
       seedEvents,
@@ -547,7 +555,7 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
                         tick =>
                           (userCompletedTask === 'generated' &&
                             generateState === 'none') ||
-                          tick < 9
+                          tick <= PATTERN_AI_NUM_SEED_EVENTS
                       )
                       .map(tick => {
                         return (
