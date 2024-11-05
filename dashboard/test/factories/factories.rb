@@ -1069,6 +1069,20 @@ FactoryBot.define do
       participant_audience {"teacher"}
       instructor_audience {"facilitator"}
     end
+
+    factory :foundations_of_cs_script do
+      after(:create) do |foundations_of_cs_script|
+        foundations_of_cs_script.curriculum_umbrella = Curriculum::SharedCourseConstants::CURRICULUM_UMBRELLA.foundations_of_cs
+        foundations_of_cs_script.save!
+      end
+    end
+
+    factory :foundations_of_programming_script do
+      after(:create) do |foundations_of_programming_script|
+        foundations_of_programming_script.curriculum_umbrella = Curriculum::SharedCourseConstants::CURRICULUM_UMBRELLA.foundations_of_programming
+        foundations_of_programming_script.save!
+      end
+    end
   end
 
   factory :project_storage do
@@ -1482,9 +1496,19 @@ FactoryBot.define do
 
   factory :school_info_non_us, class: SchoolInfo do
     country {'GB'}
-    school_type {SchoolInfo::SCHOOL_TYPE_PUBLIC}
-    full_address {'31 West Bank, London, England'}
     school_name {'Grazebrook'}
+  end
+
+  factory :school_info_us_non_nces, class: SchoolInfo do
+    country {'US'}
+    school_name {'Non NCES School'}
+    zip {'12345'}
+  end
+
+  factory :school_info_us_non_school_setting, class: SchoolInfo do
+    country {'US'}
+    school_type {SchoolInfo::SCHOOL_TYPE_NO_SCHOOL_SETTING}
+    zip {'12345'}
   end
 
   factory :school_info_us, class: SchoolInfo do

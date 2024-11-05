@@ -1,18 +1,23 @@
+import classNames from 'classnames';
 import QRCode from 'qrcode.react';
 import React, {useCallback, useEffect, useState} from 'react';
 import FocusLock from 'react-focus-lock';
 
 import {hideShareDialog} from '@cdo/apps/code-studio/components/shareDialogRedux';
+import Alert from '@cdo/apps/componentLibrary/alert/Alert';
 import {Button, LinkButton} from '@cdo/apps/componentLibrary/button';
 import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
 import Typography from '@cdo/apps/componentLibrary/typography';
 import {ProjectType} from '@cdo/apps/lab2/types';
+import {SubmissionStatusType} from '@cdo/apps/templates/projects/submitProjectDialog/submitProjectApi';
 import copyToClipboard from '@cdo/apps/util/copyToClipboard';
+import experiments from '@cdo/apps/util/experiments';
 import {useAppDispatch} from '@cdo/apps/util/reduxHooks';
 import trackEvent from '@cdo/apps/util/trackEvent';
+import {ProjectSubmissionStatus} from '@cdo/generated-scripts/sharedConstants';
 import i18n from '@cdo/locale';
 
-import moduleStyles from './ShareDialog.module.scss';
+import moduleStyles from './share-dialog.module.scss';
 
 const CopyToClipboardButton: React.FunctionComponent<{
   shareUrl: string;
@@ -28,20 +33,87 @@ const CopyToClipboardButton: React.FunctionComponent<{
   }, [shareUrl, projectType]);
 
   return (
-    <div>
-      <Button
-        iconLeft={{
-          iconName: copiedToClipboard ? 'clipboard-check' : 'clipboard',
-        }}
-        ariaLabel={i18n.copyLinkToProject()}
-        text={i18n.copyLinkToProject()}
+    <Button
+      iconLeft={{
+        iconName: copiedToClipboard ? 'clipboard-check' : 'clipboard',
+      }}
+      ariaLabel={i18n.copyLinkToProject()}
+      text={i18n.copyLinkToProject()}
+      type="secondary"
+      color="white"
+      size="m"
+      onClick={handleCopyToClipboard}
+      className={moduleStyles.projectButton}
+    />
+  );
+};
+
+const AfeCareerTourBlock: React.FunctionComponent = () => {
+  const careersUrl =
+    'https://www.amazonfutureengineer.com/careertours/careervideos';
+
+  return (
+    <div className={classNames(moduleStyles.block, moduleStyles.blockAfe)}>
+      <Typography
+        semanticTag="h2"
+        visualAppearance="heading-md"
+        className={moduleStyles.heading}
+      >
+        {i18n.careerTourTitle()}
+      </Typography>
+      <img alt="" src="/shared/images/afe/afe-career-tours-0.jpg" />
+      {i18n.careerTourDescription()}
+      <LinkButton
+        ariaLabel={i18n.careerTourAction()}
+        href={careersUrl}
+        text={i18n.careerTourAction()}
         type="primary"
-        color="black"
+        color="white"
         size="m"
-        onClick={handleCopyToClipboard}
+        target="_blank"
+        iconRight={{
+          iconName: 'arrow-up-right-from-square',
+          iconStyle: 'solid',
+          title: 'arrow-up-right-from-square',
+        }}
+        className={moduleStyles.fullWidth}
       />
     </div>
   );
+};
+
+const SubmitButtonInfo: React.FunctionComponent<{
+  submissionStatus: SubmissionStatusType | undefined;
+  onSubmitClick: () => void;
+}> = ({submissionStatus, onSubmitClick}) => {
+  if (
+    !experiments.isEnabledAllowingQueryString(experiments.LAB2_SUBMIT_PROJECT)
+  ) {
+    return null;
+  }
+  if (submissionStatus === ProjectSubmissionStatus.CAN_SUBMIT) {
+    return (
+      <Button
+        iconLeft={{iconName: 'award'}}
+        text={i18n.submitProjectGallery_header()}
+        type="secondary"
+        color="white"
+        size="m"
+        onClick={onSubmitClick}
+        className={moduleStyles.projectButton}
+      />
+    );
+  } else if (submissionStatus === ProjectSubmissionStatus.ALREADY_SUBMITTED) {
+    return (
+      <Alert
+        text={i18n.submitted()}
+        type="success"
+        size="s"
+        className={moduleStyles.alert}
+      />
+    );
+  }
+  return null;
 };
 
 /**
@@ -54,7 +126,16 @@ const ShareDialog: React.FunctionComponent<{
   shareUrl: string;
   finishUrl?: string;
   projectType: ProjectType;
-}> = ({dialogId, shareUrl, finishUrl, projectType}) => {
+  onSubmitClick: () => void;
+  submissionStatus: SubmissionStatusType | undefined;
+}> = ({
+  dialogId,
+  shareUrl,
+  finishUrl,
+  projectType,
+  onSubmitClick,
+  submissionStatus,
+}) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -71,9 +152,6 @@ const ShareDialog: React.FunctionComponent<{
     [dispatch]
   );
 
-  const careersUrl =
-    'https://www.amazonfutureengineer.com/careertours/careervideos';
-
   return (
     <FocusLock>
       <div className={moduleStyles.dialogContainer}>
@@ -87,56 +165,76 @@ const ShareDialog: React.FunctionComponent<{
               ? i18n.congratulations()
               : i18n.shareTitle()}
           </Typography>
+          <div>{dialogId === 'hoc2024' && i18n.congratsFinishedHoc()}</div>
           <div className={moduleStyles.columns}>
             <div className={moduleStyles.column}>
-              <div className={moduleStyles.share}>
-                <div id="share-qrcode-container">
-                  <QRCode value={shareUrl + '?qr=true'} size={140} />
+              <div className={moduleStyles.block}>
+                {dialogId === 'hoc2024' && (
+                  <Typography
+                    semanticTag="h2"
+                    visualAppearance="heading-md"
+                    className={moduleStyles.heading}
+                  >
+                    {i18n.shareTitle()}
+                  </Typography>
+                )}
+                <div
+                  className={moduleStyles.QRCodeContainer}
+                  id="share-qrcode-container"
+                >
+                  <div className={moduleStyles.QRCodeBorder}>
+                    <QRCode value={shareUrl + '?qr=true'} size={117} />
+                  </div>
                 </div>
                 <CopyToClipboardButton
                   shareUrl={shareUrl}
                   projectType={projectType}
                 />
+                <SubmitButtonInfo
+                  submissionStatus={submissionStatus}
+                  onSubmitClick={onSubmitClick}
+                />
               </div>
             </div>
-            <div className={moduleStyles.column}>
-              {dialogId === 'hoc2024' ? (
-                <div className={moduleStyles.careers}>
-                  Learn more about careers in technology and music.
-                  <LinkButton
-                    ariaLabel={i18n.learnMore()}
-                    href={careersUrl}
-                    text={i18n.learnMore()}
-                    type="primary"
-                    color="black"
-                    size="m"
-                    target="_blank"
-                  />
-                </div>
-              ) : (
-                <div>Share your project by using these links.</div>
-              )}
-
-              {finishUrl ? (
+            {dialogId === 'hoc2024' && (
+              <div className={moduleStyles.column}>
+                <AfeCareerTourBlock />
+              </div>
+            )}
+          </div>
+          <div className={moduleStyles.bottom}>
+            {finishUrl ? (
+              <div className={moduleStyles.contents}>
+                <Button
+                  ariaLabel={i18n.keepPlaying()}
+                  text={i18n.keepPlaying()}
+                  type="secondary"
+                  color="white"
+                  size="m"
+                  onClick={handleClose}
+                  className={moduleStyles.keepPlayingButton}
+                />
                 <LinkButton
                   ariaLabel={i18n.finish()}
                   href={finishUrl}
                   text={i18n.finish()}
                   type="primary"
+                  color="white"
                   size="m"
                   className={moduleStyles.doneButton}
                 />
-              ) : (
-                <Button
-                  ariaLabel={i18n.done()}
-                  text={i18n.done()}
-                  type="primary"
-                  size="m"
-                  onClick={handleClose}
-                  className={moduleStyles.doneButton}
-                />
-              )}
-            </div>
+              </div>
+            ) : (
+              <Button
+                ariaLabel={i18n.done()}
+                text={i18n.done()}
+                type="primary"
+                color="white"
+                size="m"
+                onClick={handleClose}
+                className={moduleStyles.doneButton}
+              />
+            )}
           </div>
           <button
             type="button"

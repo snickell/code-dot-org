@@ -934,10 +934,18 @@ class Unit < ApplicationRecord
     in_initiative?('CSC')
   end
 
+  def foundations_of_cs?
+    under_curriculum_umbrella?('Foundations of CS')
+  end
+
+  def foundations_of_programming?
+    under_curriculum_umbrella?('Foundations of Programming')
+  end
+
   # TODO: (Dani) Update to use new course types framework.
   # Currently this grouping is used to determine whether the script should have # a custom end-of-lesson experience.
   def middle_high?
-    csd? || csp? || csa?
+    csd? || csp? || csa? || foundations_of_cs? || foundations_of_programming?
   end
 
   def requires_verified_instructor?
@@ -1568,7 +1576,7 @@ class Unit < ApplicationRecord
         project_sharing: project_sharing,
         curriculum_umbrella: curriculum_umbrella,
         family_name: family_name,
-        version_year: version_year,
+        version_year: unit_group&.version_year || version_year,
         assigned_section_id: assigned_section_id,
         hasStandards: has_standards_associations?,
         tts: tts?,
