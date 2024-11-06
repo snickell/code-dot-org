@@ -1,3 +1,5 @@
+require 'cdo/chat_client'
+
 module Cdo
   module DelayedJob
     def self.process_finished?(pid)
@@ -7,6 +9,7 @@ module Cdo
     end
 
     def self.kill(signal, pid)
+      puts("\tsending #{signal} to delayed_job worker, pid=#{pid}")
       Process.kill(signal, pid)
     rescue Errno::ESRCH
     end
@@ -14,6 +17,8 @@ module Cdo
     # Gently stops a list of pids by sending TERM first, waiting
     # timeout_s for them to exit gracefully, and then sending KILL
     def self.stop_workers(pids, timeout_s: 30)
+      ChatClient.log "delayed_job: stopping #{pids.size} workers"
+
       # Send a TERM to each pid, which tells them to finish the current job and exit
       pids.each {|pid| kill('TERM', pid)}
 
@@ -21,13 +26,14 @@ module Cdo
       Timeout.timeout(timeout_s) do
         sleep 1 until pids.all? {|pid| process_finished?(pid)}
       end
-
-      # Send a kill to any remaining processes, which stops them immediately
-      pids.each {|pid| kill('KILL', pid)}
     rescue Timeout::Error
       puts "Timeout reached. Not all processes terminated within #{timeout_seconds} seconds."
+      # Send a kill to any remaining processes, which stops them immediately
+      pids_still_running = pids.reject {|pid| process_finished?(pid)}
+      pids_still_running.each {|pid| kill('KILL', pid)}
     end
 
+    # runs bin/delayed_job
     def self.delayed_job(*arguments)
       Dir.chdir(dashboard_dir) do
         RakeUtils.system 'bin/delayed_job', *arguments
@@ -37,6 +43,7 @@ module Cdo
     # Stops half the delayed_job workers first, starts replacements, then replaces
     # the remaining 50%. This keeps us from ever having 0 workers running.
     def self.rolling_deploy_workers(n_workers_to_start)
+      ChatClient.log("Doing a rolling deploy of #{n_workers_to_start} delayed_job workers")
       pid_dir = dashboard_dir('tmp/pids')
 
       # The goal here is to do a rolling restart of workers. `delayed_job` does not
@@ -65,6 +72,8 @@ module Cdo
       # Phase 4: start remaining new workers
       delayed_job '-n', n_workers_to_start - n_workers_started, 'start'
       # PROBLEM: this will replace the workers that were just started, not add new ones
+
+      ChatClient.log("Done starting #{n_workers_to_start} delayed_job workers")
     end
   end
 end
