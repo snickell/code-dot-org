@@ -57,7 +57,25 @@ module Cdo
       n_workers = n_workers_to_start - n_workers_started
       n_workers_started += start_n_workers(n_workers, initial_worker_index: n_workers_started) if n_workers > 0
 
-      ChatClient.log("delayed_job: rolling deploy done, started #{n_workers_started} workers")
+      check_worker_status(n_workers_to_start)
+    end
+
+    def self.check_worker_status(n_workers_to_start)
+      # We're done, now we're just printing informative messages:
+      pids, _ = ExistingWorkers.pids
+      n_workers_running = pids.size
+      ChatClient.log("delayed_job: rolling deploy done, (re)started #{n_workers_running} workers")
+
+      n_workers_running = 0
+      # Warn/Error if we didn't start the intended number of workers
+      if n_workers_to_start != 0 && n_workers_running == 0
+        msg = "delayed_job: ERROR no workers running after worker restart, expected #{n_workers_to_start} workers"
+        ChatClient.log msg
+        raise Exception.new(msg)
+      elsif n_workers_to_start != n_workers_running
+        ChatClient.log("delayed_job: WARNING, intended to start #{n_workers_to_start} workers, but #{n_workers_running} workers are running. If this is a significant difference, this production deploy may have issues!")
+      end
+      n_workers_running
     end
 
     # Load rails environment into memory before forking workers so
