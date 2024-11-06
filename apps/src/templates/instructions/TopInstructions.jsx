@@ -45,6 +45,8 @@ import * as topInstructionsDataApi from './topInstructionsDataApi';
 import TopInstructionsHeader from './TopInstructionsHeader';
 import {hasInstructions} from './utils';
 
+import {logUserLevelInteraction} from '@cdo/apps/userLevelInteractionsLogger/userLevelInteractionsApi';
+
 const HEADER_HEIGHT = styleConstants['workspace-headers-height'];
 const RESIZER_HEIGHT = styleConstants['resize-bar-width'];
 
@@ -473,6 +475,13 @@ class TopInstructions extends Component {
   handleHelpTabClick = () => {
     this.handleTabClick(TabType.RESOURCES);
     this.recordEvent('click-help-and-tips-tab');
+    logUserLevelInteraction({
+      levelId: this.props.serverLevelId,
+      scriptId: this.props.serverScriptId,
+      schoolYear: '2024-25',
+      interaction: 'click-help-and-tips-tab',
+      codeVersion: 'how the heck am I going to get this?!?!',
+    });
   };
 
   handleCommentTabClick = () => {
