@@ -14,6 +14,12 @@ const aiBotImages = [
   require(`@cdo/static/music/ai/ai-bot-3.png`),
 ];
 
+const aiBotGeneratingImages = [
+  require(`@cdo/static/music/ai/ai-bot-generating-0.png`),
+  require(`@cdo/static/music/ai/ai-bot-generating-1.png`),
+  require(`@cdo/static/music/ai/ai-bot-generating-2.png`),
+];
+
 const arrowImage = require(`@cdo/static/music/music-callout-arrow.png`);
 
 import {Button} from '@cdo/apps/componentLibrary/button';
@@ -51,10 +57,10 @@ type GenerateStateType = 'none' | 'generating' | 'error';
 
 const defaultAiTemperature = 8;
 
-// When generating, generatingScanStep goes from 1 to this value.  The first
+// When generating, generatingScanStep goes from 1 upwards.  The first
 // PATTERN_AI_NUM_SEED_EVENTS of these values lights up a seed column, and the
 // remainder give a little delay before the generating help text is shown.
-const numberScanSteps = PATTERN_AI_NUM_SEED_EVENTS + 10;
+const numberScanStepsBeforeHelpText = PATTERN_AI_NUM_SEED_EVENTS + 9;
 
 interface HelpProps {
   userCompletedTask: UserCompletedTaskType;
@@ -157,7 +163,7 @@ const Help: React.FunctionComponent<HelpProps> = ({
         </div>
       )}
       {generateState === 'generating' &&
-        generatingScanStep >= numberScanSteps && (
+        generatingScanStep > numberScanStepsBeforeHelpText && (
           <div className={styles.helpContainer}>
             <div className={classNames(styles.help, styles.helpGenerating)}>
               {musicI18n.patternAiGenerating()}
@@ -498,10 +504,7 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
 
   const [generatingScanStep, setGeneratingScanStep] = useState(0);
   useInterval(() => {
-    if (
-      generateState === 'generating' &&
-      generatingScanStep < numberScanSteps
-    ) {
+    if (generateState === 'generating') {
       setGeneratingScanStep(generatingScanStep + 1);
     }
   }, 100);
@@ -509,15 +512,28 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
   const aiTemperatureMin = 5;
   const aiTemperatureMax = 20;
 
-  const aiBotImageIndex = Math.min(
-    Math.floor(
-      ((aiTemperature - aiTemperatureMin) /
-        (aiTemperatureMax - aiTemperatureMin)) *
-        aiBotImages.length
-    ),
-    aiBotImages.length - 1
-  );
-  const aiBotImage = aiBotImages[aiBotImageIndex];
+  const getAiBotImage = () => {
+    if (
+      generateState === 'generating' &&
+      generatingScanStep > numberScanStepsBeforeHelpText
+    ) {
+      const aiBotGeneratingImageIndex =
+        Math.floor(generatingScanStep / 2) % aiBotGeneratingImages.length;
+      return aiBotGeneratingImages[aiBotGeneratingImageIndex];
+    } else {
+      const aiBotImageIndex = Math.min(
+        Math.floor(
+          ((aiTemperature - aiTemperatureMin) /
+            (aiTemperatureMax - aiTemperatureMin)) *
+            aiBotImages.length
+        ),
+        aiBotImages.length - 1
+      );
+      return aiBotImages[aiBotImageIndex];
+    }
+  };
+
+  const aiBotImage = getAiBotImage();
 
   return (
     <div className={styles.patternPanel}>
