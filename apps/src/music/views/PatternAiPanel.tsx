@@ -240,7 +240,7 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
   const [aiTemperature, setAiTemperature] = useState(defaultAiTemperature);
 
   const hasGeneratedEvents = currentValue.events.some(
-    event => event.tick >= PATTERN_AI_NUM_SEED_EVENTS
+    event => event.tick > PATTERN_AI_NUM_SEED_EVENTS
   );
 
   // Count generates so that we can show the "generate again" help after
