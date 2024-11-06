@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import CloseButton from '@cdo/apps/componentLibrary/closeButton/CloseButton';
+import {BodyThreeText} from '@cdo/apps/componentLibrary/typography';
 import {selectedSectionSelector} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 import i18n from '@cdo/locale';
@@ -23,7 +24,9 @@ export default function StudentScoresAlert({closeAlert}) {
   return (
     <div className={style.dismissableAlert}>
       <span className={style.dismissableAlertText}>
-        {i18n.rubricStudentScoresAlert({studentCount, sectionName})}
+        <BodyThreeText>
+          {i18n.rubricStudentScoresAlert({studentCount, sectionName})}
+        </BodyThreeText>
       </span>
       <CloseButton
         className={dialogStyle.xCloseButton}

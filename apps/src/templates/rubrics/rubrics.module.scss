@@ -108,6 +108,11 @@
 
 .dismissableAlertText {
   max-width: 266px;
+  margin-top: 4px;
+  margin-left: 4px;
+
+  color: var(--text-neutral-primary, #292F36);
+  font-variant-ligatures: no-common-ligatures;
 }
 
 .rubricContainer {
