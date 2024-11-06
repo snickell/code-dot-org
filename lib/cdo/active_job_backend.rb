@@ -15,8 +15,9 @@ module Cdo
     end
 
     def self._rolling_restart(n_workers_to_start, n_batches:)
-      n_workers_to_restart_per_batch = (n_workers_to_start.to_f / n_batches).ceil
       pids, pid_file_hash = get_existing_worker_pids
+      n_workers_to_restart_per_batch = (pids.size.to_f / n_batches).ceil
+
       ChatClient.log("delayed_job: rolling deploy of #{n_workers_to_start} workers, restarting in #{n_batches} batches of #{n_workers_to_restart_per_batch}, replacing #{pids.size} existing workers")
 
       # Stop and Start workers in equal-sized rolling batches to prevent downtime
