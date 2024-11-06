@@ -116,13 +116,13 @@ module Cdo
     def self.process_finished?(pid)
       Process.wait(pid, Process::WNOHANG).nil?
     rescue
-      true
+      true # no such process = already exited
     end
 
     def self.kill(signal, pid)
       puts("\tsending #{signal} to delayed_job worker, pid=#{pid}")
       Process.kill(signal, pid)
-    rescue Errno::ESRCH
+    rescue Errno::ESRCH # no such process = already exited
     end
 
     def self.wait_for_workers_to_exit(pids, timeout_s)
