@@ -21,15 +21,36 @@ module Cdo
 
       ChatClient.log("delayed_job: rolling deploy of #{n_workers_to_start} workers, restarting in #{n_batches} batches of #{n_workers_to_restart_per_batch}, replacing #{pids.size} existing workers")
 
+      # We delete ALL existing delayed_job pid_files in pid_dir (dashboard/tmp/pids)
+      # before we even start in order to work around a horrible bug in delayed_job:
+      #
+      # If delayed_job.2.pid doesn't exist, but delayed_job.22.pid does exist,
+      # delayed_job will think delayed_job.22.pid is delayed_job.2 and therefore
+      # already running, so when you try to start delayed_job.2 it will refuse
+      # to start and error out with:
+      #     ERROR: there is already one or more instance(s) of the program running
+      #
+      # Deleting all the pid_files before killing the processes isn't as bad as it sounds, since:
+      # 1. We already fetched pids, and we're gonna kill them all anyway
+      # 2. Even if we crash, we actually consider the union of pid files and ps output
+      #    so losing the pid files is completely recoverable, we'll still reap those processes
+      #    next time.
+      delete_pid_files(pids, pid_file_hash)
+
       # Stop and Start workers in equal-sized rolling batches to prevent downtime
       n_workers_started = 0
       pids.each_slice(n_workers_to_restart_per_batch) do |pids_in_batch|
         # Stop pre-existing delayed_job workers in this batch
         stop_workers(pids_in_batch, pid_file_hash)
 
+        ExistingWorkers.pids
+
+        sleep 5.seconds
         # Start (up to) an equal number of replacement workers
         n_workers = (n_workers_to_start - n_workers_started).clamp(0, pids_in_batch.size)
         n_workers_started += start_n_workers(n_workers, initial_worker_index: n_workers_started) if n_workers > 0
+
+        ExistingWorkers.pids
       end
 
       # Start any remaining workers (=we're starting more workers than previously existed)
@@ -106,7 +127,7 @@ module Cdo
       end
     ensure
       # delete pid files for workers that have exited, if they exist
-      cleanup_pid_files(pids.map {|pid| pid_file_hash[pid]}.compact)
+      delete_pid_files(pids, pid_file_hash)
     end
 
     def self.process_finished?(pid)
@@ -127,12 +148,13 @@ module Cdo
       end
     end
 
-    def self.cleanup_pid_files(pid_files)
-      pid_files.each do |pid_file|
-        FileUtils.rm_f(pid_file)
-      end
+    def self.delete_pid_files(pids, pid_file_hash)
+      pids.
+        map {|pid| pid_file_hash[pid]}.
+        compact.
+        each {|pid_file| FileUtils.rm_f(pid_file)}
     rescue => exception
-      puts "\tError cleaning up pid files: #{exception}"
+      puts "\tException deleting old pid files: #{exception}"
     end
 
     def self.pid_dir
@@ -169,6 +191,7 @@ module Cdo
 
         # Include any entries in workers_from_pid_files that aren't in workers_from_ps
         workers += workers_from_pid_files.reject {|job_id, _, _| workers_from_ps.any? {|id, _| id == job_id}}
+
         return workers # array of [job_id, pid, pid_file] tuples
       end
 
@@ -184,13 +207,15 @@ module Cdo
           map(&:strip).
           map {|line| line.split(/\s+/, 2)}. # split each line of ps into two columns
           map {|pid, cmd| [cmd[/^delayed_job\.(\d+)/, 1]&.to_i, pid.to_i]}. # match ps lines with delayed_job.NNN
-          reject {|job_id, _| job_id.nil?} # drop ps lines that aren't about delayed_job
+          reject {|job_id, _| job_id.nil?}. # drop ps lines that aren't about delayed_job
+          sort_by {|job_id, _| job_id}
       end
 
       # Returns an array of [job_id, pid, pid_file] tuples for processes with .pid files
       def self.get_workers_from_pid_files
         Dir["#{Cdo::ActiveJobBackend.pid_dir}/delayed_job.*.pid"].
-          map {|pid_file| get_worker_from_pid_file(pid_file)}
+          map {|pid_file| get_worker_from_pid_file(pid_file)}.
+          sort_by {|job_id, _, _| job_id}
       end
 
       def self.get_worker_from_pid_file(pid_file)
