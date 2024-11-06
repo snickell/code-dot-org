@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 
+import Alert from '@cdo/apps/componentLibrary/alert/Alert';
 import Button from '@cdo/apps/componentLibrary/button/Button';
 import Link from '@cdo/apps/componentLibrary/link/Link';
 import {BodyTwoText, Heading3} from '@cdo/apps/componentLibrary/typography';
@@ -29,6 +30,7 @@ const SubmitProjectDialog: React.FunctionComponent<
   const [projectDescription, setProjectDescription] = useState<string>('');
   const [isSubmitButtonDisabled, setIsSubmitButtonDisabled] =
     useState<boolean>(true);
+  const [showSubmitError, setShowSubmitError] = useState<boolean>(false);
 
   useEffect(() => {
     setIsSubmitButtonDisabled(!projectDescription.trim());
@@ -36,6 +38,7 @@ const SubmitProjectDialog: React.FunctionComponent<
 
   const onSubmit = useCallback(async () => {
     setIsSubmitButtonDisabled(true);
+    setShowSubmitError(true);
     analyticsReporter.sendEvent(
       EVENTS.SUBMIT_PROJECT_DIALOG_SUBMIT,
       {
@@ -50,7 +53,7 @@ const SubmitProjectDialog: React.FunctionComponent<
       onGoBack();
     } catch (err) {
       console.error(err);
-      // TODO: UI to notify user that submission was not successful.
+      setShowSubmitError(true);
     }
   }, [channelId, onGoBack, projectDescription, projectType]);
 
@@ -112,6 +115,15 @@ const SubmitProjectDialog: React.FunctionComponent<
           />
         </div>
       </div>
+      {showSubmitError && (
+        <div className={moduleStyles.alertContainer}>
+          <Alert
+            text={i18n.submitProjectGallery_tryAgain()}
+            type="danger"
+            size="s"
+          />
+        </div>
+      )}
     </AccessibleDialog>
   );
 };
