@@ -3,56 +3,6 @@ require 'delayed/command'
 
 module Cdo
   module DelayedJob
-    def self.process_finished?(pid)
-      Process.wait(pid, Process::WNOHANG).nil?
-    rescue
-      true
-    end
-
-    def self.kill(signal, pid)
-      puts("\tsending #{signal} to delayed_job worker, pid=#{pid}")
-      Process.kill(signal, pid)
-    rescue Errno::ESRCH
-    end
-
-    def self.wait_for_workers_to_exit(pids, timeout_s)
-      Timeout.timeout(timeout_s) do
-        sleep 1 until pids.all? {|pid| process_finished?(pid)}
-      end
-    end
-
-    def self.cleanup_pid_files(pid_files)
-      pid_files.each do |pid_file|
-        FileUtils.rm_f(pid_file)
-      end
-    rescue => exception
-      puts "\tError cleaning up pid files: #{exception}"
-    end
-
-    # Gently stops a list of pids by sending TERM first, waiting
-    # timeout_s for them to exit gracefully, and then sending KILL
-    def self.stop_workers(pids, pid_file_hash, timeout_s: 30.seconds)
-      ChatClient.log "delayed_job: stopping #{pids.size} workers"
-
-      # Send a TERM to each pid, which tells them to finish the current job and exit
-      pids.each {|pid| kill('TERM', pid)}
-
-      # Wait timeout_s for the processes to exit gracefully
-      wait_for_workers_to_exit(pids, 30.seconds)
-    rescue Timeout::Error
-      puts "Timeout reached. Not all processes terminated within #{timeout_seconds} seconds."
-      # Send a kill to any remaining processes, which stops them immediately
-      pids_still_running = pids.reject {|pid| process_finished?(pid)}
-      pids_still_running.each {|pid| kill('KILL', pid)}
-      begin
-        wait_for_workers_to_exit(pids_still_running, 30.seconds)
-      rescue Timeout::Error
-        ChatClient.log "ERROR: not all delayed_job worker processes terminated within #{timeout_seconds} seconds, despite sending SIGKILL, going forward anyway"
-      end
-    ensure
-      cleanup_pid_files(pids.map {|pid| pid_file_hash[pid]})
-    end
-
     # Stops half the delayed_job workers first, starts replacements, then replaces
     # the remaining 50%. This keeps us from ever having 0 workers running.
     def self.rolling_deploy_workers(n_workers_to_start)
@@ -100,14 +50,6 @@ module Cdo
       ChatClient.log("delayed_job: rolling deploy done, started #{n_workers_to_start} workers")
     end
 
-    def self.pid_dir
-      dashboard_dir('tmp/pids')
-    end
-
-    def self.log_dir
-      dashboard_dir('log')
-    end
-
     # run bin/delayed_job by forking our custom Cdo::DelayedJob::Command subclass
     def self.start_n_workers(n_workers, initial_worker_index:)
       ChatClient.log("delayed_job: starting #{n_workers} workers, initial_worker_index=#{initial_worker_index}")
@@ -149,6 +91,64 @@ module Cdo
           run_process(process_name, @options)
         end
       end
+    end
+
+    # Gently stops a list of pids by sending TERM first, waiting
+    # timeout_s for them to exit gracefully, and then sending KILL
+    def self.stop_workers(pids, pid_file_hash, timeout_s: 30.seconds)
+      ChatClient.log "delayed_job: stopping #{pids.size} workers"
+
+      # Send a TERM to each pid, which tells them to finish the current job and exit
+      pids.each {|pid| kill('TERM', pid)}
+
+      # Wait timeout_s for the processes to exit gracefully
+      wait_for_workers_to_exit(pids, 30.seconds)
+    rescue Timeout::Error
+      puts "Timeout reached. Not all processes terminated within #{timeout_seconds} seconds."
+      # Send a kill to any remaining processes, which stops them immediately
+      pids_still_running = pids.reject {|pid| process_finished?(pid)}
+      pids_still_running.each {|pid| kill('KILL', pid)}
+      begin
+        wait_for_workers_to_exit(pids_still_running, 30.seconds)
+      rescue Timeout::Error
+        ChatClient.log "ERROR: not all delayed_job worker processes terminated within #{timeout_seconds} seconds, despite sending SIGKILL, going forward anyway"
+      end
+    ensure
+      cleanup_pid_files(pids.map {|pid| pid_file_hash[pid]})
+    end
+
+    def self.process_finished?(pid)
+      Process.wait(pid, Process::WNOHANG).nil?
+    rescue
+      true
+    end
+
+    def self.kill(signal, pid)
+      puts("\tsending #{signal} to delayed_job worker, pid=#{pid}")
+      Process.kill(signal, pid)
+    rescue Errno::ESRCH
+    end
+
+    def self.wait_for_workers_to_exit(pids, timeout_s)
+      Timeout.timeout(timeout_s) do
+        sleep 1 until pids.all? {|pid| process_finished?(pid)}
+      end
+    end
+
+    def self.cleanup_pid_files(pid_files)
+      pid_files.each do |pid_file|
+        FileUtils.rm_f(pid_file)
+      end
+    rescue => exception
+      puts "\tError cleaning up pid files: #{exception}"
+    end
+
+    def self.pid_dir
+      dashboard_dir('tmp/pids')
+    end
+
+    def self.log_dir
+      dashboard_dir('log')
     end
   end
 end
