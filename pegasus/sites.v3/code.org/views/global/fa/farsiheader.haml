@@ -46,6 +46,6 @@
         %li
           %form{method: :post, action: Cdo::I18n.language_change_url(request.fullpath, locale, ge_region)}
             %a.headerlink{href: '#', onclick: 'this.parentNode.submit();'}
-              = I18n.t(:global_edition_region_language_switch, language: Cdo::I18n.language_name(locale) || locale)
+              = I18n.t(:region_language_switch, scope: %i[global_edition], language: Cdo::I18n.language_name(locale) || locale)
     = view :sign_in_or_user
     = view :hamburger, hamburger_options

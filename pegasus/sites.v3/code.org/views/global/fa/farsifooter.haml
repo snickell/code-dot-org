@@ -24,4 +24,4 @@
       .global-edition-region-reset
         %form{method: :post, action: Cdo::GlobalEdition.region_change_url(request.fullpath)}
           %button#global-edition-region-reset.small.secondary.white
-            = I18n.t(:global_edition_region_reset_button)
+            = I18n.t(:region_reset_button, scope: %i[global_edition])
