@@ -45,7 +45,7 @@ namespace :build do
     end
   end
 
-  desc 'deploy delayed_job workers'
+  desc 'Restarts Active Job workers in a rolling fashion to avoid downtime'
   task :restart_active_job_workers do
     if rack_env?(:production)
       Cdo::ActiveJobBackend.restart_workers(n_workers_to_start: 150, rolling_restart_in_n_batches: 3)
@@ -111,24 +111,6 @@ namespace :build do
           RakeUtils.rake_stream_output 'seed:default', (rack_env?(:test) ? '--trace' : nil)
         end
 
-        # Restart Active Job workers before restarting dashboard server so that:
-        # 1. the order of the restarts will be consistent between production and
-        # other environments, and
-        # 2. the server code which is queueing new jobs does not need to be
-        # backward compatible (although the job code itself still does).
-        #
-        # When making breaking changes to a job's api contract, the best
-        # practice is to update the job (in a backward compatible manner) in a
-        # first deploy, then update the code which calls it in a separate
-        # deploy, similarly to how we sequence deploys with database migrations
-        # or seeding changes.
-        #
-        # The sequencing described here is the best for mitigating any issues
-        # that may arise when that best practice is not followed.
-        ChatClient.log 'Restarting <b>dashboard</b> Active Job worker(s).'
-
-        RakeUtils.rake 'assets:clean'
-
         # Commit dsls.en.yml changes on staging
         dsls_file = dashboard_dir('config/locales/dsls.en.yml')
         if rack_env?(:staging) && GitUtils.file_changed_from_git?(dsls_file)
@@ -145,7 +127,21 @@ namespace :build do
           RakeUtils.rake_stream_output 'curriculum_pdfs:generate_missing_pdfs'
         end
 
-        # Start new workers
+        # Restart Active Job workers before restarting dashboard server so that:
+        # 1. the order of the restarts will be consistent between production and
+        # other environments, and
+        # 2. the server code which is queueing new jobs does not need to be
+        # backward compatible (although the job code itself still does).
+        #
+        # When making breaking changes to a job's api contract, the best
+        # practice is to update the job (in a backward compatible manner) in a
+        # first deploy, then update the code which calls it in a separate
+        # deploy, similarly to how we sequence deploys with database migrations
+        # or seeding changes.
+        #
+        # The sequencing described here is the best for mitigating any issues
+        # that may arise when that best practice is not followed.
+        ChatClient.log 'Restarting <b>dashboard</b> Active Job worker(s).'
         RakeUtils.rake 'build:restart_active_job_workers'
       end
 
