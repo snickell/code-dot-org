@@ -45,13 +45,13 @@ namespace :build do
     end
   end
 
-  desc 'Restarts Active Job workers in a rolling fashion to avoid downtime'
-  task :restart_active_job_workers do
+  desc 'Starts Active Job workers, restarts existing workers in a rolling fashion to avoid downtime'
+  task :start_active_job_workers do
     if rack_env?(:production)
       Cdo::ActiveJobBackend.restart_workers(n_workers_to_start: 150, rolling_restart_in_n_batches: 3)
     elsif CDO.test_system?
       Cdo::ActiveJobBackend.restart_workers(n_workers_to_start: 10, rolling_restart_in_n_batches: 2)
-    elsif !rack_env?(:development)
+    else
       Cdo::ActiveJobBackend.restart_workers(n_workers_to_start: 1, rolling_restart_in_n_batches: 1)
     end
   end
@@ -141,8 +141,10 @@ namespace :build do
         #
         # The sequencing described here is the best for mitigating any issues
         # that may arise when that best practice is not followed.
-        ChatClient.log 'Restarting <b>dashboard</b> Active Job worker(s).'
-        RakeUtils.rake 'build:restart_active_job_workers'
+        unless rack_env?(:development)
+          ChatClient.log 'Restarting <b>dashboard</b> Active Job worker(s).'
+          RakeUtils.rake 'build:start_active_job_workers'
+        end
       end
 
       # Skip asset precompile in development.
