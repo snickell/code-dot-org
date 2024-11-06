@@ -4,7 +4,7 @@ require 'cdo/rake_utils'
 require 'cdo/git_utils'
 require lib_dir 'cdo/data/logging/rake_task_event_logger'
 require 'dynamic_config/dcdo'
-require 'cdo/delayed_job'
+require 'cdo/active_job_backend'
 
 include TimedTaskWithLogging
 
@@ -46,8 +46,14 @@ namespace :build do
   end
 
   desc 'deploy delayed_job workers'
-  task :delayed_job do
-    Cdo::DelayedJob.rolling_deploy_workers(10)
+  task :restart_active_job_workers do
+    if rack_env?(:production)
+      Cdo::ActiveJobBackend.restart_workers(n_workers_to_start: 150, rolling_restart_in_n_batches: 3)
+    elsif CDO.test_system?
+      Cdo::ActiveJobBackend.restart_workers(n_workers_to_start: 10, rolling_restart_in_n_batches: 2)
+    elsif !rack_env?(:development)
+      Cdo::ActiveJobBackend.restart_workers(n_workers_to_start: 1, rolling_restart_in_n_batches: 1)
+    end
   end
 
   desc 'Builds dashboard (install gems, migrate/seed db, compile assets).'
@@ -121,19 +127,7 @@ namespace :build do
         # that may arise when that best practice is not followed.
         ChatClient.log 'Restarting <b>dashboard</b> Active Job worker(s).'
 
-        # Start new workers
-        if rack_env?(:production)
-          n_workers_to_start = 150
-          rolling_deploy_workers(n_workers_to_start)
-        else
-          # Issue a stop command to all workers. Will kill if not stopped within ~20 seconds.
-          RakeUtils.system 'bin/delayed_job', 'stop'
-          if CDO.test_system?
-            RakeUtils.system 'bin/delayed_job', '-n', '10', 'start'
-          elsif !rack_env?(:development)
-            RakeUtils.system 'bin/delayed_job', 'start'
-          end
-        end
+        RakeUtils.rake 'assets:clean'
 
         # Commit dsls.en.yml changes on staging
         dsls_file = dashboard_dir('config/locales/dsls.en.yml')
@@ -150,6 +144,9 @@ namespace :build do
           ChatClient.log "Generating missing pdfs..."
           RakeUtils.rake_stream_output 'curriculum_pdfs:generate_missing_pdfs'
         end
+
+        # Start new workers
+        RakeUtils.rake 'build:restart_active_job_workers'
       end
 
       # Skip asset precompile in development.

@@ -2,11 +2,9 @@ require 'cdo/chat_client'
 require 'delayed/command'
 
 module Cdo
-  module DelayedJob
-    ROLLING_RESTART_IN_N_BATCHES = 3
-
+  module ActiveJobBackend
     # Restarts delayed_job workers in a rolling fashion, to prevent downtime.
-    def self.restart_workers(n_workers_to_start, rolling_restart_in_n_batches: ROLLING_RESTART_IN_N_BATCHES)
+    def self.restart_workers(n_workers_to_start:, rolling_restart_in_n_batches: 1)
       pid = fork do
         # pre-cache Rails environment so each `delayed_job` worker command invocation
         # doesn't take N minutes on production.
@@ -51,7 +49,7 @@ module Cdo
     def self.start_n_workers(n_workers, initial_worker_index:)
       ChatClient.log("delayed_job: starting #{n_workers} workers, initial_worker_index=#{initial_worker_index}")
       pid = fork do
-        Cdo::DelayedJob::Command.new.start_n_workers(n_workers, initial_worker_index: initial_worker_index)
+        Cdo::ActiveJobBackend::Command.new.start_n_workers(n_workers, initial_worker_index: initial_worker_index)
       end
       Process.wait(pid) # wait for the workers to start
       return n_workers
@@ -68,14 +66,14 @@ module Cdo
       def initialize
         @options = {
           :quiet => true,
-          :pid_dir => Cdo::DelayedJob.pid_dir,
-          :log_dir => Cdo::DelayedJob.log_dir,
+          :pid_dir => Cdo::ActiveJobBackend.pid_dir,
+          :log_dir => Cdo::ActiveJobBackend.log_dir,
         }
         @args = ["start"]
       end
 
       def start_n_workers(n_workers, initial_worker_index: 0)
-        Cdo::DelayedJob.before_worker_fork
+        Cdo::ActiveJobBackend.before_worker_fork
         n_workers.times do |worker_index|
           process_name = "delayed_job.#{worker_index + initial_worker_index}"
           puts "\tstarting delayed_job worker: #{process_name}"
