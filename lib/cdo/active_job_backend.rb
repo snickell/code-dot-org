@@ -16,15 +16,7 @@ module Cdo
 
     def self._rolling_restart(n_workers_to_start, n_batches:)
       n_workers_to_restart_per_batch = (n_workers_to_start.to_f / n_batches).ceil
-
-      # Get all PIDs as [pid, pid_file] tuples, sorted numerically by
-      # delayed_job worker index (0-N)
-      pid_files = Dir["#{pid_dir}/delayed_job.*.pid"].
-                    sort_by {|file| file[/\d+/].to_i}.
-                    map {|file| [File.read(file).to_i, file]}
-      pid_file_hash = pid_files.to_h
-      pids = pid_files.map(&:first) # this must be ordered, so we can't derive from the hash
-
+      pids, pid_file_hash = get_existing_worker_pids
       ChatClient.log("delayed_job: rolling deploy of #{n_workers_to_start} workers, restarting in #{n_batches} batches of #{n_workers_to_restart_per_batch}, replacing #{pids.size} existing workers")
 
       # Stop and Start workers in equal-sized rolling batches to prevent downtime
@@ -45,6 +37,17 @@ module Cdo
       ChatClient.log("delayed_job: rolling deploy done, started #{n_workers_started} workers")
     end
 
+    def self.get_existing_worker_pids
+      # Get all PIDs as [pid, pid_file] tuples, sorted numerically by
+      # delayed_job worker index (0-N)
+      pid_files = Dir["#{pid_dir}/delayed_job.*.pid"].
+                    sort_by {|file| file[/\d+/].to_i}.
+                    map {|file| [File.read(file).to_i, file]}
+      pid_file_hash = pid_files.to_h
+      pids = pid_files.map(&:first) # this must be ordered, so we can't derive from the hash
+      return pids, pid_file_hash
+    end
+
     # run bin/delayed_job by forking our custom Cdo::DelayedJob::Command subclass
     def self.start_n_workers(n_workers, initial_worker_index:)
       ChatClient.log("delayed_job: starting #{n_workers} workers, initial_worker_index=#{initial_worker_index}")
@@ -55,13 +58,13 @@ module Cdo
       return n_workers
     end
 
-    # Subclass Delayed::Command from delayed_job/command and monkeypatch it
-    # to allow us to specify the initial worker index when spawning =
-    # new delayed_job.N workers. This allows us to start workers in multiple
-    # batches.
+    # Subclass Delayed::Command from delayed_job/command and add a new method to it
+    # that allow us to specify the initial worker index when spawning new
+    # delayed_job.N workers. This allows us to start workers in multiple batches.
     #
     # By calling before_worker_fork before forking the command processes
-    # our multiple batches even share memory.
+    # our multiple batches even share memory, and don't have to wait to load
+    # the Rails environment for each batch either.
     class Command < Delayed::Command
       def initialize
         @options = {
@@ -72,6 +75,7 @@ module Cdo
         @args = ["start"]
       end
 
+      # New method that allows us to specify the initial worker index
       def start_n_workers(n_workers, initial_worker_index: 0)
         Cdo::ActiveJobBackend.before_worker_fork
         n_workers.times do |worker_index|
