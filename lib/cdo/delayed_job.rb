@@ -36,7 +36,7 @@ module Cdo
       stop_workers(first_half_of_pids, pid_files.to_h)
 
       # Phase 2: start the same number of new workers
-      n_workers_started = n_pids_to_stop
+      n_workers_started = [n_pids_to_stop, n_workers_to_start].min
       start_n_workers(n_workers_started, initial_worker_index: 0)
 
       # Phase 3: stop the remaining worker pids
