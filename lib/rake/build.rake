@@ -45,7 +45,7 @@ namespace :build do
     end
   end
 
-  desc 'Starts Active Job workers, restarts existing workers in a rolling fashion to avoid downtime'
+  desc 'Starts Active Job workers, restarts existing workers (if any) in a rolling fashion to avoid downtime'
   task :start_active_job_workers do
     if rack_env?(:production)
       Cdo::ActiveJobBackend.restart_workers(n_workers_to_start: 150, rolling_restart_in_n_batches: 3)
