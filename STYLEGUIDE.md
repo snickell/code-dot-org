@@ -91,7 +91,7 @@ You can find more detailed guidelines and examples of best practices at [betters
 
 #### Example
 ```ruby
-describe MyClassTest do
+class FooTest < ActiveSupport::TestCase
   # `described_class` is a helper method that returns the class or module that is currently being tested, 
   # e.g. `MyClass` is returned when described_class is used in `MyClassTest`.
   let(:described_instance) {described_class.new}
