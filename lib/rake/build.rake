@@ -4,6 +4,7 @@ require 'cdo/rake_utils'
 require 'cdo/git_utils'
 require lib_dir 'cdo/data/logging/rake_task_event_logger'
 require 'dynamic_config/dcdo'
+require 'cdo/delayed_job'
 
 include TimedTaskWithLogging
 
@@ -44,51 +45,9 @@ namespace :build do
     end
   end
 
-  # Gently stops a list of pids by sending TERM first, waiting
-  # timeout_s for them to exit gracefully, and then sending KILL
-  def stop_processes(pids, timeout_s: 30)
-    # Send a term to each pid
-    pids.each {|pid| Process.kill('TERM', pid)}
-
-    # Wait timeout_s for the processes to exit
-    Timeout.timeout(timeout_s) do
-      sleep 1 until pids.all? {|pid| Process.wait(pid, Process::WNOHANG).nil? rescue true} # rubocop:disable Style/RescueModifier
-    end
-
-    # Send a kill to any remaining processes
-    pids.each {|pid| Process.kill('KILL', pid)}
-  rescue Timeout::Error
-    puts "Timeout reached. Not all processes terminated within #{timeout_seconds} seconds."
-  end
-
-  # Stops half the delayed_job workers first, starts replacements, then replaces
-  # the remaining 50%. This keeps us from ever having 0 workers running.
-  def rolling_deploy_workers(n_workers_to_start)
-    pid_dir = dashboard_dir('tmp/pids')
-
-    # The goal here is to do a rolling restart of workers. `delayed_job` does not
-    # support this, but we've hacked it in. delayed_job numbers workers 0 through N.
-
-    # Get all PIDs, sort numerically by delayed_job ID (0-N)
-    pids = Dir["#{pid_dir}/delayed_job.*.pid"].
-            sort_by {|file| file[/\d+/].to_i}.
-            map {|file| File.read(file).to_i}
-
-    # Phase 1: stop the first 50% of existing workers
-    n_pids_to_stop = pids.size / 2
-    first_half_of_pids = pids.first(n_pids_to_stop)
-    stop_workers(first_half_of_pids)
-
-    # Phase 2: start the same number of new workers
-    new_workers_started = n_pids_to_stop
-    RakeUtils.system 'bin/delayed_job', '-n', new_workers_started, 'start'
-
-    # Phase 3: stop the remaining worker pids
-    remaining_pids_to_stop = pids - half_the_pids
-    stop_workers(remaining_pids_to_stop)
-
-    # Phase 4: start remaining new workers
-    RakeUtils.system 'bin/delayed_job', '-n', n_workers_to_start - new_workers_started, 'start'
+  desc 'deploy delayed_job workers'
+  task :delayed_job do
+    Cdo::DelayedJob.rolling_deploy_workers(10)
   end
 
   desc 'Builds dashboard (install gems, migrate/seed db, compile assets).'
