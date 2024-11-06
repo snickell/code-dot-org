@@ -66,7 +66,6 @@ module Cdo
       n_workers_running = pids.size
       ChatClient.log("delayed_job: rolling deploy done, (re)started #{n_workers_running} workers")
 
-      n_workers_running = 0
       # Warn/Error if we didn't start the intended number of workers
       if n_workers_to_start != 0 && n_workers_running == 0
         msg = "delayed_job: ERROR no workers running after worker restart, expected #{n_workers_to_start} workers"
