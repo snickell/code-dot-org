@@ -85,11 +85,11 @@ const Lab2ShareDialogWrapper: React.FunctionComponent<
     setDialogPanel('submit');
   };
 
-  if (!channelId || !projectType) {
+  if (!isDialogOpen || !channelId || !projectType) {
     return null;
   }
 
-  if (LABS_USING_NEW_SHARE_DIALOG.includes(projectType) && isDialogOpen) {
+  if (LABS_USING_NEW_SHARE_DIALOG.includes(projectType)) {
     return dialogPanel === 'share' ? (
       <ShareDialog
         dialogId={shareDialogId}
