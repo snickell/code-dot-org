@@ -27,6 +27,7 @@ import {
   reportingDataShape,
   studentLevelInfoShape,
 } from './rubricShapes';
+import StudentScoresAlert from './StudentScoresAlert';
 
 import style from './rubrics.module.scss';
 
@@ -183,15 +184,18 @@ function RubricFloatingActionButton({
         />
       </button>
       {showCountBubble ? (
-        <div className={style.countOverlay}>
-          <BodyFourText className={style.countText}>
-            <StrongText>
-              <span aria-label={i18n.aiEvaluationsToReview()}>
-                {readyStudentCount}
-              </span>
-            </StrongText>
-          </BodyFourText>
-        </div>
+        <>
+          <div className={style.countOverlay}>
+            <BodyFourText className={style.countText}>
+              <StrongText>
+                <span aria-label={i18n.aiEvaluationsToReview()}>
+                  {readyStudentCount}
+                </span>
+              </StrongText>
+            </BodyFourText>
+          </div>
+          <StudentScoresAlert />
+        </>
       ) : (
         <div
           className={style.taOverlay}

@@ -2462,6 +2462,7 @@
   "rubricLevelTwoHeader": "Convincing Evidence",
   "rubricLevelFourHeader": "No Evidence",
   "rubricScores": "Rubric Scores",
+  "rubricStudentScoresAlert": "{studentCount} students in {sectionName} have AI generated assessment scores ready to review.",
   "rubricNextLearningGoal": "Go to next learning goal",
   "rubricPreviousLearningGoal": "Go to previous learning goal",
   "rubricAiHeaderText": "AI Teaching Assistant",

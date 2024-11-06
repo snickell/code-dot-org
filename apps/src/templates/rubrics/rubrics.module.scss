@@ -86,6 +86,26 @@
   font-variant-ligatures: no-common-ligatures;
 }
 
+.dismissableAlert {
+  position: fixed;
+  left: 86px;
+  bottom: 55px;
+
+  display: flex;
+  width: 300px;
+  max-width: 300px;
+  padding: 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+
+  border-radius: 4px;
+  border: 1px solid var(--neutral-gray-20, #D1D4D8);
+  background: var(--neutral-base-white, #FFF);
+
+  box-shadow: 0 4px 4px 0 rgb(0 0 0 / 0.25);
+}
+
 .rubricContainer {
   position: fixed;
   left: 10px;
