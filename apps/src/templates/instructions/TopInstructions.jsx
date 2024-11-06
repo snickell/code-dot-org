@@ -478,7 +478,6 @@ class TopInstructions extends Component {
     logUserLevelInteraction({
       levelId: this.props.serverLevelId,
       scriptId: this.props.serverScriptId,
-      schoolYear: '2024-25',
       interaction: 'click-help-and-tips-tab',
       codeVersion: 'how the heck am I going to get this?!?!',
     });
