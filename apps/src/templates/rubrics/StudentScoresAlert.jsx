@@ -12,7 +12,7 @@ import {selectReadyStudentCount} from './teacherRubricRedux';
 import style from './rubrics.module.scss';
 import dialogStyle from '@cdo/apps/sharedComponents/accessible-dialogue.module.scss';
 
-export default function StudentScoresAlert({closeAlert}) {
+export default function StudentScoresAlert({closeAlert, viewScores}) {
   const studentCount = useAppSelector(selectReadyStudentCount);
   const section = useAppSelector(selectedSectionSelector);
   const sectionName = section?.name;
@@ -33,10 +33,18 @@ export default function StudentScoresAlert({closeAlert}) {
         onClick={closeAlert}
         aria-label={i18n.closeDialog()}
       />
+      <button
+        type="button"
+        onClick={viewScores}
+        className={style.viewScoresButton}
+      >
+        <span className={style.viewScoresText}>{i18n.rubricViewScores()}</span>
+      </button>
     </div>
   );
 }
 
 StudentScoresAlert.propTypes = {
   closeAlert: PropTypes.func.isRequired,
+  viewScores: PropTypes.func.isRequired,
 };

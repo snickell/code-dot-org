@@ -118,6 +118,11 @@ function RubricFloatingActionButton({
     setHasSeenAlert(true);
   };
 
+  const viewScores = () => {
+    setHasSeenAlert(true);
+    setIsOpen(true);
+  };
+
   const logInternalError = (error, componentStack) => {
     console.error(
       'Internal error in the RubricFloatingActionButton component:',
@@ -200,7 +205,12 @@ function RubricFloatingActionButton({
               </StrongText>
             </BodyFourText>
           </div>
-          {!hasSeenAlert && <StudentScoresAlert closeAlert={closeAlert} />}
+          {!hasSeenAlert && (
+            <StudentScoresAlert
+              closeAlert={closeAlert}
+              viewScores={viewScores}
+            />
+          )}
         </>
       ) : (
         <div

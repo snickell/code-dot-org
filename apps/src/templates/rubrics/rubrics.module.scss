@@ -110,9 +110,37 @@
   max-width: 266px;
   margin-top: 4px;
   margin-left: 4px;
+  margin-bottom: -24px;
 
   color: var(--text-neutral-primary, #292F36);
   font-variant-ligatures: no-common-ligatures;
+}
+
+.viewScoresButton {
+  min-height: 35px;
+  width: 286px;
+
+  display: flex;
+  padding: 5px 16px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex: 1 0 0;
+
+  border-radius: 4px;
+  background: var(--brand-aqua-50, #3CFFF7) !important;
+}
+
+.viewScoresText {
+  color: var(--light-black, #292F36);
+  font-variant-ligatures: no-common-ligatures;
+
+  /* Button/Button 3 */
+  font-family: Metropolis, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 154%; /* 21.56px */
 }
 
 .rubricContainer {
