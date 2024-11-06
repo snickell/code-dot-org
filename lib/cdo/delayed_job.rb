@@ -15,23 +15,42 @@ module Cdo
     rescue Errno::ESRCH
     end
 
+    def self.wait_for_workers_to_exit(pids, timeout_s)
+      Timeout.timeout(timeout_s) do
+        sleep 1 until pids.all? {|pid| process_finished?(pid)}
+      end
+    end
+
+    def self.cleanup_pid_files(pid_files)
+      pid_files.each do |pid_file|
+        FileUtils.rm_f(pid_file)
+      end
+    rescue => exception
+      puts "\tError cleaning up pid files: #{exception}"
+    end
+
     # Gently stops a list of pids by sending TERM first, waiting
     # timeout_s for them to exit gracefully, and then sending KILL
-    def self.stop_workers(pids, timeout_s: 30)
+    def self.stop_workers(pids, pid_file_hash, timeout_s: 30.seconds)
       ChatClient.log "delayed_job: stopping #{pids.size} workers"
 
       # Send a TERM to each pid, which tells them to finish the current job and exit
       pids.each {|pid| kill('TERM', pid)}
 
       # Wait timeout_s for the processes to exit gracefully
-      Timeout.timeout(timeout_s) do
-        sleep 1 until pids.all? {|pid| process_finished?(pid)}
-      end
+      wait_for_workers_to_exit(pids, 30.seconds)
     rescue Timeout::Error
       puts "Timeout reached. Not all processes terminated within #{timeout_seconds} seconds."
       # Send a kill to any remaining processes, which stops them immediately
       pids_still_running = pids.reject {|pid| process_finished?(pid)}
       pids_still_running.each {|pid| kill('KILL', pid)}
+      begin
+        wait_for_workers_to_exit(pids_still_running, 30.seconds)
+      rescue Timeout::Error
+        ChatClient.log "ERROR: not all delayed_job worker processes terminated within #{timeout_seconds} seconds, despite sending SIGKILL, going forward anyway"
+      end
+    ensure
+      cleanup_pid_files(pids.map {|pid| pid_file_hash[pid]})
     end
 
     # Stops half the delayed_job workers first, starts replacements, then replaces
@@ -52,17 +71,19 @@ module Cdo
       # First, we'll stop workers 0 through N/2, then start N/2 new workers. Then we'll
       # stop the remaining workers, and start the remaining new workers.
 
-      # Get all PIDs, sort numerically by delayed_job ID (0-N)
-      pids = Dir["#{pid_dir}/delayed_job.*.pid"].
-              sort_by {|file| file[/\d+/].to_i}.
-              map {|file| File.read(file).to_i}
+      # Get all PIDs as [pid, pid_file] tuples, sorted numerically by
+      # delayed_job worker index (0-N)
+      pid_files = Dir["#{pid_dir}/delayed_job.*.pid"].
+                    sort_by {|file| file[/\d+/].to_i}.
+                    map {|file| [File.read(file).to_i, file]}
+      pids = pid_files.map(&:first)
 
       ChatClient.log("delayed_job: rolling deploy of #{n_workers_to_start} workers, replacing #{pids.size} existing workers")
 
       # Phase 1: stop the first 50% of existing workers
       n_pids_to_stop = pids.empty? ? 0 : pids.size / 2
       first_half_of_pids = pids.first(n_pids_to_stop)
-      stop_workers(first_half_of_pids)
+      stop_workers(first_half_of_pids, pid_files.to_h)
 
       # Phase 2: start the same number of new workers
       n_workers_started = n_pids_to_stop
@@ -70,7 +91,7 @@ module Cdo
 
       # Phase 3: stop the remaining worker pids
       second_half_of_pids = pids - first_half_of_pids
-      stop_workers(second_half_of_pids)
+      stop_workers(second_half_of_pids, pid_files.to_h)
 
       # Phase 4: start remaining new workers
       # PROBLEM: this will replace the workers that were just started, not add new ones
