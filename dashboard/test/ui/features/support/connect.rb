@@ -31,6 +31,7 @@ def saucelabs_browser(test_run_name)
     username: CDO.saucelabs_username,
     access_key: CDO.saucelabs_authkey,
     tunnelIdentifier: CDO.saucelabs_tunnel_name,
+    extendedDebugging: true,
   }
 
   sauce_options[:priority] = ENV['PRIORITY'].to_i if ENV['PRIORITY']

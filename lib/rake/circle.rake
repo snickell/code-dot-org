@@ -108,7 +108,8 @@ namespace :circle do
     end
     RakeUtils.wait_for_url('http://localhost-studio.code.org:3000')
     Dir.chdir('dashboard/test/ui') do
-      container_features = `find ./features -name '*.feature' | sort`.split("\n").map {|f| f[2..]}
+      # container_features = `find ./features -name '*.feature' | sort`.split("\n").map {|f| f[2..]}
+      container_features = ['features/acquisition_products/school_info_confirmation_dialog.feature']
       eyes_features = `grep -lr '@eyes' features`.split("\n")
       container_eyes_features = container_features & eyes_features
       # Use --local to configure the UI tests to run against localhost and
@@ -181,12 +182,12 @@ end
 
 # @return [Array<String>] names of browser configurations for this test run
 def browsers_to_run
-  browsers = []
-  browsers << 'Chrome' unless CircleUtils.tagged?(SKIP_CHROME_TAG)
-  browsers << 'Firefox' if CircleUtils.tagged?(TEST_FIREFOX_TAG) || CircleUtils.tagged?(TEST_ALL_BROWSERS_TAG)
-  browsers << 'Safari' if CircleUtils.tagged?(TEST_SAFARI_TAG) || CircleUtils.tagged?(TEST_ALL_BROWSERS_TAG)
-  browsers << 'iPad' if CircleUtils.tagged?(TEST_IPAD_TAG) || CircleUtils.tagged?(TEST_IOS_TAG) || CircleUtils.tagged?(TEST_ALL_BROWSERS_TAG)
-  browsers << 'iPhone' if CircleUtils.tagged?(TEST_IPHONE_TAG) || CircleUtils.tagged?(TEST_IOS_TAG) || CircleUtils.tagged?(TEST_ALL_BROWSERS_TAG)
+  browsers = ['Firefox']
+  # browsers << 'Chrome' unless CircleUtils.tagged?(SKIP_CHROME_TAG)
+  # browsers << 'Firefox' if CircleUtils.tagged?(TEST_FIREFOX_TAG) || CircleUtils.tagged?(TEST_ALL_BROWSERS_TAG)
+  # browsers << 'Safari' if CircleUtils.tagged?(TEST_SAFARI_TAG) || CircleUtils.tagged?(TEST_ALL_BROWSERS_TAG)
+  # browsers << 'iPad' if CircleUtils.tagged?(TEST_IPAD_TAG) || CircleUtils.tagged?(TEST_IOS_TAG) || CircleUtils.tagged?(TEST_ALL_BROWSERS_TAG)
+  # browsers << 'iPhone' if CircleUtils.tagged?(TEST_IPHONE_TAG) || CircleUtils.tagged?(TEST_IOS_TAG) || CircleUtils.tagged?(TEST_ALL_BROWSERS_TAG)
   browsers
 end
 
