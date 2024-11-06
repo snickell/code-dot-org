@@ -1,5 +1,7 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
+import CloseButton from '@cdo/apps/componentLibrary/closeButton/CloseButton';
 import {selectedSectionSelector} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 import i18n from '@cdo/locale';
@@ -7,8 +9,9 @@ import i18n from '@cdo/locale';
 import {selectReadyStudentCount} from './teacherRubricRedux';
 
 import style from './rubrics.module.scss';
+import dialogStyle from '@cdo/apps/sharedComponents/accessible-dialogue.module.scss';
 
-export default function StudentScoresAlert() {
+export default function StudentScoresAlert({closeAlert}) {
   const studentCount = useAppSelector(selectReadyStudentCount);
   const section = useAppSelector(selectedSectionSelector);
   const sectionName = section?.name;
@@ -19,7 +22,18 @@ export default function StudentScoresAlert() {
 
   return (
     <div className={style.dismissableAlert}>
-      {i18n.rubricStudentScoresAlert({studentCount, sectionName})}
+      <span className={style.dismissableAlertText}>
+        {i18n.rubricStudentScoresAlert({studentCount, sectionName})}
+      </span>
+      <CloseButton
+        className={dialogStyle.xCloseButton}
+        onClick={closeAlert}
+        aria-label={i18n.closeDialog()}
+      />
     </div>
   );
 }
+
+StudentScoresAlert.propTypes = {
+  closeAlert: PropTypes.func.isRequired,
+};
