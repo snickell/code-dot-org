@@ -17,7 +17,9 @@ const aiBotImages = [
 const arrowImage = require(`@cdo/static/music/music-callout-arrow.png`);
 
 import {Button} from '@cdo/apps/componentLibrary/button';
+import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
 import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
+import Slider from '@cdo/apps/componentLibrary/slider/Slider';
 import {useInterval} from '@cdo/apps/util/useInterval';
 
 import {generatePattern} from '../ai/patternAi';
@@ -280,18 +282,31 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
   };
 
   const getOuterCellClasses = (tick: number) => {
+    const isLastColumnShowing =
+      ((userCompletedTask === 'none' ||
+        userCompletedTask === 'drawnDrums' ||
+        generateState === 'generating') &&
+        tick === PATTERN_AI_NUM_SEED_EVENTS) ||
+      tick === PATTERN_AI_NUM_EVENTS;
+
     return classNames(
       styles.outerCell,
+      tick % 4 === 0 && !isLastColumnShowing && styles.outerCellFourth
+    );
+  };
+
+  const getInnerCellClasses = (tick: number) => {
+    return classNames(
+      styles.innerCell,
       tick === currentPreviewTick &&
         generateState === 'none' &&
-        styles.outerCellPlaying,
+        styles.innerCellPlaying,
       generateState === 'generating' &&
         tick === generatingScanStep &&
-        styles.outerCellScanning,
+        styles.innerCellScanning,
       generateState === 'generating' &&
         tick !== generatingScanStep &&
-        styles.outerCellSlowFade,
-      tick % 4 === 0 && styles.outerCellFourth
+        styles.innerCellSlowFade
     );
   };
 
@@ -501,17 +516,18 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
 
         <div className={styles.leftArea}>
           <div className={styles.topRow}>
-            <select
-              value={currentValue.instrument}
+            <SimpleDropdown
+              name="instrument-dropdown"
+              labelText=""
+              isLabelVisible={false}
+              selectedValue={currentValue.instrument}
               onChange={handleFolderChange}
-              className={styles.select}
-            >
-              {availableKits.map(folder => (
-                <option key={folder.id} value={folder.id}>
-                  {folder.name}
-                </option>
-              ))}
-            </select>
+              size="s"
+              items={availableKits.map(folder => ({
+                value: folder.id,
+                text: folder.name,
+              }))}
+            />
 
             <div className={styles.previewControls}>
               <PreviewControls
@@ -564,9 +580,11 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
                             onClick={() => toggleEvent(tick, index)}
                             key={tick}
                           >
-                            <div
-                              className={getCellClasses(note || index, tick)}
-                            />
+                            <div className={getInnerCellClasses(tick)}>
+                              <div
+                                className={getCellClasses(note || index, tick)}
+                              />
+                            </div>
                           </div>
                         );
                       })}
@@ -599,37 +617,27 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
             {!MusicRegistry.hideAiTemperature && (
               <div>
                 <div className={styles.temperatureRow}>
-                  <div
-                    className={styles.temperatureButton}
-                    onClick={() => {
-                      if (aiTemperature - 1 >= aiTemperatureMin) {
-                        setAiTemperature(aiTemperature - 1);
-                      }
-                    }}
-                  >
-                    <FontAwesomeV6Icon iconName={'minus'} iconStyle="solid" />
-                  </div>
-                  <input
-                    type="range"
-                    min={aiTemperatureMin}
-                    max={aiTemperatureMax}
+                  <Slider
+                    name="temperature-slider"
+                    minValue={aiTemperatureMin}
+                    maxValue={aiTemperatureMax}
                     step={1}
                     value={aiTemperature}
                     onChange={event => {
-                      setAiTemperature(event.target.valueAsNumber);
+                      setAiTemperature(+event.target.value);
                     }}
                     className={styles.temperatureInput}
-                  />
-                  <div
-                    className={styles.temperatureButton}
-                    onClick={() => {
-                      if (aiTemperature + 1 <= aiTemperatureMax) {
-                        setAiTemperature(aiTemperature + 1);
-                      }
+                    leftButtonProps={{
+                      icon: {iconName: 'minus', title: 'Decrease'},
+                      ['aria-label']: 'Decrease',
                     }}
-                  >
-                    <FontAwesomeV6Icon iconName={'plus'} iconStyle="solid" />
-                  </div>
+                    rightButtonProps={{
+                      icon: {iconName: 'plus', title: 'Increase'},
+                      ['aria-label']: 'Increase',
+                    }}
+                    hideValue={true}
+                    color="white"
+                  />
                 </div>
               </div>
             )}

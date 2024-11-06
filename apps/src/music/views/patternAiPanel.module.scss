@@ -97,7 +97,7 @@ $ai-rubric-cyan-hover: #37e1db;
   width: 110px;
   margin-left: 17px;
 
-  .controlsRow {
+  div {
     margin: 0;
   }
 }
@@ -108,8 +108,8 @@ $ai-rubric-cyan-hover: #37e1db;
   height: 23px;
 
   &:hover {
-    //background-color: rgba($light_gray_950, 0.2);
-    //border-radius: 4px;
+    background-color: rgba($white, 0.02);
+    border-radius: 4px;
   }
 }
 
@@ -130,23 +130,26 @@ $ai-rubric-cyan-hover: #37e1db;
 
 .outerCell {
   display: inline-block;
-  padding: 1px 1px;
-  margin: 2px 1px;
+  padding: 2px 1px;
   box-sizing: border-box;
   cursor: pointer;
   transition: background-color 0s;
   border-radius: 2px;
 
-  &Playing {
-    background-color: $realyellow;
-  }
+  .innerCell {
+    padding: 1px;
 
-  &Scanning {
-    background-color: $ai_rubric_cyan;
-  }
+    &Playing {
+      background-color: $realyellow;
+    }
 
-  &SlowFade {
-    transition: background-color 0.25s;
+    &Scanning {
+      background-color: $ai_rubric_cyan;
+    }
+
+    &SlowFade {
+      transition: background-color 0.25s;
+    }
   }
 
   &Fourth {
@@ -196,8 +199,11 @@ $ai-rubric-cyan-hover: #37e1db;
 }
 
 .temperatureInput {
-  width: 100px;
-  height: 5px;
+  width: 140px;
+
+  button {
+    padding-bottom: 1px !important;
+  }
 }
 
 .temperatureText {
