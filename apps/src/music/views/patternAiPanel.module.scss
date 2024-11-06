@@ -298,6 +298,7 @@ $ai-rubric-cyan-hover: #37e1db;
   max-width: 300px;
   white-space: pre-line;
   animation: slidein 0.5s;
+  z-index: 1;
 
   &DrawDrums {
     left: 370px;
@@ -307,6 +308,11 @@ $ai-rubric-cyan-hover: #37e1db;
   &Temperature {
     top: 170px;
     right: 214px;
+  }
+
+  &GenerateNoTemperature, &GenerateAgainNoTemperature {
+    top: 195px;
+    right: 216px;
   }
 
   &Generate, &GenerateAgain {
@@ -336,6 +342,11 @@ $ai-rubric-cyan-hover: #37e1db;
   &Temperature {
     right: 192px;
     top: 177px;
+  }
+
+  &GenerateNoTemperature, &GenerateAgainNoTemperature {
+    right: 189px;
+    top: 210px;
   }
 
   &Generate, &GenerateAgain {

@@ -127,7 +127,14 @@ const Help: React.FunctionComponent<HelpProps> = ({
         (userCompletedTask === 'drawnDrums' &&
           !MusicRegistry.showAiTemperatureExplanation)) && (
         <div className={styles.helpContainer}>
-          <div className={classNames(styles.help, styles.helpGenerate)}>
+          <div
+            className={classNames(
+              styles.help,
+              MusicRegistry.hideAiTemperature
+                ? styles.helpGenerateNoTemperature
+                : styles.helpGenerate
+            )}
+          >
             {userCompletedTask === 'changedTemperature'
               ? musicI18n.patternAiGenerateTemperature()
               : musicI18n.patternAiGenerate()}
@@ -135,7 +142,9 @@ const Help: React.FunctionComponent<HelpProps> = ({
           <div
             className={classNames(
               styles.arrowContainer,
-              styles.arrowContainerGenerate
+              MusicRegistry.hideAiTemperature
+                ? styles.arrowContainerGenerateNoTemperature
+                : styles.arrowContainerGenerate
             )}
           >
             <div
@@ -164,13 +173,22 @@ const Help: React.FunctionComponent<HelpProps> = ({
         !isPlaying &&
         shouldShowGenerateAgainHelp && (
           <div className={styles.helpContainer}>
-            <div className={classNames(styles.help, styles.helpGenerateAgain)}>
+            <div
+              className={classNames(
+                styles.help,
+                MusicRegistry.hideAiTemperature
+                  ? styles.helpGenerateAgainNoTemperature
+                  : styles.helpGenerateAgain
+              )}
+            >
               {musicI18n.patternAiGenerateAgain()}
             </div>
             <div
               className={classNames(
                 styles.arrowContainer,
-                styles.arrowContainerGenerateAgain
+                MusicRegistry.hideAiTemperature
+                  ? styles.arrowContainerGenerateAgainNoTemperature
+                  : styles.arrowContainerGenerateAgain
               )}
             >
               <div
@@ -452,10 +470,16 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
         const delayDuration = Number(appConfig.getValue('ai-delay')) || 3500;
         const remainingDelayDuration = Math.max(delayDuration - elapsedTime, 0);
         delay(remainingDelayDuration).then(() => {
-          currentValue.events = newEvents;
-          onChange(currentValue);
+          // Make a copy of the value object so that we don't overwrite Blockly's
+          // data, which we just sent to it above.
+          const newValue: InstrumentEventValue = JSON.parse(
+            JSON.stringify(currentValue)
+          );
+          newValue.events = newEvents;
+
+          onChange(newValue);
           setGenerateState('none');
-          playPreview();
+          startPreview(newValue);
         });
       },
       onError
@@ -468,8 +492,8 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
     onChange,
     aiTemperature,
     stopPreview,
-    playPreview,
     generateCount,
+    startPreview,
   ]);
 
   const [generatingScanStep, setGeneratingScanStep] = useState(0);
