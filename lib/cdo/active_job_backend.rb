@@ -43,14 +43,9 @@ module Cdo
         # Stop pre-existing delayed_job workers in this batch
         stop_workers(pids_in_batch, pid_file_hash)
 
-        ExistingWorkers.pids
-
-        sleep 5.seconds
         # Start (up to) an equal number of replacement workers
         n_workers = (n_workers_to_start - n_workers_started).clamp(0, pids_in_batch.size)
         n_workers_started += start_n_workers(n_workers, initial_worker_index: n_workers_started) if n_workers > 0
-
-        ExistingWorkers.pids
       end
 
       # Start any remaining workers (=we're starting more workers than previously existed)
@@ -66,7 +61,6 @@ module Cdo
       n_workers_running = pids.size
       ChatClient.log("delayed_job: rolling deploy done, (re)started #{n_workers_running} workers")
 
-      n_workers_running = 0
       # Warn/Error if we didn't start the intended number of workers
       if n_workers_to_start != 0 && n_workers_running == 0
         msg = "delayed_job: ERROR no workers running after worker restart, expected #{n_workers_to_start} workers"
