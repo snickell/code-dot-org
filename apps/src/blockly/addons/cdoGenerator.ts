@@ -9,8 +9,9 @@ import {
 export default function initializeGenerator(
   blocklyWrapper: BlocklyWrapperType
 ) {
-  blocklyWrapper.JavaScript.translateVarName = function (name: string) {
-    return Blockly.JavaScript.nameDB_.getName(
+  const generator = blocklyWrapper.JavaScript as unknown as ExtendedGenerator;
+  generator.translateVarName = function (name: string) {
+    return Blockly.JavaScript.nameDB_?.getName(
       name,
       Blockly.VARIABLE_CATEGORY_NAME
     );
@@ -51,12 +52,11 @@ export default function initializeGenerator(
         `Can only generate code in JavaScript. ${name} is unsupported.`
       );
     }
-    const generator = blocklyWrapper.getGenerator();
     if (blocklyWrapper.getMainWorkspace()) {
       generator.init(blocklyWrapper.getMainWorkspace());
     }
     generator.variableDB_ = generator.nameDB_;
-    const code: string[] = [];
+    const code: (string | [string, number])[] = [];
     blocksToGenerate.forEach(block => {
       code.push(blocklyWrapper.JavaScript.blockToCode(block));
     });

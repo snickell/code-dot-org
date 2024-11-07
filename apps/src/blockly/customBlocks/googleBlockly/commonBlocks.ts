@@ -5,6 +5,7 @@
  */
 
 import * as GoogleBlockly from 'blockly/core';
+import {Order, JavascriptGenerator} from 'blockly/javascript';
 
 import {
   BlocklyWrapperType,
@@ -51,7 +52,7 @@ export const blocks = {
     type: string,
     generatorFunction: (
       block: GoogleBlockly.Block,
-      generator: GoogleBlockly.CodeGenerator
+      generator: JavascriptGenerator
     ) => [string, number] | string | null
   ) {
     generator.forBlock[type] = generatorFunction;
@@ -127,10 +128,8 @@ export const blocks = {
     generator: JavascriptGeneratorType
   ) {
     // Random integer between [X] and [Y].
-    const argument0 =
-      generator.valueToCode(block, 'FROM', generator.ORDER_NONE) || '0';
-    const argument1 =
-      generator.valueToCode(block, 'TO', generator.ORDER_NONE) || '0';
+    const argument0 = generator.valueToCode(block, 'FROM', Order.NONE) || '0';
+    const argument1 = generator.valueToCode(block, 'TO', Order.NONE) || '0';
     const functionName = generator.provideFunction_(
       'math_random_int', // Core Blockly uses 'mathRandomInt'
       `
@@ -146,7 +145,7 @@ export const blocks = {
   `
     );
     const code = `${functionName}(${argument0}, ${argument1})`;
-    return [code, generator.ORDER_FUNCTION_CALL];
+    return [code, Order.FUNCTION_CALL];
   },
   // Creates and returns a 3-column colour field with an increased height/width
   // for menu options and the field itself. Used for the K1 Artist colour picker block.

@@ -208,6 +208,7 @@ export const READ_ONLY_PROPERTIES = [
   'html',
   'Input',
   'INPUT_VALUE',
+  'inputs',
   'inputTypes',
   'js',
   'MenuItem',

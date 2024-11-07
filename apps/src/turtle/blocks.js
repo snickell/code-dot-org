@@ -713,7 +713,7 @@ exports.install = function (blockly, blockInstallOptions) {
         ['FROM', 'Number', blockly.ALIGN_RIGHT],
         ['TO', 'Number', blockly.ALIGN_RIGHT],
         ['BY', 'Number', blockly.ALIGN_RIGHT],
-        blockly.ALIGN_RIGHT
+        blockly.inputs.Align.RIGHT
       );
       this.appendStatementInput('DO').appendField(
         Blockly.Msg.CONTROLS_FOR_INPUT_DO
@@ -771,7 +771,7 @@ exports.install = function (blockly, blockInstallOptions) {
           );
         },
         ['VALUE', 'Number', blockly.ALIGN_RIGHT],
-        blockly.ALIGN_RIGHT
+        blockly.inputs.Align.RIGHT
       );
       this.setInputsInline(true);
       this.setPreviousStatement(true);
@@ -813,7 +813,7 @@ exports.install = function (blockly, blockInstallOptions) {
           );
         },
         ['VALUE', 'Number', blockly.ALIGN_RIGHT],
-        blockly.ALIGN_RIGHT
+        blockly.inputs.Align.RIGHT
       );
       this.setInputsInline(true);
       this.setPreviousStatement(true);
@@ -1185,7 +1185,7 @@ exports.install = function (blockly, blockInstallOptions) {
         () => {
           this.appendDummyInput().appendField(dropdown, 'VALUE');
         },
-        blockly.ALIGN_RIGHT
+        blockly.inputs.Align.RIGHT
       );
       this.setPreviousStatement(true);
       this.setInputsInline(true);
@@ -1230,7 +1230,7 @@ exports.install = function (blockly, blockInstallOptions) {
             'YPOS'
           );
         },
-        blockly.ALIGN_RIGHT
+        blockly.inputs.Align.RIGHT
       );
       this.setPreviousStatement(true);
       this.setInputsInline(true);
@@ -1271,7 +1271,7 @@ exports.install = function (blockly, blockInstallOptions) {
             }
           );
         },
-        blockly.ALIGN_RIGHT
+        blockly.inputs.Align.RIGHT
       );
       this.setInputsInline(true);
       this.setPreviousStatement(true);

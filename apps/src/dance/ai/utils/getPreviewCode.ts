@@ -18,5 +18,5 @@ export const getPreviewCode = (
     currentGeneratedEffect
   );
   tempWorkspace.dispose();
-  return previewCode;
+  return previewCode as string;
 };

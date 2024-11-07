@@ -1,6 +1,6 @@
 import {
-  ObservableParameterModel,
   ObservableProcedureModel,
+  ObservableParameterModel,
 } from '@blockly/block-shareable-procedures';
 import * as GoogleBlockly from 'blockly/core';
 import {javascriptGenerator} from 'blockly/javascript';
@@ -141,7 +141,7 @@ export interface BlocklyWrapperType extends GoogleBlocklyType {
   ) => void;
   setInfiniteLoopTrap: () => void;
   clearInfiniteLoopTrap: () => void;
-  getInfiniteLoopTrap: () => string;
+  getInfiniteLoopTrap: () => string | null;
   loopHighlight: (apiName: string, blockId: string) => string;
   getWorkspaceCode: () => string;
   addChangeListener: (
@@ -294,6 +294,9 @@ export interface ExtendedGenerator extends CodeGeneratorType {
   prefixLines: (text: string, prefix: string) => string;
   nameDB_: GoogleBlockly.Names | undefined;
   variableDB_: GoogleBlockly.Names | undefined;
+  translateVarName: (name: string) => string | undefined;
+  init: (workspace: GoogleBlockly.Workspace) => void;
+  finish: (code: string) => string;
 }
 
 type XmlType = typeof GoogleBlockly.Xml;
@@ -399,6 +402,7 @@ export interface ProcedureBlock
   behaviorId?: string | null;
   prevParams_: GoogleBlockly.Procedures.IParameterModel[];
   argsMap_: Map<string, GoogleBlockly.Block>;
+  getProcedureModel: () => ObservableProcedureModel;
 }
 
 // Blockly uses {[key: string]: any} to define workspace serialization.

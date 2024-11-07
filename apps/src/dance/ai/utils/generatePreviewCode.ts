@@ -10,7 +10,7 @@ import {generateAiEffectBlocksFromResult} from './generateAiEffectBlocksFromResu
 export const generatePreviewCode = (
   workspace: GoogleBlockly.Workspace,
   effect: GeneratedEffect
-): string => {
+): string | [string, number] => {
   const blocks = generateAiEffectBlocksFromResult(workspace, effect);
   // Create a temporary setup block
   const setup: GoogleBlockly.BlockSvg = workspace.newBlock(
