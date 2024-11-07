@@ -43,6 +43,8 @@ jobs:
       
       - name: Put /var/lib/docker on the big empty temp disk
         run: |
+          echo "Docker had `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
+          echo
           sudo systemctl stop docker
           sudo mkdir /mnt/docker
           sudo chmod --reference=/var/lib/docker /mnt/docker
@@ -52,8 +54,8 @@ jobs:
           sudo rm -rf /var/lib/docker /var/lib/docker.old
           sudo ln -s /mnt/docker /var/lib/docker
           sudo systemctl start docker
-
-          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
+          echo
+          echo "Docker now has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
 
       - name: Free disk space
         run: |
