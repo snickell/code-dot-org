@@ -526,7 +526,8 @@ class ProjectsController < ApplicationController
     begin
       authorize! :submission_status, project
     rescue CanCan::AccessDenied => exception
-      return render status: :forbidden, json: {message: exception.message}
+      message = current_user ? exception.message : 'Please sign in to have option to submit your project.'
+      return render status: :forbidden, json: {message: message}
     end
     status = project.submission_status
     render(status: :ok, json: {status: status})
