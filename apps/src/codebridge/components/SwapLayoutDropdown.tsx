@@ -1,10 +1,9 @@
 import {useCodebridgeContext} from '@codebridge/codebridgeContext';
-import {PopUpButton} from '@codebridge/PopUpButton/PopUpButton';
 import {sendCodebridgeAnalyticsEvent} from '@codebridge/utils/analyticsReporterHelper';
 import React, {useCallback} from 'react';
 
 import codebridgeI18n from '@cdo/apps/codebridge/locale';
-import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
+import {ActionDropdown} from '@cdo/apps/componentLibrary/dropdown';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
@@ -46,12 +45,37 @@ const SwapLayoutDropdown: React.FunctionComponent = () => {
       : codebridgeI18n.defaultLayout();
 
   return (
-    <PopUpButton iconName="ellipsis-v" alignment="right">
-      <div onClick={onLayoutChange} className={darkModeStyles.dropdownItem}>
-        <FontAwesomeV6Icon iconName={iconName} iconStyle={'solid'} />
-        <div>{layoutLabel}</div>
-      </div>
-    </PopUpButton>
+    <ActionDropdown
+      name="swap-layout"
+      labelText={codebridgeI18n.changeLayout()}
+      triggerButtonProps={{
+        color: 'white',
+        size: 'xs',
+        icon: {
+          iconName: 'ellipsis-v',
+          iconStyle: 'solid',
+        },
+        isIconOnly: true,
+        type: 'tertiary',
+        className: darkModeStyles.iconOnlyTertiaryButton,
+      }}
+      options={[
+        {
+          onClick: onLayoutChange,
+          label: layoutLabel,
+          value:
+            config.activeGridLayout === 'horizontal'
+              ? 'change-vertical'
+              : 'change-horizontal',
+          icon: {
+            iconName,
+            iconStyle: 'solid',
+          },
+        },
+      ]}
+      menuPlacement="right"
+      size="xs"
+    />
   );
 };
 
