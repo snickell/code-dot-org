@@ -470,7 +470,10 @@ FactoryBot.define do
       after(:create) do |user|
         user.lms_landing_opted_out = true
         user.authentication_options.destroy_all
-        lti_auth = create(:lti_authentication_option, user: user)
+        lti_user_id = create(:lti_user_identity, user: user)
+        user.lti_user_identities << lti_user_id
+        auth_id = lti_user_id.lti_integration.issuer + "|" + lti_user_id.lti_integration.client_id + "|" + lti_user_id.subject
+        lti_auth = create(:lti_authentication_option, user: user, authentication_id: auth_id)
         user.authentication_options << lti_auth
         user.lti_roster_sync_enabled = true
         user.save!
@@ -1496,9 +1499,19 @@ FactoryBot.define do
 
   factory :school_info_non_us, class: SchoolInfo do
     country {'GB'}
-    school_type {SchoolInfo::SCHOOL_TYPE_PUBLIC}
-    full_address {'31 West Bank, London, England'}
     school_name {'Grazebrook'}
+  end
+
+  factory :school_info_us_non_nces, class: SchoolInfo do
+    country {'US'}
+    school_name {'Non NCES School'}
+    zip {'12345'}
+  end
+
+  factory :school_info_us_non_school_setting, class: SchoolInfo do
+    country {'US'}
+    school_type {SchoolInfo::SCHOOL_TYPE_NO_SCHOOL_SETTING}
+    zip {'12345'}
   end
 
   factory :school_info_us, class: SchoolInfo do

@@ -34,7 +34,7 @@ class VarnishEnvironment < Sinatra::Base
 
         Metrics::Events.log_event(
           event_name: 'Global Edition Region Selected',
-          session: request.session,
+          request: request,
           metadata: {
             country: request.country_code,
             region: param_ge_region,
