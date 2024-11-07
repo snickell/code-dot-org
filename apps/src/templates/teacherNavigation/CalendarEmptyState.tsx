@@ -69,6 +69,16 @@ function generateCalendarEmptyState(
   hasCalendar: boolean
 ): EmptyStateContent | null {
   let calendarEmptyState = null;
+  console.log('logging showNoCurriculumAssigned');
+  console.log(showNoCurriculumAssigned);
+  console.log('logging unitName');
+  console.log(unitName);
+  console.log('logging selectedSection');
+  console.log(selectedSection);
+  console.log('logging isLegacyScript');
+  console.log(isLegacyScript);
+  console.log('logging hasCalendar');
+  console.log(hasCalendar);
 
   if (showNoCurriculumAssigned) {
     calendarEmptyState = getNoCurriculumAssignedEmptyState();
@@ -88,7 +98,11 @@ function generateCalendarEmptyState(
       selectedSection.courseDisplayName
     );
   } else if (!hasCalendar) {
+    console.log('logging hasCalendar');
+    console.log(hasCalendar);
     calendarEmptyState = getNoCalendarForThisUnit;
   }
+  console.log('logging calendarEmptyState');
+  console.log(calendarEmptyState);
   return calendarEmptyState;
 }
