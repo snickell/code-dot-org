@@ -23,36 +23,47 @@ jobs:
           echo "GITHUB_WORKFLOW=${GITHUB_WORKFLOW}"
 
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+      # - name: ssh into the runner
+      #   uses: mxschmitt/action-tmate@v3
 
-      - run: pwd
+      # If we needed even MORE space we could use this:
+      #
+      # - name: Maximize build space
+      #   uses: easimon/maximize-build-space@master
+      #   with:
+      #     remove-dotnet: true
+      #     remove-android: true
+      #     remove-haskell: true
+      #     remove-codeql: true
+      #     # this needs to fit our git checkout:
+      #     root-reserve-mb: 2048
+      #     # because we're allocating all our maximized space to docker
+      #     build-mount-path: /var/lib/docker
+      #     build-mount-path-ownership: root:root
+      
+      - name: Put /var/lib/docker on the big empty temp disk
+        run: |
+          sudo systemctl stop docker
+          sudo mkdir /mnt/docker
+          sudo chmod --reference=/var/lib/docker /mnt/docker
+          sudo chown --reference=/var/lib/docker /mnt/docker
+          # `rm -rf docker` saves 4GB on the same disk as code-dot-org source,
+          # but `mv docker docker.old` is ~5s faster
+          sudo rm -rf /var/lib/docker /var/lib/docker.old
+          sudo ln -s /mnt/docker /var/lib/docker
+          sudo systemctl start docker
 
-      - run: |
-              df -h
-              df -h .
-              sudo du -h --max-depth=1 /var/lib/docker
+          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
 
-      - name: Maximize build space
-        uses: easimon/maximize-build-space@master
-        with:
-          remove-dotnet: true
-          remove-android: true
-          remove-haskell: true
-          remove-codeql: true
-
-      - run: |
-              df -h
-              df -h .
+      - name: Free disk space
+        run: |
+          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
+          echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
 
       - name: install skaffold
         run: |
           curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
           sudo install skaffold /usr/local/bin/
-
-      - run: |
-              df -h
-              df -h .
 
 
       # Add support for more platforms with QEMU (optional)
@@ -60,20 +71,20 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      - run: |
-              df -h
-              df -h .
-
+      - name: Free disk space
+        run: |
+          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
+          echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         #with:
         #  platforms: linux/amd64,linux/arm64
 
-      - run: |
-              df -h
-              df -h .
-
+      - name: Free disk space
+        run: |
+          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
+          echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -114,22 +125,15 @@ jobs:
       #     git checkout $GITHUB_WORKFLOW_SHA
 
       
-      - run: env
-
-      - run: export | grep RUNNER_TEMP
-
-      - run: |
-              df -h
-              df -h .
-
       - name: Checkout sources
         uses: actions/checkout@v4
 
-      - run: |
-              df -h
-              df -h .
+      - name: Free disk space
+        run: |
+          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
+          echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
 
-      - name: Skaffold Cache
+      - name: skaffold cache
         uses: actions/cache@v3
         with:
           path: "${{ github.workspace }}/.skaffold/cache"
@@ -137,10 +141,10 @@ jobs:
           restore-keys: |
             skaffold-
 
-      - run: |
-              df -h
-              df -h .
-              sudo du -h --max-depth=1 /var/lib/docker
+      - name: Free disk space
+        run: |
+          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
+          echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
 
       - name: docker pull caching
         run: |
@@ -149,10 +153,10 @@ jobs:
           docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-db-seed:latest || true
           docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-static:latest || true
 
-      - run: |
-              df -h
-              df -h .
-              sudo du -h --max-depth=1 /var/lib/docker
+      - name: Free disk space
+        run: |
+          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
+          echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
 
       - name: skaffold build
         run: |
@@ -161,9 +165,10 @@ jobs:
             --push \
             && true
 
-      - run: |
-              df -h
-              df -h .
+      - name: Free disk space
+        run: |
+          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
+          echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
 
 
   # quicktest:
