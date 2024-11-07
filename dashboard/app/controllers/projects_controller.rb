@@ -537,11 +537,11 @@ class ProjectsController < ApplicationController
     project = Project.find_by(id: project_id)
     begin
       authorize! :submit, project
-    rescue CanCan::AccessDenied
+    rescue CanCan::AccessDenied => exception
       Honeybadger.notify(
-        "Project submission error: #{PROJECT_SUBMISSION_ERROR_MAP[project.submission_status]}",
+        "Project submission error: #{exception.message}",
         context: {
-          message:  "Project submission failed due to unauthorized submission status - user unexpectedly bypassed submission_status restriction in the share dialog and attempted to submit project: #{exception.message}"
+          message:  "Project submission failed due to unauthorized submission status - user unexpectedly bypassed submission_status restriction in the share dialog and attempted to submit project."
         }
       )
       return render status: :forbidden, json: {error: PROJECT_SUBMISSION_ERROR_MAP[project.submission_status]}
@@ -551,7 +551,7 @@ class ProjectsController < ApplicationController
       Projects.new(get_storage_id).publish(channel_id, project_type, current_user)
     rescue Projects::PublishError => exception
       Honeybadger.notify(
-        exception,
+        exception.message,
         context: {
           message: "Project publish failed - user unexpectedly bypassed submission_status restriction in the share dialog and project submit authorization restrictions and attempted to publish project."
         }
