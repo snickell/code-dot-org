@@ -27,7 +27,7 @@ jobs:
       - run: |
               df -h
               df -h .
-              du -h /var/lib/docker
+              sudo du -h --max-depth=1 /var/lib/docker
 
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
@@ -132,7 +132,7 @@ jobs:
       - run: |
               df -h
               df -h .
-              du -h /var/lib/docker
+              sudo du -h --max-depth=1 /var/lib/docker
 
       - name: docker pull caching
         run: |
@@ -144,7 +144,7 @@ jobs:
       - run: |
               df -h
               df -h .
-              du -h /var/lib/docker
+              sudo du -h --max-depth=1 /var/lib/docker
 
       - name: skaffold build
         run: |
