@@ -6,8 +6,11 @@ import Link from '@cdo/apps/componentLibrary/link/Link';
 import {BodyTwoText, Heading3} from '@cdo/apps/componentLibrary/typography';
 import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import {MetricEvent} from '@cdo/apps/metrics/events';
+import MetricsReporter from '@cdo/apps/metrics/MetricsReporter';
 import AccessibleDialog from '@cdo/apps/sharedComponents/AccessibleDialog';
 import {submitProject} from '@cdo/apps/templates/projects/submitProjectDialog/submitProjectApi';
+import {NetworkError} from '@cdo/apps/util/HttpClient';
 import i18n from '@cdo/locale';
 
 import moduleStyles from './submit-project-dialog.module.scss';
@@ -52,8 +55,16 @@ const SubmitProjectDialog: React.FunctionComponent<
       await submitProject(channelId, projectType, projectDescription);
       // Close submit project dialog and display the share dialog.
       onGoBack();
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      if (!(error instanceof NetworkError && error.response.status === 403)) {
+        MetricsReporter.logError({
+          event: MetricEvent.SUBMIT_PROJECT_UNEXPECTED_ERROR,
+          errorMessage:
+            'Unexpected error in project submission in submit project dialog.',
+          projectType: projectType,
+          channelId: channelId,
+        });
+      }
       setIsSubmitButtonDisabled(false);
       setShowSubmitError(true);
     }
