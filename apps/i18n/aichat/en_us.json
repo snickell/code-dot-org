@@ -1,6 +1,8 @@
 {
   "aboutAichatLab": "About AI Chat Lab",
   "aichatWorkspaceHeader": "AI Chat",
+  "aichatView_screenReader_EditModeButton": "Edit Mode",
+  "aichatView_screenReader_UserViewModeButton": "User View Mode",
   "aiCustomizations_modelCardInfo": "Model card information",
   "aiCustomizations_retrieval": "Retrieval",
   "aiCustomizations_selectedModel": "Selected model",
@@ -10,6 +12,7 @@
   "chatEventDescriptions_copyChat": "The user copied the chat history.",
   "chatEventDescriptions_clearChat": "The user cleared the chat workspace.",
   "chatEventDescriptions_loadLevel": "The user loaded the aichat level.",
+  "chatEventDescriptions_waitForResponse": "Waiting for response", 
   "clearChatButtonText": "Clear chat",
   "continue": "Continue",
   "copyChatButtonText": "Copy chat",

@@ -160,7 +160,11 @@ const AichatView: React.FunctionComponent = () => {
       {
         label: aichatI18n.editModeButtonText(),
         value: ViewMode.EDIT,
-        iconLeft: {iconName: 'wrench', iconStyle: 'solid', title: 'Edit Mode'}, // if this is only used by a screen reader, do we translate it?
+        iconLeft: {
+          iconName: 'wrench',
+          iconStyle: 'solid',
+          title: aichatI18n.aichatView_screenReader_EditModeButton(),
+        },
       },
       {
         label: aichatI18n.userViewButtonText(),
@@ -168,7 +172,7 @@ const AichatView: React.FunctionComponent = () => {
         iconLeft: {
           iconName: 'user-group',
           iconStyle: 'solid',
-          title: 'User View Mode', // if this is only used by a screen reader, do we translate it?
+          title: aichatI18n.aichatView_screenReader_UserViewModeButton(),
         },
         id: 'uitest-user-view-button',
       },
