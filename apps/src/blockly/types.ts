@@ -108,7 +108,7 @@ export interface BlocklyWrapperType extends GoogleBlocklyType {
   FieldColour: typeof CdoFieldColour;
   FieldVariable: typeof CdoFieldVariable;
   FieldParameter: typeof CdoFieldParameter;
-  JavaScript: JavascriptGeneratorType;
+  JavaScript: ExtendedJavascriptGeneratorType;
   assetUrl: (path: string) => string;
   customSimpleDialog: (config: object) => void;
   levelBlockIds: Set<string>;
@@ -459,4 +459,4 @@ export type PointerMetadataMap = {
 export type BlockColor = [number, number, number];
 
 // Blockly defines this as any.
-export type JavascriptGeneratorType = ExtendedGenerator;
+export type ExtendedJavascriptGeneratorType = ExtendedGenerator;
