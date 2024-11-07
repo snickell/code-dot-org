@@ -110,6 +110,10 @@ jobs:
       #     git checkout $GITHUB_WORKFLOW_SHA
 
       
+      - run: env
+
+      - run: export | grep RUNNER_TEMP
+
       - run: |
               df -h
               df -h .
