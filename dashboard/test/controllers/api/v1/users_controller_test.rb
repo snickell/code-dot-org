@@ -376,8 +376,8 @@ class Api::V1::UsersControllerTest < ActionController::TestCase
 
     unit = create :unit, :with_lessons
     lesson = unit.lessons.first
+    params = {user_id: 'me', lesson_id: lesson.id}
     other_lesson = unit.lessons.last
-    params = {user_id: 'me', unit_name: unit.name, lesson_position: lesson.absolute_position}
     other_unit = create :unit, :with_lessons
 
     get :get_seen_ta_scores, params: params
@@ -387,26 +387,19 @@ class Api::V1::UsersControllerTest < ActionController::TestCase
 
     post :set_seen_ta_scores, params: params
     assert_response :success
-    expected_map = {
-      unit.name => {
-        lesson.absolute_position.to_s => true
-      }
-    }
-    assert_equal expected_map, teacher.reload.seen_ta_scores_map
+    assert_equal({lesson.id.to_s => true}, teacher.reload.seen_ta_scores_map)
 
     get :get_seen_ta_scores, params: params
     assert_response :success
     response = JSON.parse(@response.body)
     assert_equal true, response["seen"]
 
-    other_lesson_params = {user_id: 'me', unit_name: unit.name, lesson_position: other_lesson.absolute_position}
-    get :get_seen_ta_scores, params: other_lesson_params
+    get :get_seen_ta_scores, params: {user_id: 'me', lesson_id: other_lesson.id}
     assert_response :success
     response = JSON.parse(@response.body)
     assert_equal false, response["seen"]
 
-    other_unit_params = {user_id: 'me', unit_name: other_unit.name, lesson_position: other_unit.lessons.first.absolute_position}
-    get :get_seen_ta_scores, params: other_unit_params
+    get :get_seen_ta_scores, params: {user_id: 'me', lesson_id: other_unit.lessons.first.id}
     assert_response :success
     response = JSON.parse(@response.body)
     assert_equal false, response["seen"]

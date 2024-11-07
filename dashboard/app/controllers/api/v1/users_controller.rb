@@ -364,26 +364,16 @@ class Api::V1::UsersController < Api::V1::JSONApiController
 
   # POST /api/v1/users/<user_id>/set_seen_ta_scores
   def set_seen_ta_scores
-    # validate inputs
-    unit_name = params[:unit_name]
-    unit = Unit.get_from_cache(unit_name)
-    lesson_position = params[:lesson_position]
-    unit.lessons.find_by!(absolute_position: lesson_position)
-
-    # update map
     seen_ta_scores_map = @user.seen_ta_scores_map || {}
-    seen_ta_scores_map[unit_name] ||= {}
-    seen_ta_scores_map[unit_name][lesson_position] = true
+    seen_ta_scores_map[params[:lesson_id]] = true
     @user.update!(seen_ta_scores_map: seen_ta_scores_map)
-
     head :no_content
   end
 
-  # GET /api/v1/users/<user_id>/get_seen_ta_scores?unit_name=<unit_name>&lesson_position=<lesson_position>
+  # GET /api/v1/users/<user_id>/get_seen_ta_scores?lesson_id=<lesson_id>
   def get_seen_ta_scores
-    unit_map = @user.seen_ta_scores_map || {}
-    lesson_map = unit_map[params[:unit_name]] || {}
-    render json: {seen: !!lesson_map[params[:lesson_position]]}
+    seen_ta_scores_map = @user.seen_ta_scores_map || {}
+    render json: {seen: !!seen_ta_scores_map[params[:lesson_id]]}
   end
 
   # Expects a param with the key "g-recaptcha-response" that is used
