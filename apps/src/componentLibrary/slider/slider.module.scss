@@ -11,6 +11,9 @@ $slider-brand-track-disabled-color: $light_gray_100;
 $slider-white-track-fill-color: $light_white;
 $slider-white-track-empty-color: $light_gray_400;
 $slider-white-track-disabled-color: $light_gray_900;
+$slider-aqua-track-fill-color: $brand_aqua_50;
+$slider-aqua-track-empty-color: $light_gray_400;
+$slider-aqua-track-disabled-color: $brand_aqua_90;
 
 :export {
   sliderBlackTrackFillColor: $slider-black-track-fill-color;
@@ -24,6 +27,11 @@ $slider-white-track-disabled-color: $light_gray_900;
   sliderWhiteTrackFillColor: $slider-white-track-fill-color;
   sliderWhiteTrackEmptyColor: $slider-white-track-empty-color;
   sliderWhiteTrackDisabledColor: $slider-white-track-disabled-color;
+
+  sliderAquaTrackFillColor: $slider-aqua-track-fill-color;
+  sliderAquaTrackEmptyColor: $slider-aqua-track-empty-color;
+  sliderAquaTrackDisabledColor: $slider-aqua-track-disabled-color;
+
 }
 
 // Slider common styles
@@ -368,7 +376,8 @@ $slider-white-track-disabled-color: $light_gray_900;
   }
 }
 
-.slider-white {
+
+%slider-white {
   .sliderLabelSection {
     color: $light_white;
   }
@@ -393,15 +402,15 @@ $slider-white-track-disabled-color: $light_gray_900;
       // Hover Styles
       input[type='range']:hover {
         &::-webkit-slider-thumb {
-          background-color: $neutral_dark90;
+          background-color: $brand_aqua_20;
         }
 
         &::-moz-range-thumb {
-          background-color: $neutral_dark90;
+          background-color: $brand_aqua_20;
         }
 
         &::-ms-thumb {
-          background-color: $neutral_dark90;
+          background-color: $brand_aqua_20;
         }
       }
 
@@ -410,15 +419,15 @@ $slider-white-track-disabled-color: $light_gray_900;
         outline: none;
 
         &::-webkit-slider-thumb {
-          background-color: $neutral_dark90;
+          background-color: $brand_aqua_20;
         }
 
         &::-moz-range-thumb {
-          background-color: $neutral_dark90;
+          background-color: $brand_aqua_20;
         }
 
         &::-ms-thumb {
-          background-color: $neutral_dark90;
+          background-color: $brand_aqua_20;
         }
       }
 
@@ -450,6 +459,33 @@ $slider-white-track-disabled-color: $light_gray_900;
         input[type='range']::-ms-thumb {
           background-color: $light_black;
           border-color: $neutral_dark90;
+        }
+      }
+    }
+  }
+}
+
+.slider-white {
+  @extend %slider-white;
+}
+
+.slider-aqua {
+  @extend %slider-white;
+
+  .sliderMainContainer {
+    .sliderWrapper {
+      // Hover Styles
+      input[type='range']:hover {
+        &::-webkit-slider-thumb {
+          background-color: $brand_aqua_50;
+        }
+
+        &::-moz-range-thumb {
+          background-color: $brand_aqua_50;
+        }
+
+        &::-ms-thumb {
+          background-color: $brand_aqua_50;
         }
       }
     }

@@ -29,7 +29,7 @@ export interface SliderProps extends HTMLAttributes<HTMLInputElement> {
   disabled?: boolean;
   /** Color of the slider track
    * @default 'black'* */
-  color?: 'black' | 'brand' | 'white';
+  color?: 'black' | 'brand' | 'white' | 'aqua';
   /** Is the slider centered
    * @default false */
   isCentered?: boolean;
@@ -84,6 +84,11 @@ const sliderTrackColorsMap = {
     fill: moduleStyles.sliderWhiteTrackFillColor,
     empty: moduleStyles.sliderWhiteTrackEmptyColor,
     disabled: moduleStyles.sliderWhiteTrackDisabledColor,
+  },
+  aqua: {
+    fill: moduleStyles.sliderAquaTrackFillColor,
+    empty: moduleStyles.sliderAquaTrackEmptyColor,
+    disabled: moduleStyles.sliderAquaTrackDisabledColor,
   },
 };
 
@@ -268,7 +273,7 @@ const Slider: React.FunctionComponent<SliderProps> = ({
         {leftButtonProps && (
           <Button
             {...defaultSliderButtonProps}
-            color={color === 'white' ? 'white' : 'black'}
+            color={['white', 'aqua'].includes(color) ? 'white' : 'black'}
             onClick={() => handleControlButtonClick('subtract')}
             disabled={disabled}
             {...leftButtonProps}
@@ -321,7 +326,7 @@ const Slider: React.FunctionComponent<SliderProps> = ({
         {rightButtonProps && (
           <Button
             {...defaultSliderButtonProps}
-            color={color === 'white' ? 'white' : 'black'}
+            color={['white', 'aqua'].includes(color) ? 'white' : 'black'}
             onClick={() => handleControlButtonClick('add')}
             disabled={disabled}
             {...rightButtonProps}
