@@ -18,9 +18,6 @@ GIT
     image_optim_pack (0.5.0)
       fspath (>= 2.1, < 4)
       image_optim (~> 0.19)
-    image_optim_pack (0.5.0-x86_64-linux)
-      fspath (>= 2.1, < 4)
-      image_optim (~> 0.19)
 
 GIT
   remote: https://github.com/code-dot-org/lograge.git
@@ -510,8 +507,6 @@ GEM
     launchy (2.5.2)
       addressable (~> 2.8)
     libv8-node (18.16.0.0)
-    libv8-node (18.16.0.0-aarch64-linux-musl)
-    libv8-node (18.16.0.0-x86_64-linux)
     listen (3.8.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -592,10 +587,6 @@ GEM
     nokogiri (1.14.3)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
-    nokogiri (1.14.3-aarch64-linux)
-      racc (~> 1.4)
-    nokogiri (1.14.3-x86_64-linux)
-      racc (~> 1.4)
     oauth2 (2.0.9)
       faraday (>= 0.17.3, < 3.0)
       jwt (>= 1.0, < 3.0)
@@ -629,6 +620,9 @@ GEM
       actionpack (>= 4.2)
       omniauth (~> 2.0)
     open-uri (0.1.0)
+      stringio
+      time
+      uri
     open_uri_redirections (0.2.1)
     orm_adapter (0.5.0)
     os (1.1.4)
@@ -871,6 +865,7 @@ GEM
       ip3country (~> 0.2.1)
       user_agent_parser (~> 2.15.0)
     stringex (2.5.2)
+    stringio (3.1.1)
     strscan (3.1.0)
     sysexits (1.2.0)
     syslog (0.1.2)
@@ -883,6 +878,8 @@ GEM
     thwait (0.2.0)
       e2mmap
     tilt (2.0.11)
+    time (0.3.0)
+      date
     timecop (0.8.1)
     timeout (0.3.2)
     trailblazer-option (0.1.2)
@@ -899,6 +896,7 @@ GEM
     unf_ext (0.0.7.4)
     unicode-display_width (2.5.0)
     unicode_utils (1.4.0)
+    uri (0.13.0)
     user_agent_parser (2.15.0)
     validate_url (1.0.15)
       activemodel (>= 3.0.0)
@@ -929,9 +927,7 @@ GEM
     zeitwerk (2.6.7)
 
 PLATFORMS
-  aarch64-linux-musl
   ruby
-  x86_64-linux
 
 DEPENDENCIES
   abbrev
