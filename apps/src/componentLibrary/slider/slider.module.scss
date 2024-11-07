@@ -376,7 +376,6 @@ $slider-aqua-track-disabled-color: $brand_aqua_90;
   }
 }
 
-
 %slider-white {
   .sliderLabelSection {
     color: $light_white;
@@ -402,15 +401,15 @@ $slider-aqua-track-disabled-color: $brand_aqua_90;
       // Hover Styles
       input[type='range']:hover {
         &::-webkit-slider-thumb {
-          background-color: $brand_aqua_20;
+          background-color: $neutral_dark90;
         }
 
         &::-moz-range-thumb {
-          background-color: $brand_aqua_20;
+          background-color: $neutral_dark90;
         }
 
         &::-ms-thumb {
-          background-color: $brand_aqua_20;
+          background-color: $neutral_dark90;
         }
       }
 
@@ -419,15 +418,15 @@ $slider-aqua-track-disabled-color: $brand_aqua_90;
         outline: none;
 
         &::-webkit-slider-thumb {
-          background-color: $brand_aqua_20;
+          background-color: $neutral_dark90;
         }
 
         &::-moz-range-thumb {
-          background-color: $brand_aqua_20;
+          background-color: $neutral_dark90;
         }
 
         &::-ms-thumb {
-          background-color: $brand_aqua_20;
+          background-color: $neutral_dark90;
         }
       }
 
