@@ -140,10 +140,10 @@ jobs:
 
       - name: docker pull caching
         run: |
-          docker pull ${{ vars.K8S_DOCKEHUB_REPOSITORY }}/code-dot-org:latest
-          docker pull ${{ vars.K8S_DOCKEHUB_REPOSITORY }}/code-dot-org-core:latest
-          docker pull ${{ vars.K8S_DOCKEHUB_REPOSITORY }}/code-dot-org-db-seed:latest
-          docker pull ${{ vars.K8S_DOCKEHUB_REPOSITORY }}/code-dot-org-static:latest
+          docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org:latest || true
+          docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-core:latest || true
+          docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-db-seed:latest || true
+          docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-static:latest || true
 
       - run: |
               df -h
