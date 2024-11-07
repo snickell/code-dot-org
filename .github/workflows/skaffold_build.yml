@@ -3,7 +3,7 @@ on: [push]
 jobs:
   build:
     name: Skaffold Build
-    runs-on: ubuntu-latest-m
+    runs-on: ubuntu-latest
     container:
       image: gcr.io/k8s-skaffold/skaffold:v2.13.2-lts
       # env:
@@ -21,6 +21,18 @@ jobs:
           echo hi
           echo "SKAFFOLD_DEFAULT_REPO=$SKAFFOLD_DEFAULT_REPO"
           echo "GITHUB_WORKFLOW=${GITHUB_WORKFLOW}"
+
+      - run: df -h
+
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          remove-dotnet: true
+          remove-android: true
+          remove-haskell: true
+          remove-codeql: true
+
+      - run: df -h
 
       # Add support for more platforms with QEMU (optional)
       # https://github.com/docker/setup-qemu-action
