@@ -14,8 +14,6 @@ FROM $CODE_DOT_ORG_CORE AS code-dot-org-core
 FROM code-dot-org-core AS code-dot-org-bundle-install
 ################################################################################
 
-SHELL [ "/bin/sh", "-euxc" ]
-
 COPY --chown=${UID} \
   .ruby-version \
   Gemfile \
@@ -23,10 +21,7 @@ COPY --chown=${UID} \
   ./
 
 RUN --mount=type=cache,sharing=locked,uid=1000,gid=1000,target=${HOME}/.rbenv/versions/3.0.5/lib/ruby/gems/3.0.0/cache <<EOF
-  eval "$(rbenv init -)"
-  gem install bundler -v 2.3.22
-  rbenv rehash
-  bundle install --jobs 8
+  bundle install --jobs 8 --quiet
 EOF
 
 ################################################################################

@@ -81,16 +81,18 @@ FROM code-dot-org-base AS code-dot-org-rbenv
 USER ${USERNAME}
 WORKDIR ${SRC}
 
-SHELL [ "/bin/sh", "-euxc" ]
-
 COPY --chown=${UID} \
   .ruby-version \
   ./
 
 RUN <<EOF
+  # Compile and install ruby using rbenv
+  PATH=${HOME}/.rbenv/shims:${PATH}
   mkdir -p "$(rbenv root)"/plugins
-  git clone https://github.com/rbenv/ruby-build.git "$(rbenv root)"/plugins/ruby-build
-  rbenv install
+  git clone --quiet https://github.com/rbenv/ruby-build.git "$(rbenv root)"/plugins/ruby-build
+  rbenv install > /dev/null
+  gem install bundler -v 2.3.22 --silent
+  rbenv rehash
 EOF
 
 ################################################################################
