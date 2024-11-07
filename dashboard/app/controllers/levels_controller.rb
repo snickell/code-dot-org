@@ -132,6 +132,13 @@ class LevelsController < ApplicationController
       @total_level_count = @level.levels.length
     end
 
+    puts "game is " + @game
+    if @game == 'pythonlab'
+      puts "setting headers??"
+      response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
+      response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
+    end
+
     view_options(
       full_width: true,
       no_footer: @game&.no_footer?,

@@ -3,6 +3,7 @@ import {loadPyodide, PyodideInterface, version} from 'pyodide';
 
 import {MAIN_PYTHON_FILE} from '@cdo/apps/lab2/constants';
 
+import PyodideStdinHandler from './pyodideStdinHandler';
 import {HOME_FOLDER} from './pythonHelpers/constants';
 import {SETUP_CODE} from './pythonHelpers/patches';
 import {
@@ -37,6 +38,7 @@ async function loadPyodideAndPackages() {
   });
   pyodide.setStdout(getStreamHandlerOptions('sysout'));
   pyodide.setStderr(getStreamHandlerOptions('syserr'));
+  pyodide.setStdin(new PyodideStdinHandler());
   // Warm up the pyodide environment by running setup code.
   await runInternalCode(SETUP_CODE, -1);
 }

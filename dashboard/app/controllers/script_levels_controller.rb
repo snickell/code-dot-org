@@ -182,6 +182,12 @@ class ScriptLevelsController < ApplicationController
       end
     end
 
+    if @level.uses_lab2?
+      puts "setting headers??"
+      response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
+      response.headers['Cross-Origin-Embedder-Policy'] = 'credentialless'
+    end
+
     @body_classes = @level.properties['background']
 
     @rubric = @script_level.lesson.rubric

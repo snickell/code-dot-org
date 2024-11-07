@@ -25,7 +25,7 @@ const setUpPyodideWorker = () => {
   callbacks = {};
 
   worker.onmessage = event => {
-    const {type, id, message} = event.data as PyodideMessage;
+    const {type, id, message, buffer} = event.data as PyodideMessage;
     const onSuccess = callbacks[id];
     switch (type) {
       case 'sysout':
@@ -69,6 +69,20 @@ const setUpPyodideWorker = () => {
         break;
       case 'loaded_pyodide':
         getStore().dispatch(setLoadedCodeEnvironment(true));
+        break;
+      case 'stdin':
+        if (buffer) {
+          const notifier = new Int32Array(buffer);
+          const dummyString = 'hello';
+          for (
+            let view = new Uint16Array(buffer), i = 0;
+            i < dummyString.length;
+            i++
+          ) {
+            view[i] = dummyString.charCodeAt(i);
+          }
+          Atomics.notify(notifier, 0);
+        }
         break;
       default:
         console.warn(
