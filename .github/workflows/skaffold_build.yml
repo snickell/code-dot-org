@@ -74,18 +74,20 @@ jobs:
       # - name: Checkout sources
       #   uses: actions/checkout@v3
 
-      # - name: Skaffold Cache
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: "${{ github.workspace }}/.skaffold/cache"
-      #     key: skaffold-${{ hashFiles('**/cache') }}
-      #     restore-keys: |
-      #       skaffold-
+      - name: Skaffold Cache
+        uses: actions/cache@v3
+        with:
+          path: "${{ github.workspace }}/.skaffold/cache"
+          key: skaffold-${{ hashFiles('**/cache') }}
+          restore-keys: |
+            skaffold-
 
-      - run: |
+      - name: skaffold build
+        run: |
+          df -h
           skaffold build \
             --push \
-          && true
+            && true
 
 
 
