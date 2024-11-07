@@ -79,16 +79,19 @@ const Help: React.FunctionComponent<HelpProps> = ({
   isPlaying,
   shouldShowGenerateAgainHelp,
 }) => {
-  const clickDrumsText = [
+  const clickDrumsTexts = [
     musicI18n.patternAiClickDrums(),
     musicI18n.patternAiClickDrums3(),
     musicI18n.patternAiClickDrums2(),
     musicI18n.patternAiClickDrums1(),
-  ][eventsLength];
+  ];
+
+  const clickDrumsText =
+    eventsLength < clickDrumsTexts.length && clickDrumsTexts[eventsLength];
 
   return (
     <>
-      {userCompletedTask === 'none' && (
+      {userCompletedTask === 'none' && clickDrumsText && (
         <div className={styles.helpContainer}>
           <div className={classNames(styles.help, styles.helpDrawDrums)}>
             {clickDrumsText}
