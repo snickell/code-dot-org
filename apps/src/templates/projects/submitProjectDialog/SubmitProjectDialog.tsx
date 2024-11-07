@@ -89,6 +89,15 @@ const SubmitProjectDialog: React.FunctionComponent<
         </BodyTwoText>
       </div>
       <hr />
+      {showSubmitError && (
+        <div className={moduleStyles.alertContainer}>
+          <Alert
+            text={i18n.submitProjectGallery_tryAgain()}
+            type="danger"
+            size="s"
+          />
+        </div>
+      )}
       <div className={moduleStyles.bottomSection}>
         <div className={moduleStyles.bottomSectionLink}>
           <Link
@@ -115,15 +124,6 @@ const SubmitProjectDialog: React.FunctionComponent<
           />
         </div>
       </div>
-      {showSubmitError && (
-        <div className={moduleStyles.alertContainer}>
-          <Alert
-            text={i18n.submitProjectGallery_tryAgain()}
-            type="danger"
-            size="s"
-          />
-        </div>
-      )}
     </AccessibleDialog>
   );
 };
