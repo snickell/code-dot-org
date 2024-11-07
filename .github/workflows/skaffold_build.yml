@@ -22,7 +22,12 @@ jobs:
           echo "SKAFFOLD_DEFAULT_REPO=$SKAFFOLD_DEFAULT_REPO"
           echo "GITHUB_WORKFLOW=${GITHUB_WORKFLOW}"
 
-      - run: df -h
+      - run: pwd
+
+      - run: |
+              df -h
+              df -h .
+              du -h /var/lib/docker
 
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
@@ -32,28 +37,39 @@ jobs:
           remove-haskell: true
           remove-codeql: true
 
-      - run: df -h
+      - run: |
+              df -h
+              df -h .
 
       - name: install skaffold
         run: |
           curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
           sudo install skaffold /usr/local/bin/
 
-      - run: df -h
+      - run: |
+              df -h
+              df -h .
+
 
       # Add support for more platforms with QEMU (optional)
       # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      - run: df -h
+      - run: |
+              df -h
+              df -h .
+
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         #with:
         #  platforms: linux/amd64,linux/arm64
 
-      - run: df -h
+      - run: |
+              df -h
+              df -h .
+
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -93,11 +109,17 @@ jobs:
       #     git fetch --depth=1 origin $GITHUB_WORKFLOW_SHA
       #     git checkout $GITHUB_WORKFLOW_SHA
 
+      
+      - run: |
+              df -h
+              df -h .
 
-      # - name: Checkout sources
-      #   uses: actions/checkout@v3
+      - name: Checkout sources
+        uses: actions/checkout@v3
 
-      - run: df -h
+      - run: |
+              df -h
+              df -h .
 
       - name: Skaffold Cache
         uses: actions/cache@v3
@@ -107,7 +129,22 @@ jobs:
           restore-keys: |
             skaffold-
 
-      - run: df -h
+      - run: |
+              df -h
+              df -h .
+              du -h /var/lib/docker
+
+      - name: docker pull caching
+        run: |
+          docker pull ${{ vars.K8S_DOCKEHUB_REPOSITORY }}/code-dot-org:latest
+          docker pull ${{ vars.K8S_DOCKEHUB_REPOSITORY }}/code-dot-org-core:latest
+          docker pull ${{ vars.K8S_DOCKEHUB_REPOSITORY }}/code-dot-org-db-seed:latest
+          docker pull ${{ vars.K8S_DOCKEHUB_REPOSITORY }}/code-dot-org-static:latest
+
+      - run: |
+              df -h
+              df -h .
+              du -h /var/lib/docker
 
       - name: skaffold build
         run: |
@@ -116,6 +153,9 @@ jobs:
             --push \
             && true
 
+      - run: |
+              df -h
+              df -h .
 
 
   # quicktest:
