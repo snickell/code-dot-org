@@ -384,13 +384,12 @@ export const blocks = {
         if (!this.behaviorId) {
           return undefinedCode;
         }
-        const name = generator.nameDB_?.getName(
-          `${behaviorBlock.behaviorId}`,
-          'PROCEDURE'
-        );
-        return [`new Behavior(${name}, [])`, Order.ATOMIC as number];
       }
-      return null;
+      const name = generator.nameDB_?.getName(
+        `${behaviorBlock.behaviorId}`,
+        'PROCEDURE'
+      );
+      return [`new Behavior(${name}, [])`, Order.ATOMIC as number];
     };
     generator.forBlock.sprite_parameter_get = generator.forBlock.variables_get;
   },
