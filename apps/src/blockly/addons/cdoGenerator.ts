@@ -10,7 +10,7 @@ export default function initializeGenerator(
   blocklyWrapper: BlocklyWrapperType
 ) {
   blocklyWrapper.JavaScript.translateVarName = function (name: string) {
-    return Blockly.JavaScript.nameDB_.getName(
+    return Blockly.JavaScript.nameDB_?.getName(
       name,
       Blockly.VARIABLE_CATEGORY_NAME
     );
@@ -18,7 +18,10 @@ export default function initializeGenerator(
 
   // This function was a custom addition in CDO Blockly, so we need to add it here
   // so that our code generation logic still works with Google Blockly
-  blocklyWrapper.Generator.xmlToBlocks = function (_name, xml) {
+  blocklyWrapper.Generator.xmlToBlocks = function (
+    _name: 'JavaScript',
+    xml: Element
+  ) {
     const workspace = new Blockly.Workspace();
     Blockly.Xml.domToBlockSpace(workspace, xml);
     return workspace.getTopBlocks(true);
@@ -26,7 +29,10 @@ export default function initializeGenerator(
 
   // This function was a custom addition in CDO Blockly, so we need to add it here
   // so that our code generation logic still works with Google Blockly
-  blocklyWrapper.Generator.blockSpaceToCode = function (name, opt_typeFilter) {
+  blocklyWrapper.Generator.blockSpaceToCode = function (
+    name: 'JavaScript',
+    opt_typeFilter: string | string[]
+  ) {
     let blocksToGenerate = blocklyWrapper.mainBlockSpace.getTopBlocks(
       true /* ordered */
     );
@@ -56,7 +62,7 @@ export default function initializeGenerator(
       generator.init(blocklyWrapper.getMainWorkspace());
     }
     generator.variableDB_ = generator.nameDB_;
-    const code: string[] = [];
+    const code: (string | [string, number])[] = [];
     blocksToGenerate.forEach(block => {
       code.push(blocklyWrapper.JavaScript.blockToCode(block));
     });
@@ -86,7 +92,10 @@ export default function initializeGenerator(
     );
   };
 
-  blocklyWrapper.Generator.prefixLines = function (text, prefix) {
+  blocklyWrapper.Generator.prefixLines = function (
+    text: string,
+    prefix: string
+  ) {
     return blocklyWrapper.JavaScript.prefixLines(text, prefix);
   };
 

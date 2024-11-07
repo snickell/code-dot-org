@@ -3,7 +3,7 @@ import {
   ObservableProcedureModel,
 } from '@blockly/block-shareable-procedures';
 import * as GoogleBlockly from 'blockly/core';
-import {javascriptGenerator} from 'blockly/javascript';
+import type {javascriptGenerator} from 'blockly/javascript';
 
 import BlockSvgFrame from './addons/blockSvgFrame';
 import BlockSvgLimitIndicator from './addons/blockSvgLimitIndicator';
@@ -65,7 +65,6 @@ interface AnalyticsData {
 }
 
 type GoogleBlocklyType = typeof GoogleBlockly;
-
 // Type for the Blockly instance created and modified by googleBlocklyWrapper.
 export interface BlocklyWrapperType extends GoogleBlocklyType {
   analyticsData: AnalyticsData;
@@ -148,7 +147,7 @@ export interface BlocklyWrapperType extends GoogleBlocklyType {
     blockspace: GoogleBlockly.Workspace,
     handler: (e: GoogleBlockly.Events.Abstract) => void
   ) => void;
-  getGenerator: () => JavascriptGeneratorType;
+  getGenerator: () => ExtendedGenerator;
   addEmbeddedWorkspace: (workspace: GoogleBlockly.Workspace) => void;
   isEmbeddedWorkspace: (workspace: GoogleBlockly.Workspace) => boolean;
   findEmptyContainerBlock: (
@@ -279,8 +278,8 @@ export interface ExtendedWorkspace extends GoogleBlockly.Workspace {
   noFunctionBlockFrame: boolean;
 }
 
-type CodeGeneratorType = typeof GoogleBlockly.CodeGenerator;
-export interface ExtendedGenerator extends CodeGeneratorType {
+export type ExtendedGenerator = typeof javascriptGenerator & {
+  new (name: string): ExtendedGenerator;
   xmlToCode: (name: string, domBlocks: Element) => string;
   xmlToBlocks: (name: string, xml: Element) => GoogleBlockly.Block[];
   blockSpaceToCode: (
@@ -294,7 +293,8 @@ export interface ExtendedGenerator extends CodeGeneratorType {
   prefixLines: (text: string, prefix: string) => string;
   nameDB_: GoogleBlockly.Names | undefined;
   variableDB_: GoogleBlockly.Names | undefined;
-}
+  prototype: typeof GoogleBlockly.CodeGenerator.prototype;
+};
 
 type XmlType = typeof GoogleBlockly.Xml;
 export interface ExtendedXml extends XmlType {
@@ -451,4 +451,4 @@ export type PointerMetadataMap = {
 export type BlockColor = [number, number, number];
 
 // Blockly defines this as any.
-export type JavascriptGeneratorType = typeof javascriptGenerator;
+export type JavascriptGeneratorType = ExtendedGenerator;
