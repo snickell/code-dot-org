@@ -76,7 +76,7 @@ RUN \
   #
   # Install apps/node_modules using yarn
   cd apps
-  yarn install --frozen-lockfile
+  yarn install --frozen-lockfile --silent
   ls -l | grep node_modules
 EOF
 
