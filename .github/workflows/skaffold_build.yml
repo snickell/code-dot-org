@@ -22,24 +22,13 @@ jobs:
           echo "SKAFFOLD_DEFAULT_REPO=$SKAFFOLD_DEFAULT_REPO"
           echo "GITHUB_WORKFLOW=${GITHUB_WORKFLOW}"
 
+      - name: Free disk space
+        run: |
+          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
+          echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
 
       # - name: ssh into the runner
       #   uses: mxschmitt/action-tmate@v3
-
-      # If we needed even MORE space we could use this:
-      #
-      # - name: Maximize build space
-      #   uses: easimon/maximize-build-space@master
-      #   with:
-      #     remove-dotnet: true
-      #     remove-android: true
-      #     remove-haskell: true
-      #     remove-codeql: true
-      #     # this needs to fit our git checkout:
-      #     root-reserve-mb: 2048
-      #     # because we're allocating all our maximized space to docker
-      #     build-mount-path: /var/lib/docker
-      #     build-mount-path-ownership: root:root
       
       - name: Put /var/lib/docker on the big empty temp disk
         run: |
@@ -57,6 +46,21 @@ jobs:
           echo
           echo "Docker now has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
 
+      # If we needed even MORE space for docker we could maybe use this:
+      #
+      # - name: Maximize build space
+      #   uses: easimon/maximize-build-space@master
+      #   with:
+      #     remove-dotnet: true
+      #     remove-android: true
+      #     remove-haskell: true
+      #     remove-codeql: true
+      #     # this needs to fit our git checkout:
+      #     root-reserve-mb: 2048
+      #     # because we're allocating all our maximized space to docker
+      #     build-mount-path: /var/lib/docker
+      #     build-mount-path-ownership: root:root
+
       - name: Free disk space
         run: |
           echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
@@ -66,7 +70,6 @@ jobs:
         run: |
           curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
           sudo install skaffold /usr/local/bin/
-
 
       # Add support for more platforms with QEMU (optional)
       # https://github.com/docker/setup-qemu-action
@@ -80,8 +83,8 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        #with:
-        #  platforms: linux/amd64,linux/arm64
+        with:
+          platforms: linux/amd64,linux/arm64
 
       - name: Free disk space
         run: |
@@ -164,6 +167,7 @@ jobs:
         run: |
           df -h
           skaffold build \
+            -v trace \
             --push \
             && true
 
