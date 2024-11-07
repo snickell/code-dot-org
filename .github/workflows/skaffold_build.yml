@@ -3,7 +3,7 @@ on: [push]
 jobs:
   build:
     name: Skaffold Build
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-l
     container:
       image: gcr.io/k8s-skaffold/skaffold:v2.13.2-lts
       # env:
