@@ -17,6 +17,7 @@ build:
       dockerfile: ./k8s/code-dot-org.dockerfile
       cacheFrom:
       - code-dot-org
+      - docker.io/snickellcdo/code-dot-org:latest
       # - 475661607190.dkr.ecr.us-east-1.amazonaws.com/code.org:staging
     requires:
     - image: code-dot-org-core
@@ -34,18 +35,21 @@ build:
         GID: "1000"
       cacheFrom:
       - code-dot-org-core
+      - docker.io/snickellcdo/code-dot-org-core:latest
       # - 475661607190.dkr.ecr.us-east-1.amazonaws.com/code.org-core:staging
   - image: code-dot-org-static
     docker:
       dockerfile: ./k8s/code-dot-org-static.dockerfile
       cacheFrom:
       - code-dot-org-static
+      - docker.io/snickellcdo/code-dot-org-static:latest
       # - 475661607190.dkr.ecr.us-east-1.amazonaws.com/code.org-static:staging
   - image: code-dot-org-db-seed
     docker:
       dockerfile: ./k8s/code-dot-org-db-seed.dockerfile
       cacheFrom:
       - code-dot-org-db-seed
+      - docker.io/snickellcdo/code-dot-org-db-seed:latest
       # - 475661607190.dkr.ecr.us-east-1.amazonaws.com/code.org-db-seed:staging
   local:
     useBuildkit: true # required for caching layers, see https://github.com/moby/moby/issues/34715#issuecomment-589655390
