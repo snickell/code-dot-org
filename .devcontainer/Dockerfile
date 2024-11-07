@@ -27,7 +27,7 @@ RUN rbenv global 3.0.5
 # Add the Rails main Gemfile and install the gems. This means the gem install can be done
 # during build instead of on start. When a fork or branch has different gems, we still have an
 # advantage due to caching of the other gems.
-RUN gem install bundler
+RUN gem install bundler -v 2.3.24 # Pin due to https://github.com/rubygems/rubygems/pull/5698 (remove when ruby upgraded)
 RUN mkdir -p /tmp/rails
 COPY --chown=vscode:vscode Gemfile Gemfile.lock /tmp/rails/
 
