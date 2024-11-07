@@ -294,6 +294,14 @@ export type ExtendedGenerator = typeof javascriptGenerator & {
   nameDB_: GoogleBlockly.Names | undefined;
   variableDB_: GoogleBlockly.Names | undefined;
   prototype: typeof GoogleBlockly.CodeGenerator.prototype;
+  translateVarName: (name: string) => string;
+  forBlock: Record<
+    string,
+    (
+      block: GoogleBlockly.Block,
+      generator: GoogleBlockly.CodeGenerator
+    ) => string | [string, number] | null
+  >;
 };
 
 type XmlType = typeof GoogleBlockly.Xml;

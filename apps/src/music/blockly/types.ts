@@ -1,7 +1,5 @@
 import * as GoogleBlockly from 'blockly/core';
 
-import {ExtendedGenerator} from '@cdo/apps/blockly/types';
-
 import {BlockTypes} from './blockTypes';
 
 // Configuration data for a block.
@@ -9,7 +7,7 @@ export interface BlockConfig {
   definition: BlockJson;
   generator: (
     block: GoogleBlockly.Block,
-    generator: ExtendedGenerator
+    generator: GoogleBlockly.CodeGenerator
   ) => string | [string, number] | null;
 }
 
