@@ -369,4 +369,46 @@ class Api::V1::UsersControllerTest < ActionController::TestCase
 
     assert_response :unauthorized
   end
+
+  test 'set and get seen_ta_scores' do
+    teacher = create :teacher
+    sign_in(teacher)
+
+    unit = create :unit, :with_lessons
+    lesson = unit.lessons.first
+    other_lesson = unit.lessons.last
+    params = {user_id: 'me', unit_name: unit.name, lesson_position: lesson.absolute_position}
+    other_unit = create :unit, :with_lessons
+
+    get :get_seen_ta_scores, params: params
+    assert_response :success
+    response = JSON.parse(@response.body)
+    assert_equal false, response["seen"]
+
+    post :set_seen_ta_scores, params: params
+    assert_response :success
+    expected_map = {
+      unit.name => {
+        lesson.absolute_position.to_s => true
+      }
+    }
+    assert_equal expected_map, teacher.reload.seen_ta_scores_map
+
+    get :get_seen_ta_scores, params: params
+    assert_response :success
+    response = JSON.parse(@response.body)
+    assert_equal true, response["seen"]
+
+    other_lesson_params = {user_id: 'me', unit_name: unit.name, lesson_position: other_lesson.absolute_position}
+    get :get_seen_ta_scores, params: other_lesson_params
+    assert_response :success
+    response = JSON.parse(@response.body)
+    assert_equal false, response["seen"]
+
+    other_unit_params = {user_id: 'me', unit_name: other_unit.name, lesson_position: other_unit.lessons.first.absolute_position}
+    get :get_seen_ta_scores, params: other_unit_params
+    assert_response :success
+    response = JSON.parse(@response.body)
+    assert_equal false, response["seen"]
+  end
 end
