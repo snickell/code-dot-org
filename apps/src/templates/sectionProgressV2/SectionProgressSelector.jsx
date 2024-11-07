@@ -93,7 +93,7 @@ function SectionProgressSelector({
     progressTableV2ClosedBeta;
   const allowSelection =
     experiments.isEnabled(experiments.SECTION_PROGRESS_V2) ||
-    DCDO.get('progress-table-v2-enabled', false) ||
+    DCDO.get('progress-table-v2-enabled', true) ||
     isInClosedBeta;
   if (!allowSelection) {
     return <SectionProgress />;
