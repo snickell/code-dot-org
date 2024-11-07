@@ -5,6 +5,7 @@ import {Provider} from 'react-redux';
 import {Store} from 'redux';
 
 import calendar from '@cdo/apps/code-studio/calendarRedux';
+import progress from '@cdo/apps/code-studio/progressRedux';
 import {
   getStore,
   registerReducers,
@@ -16,7 +17,7 @@ import unitSelection, {setUnitName} from '@cdo/apps/redux/unitSelectionRedux';
 import currentUser, {
   setInitialData,
 } from '@cdo/apps/templates/currentUserRedux';
-import teacherSectionsRedux, {
+import teacherSections, {
   selectSection,
   setSections,
 } from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
@@ -79,9 +80,10 @@ describe('UnitCalendar', () => {
     registerReducers({
       locales,
       currentUser,
-      teacherSectionsRedux,
+      teacherSections,
       unitSelection,
       calendar,
+      progress,
     });
 
     store = getStore();
