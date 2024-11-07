@@ -3,6 +3,7 @@ import {
   ObservableProcedureModel,
   ObservableParameterModel,
 } from '@blockly/block-shareable-procedures';
+import {colourPicker} from '@blockly/field-colour';
 import {LineCursor, NavigationController} from '@blockly/keyboard-navigation';
 import {CrossTabCopyPaste} from '@blockly/plugin-cross-tab-copy-paste';
 import {
@@ -174,7 +175,8 @@ const BlocklyWrapper = function (
     overrides.forEach(override => {
       const fieldRegistryName = override[0];
       const fieldClassName = override[1];
-      const fieldClass = override[2];
+      const fieldClass =
+        override[2] as GoogleBlockly.fieldRegistry.RegistrableField;
 
       // Force Google Blockly to use our custom versions of fields
       this.blockly_.fieldRegistry.unregister(fieldRegistryName);
@@ -269,6 +271,7 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
     blocklyWrapper.wrapReadOnlyProperty(prop);
   });
 
+  colourPicker.installBlock({javascript: javascriptGenerator});
   // elements in this list should be structured as follows:
   // [field registry name for field, class name of field being overridden, class to use as override]
   const fieldOverrides: [
@@ -278,7 +281,14 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
   ][] = [
     ['field_variable', 'FieldVariable', CdoFieldVariable],
     ['field_dropdown', 'FieldDropdown', CdoFieldDropdown],
-    ['field_colour', 'FieldColour', CdoFieldColour],
+    [
+      'field_colour',
+      'FieldColour',
+      CdoFieldColour as unknown as Pick<
+        typeof GoogleBlockly.Field,
+        'prototype'
+      >,
+    ],
     ['field_number', 'FieldNumber', CdoFieldNumber],
     // CdoFieldBitmap extends from a JavaScript class without typing.
     // We know it's a field, so it's safe to cast as unknown.
@@ -422,6 +432,7 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
   Object.setPrototypeOf(javascriptGenerator.forBlock, javascriptGenerator);
 
   blocklyWrapper.JavaScript = javascriptGenerator;
+
   blocklyWrapper.LineCursor = LineCursor;
   blocklyWrapper.navigationController = new NavigationController();
   // Initialize plugin.
@@ -635,7 +646,7 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
     for (const block of blocks) {
       const emptyInput = block.inputList.find(
         input =>
-          input.type === blocklyWrapper.inputTypes.STATEMENT &&
+          input.type === GoogleBlockly.inputs.inputTypes.STATEMENT &&
           input.connection?.targetConnection === null
       );
       if (emptyInput) {
@@ -973,7 +984,7 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
   initializeCss(blocklyWrapper);
 
   blocklyWrapper.Blocks.unknown = UNKNOWN_BLOCK;
-  blocklyWrapper.JavaScript.unknown = () => '/* unknown block */\n';
+  blocklyWrapper.JavaScript.forBlock.unknown = () => '/* unknown block */\n';
 
   blocklyWrapper.cdoUtils = cdoUtils;
   blocklyWrapper.getPointerBlockImageUrl = getPointerBlockImageUrl;
