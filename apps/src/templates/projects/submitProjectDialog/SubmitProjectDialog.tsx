@@ -34,11 +34,12 @@ const SubmitProjectDialog: React.FunctionComponent<
 
   useEffect(() => {
     setIsSubmitButtonDisabled(!projectDescription.trim());
+    setShowSubmitError(false);
   }, [projectDescription]);
 
   const onSubmit = useCallback(async () => {
     setIsSubmitButtonDisabled(true);
-    setShowSubmitError(true);
+    setShowSubmitError(false);
     analyticsReporter.sendEvent(
       EVENTS.SUBMIT_PROJECT_DIALOG_SUBMIT,
       {
@@ -53,6 +54,7 @@ const SubmitProjectDialog: React.FunctionComponent<
       onGoBack();
     } catch (err) {
       console.error(err);
+      setIsSubmitButtonDisabled(false);
       setShowSubmitError(true);
     }
   }, [channelId, onGoBack, projectDescription, projectType]);
