@@ -1,5 +1,6 @@
 # don't inject K8S related manifests so skaffold doesn't rebuild/sync
 skaffold.yaml
+.github/workflows
 k8s
 
 ##########################################################################
