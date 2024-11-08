@@ -10,8 +10,8 @@ import {
 export default function initializeGenerator(
   blocklyWrapper: BlocklyWrapperType
 ) {
-  blocklyWrapper.Generator.translateVarName = function (name: string) {
-    return (Blockly.Generator.nameDB_ as GoogleBlockly.Names).getName(
+  blocklyWrapper.JavaScript.translateVarName = function (name: string) {
+    return (Blockly.JavaScript.nameDB_ as GoogleBlockly.Names).getName(
       name,
       Blockly.VARIABLE_CATEGORY_NAME
     );
