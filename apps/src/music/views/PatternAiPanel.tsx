@@ -551,7 +551,7 @@ const PatternAiPanel: React.FunctionComponent<PatternAiPanelProps> = ({
   const aiBotImage = getAiBotImage();
 
   return (
-    <div className={styles.patternPanel}>
+    <div className={styles.patternPanel} dir="ltr">
       <LoadingOverlay show={isLoading} />
 
       <div
