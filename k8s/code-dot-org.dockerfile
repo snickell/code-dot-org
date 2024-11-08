@@ -41,7 +41,7 @@ COPY --chown=${UID} \
   ./python/pycdo/
 
 RUN <<EOF
-  pdm install
+  pdm install --quiet
 EOF
 
 ################################################################################
@@ -64,12 +64,11 @@ COPY --chown=${UID} \
 
 RUN \
   #
-  # Instuct Docker to maintain a build cache for yarn package downloads
+  # Instuct Docker to maintain a download cache for yarn packages
   # so we don't have to re-download npms whenever package.json changes
   --mount=type=cache,sharing=locked,uid=1000,gid=1000,target=${SRC}/apps/.yarn/cache \
 <<EOF
-  #
-  # Install apps/node_modules using yarn
+  # yarn install
   cd apps
   yarn install --frozen-lockfile --silent
   ls -l | grep node_modules
@@ -80,11 +79,9 @@ FROM code-dot-org-core
 # ################################################################################
 
 RUN \
-  #
   # We don't copy in .git (huge), but `bundle exec rake install` references .git in 
   # a couple places, like git hooks, and fails without it, create a blank .git for now
-  git init -b staging --quiet && \
-  true
+  git init -b staging --quiet
 
 # NOTE: `COPY --link` has been disabled in Docker 24 due to a bug in moby
 # as of today, it does nothing unless `Use containerd for pulling and storing images` is enabled
@@ -146,9 +143,5 @@ COPY --chown=${UID} --link \
 
 # Copy in the rest of the source code
 COPY --chown=${UID} --link ./ ./
-
-# `kubectl exec` skips entrypoint (!), so this is the easiest way to
-# accomplish `eval $(rbenv init -)` that works for kubectl exec.
-ENV PATH=${HOME}/.rbenv/shims:${PATH}
 
 ENTRYPOINT [ "/usr/bin/zsh" ]

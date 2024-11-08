@@ -18,6 +18,7 @@ SHELL [ "/bin/sh", "-euxc" ]
 
 RUN <<EOF
   # Ideally install all apt packages here
+
   apt-get -qq update
   export DEBIAN_FRONTEND=noninteractive
   apt-get -qq -y install --no-install-recommends \
@@ -53,7 +54,6 @@ RUN <<EOF
     tzdata \
     zlib1g-dev \
     zsh \
-    # surpress noisy dpkg install/setup lines (errors & warnings still show)
     > /dev/null
 
   if [ "$USERNAME" = "root" ]; then
@@ -101,11 +101,12 @@ FROM code-dot-org-base AS code-dot-org-user-utils
 
 WORKDIR /tmp
 
-# Set things up as root
 RUN <<EOF
+  # Install apps not in apt (node, aws, etc)
+
   # install node, based on instructions at https://github.com/nodesource/distributions#using-ubuntu-1
-  curl -sL https://deb.nodesource.com/setup_20.x | bash -
-  apt-get install -y nodejs
+  curl -sL https://deb.nodesource.com/setup_20.x | bash - > /dev/null
+  apt-get install -qq -y nodejs > /dev/null
   corepack enable # corepack required for yarn support
 
   # Install AWSCLI
@@ -119,7 +120,7 @@ RUN <<EOF
   rm awscliv2.zip
 
   # install pdm for managing our python dependencies
-  pip install pdm
+  pip install -q pdm
 
   # Install Sauce Connect Proxy
   mkdir sauce_connect
@@ -142,10 +143,11 @@ FROM code-dot-org-user-utils AS code-dot-org-core
 USER ${USERNAME}
 WORKDIR ${SRC}
 
-# Set things up as ${USERNAME}
 RUN <<EOF
+  # Set things up as ${USERNAME}
+
   # Install oh-my-zsh
-  sh +x -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  sh +x -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" > /dev/null
 
   # Add CHROME_BIN env var to bashrc
   echo '# Chromium Binary\nexport CHROME_BIN=/usr/bin/chromium-browser' | tee -a ${HOME}/.bashrc ${HOME}/.zshrc
@@ -154,7 +156,7 @@ RUN <<EOF
   echo 'eval "$(rbenv init -)"' | tee -a ${HOME}/.bashrc ${HOME}/.zshrc
 
   # Enable Git LFS in ~/.gitconfig
-  git lfs install
+  git lfs --quiet install
 EOF
 
 ENV \
