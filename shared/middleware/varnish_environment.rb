@@ -57,7 +57,7 @@ class VarnishEnvironment < Sinatra::Base
     end
 
     def cookie_locale
-      language_to_locale(locale_cookie)
+      language_to_locale(request.cookies[LOCALE_KEY])
     end
 
     def param_locale

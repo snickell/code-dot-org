@@ -7,10 +7,6 @@ module Middleware
     module Cookies
       LOCALE_KEY = 'language_'
 
-      def locale_cookie
-        request.cookies[LOCALE_KEY]
-      end
-
       def set_locale_cookie(value)
         set_global_cookie(LOCALE_KEY, value, high_priority: true)
       end
