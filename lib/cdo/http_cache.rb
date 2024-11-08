@@ -51,6 +51,10 @@ class HttpCache
   ACCEPT_HEADER = %w(Accept).freeze
   ALLOWLISTED_HEADERS = LANGUAGE_HEADER + COUNTRY_HEADER + ACCEPT_HEADER
 
+  ASSETS_CROSS_ORIGIN_POLICY_HEADERS = {
+    'Cross-Origin-Embedder-Policy' => 'credentialless',
+  }
+
   DEFAULT_COOKIES = [
     # Language drop-down selection.
     'language_',
