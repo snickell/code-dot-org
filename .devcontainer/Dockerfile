@@ -32,7 +32,7 @@ RUN mkdir -p /tmp/rails
 COPY --chown=vscode:vscode Gemfile Gemfile.lock /tmp/rails/
 
 RUN cd /tmp/rails \
-    && bundle install \
+    && bundle install --verbose \
     && rm -rf /tmp/rails
 
 # Install PDM
