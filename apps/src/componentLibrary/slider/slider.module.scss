@@ -1,4 +1,5 @@
 @import 'color';
+@import '@cdo/apps/componentLibrary/common/styles/primitiveColors.css';
 @import '@cdo/apps/componentLibrary/common/styles/mixins';
 
 //Slider colors for use in JSX/TSX
@@ -11,9 +12,9 @@ $slider-brand-track-disabled-color: $light_gray_100;
 $slider-white-track-fill-color: $light_white;
 $slider-white-track-empty-color: $light_gray_400;
 $slider-white-track-disabled-color: $light_gray_900;
-$slider-aqua-track-fill-color: $brand_aqua_50;
+$slider-aqua-track-fill-color: var(--brand-aqua-50);
 $slider-aqua-track-empty-color: $light_gray_400;
-$slider-aqua-track-disabled-color: $brand_aqua_90;
+$slider-aqua-track-disabled-color: var(--brand-aqua-90);
 
 :export {
   sliderBlackTrackFillColor: $slider-black-track-fill-color;
@@ -476,15 +477,15 @@ $slider-aqua-track-disabled-color: $brand_aqua_90;
       // Hover Styles
       input[type='range']:hover {
         &::-webkit-slider-thumb {
-          background-color: $brand_aqua_50;
+          background-color: $slider-aqua-track-fill-color;
         }
 
         &::-moz-range-thumb {
-          background-color: $brand_aqua_50;
+          background-color: $slider-aqua-track-fill-color;
         }
 
         &::-ms-thumb {
-          background-color: $brand_aqua_50;
+          background-color: $slider-aqua-track-fill-color;
         }
       }
     }

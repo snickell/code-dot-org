@@ -247,6 +247,8 @@ const Slider: React.FunctionComponent<SliderProps> = ({
 
   const showLabelSection = label || !hideValue;
 
+  const buttonColor = color === 'white' || color === 'aqua' ? 'white' : 'black';
+
   return (
     <div
       className={classnames(
@@ -273,7 +275,7 @@ const Slider: React.FunctionComponent<SliderProps> = ({
         {leftButtonProps && (
           <Button
             {...defaultSliderButtonProps}
-            color={['white', 'aqua'].includes(color) ? 'white' : 'black'}
+            color={buttonColor}
             onClick={() => handleControlButtonClick('subtract')}
             disabled={disabled}
             {...leftButtonProps}
@@ -326,7 +328,7 @@ const Slider: React.FunctionComponent<SliderProps> = ({
         {rightButtonProps && (
           <Button
             {...defaultSliderButtonProps}
-            color={['white', 'aqua'].includes(color) ? 'white' : 'black'}
+            color={buttonColor}
             onClick={() => handleControlButtonClick('add')}
             disabled={disabled}
             {...rightButtonProps}
