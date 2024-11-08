@@ -22,8 +22,8 @@ jobs:
           echo "SKAFFOLD_DEFAULT_REPO=$SKAFFOLD_DEFAULT_REPO"
           echo "GITHUB_WORKFLOW=${GITHUB_WORKFLOW}"
 
-      - name: ssh into the runner
-        uses: mxschmitt/action-tmate@v3
+      # - name: ssh into the runner
+      #   uses: mxschmitt/action-tmate@v3
       
       - name: Put /var/lib/docker on the big empty temp disk
         run: |
