@@ -102,6 +102,17 @@ profiles:
       path: /deploy/helm/releases/0/setValueTemplates/development.hostPaths.skaffoldStorage
       value: '{{ cmd "sh" "-c" "echo $PWD/skaffoldStorage" }}'
 
+- name: no_cache_from
+  patches:
+    - op: remove
+      path: /build/artifacts/0/docker/cacheFrom
+    - op: remove
+      path: /build/artifacts/1/docker/cacheFrom
+    - op: remove
+      path: /build/artifacts/2/docker/cacheFrom
+    - op: remove
+      path: /build/artifacts/3/docker/cacheFrom
+
 - name: multiplatform
   build:
     platforms: ["linux/amd64", "linux/arm64"]
