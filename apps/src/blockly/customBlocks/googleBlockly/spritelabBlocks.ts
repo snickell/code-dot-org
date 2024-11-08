@@ -138,10 +138,9 @@ export const blocks = {
     const lastInput = this.inputList[this.inputList.length - 1];
     // Force add a dummy input at the end of the block, if needed.
     if (
-      ![
-        Blockly.inputs.inputTypes.END_ROW,
-        Blockly.inputs.inputTypes.STATEMENT,
-      ].includes(lastInput.type)
+      ![Blockly.inputTypes.END_ROW, Blockly.inputTypes.STATEMENT].includes(
+        lastInput.type
+      )
     ) {
       this.appendEndRowInput();
     }
