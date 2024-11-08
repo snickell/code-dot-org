@@ -51,6 +51,8 @@ class HttpCache
   ACCEPT_HEADER = %w(Accept).freeze
   ALLOWLISTED_HEADERS = LANGUAGE_HEADER + COUNTRY_HEADER + ACCEPT_HEADER
 
+  # Cross Origin Policy headers to add to all /assets responses, required to use some
+  # "high security" javascript features like SharedArrayBuffer.
   ASSETS_CROSS_ORIGIN_POLICY_HEADERS = {
     'Cross-Origin-Embedder-Policy' => 'credentialless',
   }
@@ -249,7 +251,9 @@ class HttpCache
             #
             path: '/assets/*',
             proxy: 'cdo-assets',
-            headers: [],
+            headers: [
+              *ASSETS_CROSS_ORIGIN_POLICY_HEADERS.keys
+            ],
             cookies: 'none'
           },
           {
