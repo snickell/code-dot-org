@@ -627,6 +627,8 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
     return this.JavaScript;
   };
 
+  blocklyWrapper.inputTypes = blocklyInstance.inputs.inputTypes;
+
   blocklyWrapper.addEmbeddedWorkspace = function (workspace) {
     this.embeddedWorkspaces.push(workspace.id);
   };
