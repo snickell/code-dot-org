@@ -376,7 +376,7 @@ class Api::V1::UsersControllerTest < ActionController::TestCase
 
     unit = create :unit, :with_lessons
     lesson = unit.lessons.first
-    params = {user_id: 'me', lesson_position: lesson.absolute_position}
+    params = {lesson_position: lesson.absolute_position}
     other_lesson = unit.lessons.last
     other_unit = create :unit, :with_lessons
 
@@ -394,13 +394,13 @@ class Api::V1::UsersControllerTest < ActionController::TestCase
     response = JSON.parse(@response.body)
     assert_equal true, response["seen"]
 
-    get :get_seen_ta_scores, params: {user_id: 'me', lesson_position: other_lesson.absolute_position}
+    get :get_seen_ta_scores, params: {lesson_position: other_lesson.absolute_position}
     assert_response :success
     response = JSON.parse(@response.body)
     assert_equal false, response["seen"]
 
     # other lessons with the same position are also now considered seen
-    get :get_seen_ta_scores, params: {user_id: 'me', lesson_position: other_unit.lessons.first.absolute_position}
+    get :get_seen_ta_scores, params: {lesson_position: other_unit.lessons.first.absolute_position}
     assert_response :success
     response = JSON.parse(@response.body)
     assert_equal true, response["seen"]

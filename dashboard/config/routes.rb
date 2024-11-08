@@ -988,8 +988,8 @@ Dashboard::Application.routes.draw do
         post 'users/:user_id/dismiss_donor_teacher_banner', to: 'users#dismiss_donor_teacher_banner'
         post 'users/:user_id/dismiss_parent_email_banner', to: 'users#dismiss_parent_email_banner'
 
-        get 'users/:user_id/get_seen_ta_scores', to: 'users#get_seen_ta_scores'
-        post 'users/:user_id/set_seen_ta_scores', to: 'users#set_seen_ta_scores'
+        get 'users/get_seen_ta_scores', to: 'users#get_seen_ta_scores'
+        post 'users/set_seen_ta_scores', to: 'users#set_seen_ta_scores'
 
         get 'school-districts/:state', to: 'school_districts#index', defaults: {format: 'json'}
         get 'schools/:school_district_id/:school_type', to: 'schools#index', defaults: {format: 'json'}
