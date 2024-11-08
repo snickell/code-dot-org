@@ -21,6 +21,7 @@ jobs:
           echo hi
           echo "SKAFFOLD_DEFAULT_REPO=$SKAFFOLD_DEFAULT_REPO"
           echo "GITHUB_WORKFLOW=${GITHUB_WORKFLOW}"
+          false
 
       # - name: ssh into the runner
       #   uses: mxschmitt/action-tmate@v3
