@@ -140,6 +140,7 @@ jobs:
           df -h
           skaffold build \
             -v trace \
+            -p multiplatform \
             --push \
             && true
 
