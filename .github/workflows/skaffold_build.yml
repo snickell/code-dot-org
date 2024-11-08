@@ -118,8 +118,8 @@ jobs:
       - name: skaffold cache
         uses: actions/cache@v3
         with:
-          path: "${{ github.workspace }}/.skaffold/cache"
-          key: skaffold-${{ hashFiles('**/cache') }}
+          path: ~/.skaffold/cache
+          key: skaffold-${{ hashFiles('~/.skaffold/cache') }}
           restore-keys: |
             skaffold-
 
@@ -143,6 +143,9 @@ jobs:
             -p multiplatform \
             --push \
             && true
+          set -x
+          find ~/.skaffold/cache
+          du -h ~/.skaffold/cache
 
 
   # quicktest:
