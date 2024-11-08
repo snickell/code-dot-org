@@ -41,7 +41,7 @@ COPY --chown=${UID} \
   ./python/pycdo/
 
 RUN <<EOF
-  pdm install --quiet
+  pdm install > /dev/null < /dev/null
 EOF
 
 ################################################################################

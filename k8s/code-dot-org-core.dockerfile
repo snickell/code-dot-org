@@ -147,7 +147,9 @@ RUN <<EOF
   # Set things up as ${USERNAME}
 
   # Install oh-my-zsh
-  sh +x -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" > /dev/null
+  set +x && \
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended \
+    > /dev/null && set -x
 
   # Add CHROME_BIN env var to bashrc
   echo '# Chromium Binary\nexport CHROME_BIN=/usr/bin/chromium-browser' | tee -a ${HOME}/.bashrc ${HOME}/.zshrc
@@ -156,7 +158,7 @@ RUN <<EOF
   echo 'eval "$(rbenv init -)"' | tee -a ${HOME}/.bashrc ${HOME}/.zshrc
 
   # Enable Git LFS in ~/.gitconfig
-  git lfs --quiet install
+  git lfs install
 EOF
 
 ENV \
