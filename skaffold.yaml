@@ -29,10 +29,13 @@ build:
   - image: code-dot-org-core
     docker:
       dockerfile: ./k8s/code-dot-org-core.dockerfile
+      # skaffold sync only works when the user is root 😤:
+      # https://github.com/GoogleContainerTools/skaffold/issues/2479
+      # If we find a solution, we can drop this override
       buildArgs:
-        USERNAME: code-dot-org
-        UID: "1000"
-        GID: "1000"
+        USERNAME: root
+        UID: "0"
+        GID: "0"
       cacheFrom:
       - code-dot-org-core
       - docker.io/snickellcdo/code-dot-org-core:latest
@@ -54,52 +57,54 @@ build:
   local:
     useBuildkit: true # required for caching layers, see https://github.com/moby/moby/issues/34715#issuecomment-589655390
 
+deploy:
+  helm:
+    releases:
+      - name: dashboard
+        chartPath: ./k8s/code-dot-org/helm
+        setValueTemplates:
+          image: "{{.IMAGE_FULLY_QUALIFIED_code_dot_org}}"
+          # skaffold sync only works when the user is root 😤:
+          # https://github.com/GoogleContainerTools/skaffold/issues/2479
+          # If we find a solution, we can drop this override
+          user.username: root
+          user.uid: 0
+          user.gid: 0
+          user.home: /home/root
+
 profiles:
 
-- name: multiplatform
-  build:
-    platforms: ["linux/amd64", "linux/arm64"]
-
 - name: production
-  deploy:
-    helm:
-      releases:
-        - name: dashboard
-          chartPath: ./k8s/code-dot-org/helm
-          setValueTemplates:
-            image: "{{.IMAGE_FULLY_QUALIFIED_code_dot_org}}"
-            environment: production
-            autoscaling.enabled: true
-            autoscaling.minReplicas: 1
-            autoscaling.maxReplicas: 10
+  patches:
+    - op: add
+      path: /deploy/helm/releases/0/valueFiles
+      value: k8s/code-dot-org/helm/production.values.yml
+
+- name: test
+  patches:
+    - op: add
+      path: /deploy/helm/releases/0/valueFiles
+      value: k8s/code-dot-org/helm/test.values.yml
 
 - name: development
   activation:
     - command: dev
     - kubeContext: docker-desktop
   patches:
-    # skaffold sync only works when the user is root:
-    # https://github.com/GoogleContainerTools/skaffold/issues/2479
-    - op: replace
-      path: /build/artifacts/1/docker/buildArgs
-      value:
-        USERNAME: root
-        UID: "0"
-        GID: "0"
-  deploy:
-    helm:
-      releases:
-        - name: dashboard
-          chartPath: ./k8s/code-dot-org/helm
-          setValueTemplates:
-            image: "{{.IMAGE_FULLY_QUALIFIED_code_dot_org}}"
-            user.username: root
-            user.uid: 0
-            user.gid: 0
-            user.home: /home/root
-            environment: development
-            development.hostPaths.home: '{{ cmd "sh" "-c" "echo $HOME" }}'
-            development.hostPaths.skaffoldStorage: '{{ cmd "sh" "-c" "echo $PWD/skaffoldStorage" }}'
+    - op: add
+      path: /deploy/helm/releases/0/valueFiles
+      value: k8s/code-dot-org/helm/development.values.yml
+    # These have to be patches vs in values.yml because they are templated:
+    - op: add
+      path: /deploy/helm/releases/0/setValueTemplates/development.hostPaths.home
+      value: '{{ cmd "sh" "-c" "echo $HOME" }}'
+    - op: add
+      path: /deploy/helm/releases/0/setValueTemplates/development.hostPaths.skaffoldStorage
+      value: '{{ cmd "sh" "-c" "echo $PWD/skaffoldStorage" }}'
+
+- name: multiplatform
+  build:
+    platforms: ["linux/amd64", "linux/arm64"]
 
 - name: seed
   patches:
