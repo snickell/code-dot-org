@@ -22,11 +22,6 @@ jobs:
           echo "SKAFFOLD_DEFAULT_REPO=$SKAFFOLD_DEFAULT_REPO"
           echo "GITHUB_WORKFLOW=${GITHUB_WORKFLOW}"
 
-      - name: Free disk space
-        run: |
-          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
-          echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
-
       # - name: ssh into the runner
       #   uses: mxschmitt/action-tmate@v3
       
@@ -45,6 +40,7 @@ jobs:
           sudo systemctl start docker
           echo
           echo "Docker now has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
+          echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
 
       # If we needed even MORE space for docker we could maybe use this:
       #
@@ -61,11 +57,6 @@ jobs:
       #     build-mount-path: /var/lib/docker
       #     build-mount-path-ownership: root:root
 
-      - name: Free disk space
-        run: |
-          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
-          echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
-
       - name: install skaffold
         run: |
           curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
@@ -76,20 +67,11 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      - name: Free disk space
-        run: |
-          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
-          echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
-          platforms: linux/amd64,linux/arm64
-
-      - name: Free disk space
-        run: |
-          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
-          echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
+          # platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -133,11 +115,6 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v4
 
-      - name: Free disk space
-        run: |
-          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
-          echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
-
       - name: skaffold cache
         uses: actions/cache@v3
         with:
@@ -146,11 +123,6 @@ jobs:
           restore-keys: |
             skaffold-
 
-      - name: Free disk space
-        run: |
-          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
-          echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
-
       - name: docker pull caching
         run: |
           docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org:latest || true
@@ -158,10 +130,10 @@ jobs:
           docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-db-seed:latest || true
           docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-static:latest || true
 
-      - name: Free disk space
-        run: |
-          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
-          echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
+      # - name: Free disk space
+      #   run: |
+      #     echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
+      #     echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
 
       - name: skaffold build
         run: |
@@ -170,11 +142,6 @@ jobs:
             -v trace \
             --push \
             && true
-
-      - name: Free disk space
-        run: |
-          echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
-          echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
 
 
   # quicktest:
