@@ -12,7 +12,11 @@ import {
   updatePointerBlockWarning,
 } from '@cdo/apps/blockly/addons/cdoSpritePointer';
 import {BLOCK_TYPES, NO_OPTIONS_MESSAGE} from '@cdo/apps/blockly/constants';
-import {ExtendedBlockSvg, ProcedureBlock} from '@cdo/apps/blockly/types';
+import {
+  ExtendedBlockSvg,
+  javascriptGeneratorType,
+  ProcedureBlock,
+} from '@cdo/apps/blockly/types';
 import {FALSEY_DEFAULT, readBooleanAttribute} from '@cdo/apps/blockly/utils';
 import {SVG_NS} from '@cdo/apps/constants';
 import Button from '@cdo/apps/legacySharedComponents/Button';
@@ -278,7 +282,7 @@ export const blocks = {
     const generator = Blockly.getGenerator();
     generator.forBlock.behavior_definition = function (
       _block: GoogleBlockly.Block,
-      generator: GoogleBlockly.CodeGenerator
+      generator: javascriptGeneratorType
     ): string | [string, number] | null {
       const block = _block as ProcedureBlock;
       if (!generator.nameDB_) {
