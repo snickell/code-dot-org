@@ -26,12 +26,6 @@ import moduleStyles from './chatWorkspace.module.scss';
 interface ChatWorkspaceProps {
   onClear: () => void;
 }
-interface Students {
-  [index: number]: {
-    id: number;
-    name: string;
-  };
-}
 
 enum WorkspaceTeacherViewTab {
   STUDENT_CHAT_HISTORY = 'viewStudentChatHistory',
@@ -59,9 +53,8 @@ const ChatWorkspace: React.FunctionComponent<ChatWorkspaceProps> = ({
   const currentLevelId = useAppSelector(state => state.progress.currentLevelId);
   const visibleItems = useSelector(selectAllVisibleMessages);
 
-  const students = useSelector(
-    (state: {teacherSections: {selectedStudents: Students}}) =>
-      state.teacherSections.selectedStudents
+  const students = useAppSelector(
+    state => state.teacherSections.selectedStudents
   );
 
   const dispatch = useAppDispatch();
@@ -160,6 +153,10 @@ const ChatWorkspace: React.FunctionComponent<ChatWorkspaceProps> = ({
   );
 
   const onCloseModal = useCallback(() => {
+    // We only want to show the teacher onboarding modal the first time a teacher user
+    // interacts with the aichat tool. Thus, we store a value in local storage when
+    // closing the modal. After the first time viewing the modal, the teacher user
+    // sees the warning modal on page load from then on.
     if (
       isUserTeacher &&
       showModalType === ModalTypes.TEACHER_ONBOARDING &&

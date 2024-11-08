@@ -22,18 +22,19 @@ import {navigateToHref} from '../utils';
 
 import locale from './locale';
 import {
+  ACCOUNT_TYPE_SESSION_KEY,
   EMAIL_SESSION_KEY,
-  SCHOOL_COUNTRY_SESSION_KEY,
-  SCHOOL_ID_SESSION_KEY,
-  SCHOOL_NAME_SESSION_KEY,
-  SCHOOL_ZIP_SESSION_KEY,
+  OAUTH_LOGIN_TYPE_SESSION_KEY,
+  USER_RETURN_TO_SESSION_KEY,
+  clearSignUpSessionStorage,
 } from './signUpFlowConstants';
 
 import style from './signUpFlowStyles.module.scss';
 
 const FinishTeacherAccount: React.FunctionComponent<{
   usIp: boolean;
-}> = ({usIp}) => {
+  countryCode: string;
+}> = ({usIp, countryCode}) => {
   const schoolInfo = useSchoolInfo({usIp});
   const [name, setName] = useState('');
   const [showNameError, setShowNameError] = useState(false);
@@ -41,8 +42,20 @@ const FinishTeacherAccount: React.FunctionComponent<{
   const [gdprChecked, setGdprChecked] = useState(false);
   const [showGDPR, setShowGDPR] = useState(false);
   const [isGdprLoaded, setIsGdprLoaded] = useState(false);
+  const [userReturnTo, setUserReturnTo] = useState('/home');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    // If the user hasn't selected a user type or login type, redirect them back to the incomplete step of signup.
+    if (sessionStorage.getItem(ACCOUNT_TYPE_SESSION_KEY) === null) {
+      navigateToHref('/users/new_sign_up/account_type');
+    } else if (
+      sessionStorage.getItem(EMAIL_SESSION_KEY) === null &&
+      sessionStorage.getItem(OAUTH_LOGIN_TYPE_SESSION_KEY) === null
+    ) {
+      navigateToHref('/users/new_sign_up/login_type');
+    }
+
     const fetchGdprData = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const forceInEu = urlParams.get('force_in_eu');
@@ -61,6 +74,11 @@ const FinishTeacherAccount: React.FunctionComponent<{
       }
     };
     fetchGdprData();
+
+    const userReturnToHref = sessionStorage.getItem(USER_RETURN_TO_SESSION_KEY);
+    if (userReturnToHref) {
+      setUserReturnTo(userReturnToHref);
+    }
   }, []);
 
   // GDPR is valid if
@@ -84,6 +102,7 @@ const FinishTeacherAccount: React.FunctionComponent<{
 
   const submitTeacherAccount = async () => {
     sendFinishEvent();
+    setIsSubmitting(true);
 
     const signUpParams = {
       new_sign_up: true,
@@ -92,11 +111,8 @@ const FinishTeacherAccount: React.FunctionComponent<{
         email: sessionStorage.getItem(EMAIL_SESSION_KEY),
         name: name,
         email_preference_opt_in: emailOptInChecked,
-        school: sessionStorage.getItem(SCHOOL_ID_SESSION_KEY),
-        school_id: sessionStorage.getItem(SCHOOL_ID_SESSION_KEY),
-        school_zip: sessionStorage.getItem(SCHOOL_ZIP_SESSION_KEY),
-        school_name: sessionStorage.getItem(SCHOOL_NAME_SESSION_KEY),
-        school_country: sessionStorage.getItem(SCHOOL_COUNTRY_SESSION_KEY),
+        school_info_attributes: {...schoolInfo},
+        country_code: countryCode,
       },
     };
     const authToken = await getAuthenticityToken();
@@ -109,7 +125,8 @@ const FinishTeacherAccount: React.FunctionComponent<{
       body: JSON.stringify(signUpParams),
     });
 
-    navigateToHref('/home');
+    clearSignUpSessionStorage(true);
+    navigateToHref(userReturnTo);
   };
 
   const onGDPRChange = (): void => {
@@ -216,15 +233,17 @@ const FinishTeacherAccount: React.FunctionComponent<{
               title: 'arrow-right',
             }}
             disabled={name === '' || !gdprValid}
+            isPending={isSubmitting}
           />
         </div>
       </div>
       <SafeMarkdown
         className={style.tosAndPrivacy}
         markdown={locale.by_signing_up({
-          tosLink: 'code.org/tos',
-          privacyPolicyLink: 'code.org/privacy',
+          tosLink: 'https://code.org/tos',
+          privacyPolicyLink: 'https://code.org/privacy',
         })}
+        openExternalLinksInNewTab={true}
       />
     </div>
   );

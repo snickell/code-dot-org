@@ -6,56 +6,51 @@ import React from 'react';
 
 import codebridgeI18n from '@cdo/apps/codebridge/locale';
 
-import {FileUploader} from './FileUploader';
 import {
+  useFileUploader,
   useFileUploadErrorCallback,
   useHandleFileUpload,
   usePrompts,
 } from './hooks';
-import {newFilePromptType} from './types';
 
-type FileBrowserHeaderPopUpButtonProps = {
-  newFilePrompt: newFilePromptType;
-};
-
-export const FileBrowserHeaderPopUpButton = ({
-  newFilePrompt,
-}: FileBrowserHeaderPopUpButtonProps) => {
-  const {openNewFolderPrompt} = usePrompts();
+export const FileBrowserHeaderPopUpButton = () => {
+  const {openNewFilePrompt, openNewFolderPrompt} = usePrompts();
   const {
     project,
     config: {validMimeTypes},
   } = useCodebridgeContext();
   const uploadErrorCallback = useFileUploadErrorCallback();
   const handleFileUpload = useHandleFileUpload(project.files);
+
+  const {startFileUpload, FileUploaderComponent} = useFileUploader({
+    callback: handleFileUpload,
+    errorCallback: uploadErrorCallback,
+    validMimeTypes,
+  });
   return (
-    <PopUpButton iconName="plus" alignment="left">
-      <PopUpButtonOption
-        iconName="plus"
-        labelText={codebridgeI18n.newFolder()}
-        clickHandler={() => openNewFolderPrompt({parentId: DEFAULT_FOLDER_ID})}
-      />
-      <PopUpButtonOption
-        iconName="plus"
-        labelText={codebridgeI18n.newFile()}
-        clickHandler={() => newFilePrompt()}
-      />
-      <FileUploader
-        validMimeTypes={validMimeTypes}
-        callback={(fileName, contents) =>
-          handleFileUpload({
-            folderId: DEFAULT_FOLDER_ID,
-            fileName,
-            contents,
-          })
-        }
-        errorCallback={uploadErrorCallback}
-      >
+    <>
+      <FileUploaderComponent />
+      <PopUpButton iconName="plus" alignment="left" id="uitest-files-plus">
+        <PopUpButtonOption
+          iconName="plus"
+          labelText={codebridgeI18n.newFolder()}
+          clickHandler={() =>
+            openNewFolderPrompt({parentId: DEFAULT_FOLDER_ID})
+          }
+        />
+        <PopUpButtonOption
+          iconName="plus"
+          labelText={codebridgeI18n.newFile()}
+          clickHandler={() => openNewFilePrompt({folderId: DEFAULT_FOLDER_ID})}
+          id="uitest-new-file"
+        />
+
         <PopUpButtonOption
           iconName="upload"
           labelText={codebridgeI18n.uploadFile()}
+          clickHandler={() => startFileUpload()}
         />
-      </FileUploader>
-    </PopUpButton>
+      </PopUpButton>
+    </>
   );
 };

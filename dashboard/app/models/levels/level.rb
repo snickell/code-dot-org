@@ -94,6 +94,8 @@ class Level < ApplicationRecord
     thumbnail_url
     start_libraries
     ai_tutor_available
+    offer_browser_tts
+    use_secondary_finish_button
   )
 
   # Fix STI routing http://stackoverflow.com/a/9463495

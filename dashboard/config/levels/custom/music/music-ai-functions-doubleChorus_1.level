@@ -1,5 +1,6 @@
 <Music>
   <config><![CDATA[{
+  "published": true,
   "game_id": 70,
   "created_at": "2024-10-07T22:05:49.000Z",
   "level_num": "custom",
@@ -7,7 +8,7 @@
   "properties": {
     "encrypted": "false",
     "instructions_important": "false",
-    "long_instructions": "###Build a Song with Functions\r\n\r\nAdd `intro` and `chorus` under [when run](#clickable=when-run-block) to play the sounds in the function.",
+    "long_instructions": "### Build a Song with Functions\r\n\r\nCall [intro](#clickable=) and [chorus](#clickable=) under [when run](#clickable=when-run-block) to play the sounds in the function.",
     "hide_share_and_remix": "true",
     "level_data": {
       "library": "launch2024",
@@ -30,11 +31,12 @@
               "x": 530,
               "y": 30,
               "deletable": false,
+              "movable": false,
               "extraState": {
                 "procedureId": "0yzkjbv`YpI_z$C0%b7e",
                 "initialDeleteConfig": false,
                 "initialEditConfig": true,
-                "initialMoveConfig": true
+                "initialMoveConfig": false
               },
               "fields": {
                 "NAME": "chorus"
@@ -106,11 +108,12 @@
               "id": "S2[22DMKS[`Bycg%T8B1",
               "x": 250,
               "y": 30,
+              "movable": false,
               "extraState": {
                 "procedureId": "-|(]2^6)J+b=}wD0}zVz",
                 "initialDeleteConfig": true,
                 "initialEditConfig": true,
-                "initialMoveConfig": true
+                "initialMoveConfig": false
               },
               "fields": {
                 "NAME": "intro"
@@ -120,11 +123,13 @@
                   "block": {
                     "type": "play_sounds_together",
                     "id": "^fbpb)DaPk:Udqo(~A!.",
+                    "movable": false,
                     "inputs": {
                       "code": {
                         "block": {
                           "type": "play_sound_at_current_location_simple2",
                           "id": "N/KYOy.IXc7m*u(+;Buh",
+                          "movable": false,
                           "fields": {
                             "sound": "sabrina_carpenter_espresso/drums_intro"
                           },
@@ -132,6 +137,7 @@
                             "block": {
                               "type": "play_sound_at_current_location_simple2",
                               "id": "jN6v:04PQW@K=KC*]Ik]",
+                              "movable": false,
                               "fields": {
                                 "sound": "sabrina_carpenter_espresso/bass_intro"
                               },
@@ -139,6 +145,7 @@
                                 "block": {
                                   "type": "play_sound_at_current_location_simple2",
                                   "id": "OJW^%gSWxo:Q]%_9Uv1V",
+                                  "movable": false,
                                   "fields": {
                                     "sound": "sabrina_carpenter_espresso/keys_intro"
                                   },
@@ -146,6 +153,7 @@
                                     "block": {
                                       "type": "play_sound_at_current_location_simple2",
                                       "id": "~4#B+CLI?7q0bFzd|Z8[",
+                                      "movable": false,
                                       "fields": {
                                         "sound": "sabrina_carpenter_espresso/guitar_intro"
                                       }
@@ -166,13 +174,13 @@
         },
         "procedures": [
           {
-            "id": "0yzkjbv`YpI_z$C0%b7e",
-            "name": "chorus",
+            "id": "chorus",
+            "name": "chorus_block",
             "returnTypes": null
           },
           {
-            "id": "-|(]2^6)J+b=}wD0}zVz",
-            "name": "intro",
+            "id": "intro",
+            "name": "intro_block",
             "returnTypes": null
           }
         ]
@@ -271,10 +279,10 @@
       }
     ],
     "name_suffix": "_1",
+    "offer_browser_tts": "false",
     "preload_asset_list": null
   },
-  "published": true,
-  "audit_log": "[{\"changed_at\":\"2024-10-07T22:05:49.813+00:00\",\"changed\":[\"cloned from \\\"music-ai-functions-doubleChorus_3\\\"\"],\"cloned_from\":\"music-ai-functions-doubleChorus_3\"}]"
+  "audit_log": "[{\"changed_at\":\"2024-10-07T22:05:49.813+00:00\",\"changed\":[\"cloned from \\\"music-ai-functions-doubleChorus_3\\\"\"],\"cloned_from\":\"music-ai-functions-doubleChorus_3\"},{\"changed_at\":\"2024-10-08 20:12:31 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-10-17 22:26:58 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-10-17 22:29:26 +0000\",\"changed\":[\"long_instructions\",\"level_data\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-10-17 22:34:30 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-10-17 22:36:18 +0000\",\"changed\":[\"long_instructions\",\"level_data\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-10-17 22:37:52 +0000\",\"changed\":[\"long_instructions\",\"level_data\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-10-17 22:38:54 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-10-21 23:01:15 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-10-21 23:02:14 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-10-21 23:06:18 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-10-22 00:35:29 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-10-22 00:36:34 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"}]"
 }]]></config>
   <blocks/>
 </Music>

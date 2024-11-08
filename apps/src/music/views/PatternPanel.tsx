@@ -7,8 +7,9 @@ import React, {
   useState,
 } from 'react';
 
+import {TICKS_PER_MEASURE} from '../constants';
 import MusicRegistry from '../MusicRegistry';
-import {PatternEventValue} from '../player/interfaces/PatternEvent';
+import {InstrumentEventValue} from '../player/interfaces/InstrumentEvent';
 import MusicLibrary from '../player/MusicLibrary';
 
 import LoadingOverlay from './LoadingOverlay';
@@ -17,11 +18,11 @@ import PreviewControls from './PreviewControls';
 import styles from './patternPanel.module.scss';
 
 // Generate an array containing tick numbers from 1..16.
-const arrayOfTicks = Array.from({length: 16}, (_, i) => i + 1);
+const arrayOfTicks = Array.from({length: TICKS_PER_MEASURE}, (_, i) => i + 1);
 
 interface PatternPanelProps {
-  initValue: PatternEventValue;
-  onChange: (value: PatternEventValue) => void;
+  initValue: InstrumentEventValue;
+  onChange: (value: InstrumentEventValue) => void;
 }
 
 /*
@@ -35,7 +36,9 @@ const PatternPanel: React.FunctionComponent<PatternPanelProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   // Make a copy of the value object so that we don't overwrite Blockly's
   // data.
-  const currentValue: PatternEventValue = JSON.parse(JSON.stringify(initValue));
+  const currentValue: InstrumentEventValue = JSON.parse(
+    JSON.stringify(initValue)
+  );
 
   const availableKits = useMemo(
     () => MusicLibrary.getInstance()?.kits || [],
@@ -99,7 +102,7 @@ const PatternPanel: React.FunctionComponent<PatternPanelProps> = ({
   }, [onChange, currentValue]);
 
   const startPreview = useCallback(() => {
-    MusicRegistry.player.previewPattern(
+    MusicRegistry.player.previewNotes(
       currentValue,
       (tick: number) => setCurrentPreviewTick(tick),
       () => setCurrentPreviewTick(0)
@@ -110,6 +113,13 @@ const PatternPanel: React.FunctionComponent<PatternPanelProps> = ({
     setCurrentPreviewTick(0);
     MusicRegistry.player.cancelPreviews();
   }, [setCurrentPreviewTick]);
+
+  useEffect(() => {
+    // On unmount.
+    return () => {
+      stopPreview();
+    };
+  }, [stopPreview]);
 
   useEffect(() => {
     if (!MusicRegistry.player.isInstrumentLoaded(currentValue.instrument)) {

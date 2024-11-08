@@ -13,16 +13,19 @@ import {
 import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
+import {getAuthenticityToken} from '@cdo/apps/util/AuthenticityTokenStore';
 import {isEmail} from '@cdo/apps/util/formatValidation';
+import {UserTypes} from '@cdo/generated-scripts/sharedConstants';
+
+import {navigateToHref} from '../utils';
 
 import locale from './locale';
 import {
-  IS_PARENT_SESSION_KEY,
-  PARENT_EMAIL_SESSION_KEY,
-  PARENT_EMAIL_OPT_IN_SESSION_KEY,
-  USER_AGE_SESSION_KEY,
-  USER_STATE_SESSION_KEY,
-  USER_GENDER_SESSION_KEY,
+  ACCOUNT_TYPE_SESSION_KEY,
+  EMAIL_SESSION_KEY,
+  OAUTH_LOGIN_TYPE_SESSION_KEY,
+  USER_RETURN_TO_SESSION_KEY,
+  clearSignUpSessionStorage,
 } from './signUpFlowConstants';
 
 import style from './signUpFlowStyles.module.scss';
@@ -30,8 +33,9 @@ import style from './signUpFlowStyles.module.scss';
 const FinishStudentAccount: React.FunctionComponent<{
   ageOptions: {value: string; text: string}[];
   usIp: boolean;
+  countryCode: string;
   usStateOptions: {value: string; text: string}[];
-}> = ({ageOptions, usIp, usStateOptions}) => {
+}> = ({ageOptions, usIp, countryCode, usStateOptions}) => {
   // Fields
   const [isParent, setIsParent] = useState(false);
   const [parentEmail, setParentEmail] = useState('');
@@ -50,8 +54,21 @@ const FinishStudentAccount: React.FunctionComponent<{
   const [gdprChecked, setGdprChecked] = useState(false);
   const [showGDPR, setShowGDPR] = useState(false);
   const [isGdprLoaded, setIsGdprLoaded] = useState(false);
+  const [userReturnTo, setUserReturnTo] = useState('/home');
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    // If the user hasn't selected a user type or login type, redirect them back to the incomplete step of signup.
+    if (sessionStorage.getItem(ACCOUNT_TYPE_SESSION_KEY) === null) {
+      navigateToHref('/users/new_sign_up/account_type');
+    } else if (
+      sessionStorage.getItem(EMAIL_SESSION_KEY) === null &&
+      sessionStorage.getItem(OAUTH_LOGIN_TYPE_SESSION_KEY) === null
+    ) {
+      navigateToHref('/users/new_sign_up/login_type');
+    }
+
     const fetchGdprData = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const forceInEu = urlParams.get('force_in_eu');
@@ -70,6 +87,11 @@ const FinishStudentAccount: React.FunctionComponent<{
       }
     };
     fetchGdprData();
+
+    const userReturnToHref = sessionStorage.getItem(USER_RETURN_TO_SESSION_KEY);
+    if (userReturnToHref) {
+      setUserReturnTo(userReturnToHref);
+    }
   }, []);
 
   // GDPR is valid if
@@ -93,10 +115,6 @@ const FinishStudentAccount: React.FunctionComponent<{
     );
     const newIsParentCheckedChoice = !isParent;
     setIsParent(newIsParentCheckedChoice);
-    sessionStorage.setItem(
-      IS_PARENT_SESSION_KEY,
-      `${newIsParentCheckedChoice}`
-    );
   };
 
   const onParentEmailChange = (
@@ -104,22 +122,12 @@ const FinishStudentAccount: React.FunctionComponent<{
   ): void => {
     const newParentEmail = e.target.value;
     setParentEmail(newParentEmail);
-    sessionStorage.setItem(PARENT_EMAIL_SESSION_KEY, newParentEmail);
 
     if (!isEmail(newParentEmail)) {
       setShowParentEmailError(true);
     } else {
       setShowParentEmailError(false);
     }
-  };
-
-  const onParentEmailOptInChange = (): void => {
-    const newParentEmailOptInCheckedChoice = !parentEmailOptInChecked;
-    setParentEmailOptInChecked(newParentEmailOptInCheckedChoice);
-    sessionStorage.setItem(
-      PARENT_EMAIL_OPT_IN_SESSION_KEY,
-      `${newParentEmailOptInCheckedChoice}`
-    );
   };
 
   const onNameChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -136,7 +144,6 @@ const FinishStudentAccount: React.FunctionComponent<{
   const onAgeChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     const newAge = e.target.value;
     setAge(newAge);
-    sessionStorage.setItem(USER_AGE_SESSION_KEY, newAge);
 
     if (newAge === '') {
       setShowAgeError(true);
@@ -148,19 +155,12 @@ const FinishStudentAccount: React.FunctionComponent<{
   const onStateChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     const newState = e.target.value;
     setState(newState);
-    sessionStorage.setItem(USER_STATE_SESSION_KEY, newState);
 
     if (newState === '') {
       setShowStateError(true);
     } else {
       setShowStateError(false);
     }
-  };
-
-  const onGenderChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const newGender = e.target.value;
-    setGender(newGender);
-    sessionStorage.setItem(USER_GENDER_SESSION_KEY, newGender);
   };
 
   const sendFinishEvent = (): void => {
@@ -174,6 +174,38 @@ const FinishStudentAccount: React.FunctionComponent<{
       },
       PLATFORMS.BOTH
     );
+  };
+
+  const submitStudentAccount = async () => {
+    sendFinishEvent();
+    setIsSubmitting(true);
+
+    const signUpParams = {
+      new_sign_up: true,
+      user: {
+        user_type: UserTypes.STUDENT,
+        email: sessionStorage.getItem(EMAIL_SESSION_KEY),
+        name: name,
+        age: age,
+        gender: gender,
+        us_state: state,
+        country_code: countryCode,
+        parent_email_preference_email: parentEmail,
+        parent_email_preference_opt_in: parentEmailOptInChecked,
+      },
+    };
+    const authToken = await getAuthenticityToken();
+    await fetch('/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': authToken,
+      },
+      body: JSON.stringify(signUpParams),
+    });
+
+    clearSignUpSessionStorage(false);
+    navigateToHref(userReturnTo);
   };
 
   return (
@@ -216,7 +248,7 @@ const FinishStudentAccount: React.FunctionComponent<{
                     name="parentEmailOptIn"
                     label={locale.email_me_with_updates()}
                     checked={parentEmailOptInChecked}
-                    onChange={onParentEmailOptInChange}
+                    onChange={e => setParentEmailOptInChecked(e.target.checked)}
                     size="s"
                   />
                 </div>
@@ -240,6 +272,7 @@ const FinishStudentAccount: React.FunctionComponent<{
           <div>
             <SimpleDropdown
               name="userAge"
+              className={style.dropdownContainer}
               labelText={locale.what_is_your_age()}
               size="m"
               items={ageOptions}
@@ -256,6 +289,7 @@ const FinishStudentAccount: React.FunctionComponent<{
             <div>
               <SimpleDropdown
                 name="userState"
+                className={style.dropdownContainer}
                 labelText={locale.what_state_are_you_in()}
                 size="m"
                 items={usStateOptions}
@@ -274,7 +308,7 @@ const FinishStudentAccount: React.FunctionComponent<{
             label={locale.what_is_your_gender()}
             value={gender}
             placeholder={locale.female()}
-            onChange={onGenderChange}
+            onChange={e => setGender(e.target.value)}
           />
           {showGDPR && (
             <div>
@@ -308,7 +342,7 @@ const FinishStudentAccount: React.FunctionComponent<{
             className={style.finishSignUpButton}
             color={buttonColors.purple}
             type="primary"
-            onClick={() => sendFinishEvent()}
+            onClick={submitStudentAccount}
             text={locale.go_to_my_account()}
             iconRight={{
               iconName: 'arrow-right',
@@ -322,15 +356,17 @@ const FinishStudentAccount: React.FunctionComponent<{
               (isParent && parentEmail === '') ||
               !gdprValid
             }
+            isPending={isSubmitting}
           />
         </div>
       </div>
       <SafeMarkdown
         className={style.tosAndPrivacy}
         markdown={locale.by_signing_up({
-          tosLink: 'code.org/tos',
-          privacyPolicyLink: 'code.org/privacy',
+          tosLink: 'https://code.org/tos',
+          privacyPolicyLink: 'https://code.org/privacy',
         })}
+        openExternalLinksInNewTab={true}
       />
     </div>
   );
