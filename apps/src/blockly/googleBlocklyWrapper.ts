@@ -273,7 +273,7 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
     blocklyWrapper.wrapReadOnlyProperty(prop);
   });
 
-  type registrableFieldType = GoogleBlockly.fieldRegistry.RegistrableField;
+  type registrableFieldType = Pick<typeof GoogleBlockly.Field, 'prototype'>;
   // elements in this list should be structured as follows:
   // [field registry name for field, class name of field being overridden, class to use as override]
   const fieldOverrides: [string, string, registrableFieldType][] = [
