@@ -3,7 +3,7 @@ import {
   ObservableProcedureModel,
 } from '@blockly/block-shareable-procedures';
 import * as GoogleBlockly from 'blockly/core';
-import type {javascriptGenerator} from 'blockly/javascript';
+import {javascriptGenerator} from 'blockly/javascript';
 
 import BlockSvgFrame from './addons/blockSvgFrame';
 import BlockSvgLimitIndicator from './addons/blockSvgLimitIndicator';
@@ -111,7 +111,7 @@ export interface BlocklyWrapperType extends GoogleBlocklyType {
   FieldColour: typeof CdoFieldColour;
   FieldVariable: typeof CdoFieldVariable;
   FieldParameter: typeof CdoFieldParameter;
-  JavaScript: ExtendedJavascriptGeneratorType;
+  JavaScript: typeof javascriptGenerator;
   assetUrl: (path: string) => string;
   customSimpleDialog: (config: object) => void;
   levelBlockIds: Set<string>;
@@ -128,7 +128,7 @@ export interface BlocklyWrapperType extends GoogleBlocklyType {
   // TODO: better define this type
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cdoUtils: any;
-  Generator: ExtendedGenerator;
+  Generator: ExtendedCodeGenerator;
   Xml: ExtendedXml;
   Procedures: ExtendedProcedures;
   BlockValueType: {[key: string]: string};
@@ -143,14 +143,14 @@ export interface BlocklyWrapperType extends GoogleBlocklyType {
   ) => void;
   setInfiniteLoopTrap: () => void;
   clearInfiniteLoopTrap: () => void;
-  getInfiniteLoopTrap: () => string;
+  getInfiniteLoopTrap: () => string | null;
   loopHighlight: (apiName: string, blockId: string) => string;
   getWorkspaceCode: () => string;
   addChangeListener: (
     blockspace: GoogleBlockly.Workspace,
     handler: (e: GoogleBlockly.Events.Abstract) => void
   ) => void;
-  getGenerator: () => ExtendedGenerator;
+  getGenerator: () => ExtendedJavascriptGenerator | javascriptGeneratorType;
   addEmbeddedWorkspace: (workspace: GoogleBlockly.Workspace) => void;
   isEmbeddedWorkspace: (workspace: GoogleBlockly.Workspace) => boolean;
   findEmptyContainerBlock: (
@@ -281,9 +281,9 @@ export interface ExtendedWorkspace extends GoogleBlockly.Workspace {
   noFunctionBlockFrame: boolean;
 }
 
-export type ExtendedGenerator = typeof javascriptGenerator & {
-  new (name: string): ExtendedGenerator;
-  xmlToCode: (name: string, domBlocks: Element) => string;
+type codeGeneratorType = typeof GoogleBlockly.CodeGenerator;
+export interface ExtendedCodeGenerator extends codeGeneratorType {
+  xmlToCode?: (name: string, domBlocks: Element) => string;
   xmlToBlocks: (name: string, xml: Element) => GoogleBlockly.Block[];
   blockSpaceToCode: (
     name: string,
@@ -298,14 +298,7 @@ export type ExtendedGenerator = typeof javascriptGenerator & {
   variableDB_: GoogleBlockly.Names | undefined;
   prototype: typeof GoogleBlockly.CodeGenerator.prototype;
   translateVarName: (name: string) => string;
-  forBlock: Record<
-    string,
-    (
-      block: GoogleBlockly.Block,
-      generator: GoogleBlockly.CodeGenerator
-    ) => string | [string, number] | null
-  >;
-};
+}
 
 type XmlType = typeof GoogleBlockly.Xml;
 export interface ExtendedXml extends XmlType {
@@ -461,5 +454,16 @@ export type PointerMetadataMap = {
 
 export type BlockColor = [number, number, number];
 
-// Blockly defines this as any.
-export type ExtendedJavascriptGeneratorType = ExtendedGenerator;
+export type javascriptGeneratorType = typeof javascriptGenerator;
+export interface ExtendedJavascriptGenerator
+  extends ExtendedCodeGenerator,
+    javascriptGeneratorType {
+  nameDB_: GoogleBlockly.Names | undefined;
+  forBlock: Record<
+    string,
+    (
+      block: GoogleBlockly.Block,
+      generator: GoogleBlockly.CodeGenerator
+    ) => string | [string, number] | null
+  >;
+}

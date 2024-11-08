@@ -9,7 +9,7 @@ import {Order} from 'blockly/javascript';
 
 import {
   BlocklyWrapperType,
-  ExtendedJavascriptGeneratorType,
+  ExtendedJavascriptGenerator,
 } from '@cdo/apps/blockly/types';
 import i18n from '@cdo/locale';
 
@@ -41,14 +41,14 @@ export const blocks = {
     );
   },
   copyBlockGenerator(
-    generator: ExtendedJavascriptGeneratorType,
+    generator: ExtendedJavascriptGenerator,
     type1: string,
     type2: string
   ) {
     generator.forBlock[type1] = generator.forBlock[type2];
   },
   defineNewBlockGenerator(
-    generator: ExtendedJavascriptGeneratorType,
+    generator: ExtendedJavascriptGenerator,
     type: string,
     generatorFunction: (
       block: GoogleBlockly.Block,
@@ -125,7 +125,7 @@ export const blocks = {
   // depend on the original name..
   mathRandomIntGenerator(
     block: GoogleBlockly.Block,
-    generator: ExtendedJavascriptGeneratorType
+    generator: ExtendedJavascriptGenerator
   ) {
     // Random integer between [X] and [Y].
     const argument0 = generator.valueToCode(block, 'FROM', Order.NONE) || '0';

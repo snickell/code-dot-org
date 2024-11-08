@@ -3,14 +3,15 @@ import * as GoogleBlockly from 'blockly/core';
 import {
   BlocklyWrapperType,
   ExtendedBlock,
-  ExtendedGenerator,
+  ExtendedCodeGenerator,
+  ExtendedJavascriptGenerator,
 } from '@cdo/apps/blockly/types';
 
 export default function initializeGenerator(
   blocklyWrapper: BlocklyWrapperType
 ) {
-  blocklyWrapper.JavaScript.translateVarName = function (name: string) {
-    return (Blockly.JavaScript.nameDB_ as GoogleBlockly.Names).getName(
+  blocklyWrapper.Generator.translateVarName = function (name: string) {
+    return (Blockly.Generator.nameDB_ as GoogleBlockly.Names).getName(
       name,
       Blockly.VARIABLE_CATEGORY_NAME
     );
@@ -57,7 +58,8 @@ export default function initializeGenerator(
         `Can only generate code in JavaScript. ${name} is unsupported.`
       );
     }
-    const generator = blocklyWrapper.getGenerator();
+    const generator =
+      blocklyWrapper.getGenerator() as ExtendedJavascriptGenerator;
     if (blocklyWrapper.getMainWorkspace()) {
       generator.init(blocklyWrapper.getMainWorkspace());
     }
@@ -73,7 +75,7 @@ export default function initializeGenerator(
 
   const originalBlockToCode = blocklyWrapper.Generator.prototype.blockToCode;
   blocklyWrapper.Generator.prototype.blockToCode = function (
-    this: ExtendedGenerator,
+    this: ExtendedCodeGenerator,
     block: GoogleBlockly.Block | null,
     opt_thisOnly?: boolean
   ) {
