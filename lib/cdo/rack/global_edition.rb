@@ -130,10 +130,7 @@ module Rack
       private def pegasus_route?(path = request.path)
         return false unless request.hostname == CDO.pegasus_hostname
 
-        pegasus = Documents.new
-        pegasus.helpers.setup_for(request)
-
-        pegasus.helpers.resolve_document(path).present? || pegasus.helpers.resolve_view_template(path).present?
+        pegasus_helpers.resolve_document(path).present? || pegasus_helpers.resolve_view_template(path).present?
       rescue StandardError
         false
       end
