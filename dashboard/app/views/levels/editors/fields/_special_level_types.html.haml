@@ -43,7 +43,11 @@
         =link_to 'here', 'https://github.com/code-dot-org/code-dot-org/wiki/%5BLevelbuilder%5D-Making-and-Using-Templates', target: '_blank'
       - if local_assigns[:template_warning]
         %p= "WARNING: #{template_warning}"
+        #find-a-level-dialog
       - if @level.script_levels.all? {|sl| sl.script&.allow_major_curriculum_changes? }
+      -# Add button to trigger the FindLevelDialog component
+      -# Reconfigure FindLevelDialog component to take the name an put it in the field.
+      -# Consider, to refactor this dropdown and the contents to be a React component
         = f.text_field :project_template_level_name, placeholder: 'name of level you want to use as the project template'
       - elsif @level.project_template_level_name.present?
         %p= "Template Name: #{@level.project_template_level_name}. This cannot be changed for levels in published units."
