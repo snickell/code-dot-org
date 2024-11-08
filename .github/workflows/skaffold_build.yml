@@ -146,7 +146,7 @@ jobs:
           skaffold build \
             -v info \
             --push \
-            && true
+            && echo "Skaffold build succeeded"
           set -x
           find ~/.skaffold/cache
           du -h ~/.skaffold/cache
