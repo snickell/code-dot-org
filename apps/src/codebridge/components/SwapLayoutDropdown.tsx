@@ -3,11 +3,10 @@ import {sendCodebridgeAnalyticsEvent} from '@codebridge/utils/analyticsReporterH
 import React, {useCallback} from 'react';
 
 import codebridgeI18n from '@cdo/apps/codebridge/locale';
-import {ActionDropdown} from '@cdo/apps/componentLibrary/dropdown';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
-import darkModeStyles from '@cdo/apps/lab2/styles/dark-mode.module.scss';
+import {PopUpButton} from '../PopUpButton/PopUpButton';
 
 /*
   Please note - this is a fairly brittle component in that it's only allowing toggling between
@@ -45,20 +44,7 @@ const SwapLayoutDropdown: React.FunctionComponent = () => {
       : codebridgeI18n.defaultLayout();
 
   return (
-    <ActionDropdown
-      name="swap-layout"
-      labelText={codebridgeI18n.changeLayout()}
-      triggerButtonProps={{
-        color: 'white',
-        size: 'xs',
-        icon: {
-          iconName: 'ellipsis-v',
-          iconStyle: 'solid',
-        },
-        isIconOnly: true,
-        type: 'tertiary',
-        className: darkModeStyles.iconOnlyTertiaryButton,
-      }}
+    <PopUpButton
       options={[
         {
           onClick: onLayoutChange,
@@ -73,8 +59,9 @@ const SwapLayoutDropdown: React.FunctionComponent = () => {
           },
         },
       ]}
-      menuPlacement="right"
-      size="xs"
+      iconName="ellipsis-v"
+      alignment="right"
+      labelText={codebridgeI18n.changeLayout()}
     />
   );
 };

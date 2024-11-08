@@ -2,7 +2,13 @@ import {PopUpButton} from '@codebridge/PopUpButton/PopUpButton';
 import {PopUpButtonOption} from '@codebridge/PopUpButton/PopUpButtonOption';
 import React from 'react';
 
-import {ItemRowProps} from './types';
+import {
+  DropdownOptionType,
+  FileBrowserIconComponentType,
+  FileBrowserNameComponentType,
+  FileBrowserRowItemType,
+  ItemRowProps,
+} from './types';
 
 import moduleStyles from '../styles/filebrowser.module.scss';
 
@@ -24,6 +30,17 @@ import moduleStyles from '../styles/filebrowser.module.scss';
  * @param openFunction - A function to be called when the user clicks on the item name in the row.
  * @returns A JSX element representing the item row.
  */
+
+interface ItemRowProps {
+  item: FileBrowserRowItemType;
+  // If the pop-up menu is enabled, we will show the 3-dot menu button on hover.
+  enableMenu: boolean;
+  dropdownOptions: DropdownOptionType[];
+  IconComponent: FileBrowserIconComponentType;
+  NameComponent: FileBrowserNameComponentType;
+  openFunction: (id: string) => void;
+}
+
 export const ItemRow: React.FunctionComponent<ItemRowProps> = ({
   item,
   enableMenu,
@@ -42,7 +59,16 @@ export const ItemRow: React.FunctionComponent<ItemRowProps> = ({
         <PopUpButton
           iconName="ellipsis-v"
           className={moduleStyles['button-kebab']}
-          id={`uitest-file-${item.id}-kebab`}
+          //id={`uitest-file-${item.id}-kebab`}
+          // todo fix this
+          options={dropdownOptions.map(
+            ({condition, iconName, labelText, clickHandler, id}) =>
+              condition && {
+                onClick: clickHandler,
+                icon: {iconName, iconStyle: 'solid'},
+                label: labelText,
+              }
+          )}
         >
           <span
             className={moduleStyles['button-bar']}
