@@ -7,9 +7,10 @@ module Sprockets
     alias_method :original_headers, :headers
 
     def headers(env, asset, length)
-      original_headers(env, asset, length).merge(
-        HttpCache::ASSETS_CROSS_ORIGIN_POLICY_HEADERS,
-      )
+      assets_coep_headers = {
+        'Cross-Origin-Embedder-Policy' => 'credentialless'
+      }
+      original_headers(env, asset, length).merge(assets_coep_headers)
     end
   end
 end
