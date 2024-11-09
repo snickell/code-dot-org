@@ -33,7 +33,7 @@ export const MusicConditions: ConditionNames = {
     name: 'played_sound_in_function_by_id',
     valueType: 'string',
     description:
-      "Checks if a sound is playing in a given function. The function is identified by the calling block's ID.  Simple2 only. Ex. Value: chorus",
+      'Checks if a sound is playing in a given function. The function is identified by the procedure model ID.  Simple2 only. Ex. Value: chorus',
   },
   PLAYED_SOUND_IN_ANY_FUNCTION: {
     name: 'played_sound_in_any_function',
