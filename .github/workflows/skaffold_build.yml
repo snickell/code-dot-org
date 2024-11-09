@@ -19,7 +19,6 @@ jobs:
     steps:
       - run: |
           echo hi
-          false
           echo "SKAFFOLD_DEFAULT_REPO=$SKAFFOLD_DEFAULT_REPO"
           echo "GITHUB_WORKFLOW=${GITHUB_WORKFLOW}"
 
@@ -146,7 +145,7 @@ jobs:
           skaffold build \
             -v info \
             --push \
-            && echo "Skaffold build succeeded"
+            || echo "skaffold build failed"
           set -x
           find ~/.skaffold/cache
           du -h ~/.skaffold/cache
