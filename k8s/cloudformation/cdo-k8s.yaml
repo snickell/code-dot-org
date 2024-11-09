@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'code-dot-org kubernetes cluster aka k8s-cdo'
+Description: 'code-dot-org kubernetes cluster aka cdo-k8s'
 
 Parameters:
   ClusterName:
@@ -64,7 +64,7 @@ Resources:
   # you save 33% on K8S footguns, so scientifically its a 13% win.
 
   # default namepace: for all your f around and find out needs
-  Default:
+  DefaultFargateProfile:
     Type: AWS::EKS::FargateProfile
     Properties:
       ClusterName: !Ref EKSCluster
@@ -75,11 +75,18 @@ Resources:
         - !Ref PrivateSubnet2
       Selectors:
         - Namespace: default
+        # Eventually some of these (at least production) should be
+        # in their own profile, but for now simple wins:
+        - Namespace: development
+        - Namespace: test
+        - Namespace: staging
+        - Namespace: production
+        - Namespace: infra
+        - Namespace: droneci
+        - Namespace: argocd
+        - Namespace: kaniko
+        - Namespace: kube-system
 
-  # EVENTUALLY, when stuff is baked and we don't care as much abou costs
-  # we'll want to enable more namespaces. Potentially, we could have
-  # production and everything-else, or we could have a namespace per-rails-env.
-  #
   # # staging namespace
   # Staging:
   #   Type: AWS::EKS::FargateProfile
@@ -121,35 +128,34 @@ Resources:
   #       - !Ref PrivateSubnet2 # FIXME: prod should have its own
   #     Selectors:
   #       - Namespace: production
+  #
+  # # Fargate profile for CoreDNS and other kube-system Pods
+  # KubeSystem:
+  #   Type: AWS::EKS::FargateProfile
+  #   Properties:
+  #     ClusterName: !Ref EKSCluster
+  #     FargateProfileName: kube-system
+  #     PodExecutionRoleArn: !GetAtt EKSFargatePodExecutionRole.Arn
+  #     Subnets:
+  #       - !Ref PrivateSubnet1
+  #       - !Ref PrivateSubnet2
+  #
+  # # Fargate profile for ArgoCD to run on AWS Fargate
+  # ArgoCD:
+  #   Type: AWS::EKS::FargateProfile
+  #   Properties:
+  #     ClusterName: !Ref EKSCluster
+  #     FargateProfileName: argocd
+  #     PodExecutionRoleArn: !GetAtt EKSFargatePodExecutionRole.Arn
+  #     Subnets:
+  #       - !Ref PrivateSubnet1
+  #       - !Ref PrivateSubnet2
+  #     Selectors:
+  #       - Namespace: argocd
+  #   # DependsOn forces profiles to be deployed sequentially, otherwise they try
+  #   # in parallel (which fargate doesn't allow) and the second one times out:
+  #   DependsOn: DefaultFargateProfile
 
-  # Fargate profile for ArgoCD to run on AWS Fargate
-  ArgoCD:
-    Type: AWS::EKS::FargateProfile
-    Properties:
-      ClusterName: !Ref EKSCluster
-      FargateProfileName: argocd
-      PodExecutionRoleArn: !GetAtt EKSFargatePodExecutionRole.Arn
-      Subnets:
-        - !Ref PrivateSubnet1
-        - !Ref PrivateSubnet2
-      Selectors:
-        - Namespace: argocd
-
-  # Fargate profile for CoreDNS and other kube-system Pods
-  KubeSystem:
-    Type: AWS::EKS::FargateProfile
-    Properties:
-      ClusterName: !Ref EKSCluster
-      FargateProfileName: kube-system
-      PodExecutionRoleArn: !GetAtt EKSFargatePodExecutionRole.Arn
-      Subnets:
-        - !Ref PrivateSubnet1
-        - !Ref PrivateSubnet2
-      Selectors:
-        - Namespace: kube-system
-          Labels:
-            - Key: k8s-app
-              Value: kube-dns
 
   # === IAM Roles for EKS & Fargate ===
   # IAM role allowing EKS to manage cluster operations
