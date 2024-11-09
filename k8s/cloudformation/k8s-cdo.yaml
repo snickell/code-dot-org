@@ -5,32 +5,32 @@ Parameters:
   ClusterName:
     Type: String
     Default: "code-dot-org"
-    Description: "The name of the EKS cluster"
+    Description: "The name of the EKS cluster, canonically code-dot-org. Prefix it with your stack name for dev and testing, e.g.: my-stack-code-dot-org"
 
   VpcCidr:
     Type: String
     Default: 10.100.0.0/16
-    Description: 'CIDR block for the VPC.'
+    Description: 'CIDR block for the VPC. Not sure what this should be? Pick a number between 10 and 245 (but not 100). Substitute your number for the 100 shown in the default value IP for each of the *Cidr params on this page. Lets say you pick 137, replace every instance of 10.100.X.Y in the CloudFormation param text boxes on this page with 10.137.X.Y.'
 
   PublicSubnet1Cidr:
     Type: String
     Default: 10.100.0.0/20
-    Description: 'CIDR block for public subnet 1.'
+    Description: 'CIDR block for public subnet 1. Not sure how to set this? See the VpcCidr param description below.'
 
   PublicSubnet2Cidr:
     Type: String
     Default: 10.100.16.0/20
-    Description: 'CIDR block for public subnet 2.'
+    Description: 'CIDR block for public subnet 2. Not sure how to set this? See the VpcCidr param description below.'
 
   PrivateSubnet1Cidr:
     Type: String
     Default: 10.100.32.0/20
-    Description: 'CIDR block for private subnet 1.'
+    Description: 'CIDR block for private subnet 1. Not sure how to set this? See the VpcCidr param description below.'
 
   PrivateSubnet2Cidr:
     Type: String
     Default: 10.100.48.0/20
-    Description: 'CIDR block for private subnet 2.'
+    Description: 'CIDR block for private subnet 2. Not sure how to set this? See the VpcCidr param description below.'
 
 Resources:
   #=================================
@@ -167,13 +167,13 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
       Tags:
         - Key: Name
-          Value: k8s-cdo-eks-cluster-role
+          Value: !Sub "${AWS::StackName}-eks-cluster-role"
 
   # IAM role for Fargate Pod execution, granting permissions to manage Pods
   EKSFargatePodExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: k8s-cdo-fargate-pod-execution-role
+      RoleName: !Sub "${AWS::StackName}-fargate-pod-execution-role"
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -185,8 +185,7 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonEKSFargatePodExecutionRolePolicy
       Tags:
         - Key: Name
-          Value: k8s-cdo-fargate-pod-execution-role
-
+          Value: !Sub "${AWS::StackName}-fargate-pod-execution-role"
 
   # =============
   # ===  VPC  ===
@@ -200,9 +199,6 @@ Resources:
       CidrBlock: !Ref VpcCidr
       EnableDnsSupport: true
       EnableDnsHostnames: true
-      Tags:
-        - Key: Name
-          Value: k8s-cdo-vpc
 
   # Security group for EKS Cluster networking
   ClusterSecurityGroup:
@@ -211,9 +207,7 @@ Resources:
       GroupDescription: EKS Cluster security group
       VpcId: !Ref VPC
       Tags:
-        - Key: Name
-          Value: k8s-cdo-cluster-sg
-        - Key: kubernetes.io/cluster/code-dot-org
+        - Key: !Sub "kubernetes.io/cluster/${ClusterName}"
           Value: owned
 
 
@@ -225,10 +219,6 @@ Resources:
   # Gives public subnets inbound and outbound internet access
   InternetGateway:
     Type: AWS::EC2::InternetGateway
-    Properties:
-      Tags:
-        - Key: Name
-          Value: k8s-cdo-internet-gateway
 
   AttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -243,9 +233,6 @@ Resources:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref VPC
-      Tags:
-        - Key: Name
-          Value: k8s-cdo-public-route-table
 
   PublicRoute:
     Type: AWS::EC2::Route
@@ -264,11 +251,9 @@ Resources:
       AvailabilityZone: !Select [0, !GetAZs '']
       MapPublicIpOnLaunch: true
       Tags:
-        - Key: Name
-          Value: k8s-cdo-public-subnet-1
         - Key: kubernetes.io/role/elb
           Value: '1'
-        - Key: kubernetes.io/cluster/code-dot-org
+        - Key: !Sub "kubernetes.io/cluster/${ClusterName}"
           Value: shared
 
   PublicSubnet1RouteTableAssociation:
@@ -285,11 +270,9 @@ Resources:
       AvailabilityZone: !Select [1, !GetAZs '']
       MapPublicIpOnLaunch: true
       Tags:
-        - Key: Name
-          Value: k8s-cdo-public-subnet-2
         - Key: kubernetes.io/role/elb
           Value: '1'
-        - Key: kubernetes.io/cluster/code-dot-org
+        - Key: !Sub "kubernetes.io/cluster/${ClusterName}"
           Value: shared
 
   PublicSubnet2RouteTableAssociation:
@@ -312,9 +295,6 @@ Resources:
       # Placed in a PublicSubnet so it itself can access the internet
       # and proxies outbound traffic from private subnets to PublicSubnet1
       SubnetId: !Ref PublicSubnet1
-      Tags:
-        - Key: Name
-          Value: k8s-cdo-nat-gateway
 
   # Allocates a public IP address to the NatGateway for outbound traffic
   NATGatewayEIP:
@@ -328,17 +308,11 @@ Resources:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref VPC
-      Tags:
-        - Key: Name
-          Value: k8s-cdo-private-route-table-1
 
   PrivateRouteTable2:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref VPC
-      Tags:
-        - Key: Name
-          Value: k8s-cdo-private-route-table-2
 
   # Routes for private subnets to access the NAT Gateway
   PrivateRoute1:
@@ -366,11 +340,9 @@ Resources:
       AvailabilityZone: !Select [0, !GetAZs '']
       MapPublicIpOnLaunch: false
       Tags:
-        - Key: Name
-          Value: k8s-cdo-private-subnet-1
         - Key: kubernetes.io/role/internal-elb
           Value: '1'
-        - Key: kubernetes.io/cluster/code-dot-org
+        - Key: !Sub "kubernetes.io/cluster/${ClusterName}"
           Value: shared
 
   PrivateSubnet1RouteTableAssociation:
@@ -387,11 +359,9 @@ Resources:
       AvailabilityZone: !Select [1, !GetAZs '']
       MapPublicIpOnLaunch: false
       Tags:
-        - Key: Name
-          Value: k8s-cdo-private-subnet-2
         - Key: kubernetes.io/role/internal-elb
           Value: '1'
-        - Key: kubernetes.io/cluster/code-dot-org
+        - Key: !Sub "kubernetes.io/cluster/${ClusterName}"
           Value: shared
 
   PrivateSubnet2RouteTableAssociation:
