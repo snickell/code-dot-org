@@ -1,7 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Amazon EKS Cluster with Fargate Profiles'
+Description: 'code-dot-org kubernetes cluster aka k8s-cdo'
 
 Parameters:
+  ClusterName:
+    Type: String
+    Default: "code-dot-org"
+    Description: "The name of the EKS cluster"
+
   VpcCidr:
     Type: String
     Default: 10.100.0.0/16
@@ -28,12 +33,16 @@ Parameters:
     Description: 'CIDR block for private subnet 2.'
 
 Resources:
-  # === EKS Cluster and Fargate Profiles ===
-  # Main EKS cluster resource that defines the Kubernetes cluster
+  #=================================
+  # === code-dot-org EKS Cluster ===
+  #=================================
+
+  # Create the code-dot-org Kubernetes cluster
   EKSCluster:
     Type: AWS::EKS::Cluster
     Properties:
-      Name: code-dot-org
+      # ClusterName is canonically code-dot-org:
+      Name: !Ref ClusterName
       RoleArn: !GetAtt EKSClusterRole.Arn
       ResourcesVpcConfig:
         SubnetIds:
@@ -45,8 +54,17 @@ Resources:
           - !Ref ClusterSecurityGroup
       Version: '1.27'
 
-  # Fargate profile for Pods in the default namespace to run on AWS Fargate
-  FargateProfileDefault:
+  #=================================================
+  # === A Fargate Profile for each k8s namespace ===
+  #==================================================
+
+  # Fargate is AWS's "serverless" provider for Kubernetes Pods.
+  # It allows Pods to run without managing EC2 instances.
+  # It costs about 20% more than dedicated EC2 instances, but
+  # you save 33% on K8S footguns, so scientifically its a 13% win.
+
+  # default namepace: for all your f around and find out needs
+  Default:
     Type: AWS::EKS::FargateProfile
     Properties:
       ClusterName: !Ref EKSCluster
@@ -58,8 +76,67 @@ Resources:
       Selectors:
         - Namespace: default
 
+  # EVENTUALLY, when stuff is baked and we don't care as much abou costs
+  # we'll want to enable more namespaces. Potentially, we could have
+  # production and everything-else, or we could have a namespace per-rails-env.
+  #
+  # # staging namespace
+  # Staging:
+  #   Type: AWS::EKS::FargateProfile
+  #   Properties:
+  #     ClusterName: !Ref EKSCluster
+  #     FargateProfileName: staging
+  #     PodExecutionRoleArn: !GetAtt EKSFargatePodExecutionRole.Arn
+  #     Subnets:
+  #       - !Ref PrivateSubnet1
+  #       - !Ref PrivateSubnet2
+  #     Selectors:
+  #       - Namespace: staging
+  #
+  # # test namespace
+  # Test:
+  #   Type: AWS::EKS::FargateProfile
+  #   Properties:
+  #     ClusterName: !Ref EKSCluster
+  #     FargateProfileName: test
+  #     PodExecutionRoleArn: !GetAtt EKSFargatePodExecutionRole.Arn
+  #     Subnets:
+  #       - !Ref PrivateSubnet1
+  #       - !Ref PrivateSubnet2
+  #     Selectors:
+  #       - Namespace: test
+  #
+  # # production namespace
+  # #
+  # # FIXME: at a minimum, prod should have its own PrivateSubnets
+  # #
+  # Production:
+  #   Type: AWS::EKS::FargateProfile
+  #   Properties:
+  #     ClusterName: !Ref EKSCluster
+  #     FargateProfileName: production
+  #     PodExecutionRoleArn: !GetAtt EKSFargatePodExecutionRole.Arn
+  #     Subnets:
+  #       - !Ref PrivateSubnet1 # FIXME: prod should have its own
+  #       - !Ref PrivateSubnet2 # FIXME: prod should have its own
+  #     Selectors:
+  #       - Namespace: production
+
+  # Fargate profile for ArgoCD to run on AWS Fargate
+  ArgoCD:
+    Type: AWS::EKS::FargateProfile
+    Properties:
+      ClusterName: !Ref EKSCluster
+      FargateProfileName: argocd
+      PodExecutionRoleArn: !GetAtt EKSFargatePodExecutionRole.Arn
+      Subnets:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      Selectors:
+        - Namespace: argocd
+
   # Fargate profile for CoreDNS and other kube-system Pods
-  FargateProfileKubeSystem:
+  KubeSystem:
     Type: AWS::EKS::FargateProfile
     Properties:
       ClusterName: !Ref EKSCluster
@@ -74,7 +151,7 @@ Resources:
             - Key: k8s-app
               Value: kube-dns
 
-  # === IAM Roles ===
+  # === IAM Roles for EKS & Fargate ===
   # IAM role allowing EKS to manage cluster operations
   EKSClusterRole:
     Type: AWS::IAM::Role
@@ -110,6 +187,11 @@ Resources:
         - Key: Name
           Value: k8s-cdo-fargate-pod-execution-role
 
+
+  # =============
+  # ===  VPC  ===
+  # =============
+
   # === Networking and VPC Configuration ===
   # Main VPC to host EKS resources
   VPC:
@@ -121,21 +203,6 @@ Resources:
       Tags:
         - Key: Name
           Value: k8s-cdo-vpc
-
-  # Internet gateway for public subnets
-  InternetGateway:
-    Type: AWS::EC2::InternetGateway
-    Properties:
-      Tags:
-        - Key: Name
-          Value: k8s-cdo-internet-gateway
-
-  # Attach the Internet gateway to the VPC
-  AttachGateway:
-    Type: AWS::EC2::VPCGatewayAttachment
-    Properties:
-      VpcId: !Ref VPC
-      InternetGatewayId: !Ref InternetGateway
 
   # Security group for EKS Cluster networking
   ClusterSecurityGroup:
@@ -149,7 +216,45 @@ Resources:
         - Key: kubernetes.io/cluster/code-dot-org
           Value: owned
 
-  # === Subnets ===
+
+  # =========================
+  # === PUBLIC NETWORKING ===
+  # =========================
+
+  # === Internet Gateway for Public Subnets ===
+  # Gives public subnets inbound and outbound internet access
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: k8s-cdo-internet-gateway
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  # === Public Routing ===
+  # Public route table and route to the Internet
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: k8s-cdo-public-route-table
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref InternetGateway
+
+  # === Public Subnets ===
   # Public subnets with ELB role for external access
   PublicSubnet1:
     Type: AWS::EC2::Subnet
@@ -166,6 +271,12 @@ Resources:
         - Key: kubernetes.io/cluster/code-dot-org
           Value: shared
 
+  PublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+
   PublicSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
@@ -181,82 +292,37 @@ Resources:
         - Key: kubernetes.io/cluster/code-dot-org
           Value: shared
 
-  # Private subnets for internal services
-  PrivateSubnet1:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !Ref PrivateSubnet1Cidr
-      AvailabilityZone: !Select [0, !GetAZs '']
-      MapPublicIpOnLaunch: false
-      Tags:
-        - Key: Name
-          Value: k8s-cdo-private-subnet-1
-        - Key: kubernetes.io/role/internal-elb
-          Value: '1'
-        - Key: kubernetes.io/cluster/code-dot-org
-          Value: shared
-
-  PrivateSubnet2:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !Ref PrivateSubnet2Cidr
-      AvailabilityZone: !Select [1, !GetAZs '']
-      MapPublicIpOnLaunch: false
-      Tags:
-        - Key: Name
-          Value: k8s-cdo-private-subnet-2
-        - Key: kubernetes.io/role/internal-elb
-          Value: '1'
-        - Key: kubernetes.io/cluster/code-dot-org
-          Value: shared
-
-  # === Route Tables and Associations ===
-  # Public route table and route to the Internet
-  PublicRouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref VPC
-      Tags:
-        - Key: Name
-          Value: k8s-cdo-public-route-table
-
-  PublicRoute:
-    Type: AWS::EC2::Route
-    Properties:
-      RouteTableId: !Ref PublicRouteTable
-      DestinationCidrBlock: '0.0.0.0/0'
-      GatewayId: !Ref InternetGateway
-
-  # Associate public subnets with the public route table
-  PublicSubnet1RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref PublicSubnet1
-      RouteTableId: !Ref PublicRouteTable
-
   PublicSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref PublicSubnet2
       RouteTableId: !Ref PublicRouteTable
 
-  # NAT Gateway for private subnet internet access
-  NATGatewayEIP:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
 
+  # ==========================
+  # === PRIVATE NETWORKING ===
+  # ==========================
+
+  # === NAT Gateway for Private Subnets ===
+  # Provides private subnets outbound-only internet access
   NATGateway:
     Type: AWS::EC2::NatGateway
     Properties:
       AllocationId: !GetAtt NATGatewayEIP.AllocationId
+      # Placed in a PublicSubnet so it itself can access the internet
+      # and proxies outbound traffic from private subnets to PublicSubnet1
       SubnetId: !Ref PublicSubnet1
       Tags:
         - Key: Name
           Value: k8s-cdo-nat-gateway
 
+  # Allocates a public IP address to the NatGateway for outbound traffic
+  NATGatewayEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  # === Private Routing ===
   # Private route tables for each private subnet
   PrivateRouteTable1:
     Type: AWS::EC2::RouteTable
@@ -289,18 +355,51 @@ Resources:
       DestinationCidrBlock: '0.0.0.0/0'
       NatGatewayId: !Ref NATGateway
 
-  # Associate private subnets with their route tables
+
+  # === Private Subnets ===
+  # Private subnets for internal services
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PrivateSubnet1Cidr
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: k8s-cdo-private-subnet-1
+        - Key: kubernetes.io/role/internal-elb
+          Value: '1'
+        - Key: kubernetes.io/cluster/code-dot-org
+          Value: shared
+
   PrivateSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref PrivateSubnet1
       RouteTableId: !Ref PrivateRouteTable1
 
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PrivateSubnet2Cidr
+      AvailabilityZone: !Select [1, !GetAZs '']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: k8s-cdo-private-subnet-2
+        - Key: kubernetes.io/role/internal-elb
+          Value: '1'
+        - Key: kubernetes.io/cluster/code-dot-org
+          Value: shared
+
   PrivateSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref PrivateSubnet2
       RouteTableId: !Ref PrivateRouteTable2
+
 
 Outputs:
   ClusterName:
