@@ -14,7 +14,7 @@ build:
         - '**/*.jsx'
         - '**/*.json'
     docker:
-      dockerfile: ./k8s/code-dot-org.dockerfile
+      dockerfile: ./k8s/docker/code-dot-org.dockerfile
       cacheFrom:
       - code-dot-org
       - docker.io/snickellcdo/code-dot-org:latest
@@ -28,7 +28,7 @@ build:
       alias: CODE_DOT_ORG_STATIC
   - image: code-dot-org-core
     docker:
-      dockerfile: ./k8s/code-dot-org-core.dockerfile
+      dockerfile: ./k8s/docker/code-dot-org-core.dockerfile
       # skaffold sync only works when the user is root 😤:
       # https://github.com/GoogleContainerTools/skaffold/issues/2479
       # If we find a solution, we can drop this override
@@ -42,14 +42,14 @@ build:
       # - 475661607190.dkr.ecr.us-east-1.amazonaws.com/code.org-core:staging
   - image: code-dot-org-static
     docker:
-      dockerfile: ./k8s/code-dot-org-static.dockerfile
+      dockerfile: ./k8s/docker/code-dot-org-static.dockerfile
       cacheFrom:
       - code-dot-org-static
       - docker.io/snickellcdo/code-dot-org-static:latest
       # - 475661607190.dkr.ecr.us-east-1.amazonaws.com/code.org-static:staging
   - image: code-dot-org-db-seed
     docker:
-      dockerfile: ./k8s/code-dot-org-db-seed.dockerfile
+      dockerfile: ./k8s/docker/code-dot-org-db-seed.dockerfile
       cacheFrom:
       - code-dot-org-db-seed
       - docker.io/snickellcdo/code-dot-org-db-seed:latest
@@ -62,7 +62,7 @@ deploy:
   helm:
     releases:
       - name: dashboard
-        chartPath: ./k8s/code-dot-org/helm
+        chartPath: ./k8s/helm
         setValueTemplates:
           image: "{{.IMAGE_FULLY_QUALIFIED_code_dot_org}}"
           # skaffold sync only works when the user is root 😤:
@@ -79,13 +79,13 @@ profiles:
   patches:
     - op: add
       path: /deploy/helm/releases/0/valueFiles
-      value: k8s/code-dot-org/helm/production.values.yml
+      value: k8s/helm/production.values.yml
 
 - name: test
   patches:
     - op: add
       path: /deploy/helm/releases/0/valueFiles
-      value: k8s/code-dot-org/helm/test.values.yml
+      value: k8s/helm/test.values.yml
 
 - name: development
   activation:
@@ -94,7 +94,7 @@ profiles:
   patches:
     - op: add
       path: /deploy/helm/releases/0/valueFiles
-      value: k8s/code-dot-org/helm/development.values.yml
+      value: k8s/helm/development.values.yml
     # These have to be patches vs in values.yml because they are templated:
     - op: add
       path: /deploy/helm/releases/0/setValueTemplates/development.hostPaths.home
@@ -113,10 +113,6 @@ profiles:
       path: /build/artifacts/2/docker/cacheFrom
     - op: remove
       path: /build/artifacts/3/docker/cacheFrom
-
-- name: multiplatform
-  build:
-    platforms: ["linux/amd64", "linux/arm64"]
 
 - name: seed
   patches:
