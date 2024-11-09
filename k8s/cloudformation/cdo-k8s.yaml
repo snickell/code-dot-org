@@ -77,14 +77,8 @@ Resources:
         - Namespace: default
         # Eventually some of these (at least production) should be
         # in their own profile, but for now simple wins:
-        - Namespace: development
-        - Namespace: test
-        - Namespace: staging
-        - Namespace: production
         - Namespace: infra
-        - Namespace: droneci
         - Namespace: argocd
-        - Namespace: kaniko
         - Namespace: kube-system
 
   # # staging namespace
