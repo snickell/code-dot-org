@@ -19,6 +19,7 @@ jobs:
     steps:
       - run: |
           echo hi
+          false
           echo "SKAFFOLD_DEFAULT_REPO=$SKAFFOLD_DEFAULT_REPO"
           echo "GITHUB_WORKFLOW=${GITHUB_WORKFLOW}"
 
