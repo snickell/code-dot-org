@@ -138,16 +138,19 @@ jobs:
 
       - name: skaffold build
         run: |
+          set -x
           df -h
-            # Disabled because it takes 5x as long on GitHub AMD64 machines:
-            # -p multiplatform \
+          
           export BUILDKIT_INLINE_CACHE=1
-          # skaffold build \
-          #   -v info \
-          #   --push \
-          #   || echo "skaffold build failed"
+          
+          # Disabled because it takes 5x as long on GitHub AMD64 machines: `-p multiplatform`
+          echo "first"
+          skaffold build \
+            -v info \
+            --push
+            echo "2nd"
           skaffold build -v info --push
-          echo "yo"
+          echo "last"
           false
           find ~/.skaffold/cache
           du -h ~/.skaffold/cache

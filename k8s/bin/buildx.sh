@@ -8,14 +8,16 @@
 #  (1) delete the buildx builder named `skaffold-builder`, and
 #  (2) update the corresponding node-affinities in k8s/pod.yaml.
 
-# The platforms to build. Default to linux/amd64.
-$PLATFORMS=${PLATFORMS:=linux/amd64}
+NATIVE_PLATFORM=$(docker info --format '{{.OSType}}/{{.Architecture}}')
+PLATFORMS=${PLATFORMS:=$NATIVE_PLATFORM}
 
-# `buildx` uses named _builder_ instances configured for specific platforms.
-# This script creates a `skaffold-builder` as required.
-if ! docker buildx inspect skaffold-builder >/dev/null 2>&1; then
-  docker buildx create --name skaffold-builder --platform $PLATFORMS
-fi
+for platform in ${PLATFORMS//,/ }; do
+  docker buildx inspect --bootstrap | grep '^Platforms' | grep $platform || {
+    echo "Platform $platform is not supported by the current builder."
+    echo "Please create a new builder like 'docker buildx create --platform $PLATFORMS' and try again."
+    exit 1
+  }
+done
 
 # Building for multiple platforms requires pushing to a registry
 # as the Docker Daemon cannot load multi-platform images. 
@@ -25,5 +27,5 @@ else
   args="--load"
 fi
 
-set -x      # show the command-line
-docker buildx build --builder skaffold-builder --tag $IMAGE $args "$BUILD_CONTEXT"
+set -x # show the command
+docker buildx build --tag $IMAGE $args "$BUILD_CONTEXT"
