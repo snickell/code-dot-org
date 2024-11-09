@@ -146,6 +146,8 @@ jobs:
           #   -v info \
           #   --push \
           #   || echo "skaffold build failed"
+          skaffold build -v info --push
+          echo "yo"
           false
           find ~/.skaffold/cache
           du -h ~/.skaffold/cache
