@@ -8,9 +8,9 @@ import {MusicState} from '../redux/musicRedux';
 
 import moduleStyles from './callouts.module.scss';
 
-const arrowImage = require(`@cdo/static/music/music-callout-arrow.png`);
+const arrowImage = require(`@cdo/static/music/music-callout-arrow-outline.png`);
 
-type DirectionString = 'up' | 'left';
+type DirectionString = 'up' | 'left' | 'up-inside';
 
 interface AvailableCallout {
   selector?: string;
@@ -53,6 +53,10 @@ const availableCallouts: AvailableCallouts = {
   'play-sounds-together-block-workspace': {
     selector: `.blocklyWorkspace g[data-id="${BlockTypes.PLAY_SOUNDS_TOGETHER}"] path`,
     direction: 'left',
+  },
+  'play-sounds-together-block-workspace-up-inside': {
+    selector: `.blocklyWorkspace g[data-id="${BlockTypes.PLAY_SOUNDS_TOGETHER}"] path`,
+    direction: 'up-inside',
   },
   'play-sounds-together-block-2-workspace': {
     selector: `.blocklyWorkspace g[data-id="${BlockTypes.PLAY_SOUNDS_TOGETHER}_2"] path`,
@@ -138,6 +142,12 @@ const Callouts: React.FunctionComponent = () => {
           top: elementRect.top + elementHeight / 2,
         };
         calloutClassName = moduleStyles.calloutLeft;
+      } else if (validCallout.direction === 'up-inside') {
+        target = {
+          left: elementRect.left + 45,
+          top: elementRect.top + 37,
+        };
+        calloutClassName = moduleStyles.calloutUp;
       } else {
         const elementWidth = elementRect.right - elementRect.left + 1;
         target = {
