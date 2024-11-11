@@ -97,7 +97,6 @@ module Rack
       end
 
       private def request_path_vars(*keys)
-        raise StandardError.new "This is an exception"
         PATH_PATTERN.match(request.path_info)&.values_at(*keys) || []
       end
 
@@ -155,7 +154,6 @@ module Rack
       end
 
       private def regional_path_for(region, main_path)
-        raise StandardError.new "This is an exception"
         ::File.join(ROOT_PATH, region, main_path)
       end
     end
