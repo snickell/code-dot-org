@@ -9,7 +9,7 @@
     "encrypted": "false",
     "background": "music-black",
     "instructions_important": "false",
-    "long_instructions": "#### Play Together Again\r\n\r\n- Add two [sounds](#clickable=play-sound-block) in the *first* [play together](#clickable=play-sounds-together-block-workspace) block.\r\n- Add two [sounds](#clickable=play-sound-block) in the *second* [play together](#clickable=id-left:play_sounds_together_block_2) block.\r\n",
+    "long_instructions": "#### Play Together Again\r\n\r\n- Add two [sounds](#clickable=play-sound-block) in the *first* [play together](#clickable=id-left:play_sounds_together_1) block.\r\n- Add two [sounds](#clickable=play-sound-block) in the *second* [play together](#clickable=id-left:play_sounds_together_2) block.\r\n",
     "hide_share_and_remix": "true",
     "validations": [
       {
@@ -25,7 +25,7 @@
       },
       {
         "key": "music-ai-skill-playtogether_sequence_524d0be3-14c2-4736-bdbf-d709eda13ff1",
-        "message": "Play different sounds in each [play together](#clickable=id-left:play_sounds_together_block_2) block.\n",
+        "message": "Play different sounds in each [play together](#clickable=id-up-left:play_sounds_together_2) block.\n",
         "next": false,
         "conditions": [
           {
@@ -33,11 +33,11 @@
             "value": 1
           }
         ],
-        "callout": "id-left:play_sounds_together_block_2"
+        "callout": "id-up-left:play_sounds_together_2"
       },
       {
         "key": "music-ai-skill-playtogether_sequence_3_8db01d98-40e3-4fb3-bcee-0f59b17262bb",
-        "message": "Play different sounds in each [play together](#clickable=play-sounds-together-block-workspace) block.",
+        "message": "Play different sounds in each [play together](#clickable=id-up-left:play_sounds_together_1) block.",
         "next": false,
         "conditions": [
           {
@@ -45,16 +45,16 @@
             "value": 1
           }
         ],
-        "callout": "play-sound-block-workspace"
+        "callout": "id-up-left:play_sounds_together_1"
       },
       {
         "key": "music-ai-skill-playtogether_36540a11-c67f-47da-bb3a-e2bb6181e9d1",
-        "message": "Nothing has played yet. Add some [sound](#clickable=play-sound-block) blocks into each [play together](#clickable=play-sounds-together-block-workspace) block. ",
+        "message": "Nothing has played yet. Add some [sound](#clickable=play-sound-block) blocks into each [play together](#clickable=id-left:play_sounds_together_1) block. ",
         "next": false,
         "conditions": [
 
         ],
-        "callout": "play-sound-block---play-sounds-together-block-workspace-up-inside"
+        "callout": "play-sound-block---id-up-inside:play_sounds_together_1"
       }
     ],
     "level_data": {
@@ -73,13 +73,13 @@
               "next": {
                 "block": {
                   "type": "play_sounds_together",
-                  "id": "play_sounds_together",
+                  "id": "play_sounds_together_1",
                   "deletable": false,
                   "movable": false,
                   "next": {
                     "block": {
                       "type": "play_sounds_together_no_next",
-                      "id": "play_sounds_together_block_2",
+                      "id": "play_sounds_together_2",
                       "deletable": false,
                       "movable": false
                     }
@@ -165,7 +165,7 @@
     "use_secondary_finish_button": "false",
     "preload_asset_list": null
   },
-  "audit_log": "[{\"changed_at\":\"2024-10-22T23:17:16.784+00:00\",\"changed\":[\"cloned from \\\"music-ai-skill-playtogether_sequence_1\\\"\"],\"cloned_from\":\"music-ai-skill-playtogether_sequence_1\"},{\"changed_at\":\"2024-10-22 23:42:40 +0000\",\"changed\":[\"name\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-10-25 20:53:44 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-10-28 21:00:22 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-10-31 21:04:32 +0000\",\"changed\":[\"offer_browser_tts\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-11-10 22:26:57 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":1,\"changed_by_email\":\"brendan+levelbuilder@code.org\"}]"
+  "audit_log": "[{\"changed_at\":\"2024-10-22T23:17:16.784+00:00\",\"changed\":[\"cloned from \\\"music-ai-skill-playtogether_sequence_1\\\"\"],\"cloned_from\":\"music-ai-skill-playtogether_sequence_1\"},{\"changed_at\":\"2024-10-22 23:42:40 +0000\",\"changed\":[\"name\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-10-25 20:53:44 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-10-28 21:00:22 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-10-31 21:04:32 +0000\",\"changed\":[\"offer_browser_tts\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-11-10 22:26:57 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":1,\"changed_by_email\":\"brendan+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-11 05:12:29 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":1,\"changed_by_email\":\"brendan+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-11 05:18:26 +0000\",\"changed\":[\"validations\",\"level_data\"],\"changed_by_id\":1,\"changed_by_email\":\"brendan+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-11 05:21:01 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":1,\"changed_by_email\":\"brendan+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-11 05:22:18 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":1,\"changed_by_email\":\"brendan+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-11 05:25:36 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":1,\"changed_by_email\":\"brendan+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-11 05:26:28 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":1,\"changed_by_email\":\"brendan+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-11 05:28:53 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":1,\"changed_by_email\":\"brendan+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-11 05:30:26 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":1,\"changed_by_email\":\"brendan+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-11 05:31:15 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":1,\"changed_by_email\":\"brendan+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-11 05:32:23 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":1,\"changed_by_email\":\"brendan+levelbuilder@code.org\"}]"
 }]]></config>
   <blocks/>
 </Music>
