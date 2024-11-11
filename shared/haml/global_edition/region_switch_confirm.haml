@@ -1,5 +1,6 @@
 :ruby
   require 'cdo/global_edition'
+  return unless DCDO.get('global_edition_enabled', false)
 
   country_code = request.country_code
   ge_region = Cdo::GlobalEdition.country_region(country_code)
