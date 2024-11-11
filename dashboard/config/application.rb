@@ -50,6 +50,12 @@ module Dashboard
       end
     end
 
+    if CDO.use_cookie_dcdo
+      # Enables the setting of DCDO via cookies for testing purposes.
+      require 'cdo/rack/cookie_dcdo'
+      config.middleware.insert_before Rack::Cors, Rack::CookieDCDO
+    end
+
     require 'cdo/rack/global_edition'
     config.middleware.insert_before Rack::Cors, Rack::GlobalEdition
 
@@ -96,12 +102,6 @@ module Dashboard
 
     require 'cdo/rack/upgrade_insecure_requests'
     config.middleware.use ::Rack::UpgradeInsecureRequests
-
-    if CDO.use_cookie_dcdo
-      # Enables the setting of DCDO via cookies for testing purposes.
-      require 'cdo/rack/cookie_dcdo'
-      config.middleware.insert_after ActionDispatch::RequestId, Rack::CookieDCDO
-    end
 
     if CDO.use_geolocation_override
       # Apply the remote_addr middleware to allow pretending to be at a particular IP
