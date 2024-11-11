@@ -63,3 +63,26 @@ Continuous Deployment
 - ArgoCD: if we decide to deploy with a GitOps workflow, we'll use ArgoCD.
 
 Skaffold
+
+- Pometheus
+- Grafana
+
+# Setting up a prod-like cluster
+
+1. Create a cloudformation stack by uploading k8s/cloudformation/cdo-k8s.yaml in the AWS console
+  - Record the ClusterName param you input when creating the stack
+  - Wait for the stack to be created...
+2. Setup kubectl to access your new cluster via kubeconfig: `k8s/bin/select-eks-cluster.sh`
+  - Alternatively, if you already have aws region and profile defaults setup correctly you can run `aws eks update-kubeconfig --name <ClusterName from step 1>` directly
+  - Verify you
+  - Or run: 
+    - You'll need to have AWS_REGION and AWS_PROFILE already set appropriately
+    - verify everything is working with `kubectl cluster-info`
+3. Install argocd onto the cluster: `kubectl apply -k k8s/argocd`
+  - We'll use ArgoCD to install the rest of the apps we use, including code-dot-org itself
+
+## Accessing the ArgoCD UI
+
+- Forward ArgoCD port 80 to local port 4040: `kubectl port-forward svc/argocd-server -n argocd 4040:80`
+- Get the password for user 'admin': `kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d`
+- Login with user admin and the password from previous step at: http://localhost:4040
