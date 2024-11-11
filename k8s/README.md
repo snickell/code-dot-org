@@ -78,8 +78,10 @@ Skaffold
   - Or run: 
     - You'll need to have AWS_REGION and AWS_PROFILE already set appropriately
     - verify everything is working with `kubectl cluster-info`
-3. Install argocd onto the cluster: `kubectl apply -k k8s/argocd`
-  - We'll use ArgoCD to install the rest of the apps we use, including code-dot-org itself
+3. Install argocd onto the cluster: 
+  - `kubectl create namespace argocd`
+  - `kubectl apply -k k8s/argocd`
+
 
 ## Accessing the ArgoCD UI
 

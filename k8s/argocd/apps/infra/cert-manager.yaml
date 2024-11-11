@@ -1,17 +1,20 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: grafana
+  name: cert-manager
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://grafana.github.io/helm-charts
-    chart: grafana
+    repoURL: https://charts.jetstack.io
+    chart: cert-manager
     targetRevision: latest
+    helm:
+      values: |
+        installCRDs: true
   destination:
     server: https://kubernetes.default.svc
-    namespace: monitoring
+    namespace: infra
   syncPolicy:
     automated:
       prune: true

@@ -4,8 +4,10 @@ kind: Kustomization
 namespace: argocd
 resources:
   - https://raw.githubusercontent.com/argoproj/argo-cd/v2.13.0/manifests/install.yaml
-  - namespace.yaml
-  - apps/prometheus.yaml
-  - apps/grafana.yaml
-  - apps/loki.yaml
-  - apps/cert-manager.yaml
+  # - namespace.yaml
+  - apps/infra/namespace.yaml
+  - apps/infra/prometheus.yaml
+  - apps/infra/grafana.yaml
+  - apps/infra/loki.yaml
+  - apps/infra/cert-manager.yaml
+  

@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: prometheus
+  name: grafana
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://prometheus-community/helm-charts
-    chart: prometheus
+    repoURL: https://grafana.github.io/helm-charts
+    chart: grafana
     targetRevision: latest
   destination:
     server: https://kubernetes.default.svc
-    namespace: monitoring
+    namespace: infra
   syncPolicy:
     automated:
       prune: true
