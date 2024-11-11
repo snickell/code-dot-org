@@ -79,9 +79,11 @@ Skaffold
     - You'll need to have AWS_REGION and AWS_PROFILE already set appropriately
     - verify everything is working with `kubectl cluster-info`
 3. Install argocd onto the cluster: 
-  - `kubectl create namespace argocd`
-  - `kubectl apply -k k8s/argocd`
-
+  ```
+  kubectl create namespace argocd
+  kubectl create namespace infra
+  kubectl apply -k k8s/argocd
+  ```
 
 ## Accessing the ArgoCD UI
 
