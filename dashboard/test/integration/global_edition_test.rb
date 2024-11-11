@@ -3,7 +3,14 @@
 require 'test_helper'
 
 class GlobalEditionTest < ActionDispatch::IntegrationTest
+  include Minitest::RSpecMocks
+
   let(:document) {Nokogiri::HTML(response.body)}
+
+  before do
+    allow(DCDO).to receive(:get).and_call_original
+    allow(DCDO).to receive(:get).with('global_edition_enabled', anything).and_return(true)
+  end
 
   describe 'routing' do
     let(:international_page_path) {'/incubator'}

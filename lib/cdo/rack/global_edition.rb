@@ -4,6 +4,7 @@ require 'active_support/all'
 require 'request_store'
 
 require 'cdo/global_edition'
+require 'dynamic_config/dcdo'
 require 'helpers/cookies'
 
 module Rack
@@ -159,7 +160,7 @@ module Rack
     def call(env)
       request = Request.new(env)
 
-      if Cdo::GlobalEdition.target_host?(request.hostname)
+      if Cdo::GlobalEdition.target_host?(request.hostname) && DCDO.get('global_edition_enabled', false)
         RouteHandler.new(@app, request).call
       else
         @app.call(env)

@@ -63,7 +63,7 @@ module Cdo
       end
 
       def grouped_ge_regions_locale_options
-        return {} unless DCDO.get('global_edition_region_selection_enabled', false)
+        return {} unless DCDO.get('global_edition_enabled', false)
 
         @grouped_ge_regions_locale_options ||= begin
           grouped_options = {}

@@ -3,7 +3,7 @@ Feature: Global Edition - Region Select
 
   Background:
     Given I am on "http://code.org"
-    And I use a cookie to mock the DCDO key "global_edition_region_selection_enabled" as "true"
+    And I use a cookie to mock the DCDO key "global_edition_enabled" as "true"
 
   Scenario: User can switch between the international and regional versions using the language selector on a Pegasus page
     Given I am on "http://code.org"
