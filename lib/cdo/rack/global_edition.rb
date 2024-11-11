@@ -51,6 +51,7 @@ module Rack
 
           setup_region(new_region)
           response.redirect(redirect_path)
+          response.do_not_cache!
         elsif PATH_PATTERN.match?(request.path_info)
           ge_prefix, ge_region, main_path = request_path_vars(:ge_prefix, :ge_region, :main_path)
 
@@ -68,7 +69,10 @@ module Rack
         elsif Cdo::GlobalEdition.region_available?(region)
           # Redirects to the regional version of the path if it's available.
           redirect_path = regional_path_for(region, request.fullpath)
-          response.redirect(redirect_path) if redirectable?(redirect_path)
+          if redirectable?(redirect_path)
+            response.redirect(redirect_path)
+            response.do_not_cache!
+          end
         end
 
         response.finish
