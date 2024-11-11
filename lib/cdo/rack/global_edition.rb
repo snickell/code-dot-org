@@ -4,6 +4,7 @@ require 'active_support/all'
 require 'request_store'
 
 require 'cdo/global_edition'
+require 'cdo/honeybadger'
 require 'dynamic_config/dcdo'
 require 'helpers/cookies'
 
@@ -27,11 +28,11 @@ module Rack
         (?<main_path>/.*|$)
       REGEXP
 
-      attr_reader :app, :request
+      attr_reader :app, :env
 
-      def initialize(app, request)
+      def initialize(app, env)
         @app = app
-        @request = request
+        @env = env
       end
 
       # @note Changes to the `request` should be made before the `response` is initialized to apply the changes.
@@ -75,6 +76,10 @@ module Rack
         RequestStore.store.delete(Cdo::GlobalEdition::REGION_KEY)
       end
 
+      private def request
+        @request ||= Rack::Request.new(env)
+      end
+
       private def region
         request.cookies[REGION_KEY].presence
       end
@@ -83,7 +88,7 @@ module Rack
       private def response
         @response ||= begin
           RequestStore.store[Cdo::GlobalEdition::REGION_KEY] = region if Cdo::GlobalEdition.region_available?(region)
-          Rack::Response[*app.call(request.env)]
+          Rack::Response[*app.call(env)]
         end
       end
 
@@ -158,13 +163,26 @@ module Rack
     end
 
     def call(env)
-      request = Request.new(env)
+      return process_request(env) if global_edition_enabled?(env)
+      @app.call(env)
+    end
 
-      if Cdo::GlobalEdition.target_host?(request.hostname) && DCDO.get('global_edition_enabled', false)
-        RouteHandler.new(@app, request).call
-      else
-        @app.call(env)
-      end
+    private def global_edition_enabled?(env)
+      DCDO.get('global_edition_enabled', false) && Cdo::GlobalEdition.target_host?(Request.new(env).hostname)
+    end
+
+    private def process_request(env)
+      RouteHandler.new(@app, env).call
+    rescue StandardError => exception
+      Honeybadger.notify(
+        exception,
+        error_message: '[Rack::GlobalEdition] Runtime error',
+        context: {
+          env: env,
+        }
+      )
+
+      @app.call(env)
     end
   end
 end

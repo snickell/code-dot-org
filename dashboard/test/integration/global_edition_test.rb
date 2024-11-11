@@ -78,7 +78,7 @@ class GlobalEditionTest < ActionDispatch::IntegrationTest
           must_respond_with :success
         end
 
-        context 'if ge_region is unavailable' do
+        context 'if ge_region is invalid' do
           let(:ge_region) {'_'}
 
           it 'stays on international page' do
@@ -134,12 +134,12 @@ class GlobalEditionTest < ActionDispatch::IntegrationTest
         _ {get_regional_page}.must_change -> {incubator_path}, from: international_page_path, to: regional_page_path
       end
 
-      context 'when ge_region is unavailable' do
+      context 'when ge_region is invalid' do
         let(:ge_region) {'_'}
 
         it 'is not accessible' do
-          actual_error = _ {get_regional_page}.must_raise(ActionController::RoutingError)
-          _(actual_error.message).must_equal %Q[No route matches [GET] "#{regional_page_path}"]
+          get_regional_page
+          must_respond_with 500
         end
       end
     end
