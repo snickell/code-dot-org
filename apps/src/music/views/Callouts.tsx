@@ -114,7 +114,6 @@ const Callouts: React.FunctionComponent = () => {
     const splitId = calloutId.split(':');
     if (splitId.length === 2) {
       const dataId = splitId[1];
-
       validCallouts.push({
         selector: `.blocklyWorkspace g[data-id="${dataId}"] path`,
         direction:

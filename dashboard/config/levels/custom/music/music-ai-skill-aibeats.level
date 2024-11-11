@@ -7,7 +7,6 @@
   "user_id": 1196,
   "properties": {
     "encrypted": "false",
-    "finish_dialog": "hoc2024",
     "instructions_important": "false",
     "long_instructions": "#### Customize a Drum Beat\r\n\r\n- Drag an [AI Beat](#clickable=play-pattern-ai-block) block under [when run](#clickable=when-run-block).\r\n- Click the [AI Beat](#clickable=play-pattern-ai-block) block to create custom beats. AI Bot will help you generate a new beat for your song. ",
     "hide_share_and_remix": "false",

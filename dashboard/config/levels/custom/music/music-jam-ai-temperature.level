@@ -37,7 +37,7 @@
       },
       {
         "key": "music-ai-skill-aibeats-temperature_1_1a17f661-6104-4b40-a4b9-aa577b660683",
-        "message": "Choose a few beats in the [play AI drums](#clickable=id-left:play_pattern_ai_at_current_location_simple2) to get started. Then click \"Generate\". ",
+        "message": "Choose a few beats in the [play AI drums](#clickable=id-left:play_pattern_ai_at_current_location_simple2) to get started. Then click \"Generate\".",
         "next": false,
         "conditions": [
           {
@@ -49,7 +49,7 @@
       },
       {
         "key": "music-ai-skill-aibeats_2ec51257-daa4-40af-b5d4-4b42a2cfaf11",
-        "message": "No sounds have played yet. ",
+        "message": "No sounds have played yet.",
         "next": false,
         "conditions": [
 
