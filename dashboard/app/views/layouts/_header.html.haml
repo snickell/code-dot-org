@@ -63,6 +63,7 @@
   user_header_options[:ge_region] = request.ge_region
 
   require 'cdo/hamburger'
+  require 'cdo/global_edition'
 
 = console if @use_web_console
 
@@ -78,7 +79,7 @@
           - if current_user
             = link_to(image_tag('logo.svg', alt: I18n.t(:code_org_logo_alt)), '/home', {id: "logo_home_link"})
           - else
-            = link_to(image_tag('logo.svg', alt: I18n.t(:code_org_logo_alt)), CDO.code_org_url, {id: "logo_home_link"})
+            = link_to(image_tag('logo.svg', alt: I18n.t(:code_org_logo_alt)), Cdo::GlobalEdition.current_home_url, {id: "logo_home_link"})
 
       .header_middle{dir: locale_dir}
         - if should_show_progress || level

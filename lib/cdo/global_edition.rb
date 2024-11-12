@@ -9,6 +9,8 @@ module Cdo
   module GlobalEdition
     REGION_KEY = 'ge_region'
 
+    ROOT_PATH = '/global'
+
     # Retrieves a list a global region names.
     REGIONS = Dir.glob('*.yml', base: CDO.dir('config', 'global_editions')).map {|f| File.basename(f, '.yml')}.freeze
 
@@ -20,6 +22,11 @@ module Cdo
     # @see +Rack::GlobalEdition::RouteHandler#response+
     def self.current_region
       RequestStore.store[REGION_KEY]
+    end
+
+    # Returns the home URL for the current region
+    def self.current_home_url
+      CDO.code_org_url(current_region ? ::File.join('/', ROOT_PATH, current_region) : "")
     end
 
     # Freezes an entire complex data structure

@@ -15,7 +15,7 @@ module Rack
     class RouteHandler
       include Middleware::Helpers::Cookies
 
-      ROOT_PATH = '/global'
+      ROOT_PATH = Cdo::GlobalEdition::ROOT_PATH
       # @example Matches paths like `/global/fa/home`, capturing:
       # - ge_prefix: "/global/fa"
       # - ge_region: "fa"
