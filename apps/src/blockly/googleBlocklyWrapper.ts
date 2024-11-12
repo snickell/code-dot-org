@@ -3,6 +3,7 @@ import {
   ObservableProcedureModel,
   ObservableParameterModel,
 } from '@blockly/block-shareable-procedures';
+import {installAllBlocks as installFieldColourBlocks} from '@blockly/field-colour';
 import {LineCursor, NavigationController} from '@blockly/keyboard-navigation';
 import {CrossTabCopyPaste} from '@blockly/plugin-cross-tab-copy-paste';
 import {
@@ -272,6 +273,10 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
   READ_ONLY_PROPERTIES.forEach(prop => {
     blocklyWrapper.wrapReadOnlyProperty(prop);
   });
+
+  // Installs colour_picker, colour_rgb, colour_random, and colour_blend blocks.
+  // These are exclusively provided via the FieldColour plugin as of Blockly v11.
+  installFieldColourBlocks({javascript: javascriptGenerator});
 
   type registrableFieldType = Pick<typeof GoogleBlockly.Field, 'prototype'>;
   // elements in this list should be structured as follows:
