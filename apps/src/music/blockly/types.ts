@@ -1,11 +1,16 @@
 import * as GoogleBlockly from 'blockly/core';
 
+import {javascriptGeneratorType} from '@cdo/apps/blockly/types';
+
 import {BlockTypes} from './blockTypes';
 
 // Configuration data for a block.
 export interface BlockConfig {
   definition: BlockJson;
-  generator: (block: GoogleBlockly.Block) => string | string[];
+  generator: (
+    block: GoogleBlockly.Block,
+    generator: javascriptGeneratorType
+  ) => string | [string, number] | null;
 }
 
 export interface BlockJson {
