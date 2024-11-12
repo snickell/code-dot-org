@@ -19,7 +19,7 @@ export class CdoFieldBitmap extends FieldBitmap {
    * Constructs a new instance of CdoFieldBitmap.
    * @param {number[][] | typeof Blockly.Field.SKIP_SETUP} value - The initial value of the field, represented
    * as a 2D array of any length, or undefined.
-   * @param {object | null} validator - The options for the field, can be an object or null/undefined.
+   * @param {object | null} validator - A function that is called to validate a new field value or null/undefined.
    * @param {object | null} config - Additional configuration options, can be an object or null/undefined.
    */
   constructor(
