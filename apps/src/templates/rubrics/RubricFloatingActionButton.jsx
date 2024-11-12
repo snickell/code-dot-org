@@ -113,6 +113,9 @@ function RubricFloatingActionButton({
       ? EVENTS.TA_RUBRIC_CLOSED_FROM_FAB_EVENT
       : EVENTS.TA_RUBRIC_OPENED_FROM_FAB_EVENT;
     analyticsReporter.sendEvent(eventName, eventData);
+    if (!isOpen) {
+      setSeenTaScores();
+    }
     setIsOpen(!isOpen);
   };
 
@@ -120,14 +123,29 @@ function RubricFloatingActionButton({
   const showScoresAlert =
     canShowTaScoresAlert && !hasSeenAlert && showCountBubble;
 
-  const closeAlert = () => {
+  const setSeenTaScores = useCallback(() => {
     setHasSeenAlert(true);
-  };
+
+    fetch(`/api/v1/users/set_seen_ta_scores`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({lesson_position: rubric.lesson.position}),
+    }).catch(error => {
+      console.error('Error setting seen TA scores:', error);
+    });
+  }, [rubric.lesson.position]);
 
   const viewScores = () => {
-    setHasSeenAlert(true);
+    setSeenTaScores();
     setIsOpen(true);
   };
+
+  // Dismiss the alert if the TA window is open initially.
+  useEffect(() => {
+    if (canShowTaScoresAlert && !hasSeenAlert && initialIsOpen) {
+      setSeenTaScores();
+    }
+  }, [canShowTaScoresAlert, hasSeenAlert, initialIsOpen, setSeenTaScores]);
 
   const logInternalError = (error, componentStack) => {
     console.error(
@@ -213,7 +231,7 @@ function RubricFloatingActionButton({
           </div>
           {showScoresAlert && (
             <StudentScoresAlert
-              closeAlert={closeAlert}
+              closeAlert={setSeenTaScores}
               viewScores={viewScores}
             />
           )}

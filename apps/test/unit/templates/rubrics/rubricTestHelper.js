@@ -47,6 +47,10 @@ export function stubFetch({
     if (/rubrics\/\d+\/run_ai_evaluations_for_user$/.test(url)) {
       return Promise.resolve(new Response(JSON.stringify({})));
     }
+
+    if (/api\/v1\/users\/set_seen_ta_scores/.test(url)) {
+      return Promise.resolve(new Response(JSON.stringify({})));
+    }
   });
 
   return fetchStub;
