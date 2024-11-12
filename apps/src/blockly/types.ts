@@ -111,7 +111,7 @@ export interface BlocklyWrapperType extends GoogleBlocklyType {
   FieldColour: typeof CdoFieldColour;
   FieldVariable: typeof CdoFieldVariable;
   FieldParameter: typeof CdoFieldParameter;
-  JavaScript: typeof javascriptGenerator;
+  JavaScript: javascriptGeneratorType;
   assetUrl: (path: string) => string;
   customSimpleDialog: (config: object) => void;
   levelBlockIds: Set<string>;
@@ -281,8 +281,8 @@ export interface ExtendedWorkspace extends GoogleBlockly.Workspace {
   noFunctionBlockFrame: boolean;
 }
 
-type codeGeneratorType = typeof GoogleBlockly.CodeGenerator;
-export interface ExtendedCodeGenerator extends codeGeneratorType {
+type CodeGeneratorType = typeof GoogleBlockly.CodeGenerator;
+export interface ExtendedCodeGenerator extends CodeGeneratorType {
   xmlToCode?: (name: string, domBlocks: Element) => string;
   xmlToBlocks: (name: string, xml: Element) => GoogleBlockly.Block[];
   blockSpaceToCode: (
