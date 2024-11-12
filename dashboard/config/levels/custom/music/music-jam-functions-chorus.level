@@ -263,11 +263,11 @@
         "next": true,
         "conditions": [
           {
-            "name": "played_sound_in_function_by_id",
+            "name": "played_sound_in_function",
             "value": "chorus-procedure"
           },
           {
-            "name": "played_sound_in_function_by_id",
+            "name": "played_sound_in_function",
             "value": "intro-procedure"
           }
         ]
@@ -278,7 +278,7 @@
         "next": false,
         "conditions": [
           {
-            "name": "played_sound_in_function_by_id",
+            "name": "played_sound_in_function",
             "value": "intro-procedure"
           }
         ]
@@ -289,7 +289,7 @@
         "next": false,
         "conditions": [
           {
-            "name": "played_sound_in_function_by_id",
+            "name": "played_sound_in_function",
             "value": "chorus-procedure"
           }
         ]
