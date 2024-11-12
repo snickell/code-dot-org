@@ -12,7 +12,39 @@ class RubricsTest < ActionDispatch::IntegrationTest
     create :rubric, lesson: @other_script_level.lesson, level: @other_script_level.levels.first
   end
 
-  test 'set_seen_ta_scores sets canShowTaScoresAlert to false for csd 2024 level' do
+  test 'canShowTaScoresAlert is true for csd 2024 level' do
+    sign_in @teacher
+    CourseOffering.add_course_offering(@unit)
+
+    get build_script_level_path(@script_level)
+    assert_response :success
+    rubric_data = JSON.parse(css_select('script[data-rubricdata]').first.attribute('data-rubricdata').to_s)
+    assert rubric_data['canShowTaScoresAlert']
+  end
+
+  test 'canShowTaScoresAlert is false for other version year' do
+    sign_in @teacher
+    @unit.update!(version_year: '2025')
+    CourseOffering.add_course_offering(@unit)
+
+    get build_script_level_path(@script_level)
+    assert_response :success
+    rubric_data = JSON.parse(css_select('script[data-rubricdata]').first.attribute('data-rubricdata').to_s)
+    refute rubric_data['canShowTaScoresAlert']
+  end
+
+  test 'canShowTaScoresAlert is false for csp level' do
+    sign_in @teacher
+    @unit.update!(family_name: 'csp')
+    CourseOffering.add_course_offering(@unit)
+
+    get build_script_level_path(@script_level)
+    assert_response :success
+    rubric_data = JSON.parse(css_select('script[data-rubricdata]').first.attribute('data-rubricdata').to_s)
+    refute rubric_data['canShowTaScoresAlert']
+  end
+
+  test 'set_seen_ta_scores sets canShowTaScoresAlert to false' do
     sign_in @teacher
     CourseOffering.add_course_offering(@unit)
 
