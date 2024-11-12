@@ -3,7 +3,7 @@ require 'test_helper'
 class ScriptsTest < ActionDispatch::IntegrationTest
   include LevelsHelper # for build_script_level_path
 
-  test 'set_seen_ta_scores sets canShowTaScoresAlert to false' do
+  test 'set_seen_ta_scores sets canShowTaScoresAlert to false for csd level' do
     teacher = create :authorized_teacher
     sign_in teacher
 

@@ -370,39 +370,17 @@ class Api::V1::UsersControllerTest < ActionController::TestCase
     assert_response :unauthorized
   end
 
-  test 'set and get seen_ta_scores' do
+  test 'set_seen_ta_scores' do
     teacher = create :teacher
+    assert_equal(nil, teacher.seen_ta_scores_map)
     sign_in(teacher)
 
     unit = create :unit, :with_lessons
     lesson = unit.lessons.first
     params = {lesson_position: lesson.absolute_position}
-    other_lesson = unit.lessons.last
-    other_unit = create :unit, :with_lessons
-
-    get :get_seen_ta_scores, params: params
-    assert_response :success
-    response = JSON.parse(@response.body)
-    assert_equal false, response["seen"]
 
     post :set_seen_ta_scores, params: params
     assert_response :success
     assert_equal({lesson.absolute_position.to_s => true}, teacher.reload.seen_ta_scores_map)
-
-    get :get_seen_ta_scores, params: params
-    assert_response :success
-    response = JSON.parse(@response.body)
-    assert_equal true, response["seen"]
-
-    get :get_seen_ta_scores, params: {lesson_position: other_lesson.absolute_position}
-    assert_response :success
-    response = JSON.parse(@response.body)
-    assert_equal false, response["seen"]
-
-    # other lessons with the same position are also now considered seen
-    get :get_seen_ta_scores, params: {lesson_position: other_unit.lessons.first.absolute_position}
-    assert_response :success
-    response = JSON.parse(@response.body)
-    assert_equal true, response["seen"]
   end
 end
