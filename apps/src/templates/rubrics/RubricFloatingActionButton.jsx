@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {connect} from 'react-redux';
 
 import {BodyFourText, StrongText} from '@cdo/apps/componentLibrary/typography';
@@ -78,13 +78,16 @@ function RubricFloatingActionButton({
   notificationsEnabled,
 }) {
   const sessionStorageKey = 'RubricFabOpenStateKey';
-  const [isOpen, setIsOpen] = useState(
-    JSON.parse(tryGetSessionStorage(sessionStorageKey, false)) || false
-  );
+
+  const initialIsOpen = useMemo(() => {
+    return JSON.parse(tryGetSessionStorage(sessionStorageKey, false)) || false;
+  }, []);
+  const [isOpen, setIsOpen] = useState(initialIsOpen);
+
   // Show the pulse if this is the first time the user has seen the FAB in this
   // session. Depends on other logic which sets the open state in session storage.
   const [isFirstSession] = useState(
-    JSON.parse(tryGetSessionStorage(sessionStorageKey, null)) === null
+    tryGetSessionStorage(sessionStorageKey, null) === null
   );
   const [isFabImageLoaded, setIsFabImageLoaded] = useState(false);
   const [isTaImageLoaded, setIsTaImageLoaded] = useState(false);
