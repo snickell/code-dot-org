@@ -46,6 +46,7 @@ import TopInstructionsHeader from './TopInstructionsHeader';
 import {hasInstructions} from './utils';
 
 import {logUserLevelInteraction} from '@cdo/apps/userLevelInteractionsLogger/userLevelInteractionsApi';
+import {UserLevelInteractions} from '@cdo/generated-scripts/sharedConstants';
 
 const HEADER_HEIGHT = styleConstants['workspace-headers-height'];
 const RESIZER_HEIGHT = styleConstants['resize-bar-width'];
@@ -478,7 +479,7 @@ class TopInstructions extends Component {
     logUserLevelInteraction({
       levelId: this.props.serverLevelId,
       scriptId: this.props.serverScriptId,
-      interaction: 'click-help-and-tips-tab',
+      interaction: UserLevelInteractions.click_help_and_tips,
       codeVersion: 'how the heck am I going to get this?!?!',
     });
   };
