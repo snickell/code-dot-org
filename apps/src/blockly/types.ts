@@ -71,6 +71,7 @@ export interface BlocklyWrapperType extends GoogleBlocklyType {
   ALIGN_CENTRE: GoogleBlockly.inputs.Align.CENTRE;
   ALIGN_LEFT: GoogleBlockly.inputs.Align.LEFT;
   ALIGN_RIGHT: GoogleBlockly.inputs.Align.RIGHT;
+  inputTypes: typeof GoogleBlockly.inputs.inputTypes;
   analyticsData: AnalyticsData;
   showUnusedBlocks: boolean | undefined;
   BlockFieldHelper: {[fieldHelper: string]: string};
