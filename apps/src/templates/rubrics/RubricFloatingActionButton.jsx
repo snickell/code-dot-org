@@ -76,6 +76,7 @@ function RubricFloatingActionButton({
   aiEnabled,
   sectionId,
   notificationsEnabled,
+  canShowTaScoresAlert,
 }) {
   const sessionStorageKey = 'RubricFabOpenStateKey';
 
@@ -115,7 +116,9 @@ function RubricFloatingActionButton({
     setIsOpen(!isOpen);
   };
 
-  const [hasSeenAlert, setHasSeenAlert] = useState(false);
+  const [hasSeenAlert, setHasSeenAlert] = useState(!canShowTaScoresAlert);
+  const showScoresAlert =
+    canShowTaScoresAlert && !hasSeenAlert && showCountBubble;
 
   const closeAlert = () => {
     setHasSeenAlert(true);
@@ -208,7 +211,7 @@ function RubricFloatingActionButton({
               </StrongText>
             </BodyFourText>
           </div>
-          {!hasSeenAlert && (
+          {showScoresAlert && (
             <StudentScoresAlert
               closeAlert={closeAlert}
               viewScores={viewScores}
@@ -261,6 +264,7 @@ RubricFloatingActionButton.propTypes = {
   aiEnabled: PropTypes.bool,
   sectionId: PropTypes.number,
   notificationsEnabled: PropTypes.bool,
+  canShowTaScoresAlert: PropTypes.bool,
 };
 
 export const UnconnectedRubricFloatingActionButton = RubricFloatingActionButton;
