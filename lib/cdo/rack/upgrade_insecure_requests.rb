@@ -39,6 +39,8 @@ module Rack
         # http://www.w3.org/TR/upgrade-insecure-requests/#recommendations
         # http://www.w3.org/TR/upgrade-insecure-requests/#reporting-upgrades
 
+        #headers["Cross-Origin-Opener-Policy"] = "same-origin"
+        headers["Cross-Origin-Embedder-Policy"] = "credentialless"
         policies = []
         if ssl?(env)
           # headers['Content-Security-Policy'] = 'upgrade-insecure-requests'
