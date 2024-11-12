@@ -14,7 +14,10 @@ $default-spacing: 2px;
 %panel-container-header {
   min-height: 30px;
   position: relative;
-  z-index: 1;
+  //z-index: 1;
+  display: flex;
+  gap: 6px;
+  padding-left: 6px;
 }
 
 .panelContainerHeader-dark {
@@ -32,19 +35,22 @@ $default-spacing: 2px;
 }
 
 .panelContainerHeaderItem {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  //position: absolute;
+  //top: 50%;
+  //transform: translateY(-50%);
 
   &Text {
-    width: 100%;
-    text-align: center;
+    flex: 1;
+    justify-content: center;
+    display: flex;
+    align-items: center;
   }
 
   [dir='ltr'] &Right,
   [dir='rtl'] &Left {
     right: 4px;
     z-index: 1;
+    overflow: hidden;
   }
 
   [dir='ltr'] &Left,
