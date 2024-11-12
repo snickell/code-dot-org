@@ -7,21 +7,6 @@ class UserLevelInteractionsController < ApplicationController
 
   # POST /user_level_interactions
   def create
-    # user_level_interaction_params[:school_year] = "2024-25"
-    # unit = Unit.find(user_level_interaction_params[:script_id])
-    # level = Level.find(user_level_interaction_params[:level_id])
-    # metadata = {
-    #   course_offering: unit.properties["curriculum_umbrella"],
-    #   unit: unit.name,
-    #   level_type: level.type,
-    # }
-    # puts "metadata"
-    # puts
-    # puts metadata
-    # user_level_interaction_params[:metadata] = metadata
-    # puts "params"
-    # puts
-    # puts user_level_interaction_params
     @user_level_interaction = UserLevelInteraction.new(user_level_interaction_params)
     if @user_level_interaction.save
       render json: {message: "Successfully created UserLevelInteraction.", id: @user_level_interaction.id}, status: :created

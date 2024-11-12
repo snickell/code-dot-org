@@ -3,6 +3,6 @@ export interface UserLevelInteraction {
   scriptId: number;
   schoolYear: string;
   interaction: string;
-  code_version: string;
+  codeVersion: string;
   metadata: JSON;
 }
