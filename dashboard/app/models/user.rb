@@ -166,7 +166,7 @@ class User < ApplicationRecord
     failed_attempts
     locked_at
     has_seen_ai_assessments_announcement
-    seen_csd3_ta_scores_map
+    seen_ta_scores_map
     roster_synced
   )
 

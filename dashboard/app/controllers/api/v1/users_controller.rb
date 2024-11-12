@@ -365,17 +365,17 @@ class Api::V1::UsersController < Api::V1::JSONApiController
   # POST /api/v1/users/<user_id>/set_seen_ta_scores
   def set_seen_ta_scores
     return head :unauthorized unless current_user&.teacher?
-    seen_csd3_ta_scores_map = current_user.seen_csd3_ta_scores_map || {}
-    seen_csd3_ta_scores_map[params[:lesson_position]] = true
-    current_user.update!(seen_csd3_ta_scores_map: seen_csd3_ta_scores_map)
+    seen_ta_scores_map = current_user.seen_ta_scores_map || {}
+    seen_ta_scores_map[params[:lesson_position]] = true
+    current_user.update!(seen_ta_scores_map: seen_ta_scores_map)
     head :no_content
   end
 
   # GET /api/v1/users/<user_id>/get_seen_ta_scores?lesson_position=<lesson_position>
   def get_seen_ta_scores
     return head :unauthorized unless current_user&.teacher?
-    seen_csd3_ta_scores_map = current_user.seen_csd3_ta_scores_map || {}
-    render json: {seen: !!seen_csd3_ta_scores_map[params[:lesson_position]]}
+    seen_ta_scores_map = current_user.seen_ta_scores_map || {}
+    render json: {seen: !!seen_ta_scores_map[params[:lesson_position]]}
   end
 
   # Expects a param with the key "g-recaptcha-response" that is used

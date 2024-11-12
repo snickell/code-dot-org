@@ -387,7 +387,7 @@ class Api::V1::UsersControllerTest < ActionController::TestCase
 
     post :set_seen_ta_scores, params: params
     assert_response :success
-    assert_equal({lesson.absolute_position.to_s => true}, teacher.reload.seen_csd3_ta_scores_map)
+    assert_equal({lesson.absolute_position.to_s => true}, teacher.reload.seen_ta_scores_map)
 
     get :get_seen_ta_scores, params: params
     assert_response :success
