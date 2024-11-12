@@ -1,13 +1,14 @@
 import {PopUpButton} from '@codebridge/PopUpButton/PopUpButton';
-import {PopUpButtonOption} from '@codebridge/PopUpButton/PopUpButtonOption';
 import React from 'react';
+
+import codebridgeI18n from '@cdo/apps/codebridge/locale';
+import {ActionDropdownOption} from '@cdo/apps/componentLibrary/dropdown/actionDropdown';
 
 import {
   DropdownOptionType,
   FileBrowserIconComponentType,
   FileBrowserNameComponentType,
   FileBrowserRowItemType,
-  ItemRowProps,
 } from './types';
 
 import moduleStyles from '../styles/filebrowser.module.scss';
@@ -49,6 +50,20 @@ export const ItemRow: React.FunctionComponent<ItemRowProps> = ({
   NameComponent,
   openFunction,
 }) => {
+  const getDropdownOptions = () => {
+    return dropdownOptions
+      .map(({condition, iconName, labelText, clickHandler, id}) => {
+        const option: ActionDropdownOption = {
+          onClick: clickHandler,
+          icon: {iconName, iconStyle: 'solid'},
+          label: labelText,
+          value: labelText,
+        };
+        return condition ? option : null;
+      })
+      .filter(option => option !== null);
+  };
+
   return (
     <div className={moduleStyles.row} id={`uitest-file-${item.id}-row`}>
       <div className={moduleStyles.label} onClick={() => openFunction(item.id)}>
@@ -61,33 +76,9 @@ export const ItemRow: React.FunctionComponent<ItemRowProps> = ({
           className={moduleStyles['button-kebab']}
           //id={`uitest-file-${item.id}-kebab`}
           // todo fix this
-          options={dropdownOptions.map(
-            ({condition, iconName, labelText, clickHandler, id}) =>
-              condition && {
-                onClick: clickHandler,
-                icon: {iconName, iconStyle: 'solid'},
-                label: labelText,
-              }
-          )}
-        >
-          <span
-            className={moduleStyles['button-bar']}
-            id={`uitest-file-${item.id}-popup`}
-          >
-            {dropdownOptions.map(
-              ({condition, iconName, labelText, clickHandler, id}) =>
-                condition && (
-                  <PopUpButtonOption
-                    key={labelText}
-                    iconName={iconName}
-                    labelText={labelText}
-                    clickHandler={clickHandler}
-                    id={id}
-                  />
-                )
-            )}
-          </span>
-        </PopUpButton>
+          options={getDropdownOptions()}
+          labelText={codebridgeI18n.fileOptions()}
+        />
       )}
     </div>
   );

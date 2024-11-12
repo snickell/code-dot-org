@@ -1,7 +1,6 @@
 import {useCodebridgeContext} from '@codebridge/codebridgeContext';
 import {DEFAULT_FOLDER_ID} from '@codebridge/constants';
 import {PopUpButton} from '@codebridge/PopUpButton/PopUpButton';
-import {PopUpButtonOption} from '@codebridge/PopUpButton/PopUpButtonOption';
 import React from 'react';
 
 import codebridgeI18n from '@cdo/apps/codebridge/locale';
@@ -30,27 +29,31 @@ export const FileBrowserHeaderPopUpButton = () => {
   return (
     <>
       <FileUploaderComponent />
-      <PopUpButton iconName="plus" alignment="left" id="uitest-files-plus">
-        <PopUpButtonOption
-          iconName="plus"
-          labelText={codebridgeI18n.newFolder()}
-          clickHandler={() =>
-            openNewFolderPrompt({parentId: DEFAULT_FOLDER_ID})
-          }
-        />
-        <PopUpButtonOption
-          iconName="plus"
-          labelText={codebridgeI18n.newFile()}
-          clickHandler={() => openNewFilePrompt({folderId: DEFAULT_FOLDER_ID})}
-          id="uitest-new-file"
-        />
-
-        <PopUpButtonOption
-          iconName="upload"
-          labelText={codebridgeI18n.uploadFile()}
-          clickHandler={() => startFileUpload()}
-        />
-      </PopUpButton>
+      <PopUpButton
+        iconName="plus"
+        alignment="left"
+        labelText={codebridgeI18n.manageFilesAndFolders()}
+        options={[
+          {
+            icon: {iconName: 'plus', iconStyle: 'solid'},
+            label: codebridgeI18n.newFolder(),
+            onClick: () => openNewFolderPrompt({parentId: DEFAULT_FOLDER_ID}),
+            value: codebridgeI18n.newFolder(),
+          },
+          {
+            icon: {iconName: 'plus', iconStyle: 'solid'},
+            label: codebridgeI18n.newFile(),
+            onClick: () => openNewFilePrompt({folderId: DEFAULT_FOLDER_ID}),
+            value: codebridgeI18n.newFile(),
+          },
+          {
+            icon: {iconName: 'upload', iconStyle: 'solid'},
+            label: codebridgeI18n.uploadFile(),
+            onClick: startFileUpload,
+            value: codebridgeI18n.uploadFile(),
+          },
+        ]}
+      />
     </>
   );
 };
