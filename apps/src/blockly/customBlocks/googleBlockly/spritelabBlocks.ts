@@ -320,8 +320,12 @@ export const blocks = {
 
       // Translate all the inner blocks within the current block into code
       const branch = generator.statementToCode(block, 'STACK');
+      // Sprite Lab behavior blocks do not have return inputs, but this check is included
+      // in case we'd like to support that in the future.
       let returnValue =
-        generator.valueToCode(block, 'RETURN', Order.NONE) || '';
+        (block.getInput('RETURN') &&
+          generator.valueToCode(block, 'RETURN', Order.NONE)) ||
+        '';
 
       // Contains the same code as xfix1 if both are present, but applied before the return statement
       let xfix2 = '';
