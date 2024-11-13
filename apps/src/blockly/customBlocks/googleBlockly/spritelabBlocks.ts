@@ -14,7 +14,7 @@ import {
 import {BLOCK_TYPES, NO_OPTIONS_MESSAGE} from '@cdo/apps/blockly/constants';
 import {
   ExtendedBlockSvg,
-  javascriptGeneratorType,
+  JavascriptGeneratorType,
   ProcedureBlock,
 } from '@cdo/apps/blockly/types';
 import {FALSEY_DEFAULT, readBooleanAttribute} from '@cdo/apps/blockly/utils';
@@ -281,7 +281,7 @@ export const blocks = {
     const generator = Blockly.getGenerator();
     generator.forBlock.behavior_definition = function (
       _block: GoogleBlockly.Block,
-      generator: javascriptGeneratorType
+      generator: JavascriptGeneratorType
     ): string | [string, number] | null {
       const block = _block as ProcedureBlock;
       if (!generator.nameDB_) {
