@@ -151,7 +151,7 @@ export interface BlocklyWrapperType extends GoogleBlocklyType {
     blockspace: GoogleBlockly.Workspace,
     handler: (e: GoogleBlockly.Events.Abstract) => void
   ) => void;
-  getGenerator: () => ExtendedJavascriptGenerator | JavascriptGeneratorType;
+  getGenerator: () => ExtendedJavascriptGenerator;
   addEmbeddedWorkspace: (workspace: GoogleBlockly.Workspace) => void;
   isEmbeddedWorkspace: (workspace: GoogleBlockly.Workspace) => boolean;
   findEmptyContainerBlock: (
