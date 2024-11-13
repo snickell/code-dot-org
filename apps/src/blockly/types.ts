@@ -112,7 +112,7 @@ export interface BlocklyWrapperType extends GoogleBlocklyType {
   FieldColour: typeof FieldColour;
   FieldVariable: typeof CdoFieldVariable;
   FieldParameter: typeof CdoFieldParameter;
-  JavaScript: javascriptGeneratorType;
+  JavaScript: JavascriptGeneratorType;
   assetUrl: (path: string) => string;
   customSimpleDialog: (config: object) => void;
   levelBlockIds: Set<string>;
@@ -151,7 +151,7 @@ export interface BlocklyWrapperType extends GoogleBlocklyType {
     blockspace: GoogleBlockly.Workspace,
     handler: (e: GoogleBlockly.Events.Abstract) => void
   ) => void;
-  getGenerator: () => ExtendedJavascriptGenerator | javascriptGeneratorType;
+  getGenerator: () => ExtendedJavascriptGenerator | JavascriptGeneratorType;
   addEmbeddedWorkspace: (workspace: GoogleBlockly.Workspace) => void;
   isEmbeddedWorkspace: (workspace: GoogleBlockly.Workspace) => boolean;
   findEmptyContainerBlock: (
@@ -455,10 +455,10 @@ export type PointerMetadataMap = {
 
 export type BlockColor = [number, number, number];
 
-export type javascriptGeneratorType = typeof javascriptGenerator;
+export type JavascriptGeneratorType = typeof javascriptGenerator;
 export interface ExtendedJavascriptGenerator
   extends ExtendedCodeGenerator,
-    javascriptGeneratorType {
+    JavascriptGeneratorType {
   nameDB_: GoogleBlockly.Names | undefined;
   forBlock: Record<
     string,

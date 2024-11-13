@@ -14,7 +14,7 @@ import {
 import {BLOCK_TYPES, NO_OPTIONS_MESSAGE} from '@cdo/apps/blockly/constants';
 import {
   ExtendedBlockSvg,
-  javascriptGeneratorType,
+  JavascriptGeneratorType,
   ProcedureBlock,
 } from '@cdo/apps/blockly/types';
 import {FALSEY_DEFAULT, readBooleanAttribute} from '@cdo/apps/blockly/utils';
@@ -281,7 +281,7 @@ export const blocks = {
     const generator = Blockly.getGenerator();
     generator.forBlock.behavior_definition = function (
       _block: GoogleBlockly.Block,
-      generator: javascriptGeneratorType
+      generator: JavascriptGeneratorType
     ): string | [string, number] | null {
       const block = _block as ProcedureBlock;
       if (!generator.nameDB_) {
@@ -320,8 +320,12 @@ export const blocks = {
 
       // Translate all the inner blocks within the current block into code
       const branch = generator.statementToCode(block, 'STACK');
+      // Sprite Lab behavior blocks do not have return inputs, but this check is included
+      // in case we'd like to support that in the future.
       let returnValue =
-        generator.valueToCode(block, 'RETURN', Order.NONE) || '';
+        (block.getInput('RETURN') &&
+          generator.valueToCode(block, 'RETURN', Order.NONE)) ||
+        '';
 
       // Contains the same code as xfix1 if both are present, but applied before the return statement
       let xfix2 = '';
