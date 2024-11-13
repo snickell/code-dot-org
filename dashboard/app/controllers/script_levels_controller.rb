@@ -182,6 +182,11 @@ class ScriptLevelsController < ApplicationController
       end
     end
 
+    if @level.game == Game.pythonlab
+      response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
+      response.headers['Cross-Origin-Embedder-Policy'] = 'credentialless'
+    end
+
     @body_classes = @level.properties['background']
 
     @rubric = @script_level.lesson.rubric
