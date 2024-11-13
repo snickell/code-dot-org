@@ -184,7 +184,7 @@ class ScriptLevelsController < ApplicationController
 
     if @level.game == Game.pythonlab
       response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
-      response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
+      response.headers['Cross-Origin-Embedder-Policy'] = 'credentialless'
     end
 
     @body_classes = @level.properties['background']
