@@ -13,11 +13,7 @@ module Services
       def call
         ActiveRecord::Base.transaction do
           user.authentication_options << rehydrated_user.authentication_options.first
-          if rehydrated_user.lti_user_identities.empty?
-            Services::Lti.create_lti_user_identity(user)
-          else
-            user.lti_user_identities << rehydrated_user.lti_user_identities.first
-          end
+          Services::Lti.create_lti_user_identity(user)
           @lti_integration = user.lti_user_identities.first.lti_integration
           handle_sections(rehydrated_user, user)
           user.lti_roster_sync_enabled = true if user.teacher?
