@@ -1,0 +1,19 @@
+{
+  "name": "@code-dot-org/css-poc",
+  "version": "0.0.0",
+  "type": "module",
+  "files": [
+    "*.scss"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/code-dot-org/design-system-poc-turborepo.git",
+    "directory": "packages/ui"
+  },
+  "bugs": {
+    "url": "https://github.com/code-dot-org/design-system"
+  }
+}

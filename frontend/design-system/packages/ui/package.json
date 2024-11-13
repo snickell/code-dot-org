@@ -1,0 +1,47 @@
+{
+  "name": "@code-dot-org/ui-poc",
+  "version": "0.0.8",
+  "homepage": "https://code.org",
+  "license": "Apache-2.0",
+  "main": "components/index.ts",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/code-dot-org/design-system-poc-turborepo.git",
+    "directory": "packages/ui"
+  },
+  "bugs": {
+    "url": "https://github.com/code-dot-org/design-system"
+  },
+  "scripts": {
+    "build": "tsup --dts",
+    "build:fast": "tsup",
+    "dev": "yarn build:fast --watch",
+    "clean": "rimraf dist .turbo",
+    "typecheck": "tsc --noEmit",
+    "prepack": "clean-package",
+    "postpack": "clean-package restore"
+  },
+  "peerDependencies": {
+    "react": ">=16",
+    "react-dom": ">=16"
+  },
+  "dependencies": {
+    "classnames": "^2.5.1",
+    "react-bootstrap": "^2.10.5"
+  },
+  "devDependencies": {
+    "@code-dot-org/css-poc": "workspace:*",
+    "clean-package": "2.2.0",
+    "postcss-modules": "^6.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "clean-package": "./clean-package.config.js"
+}

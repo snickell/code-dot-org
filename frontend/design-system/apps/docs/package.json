@@ -1,0 +1,29 @@
+{
+  "name": "@cdo-ui/docs",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@playwright/test": "^1.48.2",
+    "@storybook/addon-essentials": "^8.4.1",
+    "@storybook/addon-interactions": "^8.4.1",
+    "@storybook/addon-onboarding": "^8.4.1",
+    "@storybook/addon-styling-webpack": "^1.0.1",
+    "@storybook/addon-webpack5-compiler-swc": "^1.0.5",
+    "@storybook/blocks": "^8.4.1",
+    "@storybook/react": "^8.4.1",
+    "@storybook/react-webpack5": "^8.4.1",
+    "@storybook/test": "^8.4.1",
+    "@storybook/test-runner": "^0.19.1",
+    "@types/jest-image-snapshot": "^6",
+    "jest-image-snapshot": "^6.4.0",
+    "sass-loader": "^16.0.3",
+    "storybook": "^8.4.1"
+  },
+  "scripts": {
+    "dev": "yarn run storybook",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "test-storybook": "test-storybook --url http://localhost:6006"
+  }
+}
