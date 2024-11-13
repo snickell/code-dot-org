@@ -42,6 +42,10 @@ def studio_url(path = '')
   "//#{canonical_hostname('studio.code.org')}#{port}/#{path}"
 end
 
+def webpack_asset_path(asset)
+  studio_url(AssetHelper.instance.webpack_asset_path(asset))
+end
+
 def code_org_url(path = '')
   port = (!rack_env?(:development) || CDO.https_development) ? '' : ":#{CDO.pegasus_port}"
   "//#{canonical_hostname('code.org')}#{port}/#{path}"
