@@ -90,6 +90,7 @@
   position: fixed;
   left: 86px;
   bottom: 55px;
+  z-index: 2000;
 
   display: flex;
   width: 300px;
@@ -146,7 +147,7 @@
 .rubricContainer {
   position: fixed;
   left: 10px;
-  bottom: 120px;
+  bottom: 123px;
   z-index: 2000;
   width: 760px;
 }
