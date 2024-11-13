@@ -38,7 +38,9 @@ async function loadPyodideAndPackages() {
   });
   pyodide.setStdout(getStreamHandlerOptions('sysout'));
   pyodide.setStderr(getStreamHandlerOptions('syserr'));
-  pyodide.setStdin(new PyodideStdinHandler());
+  if (self.isSecureContext) {
+    pyodide.setStdin(new PyodideStdinHandler());
+  }
   // Warm up the pyodide environment by running setup code.
   await runInternalCode(SETUP_CODE, -1);
 }
