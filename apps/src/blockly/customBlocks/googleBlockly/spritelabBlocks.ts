@@ -14,7 +14,7 @@ import {
 import {BLOCK_TYPES, NO_OPTIONS_MESSAGE} from '@cdo/apps/blockly/constants';
 import {
   ExtendedBlockSvg,
-  JavascriptGeneratorType,
+  ExtendedJavascriptGenerator,
   ProcedureBlock,
 } from '@cdo/apps/blockly/types';
 import {FALSEY_DEFAULT, readBooleanAttribute} from '@cdo/apps/blockly/utils';
@@ -281,7 +281,7 @@ export const blocks = {
     const generator = Blockly.getGenerator();
     generator.forBlock.behavior_definition = function (
       _block: GoogleBlockly.Block,
-      generator: JavascriptGeneratorType
+      generator: GoogleBlockly.CodeGenerator
     ): string | [string, number] | null {
       const block = _block as ProcedureBlock;
       if (!generator.nameDB_) {
@@ -361,7 +361,11 @@ export const blocks = {
         xfix2 +
         returnValue +
         '}';
-      code = generator.scrub_(block, code);
+      // Once we are on V11, we can remove this cast as scrub_ will no longer be protected.
+      code = (generator as unknown as ExtendedJavascriptGenerator).scrub_(
+        block,
+        code
+      );
       // Add % so as not to collide with helper functions in definitions list.
       generator.provideFunction_('%' + funcName, code);
       return null;

@@ -105,6 +105,7 @@ import {
   ExtendedBlocklyOptions,
   ExtendedConnection,
   ExtendedInput,
+  ExtendedJavascriptGenerator,
   ExtendedVariableMap,
   ExtendedWorkspace,
   ExtendedWorkspaceSvg,
@@ -627,7 +628,9 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
   (blocklyWrapper.Flyout as any).configure = function () {};
 
   blocklyWrapper.getGenerator = function () {
-    return this.JavaScript;
+    // Additional methods are added to the generator when initializeGenerator is called,
+    // So it is safe to cast as unknown here.
+    return this.JavaScript as unknown as ExtendedJavascriptGenerator;
   };
 
   blocklyWrapper.inputTypes = blocklyInstance.inputs.inputTypes;
