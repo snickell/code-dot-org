@@ -12,11 +12,13 @@ export interface PyodideMessage {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   message: any;
   id: number;
+  buffer?: SharedArrayBuffer;
 }
 
 export type MessageType =
   | 'sysout'
   | 'syserr'
+  | 'stdin'
   | 'updated_source'
   | 'run_complete'
   | 'error'
