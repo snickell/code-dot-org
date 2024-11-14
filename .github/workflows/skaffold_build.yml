@@ -126,7 +126,6 @@ jobs:
       - name: Cheap Skaffold Build
         run: |
           echo "This build should ideally build from the cache?"
-          #export BUILDKIT_INLINE_CACHE=1
           skaffold build -f cheapskaffold.yaml -v debug --push --tag $DOCKER_TAG
 
       # - name: ssh into the runner
