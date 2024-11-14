@@ -146,13 +146,13 @@ jobs:
           
           echo "first"
           skaffold \
-            # can we put a comment here?
+            # can we put a comment here? \
             build \
             -v info \
             --push \
             && true
           echo "Seccccconnnnnnnnd"
-          skaffold build -v info --push
+          # skaffold build -v info --push
           echo "last"
           false
           find ~/.skaffold/cache
