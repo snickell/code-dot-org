@@ -209,10 +209,6 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
     blocklyInstance
   ) as BlocklyWrapperType;
 
-  blocklyWrapper.ALIGN_CENTRE = blocklyInstance.inputs.Align.CENTRE;
-  blocklyWrapper.ALIGN_LEFT = blocklyInstance.inputs.Align.LEFT;
-  blocklyWrapper.ALIGN_RIGHT = blocklyInstance.inputs.Align.RIGHT;
-
   blocklyWrapper.setInfiniteLoopTrap = function () {
     Blockly.JavaScript.INFINITE_LOOP_TRAP = INFINITE_LOOP_TRAP;
   };
@@ -409,6 +405,10 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
   SETTABLE_PROPERTIES.forEach(property =>
     blocklyWrapper.wrapSettableProperty(property)
   );
+
+  blocklyWrapper.ALIGN_CENTRE = blocklyWrapper.inputs.Align.CENTRE;
+  blocklyWrapper.ALIGN_LEFT = blocklyWrapper.inputs.Align.LEFT;
+  blocklyWrapper.ALIGN_RIGHT = blocklyWrapper.inputs.Align.RIGHT;
 
   // Allows for dynamically setting the workspace theme with workspace.setTheme()
   blocklyWrapper.themes = {
