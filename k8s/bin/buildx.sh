@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # This script demonstrates how to use `docker buildx` to build container
 # images for the linux/amd64 and linux/arm64 platforms.  It creates a
 # `docker buildx` builder instance when required.
