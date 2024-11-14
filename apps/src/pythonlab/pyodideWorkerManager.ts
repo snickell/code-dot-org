@@ -17,6 +17,7 @@ import {MATPLOTLIB_IMG_TAG} from './pythonHelpers/patches';
 import {PyodideMessage} from './types';
 
 let callbacks: {[key: number]: (event: PyodideMessage) => void} = {};
+let inputServiceWorker: ServiceWorker | undefined;
 
 const setUpPyodideWorker = () => {
   // @ts-expect-error because TypeScript does not like this syntax.
@@ -24,7 +25,7 @@ const setUpPyodideWorker = () => {
 
   callbacks = {};
 
-  worker.onmessage = event => {
+  worker.onmessage = async event => {
     const {type, id, message} = event.data as PyodideMessage;
     const onSuccess = callbacks[id];
     switch (type) {
@@ -79,6 +80,54 @@ const setUpPyodideWorker = () => {
         );
         break;
     }
+
+    if ('serviceWorker' in navigator) {
+      try {
+        const url = new URL(
+          '/pythonHelpers/inputServiceWorker',
+          // @ts-expect-error because TypeScript does not like this syntax.
+          import.meta.url
+        );
+        const registration = await navigator.serviceWorker.register(url);
+        if (registration.active) {
+          console.debug('Service worker active');
+          inputServiceWorker = registration.active;
+        }
+
+        registration.addEventListener('updatefound', () => {
+          const installingWorker = registration.installing;
+          if (installingWorker) {
+            console.debug('Installing new service worker');
+            installingWorker.addEventListener('statechange', () => {
+              if (installingWorker.state === 'installed') {
+                console.debug('New service worker installed');
+                inputServiceWorker = installingWorker;
+              }
+            });
+          }
+        });
+      } catch (error) {
+        console.error(`Registration failed with ${error}`);
+      }
+
+      navigator.serviceWorker.onmessage = event => {
+        if (event.data.type === 'CDO_PY_AWAITING_INPUT') {
+          if (event.source instanceof ServiceWorker) {
+            // Update the service worker reference, in case the service worker is different to the one we registered
+            inputServiceWorker = event.source;
+          }
+          // TODO: get input from the user here
+          // setWorkerAwaitingInputIds(prev => new Set(prev).add(event.data.id));
+          // setWorkerAwaitingInputPrompt(prev => {
+          //   const next = new Map(prev);
+          //   next.set(event.data.id, event.data.prompt);
+          //   return next;
+          // });
+        }
+      };
+    } else {
+      console.error('Service workers not supported');
+    }
   };
 
   return worker;
@@ -121,4 +170,33 @@ const restartPyodideIfProgramIsRunning = () => {
   }
 };
 
-export {asyncRun, restartPyodideIfProgramIsRunning};
+const sendInput = (id: string, value: string): void => {
+  // if (!workerAwaitingInputIds.has(id)) {
+  //   console.error('Worker not awaiting input')
+  //   return
+  // }
+
+  if (!inputServiceWorker) {
+    console.error('No service worker registered');
+    return;
+  }
+
+  inputServiceWorker.postMessage({
+    type: 'CDO_PY_INPUT',
+    id,
+    value,
+  });
+
+  // setWorkerAwaitingInputIds(prev => {
+  //   const next = new Set(prev);
+  //   next.delete(id);
+  //   return next;
+  // });
+  // setWorkerAwaitingInputPrompt(prev => {
+  //   const next = new Map(prev);
+  //   next.delete(id);
+  //   return next;
+  // });
+};
+
+export {asyncRun, restartPyodideIfProgramIsRunning, sendInput};

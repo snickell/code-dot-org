@@ -4,7 +4,7 @@ import {loadPyodide, PyodideInterface, version} from 'pyodide';
 import {MAIN_PYTHON_FILE} from '@cdo/apps/lab2/constants';
 
 import {HOME_FOLDER} from './pythonHelpers/constants';
-import {SETUP_CODE} from './pythonHelpers/patches';
+import {cdoPyModule, patchInputCode, SETUP_CODE} from './pythonHelpers/patches';
 import {
   getCleanupCode,
   getUpdatedSourceAndDeleteFiles,
@@ -37,6 +37,7 @@ async function loadPyodideAndPackages() {
   });
   pyodide.setStdout(getStreamHandlerOptions('sysout'));
   pyodide.setStderr(getStreamHandlerOptions('syserr'));
+  pyodide.registerJsModule('cdo_py', cdoPyModule);
   // Warm up the pyodide environment by running setup code.
   await runInternalCode(SETUP_CODE, -1);
 }
@@ -86,6 +87,7 @@ onmessage = async event => {
   try {
     writeSource(sourceToWrite, DEFAULT_FOLDER_ID, '', pyodide);
     await importPackagesFromFiles(sourceToWrite, pyodide);
+    await runInternalCode(patchInputCode(id), id);
     results = await pyodide.runPythonAsync(python, {
       filename: `/${HOME_FOLDER}/${MAIN_PYTHON_FILE}`,
     });
