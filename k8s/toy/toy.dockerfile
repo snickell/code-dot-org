@@ -1,8 +1,7 @@
 # syntax=docker/dockerfile:1
 
-ARG CHEAP_BASE
-
-FROM $CHEAP_BASE AS toy-base
+ARG TOY_BASE
+FROM $TOY_BASE AS toy-base
 
 FROM toy-base as toy-1
 COPY k8s/toy/toy-1.txt toy-1.txt
