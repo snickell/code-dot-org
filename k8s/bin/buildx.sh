@@ -29,6 +29,6 @@ if [ "$PUSH_IMAGE" = true ]; then
 fi
 
 set -x # show the command
-docker image ls
+docker image ls --digests --format '{{.Repository}}:{{.Tag}}@{{.Digest}} | ID: {{.ID}} | Created: {{.CreatedSince}} | Size: {{.Size}}'
 docker buildx build --load --tag $IMAGE $args $cache_from $cache_to "$BUILD_CONTEXT" $@
-docker image ls
+docker image ls --digests --format '{{.Repository}}:{{.Tag}}@{{.Digest}} | ID: {{.ID}} | Created: {{.CreatedSince}} | Size: {{.Size}}'
