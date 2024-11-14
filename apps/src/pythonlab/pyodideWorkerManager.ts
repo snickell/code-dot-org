@@ -120,13 +120,8 @@ const setUpPyodideWorker = () => {
             inputServiceWorker = event.source;
           }
           lastInputId = event.data.id;
-          // TODO: get input from the user here
-          // setWorkerAwaitingInputIds(prev => new Set(prev).add(event.data.id));
-          // setWorkerAwaitingInputPrompt(prev => {
-          //   const next = new Map(prev);
-          //   next.set(event.data.id, event.data.prompt);
-          //   return next;
-          // });
+          // TODO: do we need to support waiting for multiple inputs at once?? Do we want to be smarter
+          // about only accepting input when we are awaiting a response?
         }
       };
     } else {
@@ -176,10 +171,10 @@ const restartPyodideIfProgramIsRunning = () => {
 
 const sendInput = (value: string): void => {
   console.log('sending input?');
-  // if (!workerAwaitingInputIds.has(id)) {
-  //   console.error('Worker not awaiting input')
-  //   return
-  // }
+  if (lastInputId < 0) {
+    console.error('Worker not awaiting input');
+    return;
+  }
 
   if (!inputServiceWorker) {
     console.error('No service worker registered');
@@ -191,17 +186,7 @@ const sendInput = (value: string): void => {
     value,
     id: lastInputId,
   });
-
-  // setWorkerAwaitingInputIds(prev => {
-  //   const next = new Set(prev);
-  //   next.delete(id);
-  //   return next;
-  // });
-  // setWorkerAwaitingInputPrompt(prev => {
-  //   const next = new Map(prev);
-  //   next.delete(id);
-  //   return next;
-  // });
+  lastInputId = -1;
 };
 
 export {asyncRun, restartPyodideIfProgramIsRunning, sendInput};
