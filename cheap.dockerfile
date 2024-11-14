@@ -8,4 +8,4 @@ RUN touch cheap.txt && echo "RUN post cheap"
 
 COPY cheap2.txt cheap2.txt
 
-RUN touch cheap2.txt && echo "RUN post cheap2"
+RUN touch cheap2.txt && echo "RUNnn post cheap2"
