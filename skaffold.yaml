@@ -43,10 +43,10 @@ build:
           path: k8s/docker/code-dot-org-static.dockerfile
   - image: code-dot-org-db-seed
     custom:
-      buildCommand: k8s/bin/buildx.sh -f k8s/docker/code-dot-org-seed.dockerfile
+      buildCommand: k8s/bin/buildx.sh -f k8s/docker/code-dot-org-db-seed.dockerfile
       dependencies:
         dockerfile:
-          path: k8s/docker/code-dot-org-seed.dockerfile
+          path: k8s/docker/code-dot-org-db-seed.dockerfile
 
 deploy:
   helm:
