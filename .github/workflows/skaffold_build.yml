@@ -21,7 +21,7 @@ jobs:
       - name: Set ENV vars
         run: |
           lscpu
-          free -f
+          free -h
           echo "SKAFFOLD_DEFAULT_REPO=$SKAFFOLD_DEFAULT_REPO"
           echo "GITHUB_WORKFLOW=${GITHUB_WORKFLOW}"
 
