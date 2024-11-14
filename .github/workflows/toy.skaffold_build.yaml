@@ -2,7 +2,7 @@ name: toy
 on: [push]
 jobs:
   build:
-    # if: false # disable toy build, useful for debugging skaffold + docker buildx, including caching of layers etc
+    if: false # disable toy build, useful for debugging skaffold + docker buildx, including caching of layers etc
     name: toy build
     runs-on: ubuntu-latest
     env:
