@@ -8,7 +8,7 @@
 #  (1) delete the buildx builder named `skaffold-builder`, and
 #  (2) update the corresponding node-affinities in k8s/pod.yaml.
 
-NATIVE_PLATFORM=$(docker info --format '{{.OSType}}/{{.Architecture}}')
+NATIVE_PLATFORM=$(docker info --format '{{.OSType}}/{{.Architecture}}' | sed 's/aarch64/arm64/')
 PLATFORMS=${PLATFORMS:=$NATIVE_PLATFORM}
 
 for platform in ${PLATFORMS//,/ }; do
@@ -27,5 +27,7 @@ else
   args="--load"
 fi
 
+DOCKERFILE=${1:-"$BUILD_CONTEXT/Dockerfile"}
+
 set -x # show the command
-docker buildx build --tag $IMAGE $args "$BUILD_CONTEXT"
+docker buildx build -f "$DOCKERFILE" --tag $IMAGE $args "$BUILD_CONTEXT"

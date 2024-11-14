@@ -6,13 +6,14 @@ build:
       ignoreChanges: true
   artifacts:
   - image: cheap
-    docker:
-      dockerfile: ./cheap.dockerfile
-      cacheFrom:
-      - cheap
-      buildArgs:
-        push: 1
-  local:
-    useBuildkit: true
-    useDockerCLI: true
+    # docker:
+    #   dockerfile: ./cheap.dockerfile
+    #   cacheFrom:
+    #   - cheap
+    custom:
+      buildCommand: k8s/bin/buildx.sh cheap.dockerfile
+      dependencies:
+        dockerfile:
+          path: cheap.dockerfile
+
 
