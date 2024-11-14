@@ -109,13 +109,14 @@ const ChatWorkspace: React.FunctionComponent<ChatWorkspaceProps> = ({
     {
       value: 'viewStudentChatHistory',
       text:
-        // TODO: Seems multiple tabs share a hidden "view only" functionality
-        // Investigate if it makes sense to use a common localization function for this
-        `${selectedStudentName}'s chat history` +
-        (selectedTab === WorkspaceTeacherViewTab.STUDENT_CHAT_HISTORY
-          ? ' (view only)'
-          : ''),
-
+        // `${selectedStudentName}'s chat history + '(view only)' || ''
+        selectedTab === WorkspaceTeacherViewTab.STUDENT_CHAT_HISTORY
+          ? aichatI18n.viewOnlyTabLabel({
+              fieldLabel: aichatI18n.viewStudentChatHistory(),
+            })
+          : aichatI18n.viewStudentChatHistory({
+              selectedStudentName: selectedStudentName ?? '',
+            }),
       tabContent: (
         <ChatEventsList events={studentChatHistory} isTeacherView={true} />
       ),
