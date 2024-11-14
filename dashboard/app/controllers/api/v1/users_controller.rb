@@ -365,8 +365,10 @@ class Api::V1::UsersController < Api::V1::JSONApiController
   # POST /api/v1/users/set_seen_ta_scores
   def set_seen_ta_scores
     return head :unauthorized unless current_user&.teacher?
+    return head :bad_request if params[:lesson_id].blank?
+    return head :bad_request unless params[:lesson_id].to_i > 0
     seen_ta_scores_map = current_user.seen_ta_scores_map || {}
-    seen_ta_scores_map[params[:lesson_id]] = true
+    seen_ta_scores_map[params[:lesson_id].to_i.to_s] = true
     current_user.update!(seen_ta_scores_map: seen_ta_scores_map)
     head :no_content
   end
