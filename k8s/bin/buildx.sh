@@ -8,11 +8,6 @@
 #  (1) delete the buildx builder named `skaffold-builder`, and
 #  (2) update the corresponding node-affinities in k8s/pod.yaml.
 
-if [ -n "$TOY_BASE" ]; then
-  echo "TOY_BASE exists, doing docker pull $TOY_BASE"
-  docker pull "$TOY_BASE"
-fi
-
 NATIVE_PLATFORM=$(docker info --format '{{.OSType}}/{{.Architecture}}' | sed -e 's/aarch64/arm64/' -e 's/x86_64/amd64/')
 PLATFORMS=${PLATFORMS:=$NATIVE_PLATFORM}
 
@@ -35,6 +30,4 @@ if [ "$PUSH_IMAGE" = true ]; then
 fi
 
 set -x # show the command
-docker image ls --digests --format '{{.Repository}}:{{.Tag}}@{{.Digest}} | ID: {{.ID}} | Created: {{.CreatedSince}} | Size: {{.Size}}'
 docker buildx build --load --tag $IMAGE $args $cache_from $cache_to "$BUILD_CONTEXT" $@
-docker image ls --digests --format '{{.Repository}}:{{.Tag}}@{{.Digest}} | ID: {{.ID}} | Created: {{.CreatedSince}} | Size: {{.Size}}'
