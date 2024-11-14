@@ -13,27 +13,15 @@ build:
         - '**/*.js'
         - '**/*.jsx'
         - '**/*.json'
-    hooks:
-      before:
-        - command:
-          - ps
-        - command:
-          - export
-          - GIT_BOO="shame on you!"
-      after:
-        - command:
-            - sh
-            - -cx
-            - |
-              echo "Env vars:"
-              export
-              echo "DONE!"
-    docker:
-      dockerfile: ./k8s/docker/code-dot-org.dockerfile
-      cacheFrom:
-      - code-dot-org
-      - docker.io/snickellcdo/code-dot-org:latest
-      # - 475661607190.dkr.ecr.us-east-1.amazonaws.com/code.org:staging
+    custom:
+      buildCommand: |
+        k8s/bin/buildx.sh -f k8s/docker/code-dot-org.dockerfile \
+          --build-arg CODE_DOT_ORG_CORE="$CODE_DOT_ORG_CORE" \
+          --build-arg CODE_DOT_ORG_DB_SEED="$CODE_DOT_ORG_DB_SEED" \
+          --build-arg CODE_DOT_ORG_STATIC="$CODE_DOT_ORG_STATIC"
+      dependencies:
+        dockerfile:
+          path: k8s/docker/code-dot-org.dockerfile
     requires:
     - image: code-dot-org-core
       alias: CODE_DOT_ORG_CORE
@@ -42,36 +30,23 @@ build:
     - image: code-dot-org-static
       alias: CODE_DOT_ORG_STATIC
   - image: code-dot-org-core
-    docker:
-      dockerfile: ./k8s/docker/code-dot-org-core.dockerfile
-      # skaffold sync only works when the user is root 😤:
-      # https://github.com/GoogleContainerTools/skaffold/issues/2479
-      # If we find a solution, we can drop this override
-      buildArgs:
-        USERNAME: root
-        UID: "0"
-        GID: "0"
-      cacheFrom:
-      - code-dot-org-core
-      - docker.io/snickellcdo/code-dot-org-core:latest
-      # - 475661607190.dkr.ecr.us-east-1.amazonaws.com/code.org-core:staging
+    custom:
+      buildCommand: k8s/bin/buildx.sh -f k8s/docker/code-dot-org-core.dockerfile
+      dependencies:
+        dockerfile:
+          path: k8s/docker/code-dot-org-core.dockerfile
   - image: code-dot-org-static
-    docker:
-      dockerfile: ./k8s/docker/code-dot-org-static.dockerfile
-      cacheFrom:
-      - code-dot-org-static
-      - docker.io/snickellcdo/code-dot-org-static:latest
-      # - 475661607190.dkr.ecr.us-east-1.amazonaws.com/code.org-static:staging
+    custom:
+      buildCommand: k8s/bin/buildx.sh -f k8s/docker/code-dot-org-static.dockerfile
+      dependencies:
+        dockerfile:
+          path: k8s/docker/code-dot-org-static.dockerfile
   - image: code-dot-org-db-seed
-    docker:
-      dockerfile: ./k8s/docker/code-dot-org-db-seed.dockerfile
-      cacheFrom:
-      - code-dot-org-db-seed
-      - docker.io/snickellcdo/code-dot-org-db-seed:latest
-      # - 475661607190.dkr.ecr.us-east-1.amazonaws.com/code.org-db-seed:staging
-  local:
-    useBuildkit: true # required for caching layers, see https://github.com/moby/moby/issues/34715#issuecomment-589655390
-    useDockerCLI: true
+    custom:
+      buildCommand: k8s/bin/buildx.sh -f k8s/docker/code-dot-org-seed.dockerfile
+      dependencies:
+        dockerfile:
+          path: k8s/docker/code-dot-org-seed.dockerfile
 
 deploy:
   helm:
@@ -82,7 +57,8 @@ deploy:
           image: "{{.IMAGE_FULLY_QUALIFIED_code_dot_org}}"
           # skaffold sync only works when the user is root 😤:
           # https://github.com/GoogleContainerTools/skaffold/issues/2479
-          # If we find a solution, we can drop this override
+          # If we find a solution, we can drop this override along with
+          # changing ARGS in code-dot-org-core.dockerfile itself.
           user.username: root
           user.uid: 0
           user.gid: 0
@@ -117,17 +93,6 @@ profiles:
     - op: add
       path: /deploy/helm/releases/0/setValueTemplates/development.hostPaths.skaffoldStorage
       value: '{{ cmd "sh" "-c" "echo $PWD/skaffoldStorage" }}'
-
-- name: no_cache_from
-  patches:
-    - op: remove
-      path: /build/artifacts/0/docker/cacheFrom
-    - op: remove
-      path: /build/artifacts/1/docker/cacheFrom
-    - op: remove
-      path: /build/artifacts/2/docker/cacheFrom
-    - op: remove
-      path: /build/artifacts/3/docker/cacheFrom
 
 - name: seed
   patches:
