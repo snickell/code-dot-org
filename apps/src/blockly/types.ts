@@ -65,7 +65,6 @@ interface AnalyticsData {
 }
 
 type GoogleBlocklyType = typeof GoogleBlockly;
-
 // Type for the Blockly instance created and modified by googleBlocklyWrapper.
 export interface BlocklyWrapperType extends GoogleBlocklyType {
   ALIGN_CENTRE: GoogleBlockly.inputs.Align.CENTRE;
@@ -130,7 +129,7 @@ export interface BlocklyWrapperType extends GoogleBlocklyType {
   // TODO: better define this type
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cdoUtils: any;
-  Generator: ExtendedGenerator;
+  Generator: ExtendedCodeGenerator;
   Xml: ExtendedXml;
   Procedures: ExtendedProcedures;
   BlockValueType: {[key: string]: string};
@@ -145,14 +144,14 @@ export interface BlocklyWrapperType extends GoogleBlocklyType {
   ) => void;
   setInfiniteLoopTrap: () => void;
   clearInfiniteLoopTrap: () => void;
-  getInfiniteLoopTrap: () => string;
+  getInfiniteLoopTrap: () => string | null;
   loopHighlight: (apiName: string, blockId: string) => string;
   getWorkspaceCode: () => string;
   addChangeListener: (
     blockspace: GoogleBlockly.Workspace,
     handler: (e: GoogleBlockly.Events.Abstract) => void
   ) => void;
-  getGenerator: () => JavascriptGeneratorType;
+  getGenerator: () => ExtendedJavascriptGenerator;
   addEmbeddedWorkspace: (workspace: GoogleBlockly.Workspace) => void;
   isEmbeddedWorkspace: (workspace: GoogleBlockly.Workspace) => boolean;
   findEmptyContainerBlock: (
@@ -284,8 +283,8 @@ export interface ExtendedWorkspace extends GoogleBlockly.Workspace {
 }
 
 type CodeGeneratorType = typeof GoogleBlockly.CodeGenerator;
-export interface ExtendedGenerator extends CodeGeneratorType {
-  xmlToCode: (name: string, domBlocks: Element) => string;
+export interface ExtendedCodeGenerator extends CodeGeneratorType {
+  xmlToCode?: (name: string, domBlocks: Element) => string;
   xmlToBlocks: (name: string, xml: Element) => GoogleBlockly.Block[];
   blockSpaceToCode: (
     name: string,
@@ -298,6 +297,8 @@ export interface ExtendedGenerator extends CodeGeneratorType {
   prefixLines: (text: string, prefix: string) => string;
   nameDB_: GoogleBlockly.Names | undefined;
   variableDB_: GoogleBlockly.Names | undefined;
+  prototype: typeof GoogleBlockly.CodeGenerator.prototype;
+  translateVarName: (name: string) => string;
 }
 
 type XmlType = typeof GoogleBlockly.Xml;
@@ -454,5 +455,16 @@ export type PointerMetadataMap = {
 
 export type BlockColor = [number, number, number];
 
-// Blockly defines this as any.
 export type JavascriptGeneratorType = typeof javascriptGenerator;
+export interface ExtendedJavascriptGenerator
+  extends ExtendedCodeGenerator,
+    JavascriptGeneratorType {
+  nameDB_: GoogleBlockly.Names | undefined;
+  forBlock: Record<
+    string,
+    (
+      block: GoogleBlockly.Block,
+      generator: GoogleBlockly.CodeGenerator
+    ) => string | [string, number] | null
+  >;
+}
