@@ -41,7 +41,9 @@ const ResourceRow: React.FC<ResourceRowProps> = ({unitNumber, resource}) => {
       <div className={styles.iconAndName}>
         <ResourceIcon resourceType={resource.type} resourceUrl={resource.url} />
         <BodyTwoText className={styles.resourceLabel}>
-          {resourceDisplayText()}
+          <a href={resource.url} target="_blank" rel="noopener noreferrer">
+            {resourceDisplayText()}
+          </a>
         </BodyTwoText>
       </div>
       <ResourceViewOptionsDropdown resource={resource} />
