@@ -1,12 +1,21 @@
 #!/bin/bash
-# This script demonstrates how to use `docker buildx` to build container
-# images for the linux/amd64 and linux/arm64 platforms.  It creates a
-# `docker buildx` builder instance when required.
+# Skaffold still doesn't have native builder support for `docker buildx`, which is
+# essential both for getting multi-platform builds AND perhaps more importantly
+# for being able to use a registry cache (or even inline cache), especially with
+# multiple source images that layer together.
 #
-# If you change the platforms, be sure to
+# Without this, every build is from scratch and is slow, because our GitHub actions
+# builder doesn't maintain a local docker cache between builds.
 #
-#  (1) delete the buildx builder named `skaffold-builder`, and
-#  (2) update the corresponding node-affinities in k8s/pod.yaml.
+# I've tested trying to hack some degree of layer caching in without using a custom
+# build command using BUILDKIT_INLINE_CACHE=1, but it only works when we replace
+# `docker build` with `docker buildx`, and then it breaks skaffold on cache hits
+# because nothing loads them back into the daemon for the next build stage, and there's
+# no way to pass --push on to them (skaffold doesn't).
+#
+# So as ugly as this is, using a custom build command with skaffold is still the
+# only real way to get layer caching + multi-stage builds, until skaffold supports
+# `docker buildx` (NOT buildkit, that's not enough) natively.
 
 NATIVE_PLATFORM=$(docker info --format '{{.OSType}}/{{.Architecture}}' | sed -e 's/aarch64/arm64/' -e 's/x86_64/amd64/')
 PLATFORMS=${PLATFORMS:=$NATIVE_PLATFORM}
