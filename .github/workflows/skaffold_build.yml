@@ -206,10 +206,11 @@ jobs:
           echo "OUTPUTS='${{ needs.build.outputs }}'"
           # Convert all outputs from build job to JSON
           DOCKER_TAGS_JSON='${{ toJSON(needs.build.outputs) }}'
+          echo DOCKER_TAGS_JSON="$DOCKER_TAGS_JSON"
 
           # Extract tags prefixed with "docker_tag_" from the JSON list
           TAGS=($(echo "$DOCKER_TAGS_JSON" | jq -r 'to_entries[] | select(.key | startswith("docker_tag_")) | .value'))
-
+          echo "TAGS=${TAGS[*]}"
           # Export tags as a space-separated list for the next step
           echo "TAGS=${TAGS[*]}" >> "$GITHUB_ENV"
 
@@ -217,6 +218,8 @@ jobs:
         run: |
           # Define the target multi-platform image tag using one of the architecture tags as the base
           MULTI_PLATFORM_TAG=ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ needs.build.outputs.docker_tag }}
+
+          echo "MULTI_PLATFORM_TAG=$MULTI_PLATFORM_TAG"
 
           # Use imagetools to stitch all platform-specific images into one multi-platform image
           docker buildx imagetools create -t "$MULTI_PLATFORM_TAG" $TAGS
