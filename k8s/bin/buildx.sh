@@ -44,7 +44,9 @@ cache_from="--cache-from type=registry,ref=$CACHE_IMAGE_NAME"
 if [ "$PUSH_IMAGE" = true ]; then
   args="--platform $PLATFORMS --push"
   cache_to="--cache-to type=registry,ref=$CACHE_IMAGE_NAME"
+else
+  args="--load"
 fi
 
 set -x # show the command
-docker buildx build --load --tag $IMAGE $args $cache_from $cache_to "$BUILD_CONTEXT" $@
+docker buildx build --tag $IMAGE $args $cache_from $cache_to "$BUILD_CONTEXT" $@

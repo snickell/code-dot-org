@@ -1,8 +1,8 @@
-name: Skaffold
+name: skaffold
 on: [push]
 jobs:
   build:
-    name: Build
+    name: build
     runs-on: ubuntu-latest
     env:
       SKAFFOLD_DEFAULT_REPO: docker.io/snickellcdo

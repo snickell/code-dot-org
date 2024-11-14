@@ -70,8 +70,7 @@ RUN \
 <<EOF
   # yarn install
   cd apps
-  CI=true yarn install --frozen-lockfile --silent
-  ls -l | grep node_modules
+  CI=true yarn install --immutable --silent
 EOF
 
 # ################################################################################
