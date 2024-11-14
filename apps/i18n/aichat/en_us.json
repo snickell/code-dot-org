@@ -59,7 +59,6 @@
   "modelCustomizationTab_setupText": "Setup",
   "modelCustomizationTab_retrievalText": "Retrieval",
   "modelCustomizationTab_modelPublishText": "Publish",
-  "modelCustomizationTab_viewOnlySuffixTag": " (view only)",
   "modelCustomizationSaveButtonText": "Save",
   "modelDescriptionPanel": "Choose a model",
   "modelResetNotification": "Model customizations and model card information have been reset to default settings.",
@@ -92,6 +91,8 @@
   "technicalInfoHeader_retrievalUsed": "Retrieval Used",
   "testStudentModel": "Test student model",
   "userViewButtonText": "User View",
+  "viewStudentChatHistory": "{selectedStudentName}'s chat history",
+  "viewOnlyTabLabel": "{fieldLabel} (view only)",
   "waitingForChatResponse": "Waiting for a response...",
   "welcomeToAichatLab": "Welcome to AI Chat Lab",
   "whatIsPersonalInformation": "What is considered personal information?"
