@@ -133,6 +133,9 @@ jobs:
             --push \
             --tag $DOCKER_TAG
 
+      - name: ssh into the runner
+        uses: mxschmitt/action-tmate@v3
+
       # - name: skaffold cache
       #   uses: actions/cache@v3
       #   with:
