@@ -14,7 +14,7 @@ export
 echo
 echo
 
-NATIVE_PLATFORM=$(docker info --format '{{.OSType}}/{{.Architecture}}' | sed 's/aarch64/arm64/')
+NATIVE_PLATFORM=$(docker info --format '{{.OSType}}/{{.Architecture}}' | sed -e 's/aarch64/arm64/' -e 's/x86_64/amd64/')
 PLATFORMS=${PLATFORMS:=$NATIVE_PLATFORM}
 
 echo "Native platform: $NATIVE_PLATFORM"
