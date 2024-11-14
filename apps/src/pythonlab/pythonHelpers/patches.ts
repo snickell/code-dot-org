@@ -17,7 +17,7 @@ __prompt_str__ = ""
 def get_input(prompt=""):
     global __prompt_str__
     __prompt_str__ = prompt
-    print(prompt, end="")
+    print(prompt)
     s = cdo_py.getInput("${id}", prompt)
     print()
     return s
@@ -29,6 +29,7 @@ export const cdoPyModule = {
   getInput: (id: string, prompt: string) => {
     const request = new XMLHttpRequest();
     // Synchronous request to be intercepted by service worker
+    console.log('opening request');
     request.open(
       'GET',
       `/cdo-py-get-input/?id=${id}&prompt=${encodeURIComponent(prompt)}`,

@@ -85,7 +85,7 @@ const setUpPyodideWorker = () => {
     if ('serviceWorker' in navigator) {
       try {
         const url = new URL(
-          './pythonHelpers/inputServiceWorker.ts',
+          './inputServiceWorker.js',
           // @ts-expect-error because TypeScript does not like this syntax.
           import.meta.url
         );
@@ -112,7 +112,9 @@ const setUpPyodideWorker = () => {
       }
 
       navigator.serviceWorker.onmessage = event => {
+        console.log(`got message in main thread with type ${event.data.type}`);
         if (event.data.type === 'CDO_PY_AWAITING_INPUT') {
+          console.log('got input request in main thread');
           if (event.source instanceof ServiceWorker) {
             // Update the service worker reference, in case the service worker is different to the one we registered
             inputServiceWorker = event.source;
@@ -173,6 +175,7 @@ const restartPyodideIfProgramIsRunning = () => {
 };
 
 const sendInput = (value: string): void => {
+  console.log('sending input?');
   // if (!workerAwaitingInputIds.has(id)) {
   //   console.error('Worker not awaiting input')
   //   return
