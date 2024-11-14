@@ -3,7 +3,7 @@ on: [push]
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: linux-arm64
     env:
       SKAFFOLD_DEFAULT_REPO: docker.io/snickellcdo
       BASE_COMMIT: 1e5e6230c17e962fc49c8f0e6b833845db816a49
