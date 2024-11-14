@@ -27,8 +27,8 @@ if [ "$PUSH_IMAGE" = true ]; then
   args="--platform $PLATFORMS --push"
   cache_to="--cache-to type=registry,ref=$IMAGE"
 else
-  args="--load"
+  # always --load so we can do multi-image builds via skaffold
 fi
 
 set -x # show the command
-docker buildx build --tag $IMAGE $args $cache_from $cache_to "$BUILD_CONTEXT" $@
+docker buildx build --load --tag $IMAGE $args $cache_from $cache_to "$BUILD_CONTEXT" $@
