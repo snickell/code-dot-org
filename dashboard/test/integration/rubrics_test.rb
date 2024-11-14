@@ -5,7 +5,9 @@ class RubricsTest < ActionDispatch::IntegrationTest
 
   setup do
     @teacher = create :authorized_teacher
-    @unit = create :script, :with_levels, lessons_count: 4, name: 'test-unit', is_course: true, family_name: 'csd', version_year: '2024'
+    sign_in @teacher
+
+    @unit = create :script, :with_levels, lessons_count: 4, name: 'test-unit'
     @first_script_level = @unit.script_levels.first
     create :rubric, lesson: @first_script_level.lesson, level: @first_script_level.levels.first
     @last_script_level = @unit.script_levels.last
@@ -13,9 +15,6 @@ class RubricsTest < ActionDispatch::IntegrationTest
   end
 
   test 'canShowTaScoresAlert is true by default' do
-    sign_in @teacher
-    CourseOffering.add_course_offering(@unit)
-
     get build_script_level_path(@first_script_level)
     assert_response :success
     rubric_data = JSON.parse(css_select('script[data-rubricdata]').first.attribute('data-rubricdata').to_s)
@@ -23,9 +22,6 @@ class RubricsTest < ActionDispatch::IntegrationTest
   end
 
   test 'set_seen_ta_scores sets canShowTaScoresAlert to false' do
-    sign_in @teacher
-    CourseOffering.add_course_offering(@unit)
-
     get build_script_level_path(@first_script_level)
     assert_response :success
     rubric_data = JSON.parse(css_select('script[data-rubricdata]').first.attribute('data-rubricdata').to_s)
@@ -49,9 +45,6 @@ class RubricsTest < ActionDispatch::IntegrationTest
   end
 
   test 'canShowTaScoresAlert is always false once seen max times' do
-    sign_in @teacher
-    CourseOffering.add_course_offering(@unit)
-
     (1..3).each do |i|
       post '/api/v1/users/set_seen_ta_scores', params: {lesson_id: @unit.lessons[i].id}
       assert_response :success
@@ -64,7 +57,7 @@ class RubricsTest < ActionDispatch::IntegrationTest
     refute rubric_data['canShowTaScoresAlert']
 
     # cannot show alert for lessons in other unit
-    unit = create :script, :with_levels, name: 'test-unit-2', is_course: true, family_name: 'csd', version_year: '2024'
+    unit = create :script, :with_levels, name: 'test-unit-2'
     script_level = unit.script_levels.first
     create :rubric, lesson: script_level.lesson, level: script_level.levels.first
     get build_script_level_path(script_level)
