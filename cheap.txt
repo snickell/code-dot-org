@@ -1,1 +1,2 @@
 yoyoyoyoyoyo
+install: true AND useDockerCLI: true
