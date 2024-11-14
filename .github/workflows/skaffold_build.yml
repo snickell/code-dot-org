@@ -137,6 +137,16 @@ jobs:
             --tag $DOCKER_TAG \
             && true
 
+          echo "The last exit status was $?"
+
+          skaffold \
+            build \
+            -v info \
+            --push \
+            --tag $DOCKER_TAG
+
+          echo "The last exit status was $?"
+
           # Disabled because it takes 5x as long on GitHub AMD64 machines:
           #   --platform=linux/arm64,linux/amd64
 
