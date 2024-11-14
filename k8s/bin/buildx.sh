@@ -28,6 +28,9 @@ for platform in ${PLATFORMS//,/ }; do
   }
 done
 
+# We --cache-to and --cache-from a different image name than we --push to
+# because the --cache image will be an OCI tarball, and docker cannot pull
+# from that. We want to use a different tag (or repo, or image) for the cache.
 CACHE_IMAGE_NAME="$IMAGE-cache"
 cache_from="--cache-from type=registry,ref=$CACHE_IMAGE_NAME"
 
