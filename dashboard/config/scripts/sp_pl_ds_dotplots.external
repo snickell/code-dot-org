@@ -22,7 +22,12 @@ markdown <<MARKDOWN
 #### 1. Click on the Graph icon to create a new graph.
 #### 2. Drag an attribute into the graph to see a dot plot.
 
+<details><summary style="font-size: 18px;"><strong>🔎 Show Me How 🔎</strong></summary> <img src="https://images.code.org/3cd39edf44e0dc6c67127910b787e636-image-1731532823495.gif">
+</details>
+
+
 <div style="clear:both;"></div>
+
 
 ---
 
@@ -32,6 +37,9 @@ markdown <<MARKDOWN
 #### Using the same CODAP link and dot plot plot you previously created, for a bar chart by:
 #### 1. Clicking the Configuration tab on the right of the bar graph.
 #### 2. Select 'Fuse Dots into Bars'
+
+<details><summary style="font-size: 18px;"><strong>🔎 Show Me How 🔎</strong></summary> <img src="https://images.code.org/a343e96165703b6c5f3819af77d15a47-image-1731532933733.gif">
+</details>
 
 <div style="clear:both;"></div>
 
@@ -44,6 +52,9 @@ markdown <<MARKDOWN
 #### Using the same CODAP link and bar chart you previously created, form a scatter plot by:
 #### 1. Selecting a unique attribute not currently used in your graph.
 #### 2. Drag the new attribute into the existing graph axis, replacing "Count".
+
+<details><summary style="font-size: 18px;"><strong>🔎 Show Me How 🔎</strong></summary> <img src="https://images.code.org/dc6b5337afc103094149798c1a6634f1-image-1731533159844.gif">
+</details>
 
 <div style="clear:both;"></div>
 
