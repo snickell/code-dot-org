@@ -210,7 +210,7 @@ export default class CdoBlockFlyout extends GoogleBlockly.HorizontalFlyout {
    *     area.
    * @override
    */
-  wouldDelete(_element: GoogleBlockly.IDraggable, _couldConnect: boolean) {
+  wouldDelete(_element: GoogleBlockly.IDraggable) {
     return false;
   }
 
