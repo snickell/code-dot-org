@@ -124,10 +124,7 @@ jobs:
 
       - name: Cheap Skaffold Build
         run: |
-          echo "Env vars:"
-          export
-          echo
-
+          export BUILDKIT_INLINE_CACHE=1
           skaffold build \
             -f cheapskaffold.yaml \
             -v info \
