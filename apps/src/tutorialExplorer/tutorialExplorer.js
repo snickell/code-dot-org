@@ -653,9 +653,6 @@ function getFilters({mobile}) {
       entries: [
         {name: 'all', text: i18n.filterGradesAll()},
         {name: 'pre', text: i18n.filterGradesPre()},
-        {name: '2-5', text: i18n.filterGrades25()},
-        {name: '6-8', text: i18n.filterGrades68()},
-        {name: '9+', text: i18n.filterGrades9()},
       ],
     },
     {

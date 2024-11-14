@@ -165,7 +165,7 @@ const styles = {
     color: 'dimgrey',
   },
   filterGroupGradeContainer: {
-    width: '68%',
+    width: '28%',
     float: 'left',
   },
   filterGroupStudentExperienceContainer: {
