@@ -31,4 +31,4 @@ else
 fi
 
 set -x # show the command
-docker buildx build --tag $IMAGE $args --output type=oci $cache_from $cache_to "$BUILD_CONTEXT" $@
+docker buildx build --tag $IMAGE $args $cache_from $cache_to "$BUILD_CONTEXT" $@
