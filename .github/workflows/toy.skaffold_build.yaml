@@ -1,8 +1,8 @@
-name: toy.skaffold.yaml
+name: toy
 on: [push]
 jobs:
   build:
-    name: Toy Build
+    name: toy build
     runs-on: ubuntu-latest
     env:
       SKAFFOLD_DEFAULT_REPO: docker.io/snickellcdo

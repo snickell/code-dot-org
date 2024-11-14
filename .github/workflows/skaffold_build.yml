@@ -2,7 +2,7 @@ name: Skaffold
 on: [push]
 jobs:
   build:
-    name: Skaffold Build
+    name: Build
     runs-on: ubuntu-latest
     #container:
       #image: gcr.io/k8s-skaffold/skaffold:v2.13.2-lts
