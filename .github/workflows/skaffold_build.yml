@@ -9,7 +9,7 @@ permissions:
 jobs:
   build:
     name: build
-    runs-on: enterprise-arm64
+    runs-on: ubuntu-latest
     env:
       SKAFFOLD_DEFAULT_REPO: ghcr.io/${{ github.repository_owner }}
       BASE_COMMIT: 1e5e6230c17e962fc49c8f0e6b833845db816a49
@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Set ENV vars
         run: |
+          lscpu
+          free -f
           echo "SKAFFOLD_DEFAULT_REPO=$SKAFFOLD_DEFAULT_REPO"
           echo "GITHUB_WORKFLOW=${GITHUB_WORKFLOW}"
 
