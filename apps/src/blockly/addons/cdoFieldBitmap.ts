@@ -38,7 +38,6 @@ export class CdoFieldBitmap extends FieldBitmap {
    * @param e Optional mouse event that triggered the field to open, or
    *    undefined if triggered programmatically.
    */
-  // eslint-disable-next-line
   protected showEditor_(this: typeof FieldBitmap, e?: Event) {
     super.showEditor_();
 
