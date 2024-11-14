@@ -8,7 +8,7 @@ module Sprockets
 
     def headers(env, asset, length)
       assets_coep_headers = {
-        'Cross-Origin-Embedder-Policy' => 'credentialless'
+        'Cross-Origin-Embedder-Policy' => 'require-corp'
       }
       original_headers(env, asset, length).merge(assets_coep_headers)
     end
