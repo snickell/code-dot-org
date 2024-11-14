@@ -26,8 +26,6 @@ cache_from="--cache-from type=registry,ref=$IMAGE"
 if [ "$PUSH_IMAGE" = true ]; then
   args="--platform $PLATFORMS --push"
   cache_to="--cache-to type=registry,ref=$IMAGE"
-else
-  # always --load so we can do multi-image builds via skaffold
 fi
 
 set -x # show the command
