@@ -82,6 +82,8 @@
   "teacherOnboardingModal_optionalSuffixTag": "(optional)",
   "teacherOnboardingModal_warning": "While Code.org's content moderation policy reviews both student customizations and chat messages, violations will be flagged accordingly. However, because this is a generative AI tool, we cannot fully predict or guarantee that the chatbot's output will always be free from disruption.",
   "teacherOnboardingModal_chatHistoryAccess": "As a teacher, you have access to all of your students' chat history and customizations. ",
+  "technicalInfoHeader": "Technical Info",
+  "technicalInfoHeader_tooltipText": "Behind-the-scenes technical information for the underlying language model.",
   "technicalInfoHeader_modelName": "Model Name",
   "technicalInfoHeader_overview": "Overview",
   "technicalInfoHeader_trainingData": "Training Data",
