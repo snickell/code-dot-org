@@ -20,7 +20,7 @@ COPY --chown=${UID} \
   Gemfile.lock \
   ./
 
-RUN --mount=type=cache,sharing=locked,uid=1000,gid=1000,target=${HOME}/.rbenv/versions/3.0.5/lib/ruby/gems/3.0.0/cache <<EOF
+RUN --mount=type=cache,sharing=locked,uid=${UID},gid=${GID},target=${HOME}/.rbenv/versions/3.0.5/lib/ruby/gems/3.0.0/cache <<EOF
   bundle install --jobs 8 --quiet
 EOF
 
@@ -66,7 +66,7 @@ RUN \
   #
   # Instuct Docker to maintain a download cache for yarn packages
   # so we don't have to re-download npms whenever package.json changes
-  --mount=type=cache,sharing=locked,uid=1000,gid=1000,target=${SRC}/apps/.yarn/cache \
+  --mount=type=cache,sharing=locked,uid=${UID},gid=${GID},target=${SRC}/apps/.yarn/cache \
 <<EOF
   # yarn install
   cd apps
