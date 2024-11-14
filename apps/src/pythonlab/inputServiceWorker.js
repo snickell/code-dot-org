@@ -1,20 +1,15 @@
 addEventListener('install', () => {
-  console.log('install event');
   self.skipWaiting();
 });
 
 addEventListener('activate', () => {
-  console.log('activate event');
-  self.clients.claim().then(() => {
-    console.log('clients claimed');
-  });
+  self.clients.claim();
 });
 
 console.log('hi from inputServiceWorker.js');
 const resolvers = new Map();
 
 addEventListener('message', event => {
-  console.log('message event');
   if (event.data.type === 'CDO_PY_INPUT') {
     console.log(`Received input: ${event.data.value} with id ${event.data.id}`);
     const resolverArray = resolvers.get(event.data.id);
@@ -29,7 +24,6 @@ addEventListener('message', event => {
 });
 
 addEventListener('fetch', event => {
-  console.log('fetch event');
   const url = new URL(event.request.url);
 
   if (url.pathname === '/cdo-py-get-input/') {
@@ -44,26 +38,16 @@ addEventListener('fetch', event => {
         self.clients.matchAll({includeUncontrolled: true}).then(clients => {
           console.log(`clients length: ${clients.length}`);
           clients.forEach(client => {
-            //if (client.type === 'window') {
-            console.log('posting await message');
-            client.postMessage({
-              type: 'CDO_PY_AWAITING_INPUT',
-              id,
-              prompt,
-            });
-            //}
+            if (client.type === 'window') {
+              console.log('posting await message');
+              client.postMessage({
+                type: 'CDO_PY_AWAITING_INPUT',
+                id,
+                prompt,
+              });
+            }
           });
         });
-
-        // Does not match the window in Safari
-        // This is likely due to the request originating from a web worker
-        // if (!event.clientId) return
-        // const client = await clients.get(event.clientId)
-        // if (!client) return
-        // client.postMessage({
-        //   type: 'CDO_PY_AWAITING_INPUT',
-        //   id
-        // })
       })()
     );
 
