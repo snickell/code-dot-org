@@ -18,14 +18,15 @@ jobs:
       BASE_COMMIT: 1e5e6230c17e962fc49c8f0e6b833845db816a49
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
     steps:
-      - run: |
-          echo hi
+      - name: Set ENV vars
+        run: |
           echo "SKAFFOLD_DEFAULT_REPO=$SKAFFOLD_DEFAULT_REPO"
           echo "GITHUB_WORKFLOW=${GITHUB_WORKFLOW}"
 
-          # $DOCKER_TAG is $BRANCH_NAME with non-alphanumeric characters replaced with '-'
-          export DOCKER_TAG=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9_.-]/-/g')
+          DOCKER_TAG="${BRANCH_NAME//[^a-zA-Z0-9_.-]/-}"
+          echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
 
+      - run: |
           echo "DOCKER_TAG=$DOCKER_TAG"
 
       # - name: ssh into the runner
@@ -126,7 +127,7 @@ jobs:
           echo "Env vars:"
           export
           echo
-          
+
           skaffold build \
             -v info \
             --push \
