@@ -220,7 +220,9 @@ function RubricFloatingActionButton({
       </button>
       {showCountBubble ? (
         <>
-          <div className={style.countOverlay}>
+          <div
+            className={classnames(style.countOverlay, 'uitest-count-bubble')}
+          >
             <BodyFourText className={style.countText}>
               <StrongText>
                 <span aria-label={i18n.aiEvaluationsToReview()}>
