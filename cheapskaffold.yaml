@@ -12,3 +12,4 @@ build:
       - cheap
   local:
     useBuildkit: true
+    useDockerCLI: true
