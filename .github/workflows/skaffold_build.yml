@@ -72,6 +72,7 @@ jobs:
         with:
           # platforms: linux/amd64,linux/arm64
           platforms: linux/amd64
+          install: true # replace `docker build` with `docker buildx`
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -123,12 +124,12 @@ jobs:
       #     restore-keys: |
       #       skaffold-
 
-      # - name: docker pull caching
-      #   run: |
-      #     docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org:latest || true
-      #     docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-core:latest || true
-      #     docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-db-seed:latest || true
-      #     docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-static:latest || true
+      - name: docker pull caching
+        run: |
+          docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org:latest || true
+          docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-core:latest || true
+          docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-db-seed:latest || true
+          docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-static:latest || true
 
       # - name: Free disk space
       #   run: |
@@ -143,18 +144,13 @@ jobs:
           export BUILDKIT_INLINE_CACHE=1
           
           # Disabled because it takes 5x as long on GitHub AMD64 machines: --platform=linux/arm64,linux/amd64
-          
-          echo "first"
+          echo "Starting skaffold build"
           skaffold \
-            # can we put a comment here? \
             build \
             -v info \
             --push \
             && true
-          echo "Seccccconnnnnnnnd"
-          # skaffold build -v info --push
-          echo "last"
-          false
+          echo "Done with skaffold build"
           find ~/.skaffold/cache
           du -h ~/.skaffold/cache
 
