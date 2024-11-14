@@ -17,3 +17,4 @@ build:
       dependencies:
         dockerfile:
           path: k8s/toy/toy-base.dockerfile
+
