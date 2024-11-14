@@ -20,6 +20,7 @@ jobs:
     steps:
       - name: Set ENV vars
         run: |
+          lsb_release -a
           lscpu
           free -h
           echo "SKAFFOLD_DEFAULT_REPO=$SKAFFOLD_DEFAULT_REPO"
