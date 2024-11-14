@@ -8,6 +8,12 @@
 #  (1) delete the buildx builder named `skaffold-builder`, and
 #  (2) update the corresponding node-affinities in k8s/pod.yaml.
 
+echo
+echo "buildx.sh, env vars:"
+export
+echo
+echo
+
 NATIVE_PLATFORM=$(docker info --format '{{.OSType}}/{{.Architecture}}' | sed 's/aarch64/arm64/')
 PLATFORMS=${PLATFORMS:=$NATIVE_PLATFORM}
 
