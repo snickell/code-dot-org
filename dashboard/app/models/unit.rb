@@ -1624,6 +1624,8 @@ class Unit < ApplicationRecord
       scriptResourcesPdfUrl: get_unit_resources_pdf_url,
       teacher_resources: resources.sort_by(&:name).map(&:summarize_for_resources_dropdown),
       student_resources: student_resources.sort_by(&:name).map(&:summarize_for_resources_dropdown),
+      hasNumberedUnits: unit_group&.has_numbered_units?,
+      versionYear: unit_group&.version_year || version_year,
     }
     # Only get lessons with lesson plans
     filtered_lessons = lessons.select(&:has_lesson_plan)

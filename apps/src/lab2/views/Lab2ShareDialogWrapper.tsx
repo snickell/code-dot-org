@@ -5,12 +5,17 @@ import ShareDialogLegacy from '@cdo/apps/code-studio/components/ShareDialog';
 import {hideShareDialog} from '@cdo/apps/code-studio/components/shareDialogRedux';
 import popupWindow from '@cdo/apps/code-studio/popup-window';
 import {LABS_USING_NEW_SHARE_DIALOG} from '@cdo/apps/lab2/constants';
+import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import {MetricEvent} from '@cdo/apps/metrics/events';
+import MetricsReporter from '@cdo/apps/metrics/MetricsReporter';
 import {isSignedIn as getIsSignedIn} from '@cdo/apps/templates/currentUserRedux';
 import {
   getSubmissionStatus,
   SubmissionStatusType,
 } from '@cdo/apps/templates/projects/submitProjectDialog/submitProjectApi';
 import SubmitProjectDialog from '@cdo/apps/templates/projects/submitProjectDialog/SubmitProjectDialog';
+import {NetworkError} from '@cdo/apps/util/HttpClient';
 import {useAppDispatch} from '@cdo/apps/util/reduxHooks';
 
 import {LabState} from '../lab2Redux';
@@ -63,13 +68,30 @@ const Lab2ShareDialogWrapper: React.FunctionComponent<
     SubmissionStatusType | undefined
   >(undefined);
 
+  const fetchSubmissionStatusHandleError = (
+    channelId: string,
+    projectType: string
+  ) => {
+    getSubmissionStatus(channelId, projectType)
+      .then(response => setSubmissionStatus(response))
+      .catch(error => {
+        if (!(error instanceof NetworkError && error.response.status === 403)) {
+          MetricsReporter.logError({
+            event: MetricEvent.SUBMISSION_STATUS_UNEXPECTED_ERROR,
+            errorMessage: 'Unexpected error in getting submission status.',
+            projectType: projectType,
+            channelId: channelId,
+          });
+        }
+      });
+  };
+
   useEffect(() => {
-    if (channelId && projectType) {
-      getSubmissionStatus(channelId, projectType).then(response =>
-        setSubmissionStatus(response?.status)
-      );
+    // Only signed-in users can submit projects to be considered for the featured project gallery.
+    if (channelId && projectType && isSignedIn) {
+      fetchSubmissionStatusHandleError(channelId, projectType);
     }
-  }, [channelId, projectType]);
+  }, [channelId, isSignedIn, projectType]);
 
   const dispatch = useAppDispatch();
   const onCloseSubmitProjectDialog = useCallback(() => {
@@ -79,17 +101,29 @@ const Lab2ShareDialogWrapper: React.FunctionComponent<
 
   const onGoBack = () => {
     setDialogPanel('share');
+    // If the project was submitted successfully, the submission status is updated (only for signed-in users).
+    if (channelId && projectType && isSignedIn) {
+      fetchSubmissionStatusHandleError(channelId, projectType);
+    }
   };
 
   const onSubmitClick = () => {
     setDialogPanel('submit');
+    analyticsReporter.sendEvent(
+      EVENTS.SHARING_DIALOG_SUBMIT_TO_BE_FEATURED,
+      {
+        lab_type: projectType,
+        channel_id: channelId,
+      },
+      PLATFORMS.STATSIG
+    );
   };
 
-  if (!channelId || !projectType) {
+  if (!isDialogOpen || !channelId || !projectType) {
     return null;
   }
 
-  if (LABS_USING_NEW_SHARE_DIALOG.includes(projectType) && isDialogOpen) {
+  if (LABS_USING_NEW_SHARE_DIALOG.includes(projectType)) {
     return dialogPanel === 'share' ? (
       <ShareDialog
         dialogId={shareDialogId}
@@ -98,11 +132,14 @@ const Lab2ShareDialogWrapper: React.FunctionComponent<
         projectType={projectType}
         onSubmitClick={onSubmitClick}
         submissionStatus={submissionStatus}
+        channelId={channelId}
       />
     ) : (
       <SubmitProjectDialog
         onClose={onCloseSubmitProjectDialog}
         onGoBack={onGoBack}
+        projectType={projectType}
+        channelId={channelId}
       />
     );
   }
