@@ -69,8 +69,6 @@ const CopyButton: React.FunctionComponent<{isDisabled: boolean}> = ({
 function chatEventToFormattedString(chatEvent: ChatEvent) {
   const formattedTimestamp = timestampToDateTime(chatEvent.timestamp);
   if (isChatMessage(chatEvent)) {
-    // [{timestamp} - {role}] [FLAGGED AS PROFANITY] | chatMessageText
-    // Does role need to be translated?
     return `[${formattedTimestamp} - ${chatEvent.role}] ${
       chatEvent.status === Status.PROFANITY_VIOLATION
         ? aichatI18n.copyChatContainsProfanity()
@@ -79,7 +77,6 @@ function chatEventToFormattedString(chatEvent: ChatEvent) {
   }
 
   if (isModelUpdate(chatEvent)) {
-    // [{timestamp} - Model Update] {updatedAiCustomization} updated.
     return aichatI18n.copyChatFormatting_modelUpdate({
       timestamp: formattedTimestamp,
       updatedFieldLabel: AI_CUSTOMIZATIONS_LABELS[chatEvent.updatedField],
@@ -87,7 +84,6 @@ function chatEventToFormattedString(chatEvent: ChatEvent) {
   }
 
   if (isNotification(chatEvent)) {
-    // [{timestamp} - Notification] {chatEventText}
     return aichatI18n.copyChatFormatting_notification({
       timestamp: formattedTimestamp,
       chatEventText: chatEvent.text,

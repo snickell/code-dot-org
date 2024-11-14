@@ -109,7 +109,6 @@ const ChatWorkspace: React.FunctionComponent<ChatWorkspaceProps> = ({
     {
       value: 'viewStudentChatHistory',
       text:
-        // `${selectedStudentName}'s chat history + '(view only)' || ''
         selectedTab === WorkspaceTeacherViewTab.STUDENT_CHAT_HISTORY
           ? aichatI18n.viewOnlyTabLabel({
               fieldLabel: aichatI18n.viewStudentChatHistory(),

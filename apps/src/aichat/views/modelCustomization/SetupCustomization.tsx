@@ -151,7 +151,6 @@ const SetupCustomization: React.FunctionComponent = () => {
         })
       );
     },
-    // TO-DO: Aria Label Localization
     className: styles.temperatureSlider,
     leftButtonProps: {
       icon: {

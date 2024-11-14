@@ -24,7 +24,6 @@ import moduleStyles from './onboarding-modal.module.scss';
 export interface TeacherOnboardingModalProps {
   onClose: () => void;
 }
-// <SafeMarkdown markdown={applabI18n.makerSetupAdafruitWindowsDrivers()} />
 const TeacherOnboardingModal: React.FunctionComponent<
   TeacherOnboardingModalProps
 > = ({onClose}) => {
