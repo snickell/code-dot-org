@@ -70,7 +70,6 @@ RUN \
 <<EOF
   # yarn install
   cd apps
-  find .yarn
   CI=true yarn install --immutable --silent
 EOF
 
