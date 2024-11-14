@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 FROM ubuntu:22.04 as toy-base-core
 RUN <<EOF
-  echo "Very slow apt-get goes here: `date`"
+  echo "Ver slow apt-get goes here: `date`"
   apt-get update
   echo "Done with apt-get: `date`"
 EOF
