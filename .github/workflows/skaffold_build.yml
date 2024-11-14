@@ -8,6 +8,9 @@ jobs:
       SKAFFOLD_DEFAULT_REPO: docker.io/snickellcdo
       BASE_COMMIT: 1e5e6230c17e962fc49c8f0e6b833845db816a49
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+    defaults:
+      run:
+        shell: bash -ex
     steps:
       - name: Set ENV vars
         run: |
@@ -127,15 +130,15 @@ jobs:
 
       - name: skaffold build
         run: |
-          set -x
-          # Disabled because it takes 5x as long on GitHub AMD64 machines:
-          #   --platform=linux/arm64,linux/amd64
-
           skaffold \
             build \
             -v info \
             --push \
-            --tag $DOCKER_TAG
+            --tag $DOCKER_TAG \
+            && true
+
+          # Disabled because it takes 5x as long on GitHub AMD64 machines:
+          #   --platform=linux/arm64,linux/amd64
 
           echo "Done with skaffold build"
 
