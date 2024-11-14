@@ -2,6 +2,7 @@ import React from 'react';
 
 import Button, {buttonColors} from '@cdo/apps/componentLibrary/button/Button';
 import Link from '@cdo/apps/componentLibrary/link/Link';
+import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
 import {
   BodyOneText,
   BodyTwoText,
@@ -23,7 +24,7 @@ import moduleStyles from './onboarding-modal.module.scss';
 export interface TeacherOnboardingModalProps {
   onClose: () => void;
 }
-
+// <SafeMarkdown markdown={applabI18n.makerSetupAdafruitWindowsDrivers()} />
 const TeacherOnboardingModal: React.FunctionComponent<
   TeacherOnboardingModalProps
 > = ({onClose}) => {
@@ -47,38 +48,28 @@ const TeacherOnboardingModal: React.FunctionComponent<
           <ul>
             <li>
               <BodyTwoText>
-                <StrongText>
-                  {aichatI18n.teacherOnboardingModal_instructionsBulletTitleText()}
-                </StrongText>
-                {aichatI18n.teacherOnboardingModal_instructionsBulletBodyText()}
+                <SafeMarkdown
+                  markdown={aichatI18n.teacherOnboardingModal_instructionsBullet()}
+                />
               </BodyTwoText>
             </li>
             <BodyTwoText>
-              <StrongText>
-                {aichatI18n.teacherOnboardingModal_modelCustomizationBulletTitleText()}
-              </StrongText>
-              <EmText>
-                {aichatI18n.teacherOnboardingModal_optionalSuffixTag()}
-              </EmText>
-              {aichatI18n.teacherOnboardingModal_modelCustomizationBulletBodyText()}
+              <SafeMarkdown
+                markdown={aichatI18n.teacherOnboardingModal_modelCustomizationBullet()}
+              />
             </BodyTwoText>
             <li>
               <BodyTwoText>
-                <StrongText>
-                  {aichatI18n.teacherOnboardingModal_aiChatBulletTitleText()}
-                </StrongText>
-                {aichatI18n.teacherOnboardingModal_aiChatBulletBodyText()}
+                <SafeMarkdown
+                  markdown={aichatI18n.teacherOnboardingModal_aiChatBullet()}
+                />
               </BodyTwoText>
             </li>
             <li>
               <BodyTwoText>
-                <StrongText>
-                  {aichatI18n.teacherOnboardingModal_userViewBulletTitleText()}{' '}
-                </StrongText>
-                <EmText>
-                  {aichatI18n.teacherOnboardingModal_optionalSuffixTag()}
-                </EmText>
-                {aichatI18n.teacherOnboardingModal_userViewBulletBodyText()}
+                <SafeMarkdown
+                  markdown={aichatI18n.teacherOnboardingModal_userViewBullet()}
+                />
               </BodyTwoText>
             </li>
           </ul>
