@@ -28,10 +28,13 @@ for platform in ${PLATFORMS//,/ }; do
   }
 done
 
+cache_from="--cache-from type=registry,ref=$IMAGE"
+
 # Building for multiple platforms requires pushing to a registry
 # as the Docker Daemon cannot load multi-platform images. 
 if [ "$PUSH_IMAGE" = true ]; then
   args="--platform $PLATFORMS --push"
+  cache_to="--cache-to type=registry,ref=$IMAGE"
 else
   args="--load"
 fi
@@ -39,4 +42,4 @@ fi
 DOCKERFILE=${1:-"$BUILD_CONTEXT/Dockerfile"}
 
 set -x # show the command
-docker buildx build -f "$DOCKERFILE" --tag $IMAGE $args "$BUILD_CONTEXT"
+docker buildx build -f "$DOCKERFILE" --tag $IMAGE $args $cache_from $cache_to "$BUILD_CONTEXT"
