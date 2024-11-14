@@ -24,7 +24,7 @@ class UserLevelInteractionsController < ApplicationController
       :code_version,
     )
     user_level_interaction_params[:user_id] = current_user.id
-    user_level_interaction_params[:school_year] = "2024-25"
+    user_level_interaction_params[:school_year] = school_year
     unit = Unit.find(user_level_interaction_params[:script_id])
     level = Level.find(user_level_interaction_params[:level_id])
     metadata = {
