@@ -9,7 +9,7 @@ permissions:
 jobs:
   build:
     name: build
-    runs-on: test-runner-arm64
+    runs-on: enterprise-arm64
     env:
       SKAFFOLD_DEFAULT_REPO: ghcr.io/${{ github.repository_owner }}
       BASE_COMMIT: 1e5e6230c17e962fc49c8f0e6b833845db816a49
