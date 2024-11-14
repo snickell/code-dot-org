@@ -1,2 +1,3 @@
 yoyoyoyoyoyo
 install: true AND useDockerCLI: true
+invalidate cheap.txt
