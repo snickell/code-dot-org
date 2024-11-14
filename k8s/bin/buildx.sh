@@ -16,6 +16,11 @@
 # So as ugly as this is, using a custom build command with skaffold is still the
 # only real way to get layer caching + multi-stage builds, until skaffold supports
 # `docker buildx` (NOT buildkit, that's not enough) natively.
+#
+# If you want to experiment with new builders or configuration, its recommended to
+# try it out on the "toy" docker setup first, which builds fast but exhibits the
+# necessary multi-stage and layer complexity, easy to double-check caching behavior:
+# https://github.com/code-dot-org/code-dot-org/blob/69ec3f76a4027e3171f35304463a539ba40a633e/k8s/toy/toy.skaffold.yaml/#L1-L20
 
 NATIVE_PLATFORM=$(docker info --format '{{.OSType}}/{{.Architecture}}' | sed -e 's/aarch64/arm64/' -e 's/x86_64/amd64/')
 PLATFORMS=${PLATFORMS:=$NATIVE_PLATFORM}
