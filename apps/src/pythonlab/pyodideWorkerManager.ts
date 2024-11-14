@@ -17,6 +17,7 @@ import {MATPLOTLIB_IMG_TAG} from './pythonHelpers/patches';
 import {PyodideMessage} from './types';
 
 let callbacks: {[key: number]: (event: PyodideMessage) => void} = {};
+let inputBuffer: SharedArrayBuffer | null = null;
 
 const setUpPyodideWorker = () => {
   // @ts-expect-error because TypeScript does not like this syntax.
@@ -38,6 +39,7 @@ const setUpPyodideWorker = () => {
           getStore().dispatch(appendOutputImage(image));
           break;
         }
+        console.log(`system out message: ${message}`);
         getStore().dispatch(appendSystemOutMessage(message));
         break;
       case 'run_complete':
@@ -75,16 +77,7 @@ const setUpPyodideWorker = () => {
         break;
       case 'stdin':
         if (buffer) {
-          const notifier = new Int32Array(buffer);
-          const dummyString = 'hello';
-          for (
-            let view = new Uint16Array(buffer), i = 0;
-            i < dummyString.length;
-            i++
-          ) {
-            view[i] = dummyString.charCodeAt(i);
-          }
-          Atomics.notify(notifier, 0);
+          inputBuffer = buffer;
         }
         break;
       default:
@@ -122,6 +115,21 @@ const asyncRun = (() => {
   };
 })();
 
+const setInput = (input: string) => {
+  if (inputBuffer) {
+    const notifier = new Int32Array(inputBuffer);
+    for (
+      let view = new Uint16Array(inputBuffer), i = 0;
+      i < input.length;
+      i++
+    ) {
+      view[i] = input.charCodeAt(i);
+    }
+    Atomics.notify(notifier, 0);
+    inputBuffer = null;
+  }
+};
+
 const restartPyodideIfProgramIsRunning = () => {
   // Only restart if there are pending callbacks, as that means the worker is currently
   // running a program.
@@ -135,4 +143,4 @@ const restartPyodideIfProgramIsRunning = () => {
   }
 };
 
-export {asyncRun, restartPyodideIfProgramIsRunning};
+export {asyncRun, restartPyodideIfProgramIsRunning, setInput};
