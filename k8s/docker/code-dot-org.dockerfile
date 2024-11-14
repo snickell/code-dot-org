@@ -144,3 +144,5 @@ COPY --chown=${UID} --link \
 COPY --chown=${UID} --link ./ ./
 
 ENTRYPOINT [ "/usr/bin/zsh" ]
+
+LABEL org.opencontainers.image.source="https://github.com/code-dot-org/code-dot-org"

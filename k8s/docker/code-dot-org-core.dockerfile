@@ -183,3 +183,5 @@ COPY --chown=${UID} --link \
 # `kubectl exec` skips entrypoint (!), so this is the easiest way to
 # accomplish `eval $(rbenv init -)` that works for kubectl exec.
 ENV PATH=${HOME}/.rbenv/shims:${PATH}
+
+LABEL org.opencontainers.image.source="https://github.com/code-dot-org/code-dot-org"
