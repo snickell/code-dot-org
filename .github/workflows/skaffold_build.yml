@@ -135,8 +135,8 @@ jobs:
             build \
             -v info \
             --push \
-            --tag $DOCKER_TAG \
-            && true
+            --tag $DOCKER_TAG
+
           echo "Done with skaffold build"
 
       - name: did we use skaffold cache?
