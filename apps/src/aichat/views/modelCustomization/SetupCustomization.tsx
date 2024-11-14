@@ -154,12 +154,18 @@ const SetupCustomization: React.FunctionComponent = () => {
     // TO-DO: Aria Label Localization
     className: styles.temperatureSlider,
     leftButtonProps: {
-      icon: {iconName: 'minus', title: 'Decrease'},
-      ['aria-label']: 'Decrease',
+      icon: {
+        iconName: 'minus',
+        title: aichatI18n.modelCustomization_sliderDecrease(),
+      },
+      ['aria-label']: aichatI18n.modelCustomization_sliderDecrease(),
     },
     rightButtonProps: {
-      icon: {iconName: 'plus', title: 'Increase'},
-      ['aria-label']: 'Increase',
+      icon: {
+        iconName: 'plus',
+        title: aichatI18n.modelCustomization_sliderIncrease(),
+      },
+      ['aria-label']: aichatI18n.modelCustomization_sliderIncrease(),
     },
   };
 
