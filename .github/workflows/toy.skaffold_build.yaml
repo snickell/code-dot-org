@@ -6,7 +6,7 @@ jobs:
     name: toy build
     runs-on: ubuntu-latest
     env:
-      SKAFFOLD_DEFAULT_REPO: docker.io/snickellcdo
+      SKAFFOLD_DEFAULT_REPO: ghcr.io/${{ github.repository_owner }}
       BASE_COMMIT: 1e5e6230c17e962fc49c8f0e6b833845db816a49
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
     steps:
@@ -57,12 +57,13 @@ jobs:
           # platforms: linux/amd64,linux/arm64
           platforms: linux/amd64
 
-      - name: Login to Docker Hub
+      # Login to GitHub Container Registry
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
-          registry: ${{ vars.K8S_DOCKEHUB_REPOSITORY }}
-          username: ${{ vars.K8S_DOCKERHUB_USERNAME }}
-          password: ${{ secrets.K8S_DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Checkout sources
         uses: actions/checkout@v4
