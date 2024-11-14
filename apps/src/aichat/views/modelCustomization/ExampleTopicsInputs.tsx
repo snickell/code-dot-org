@@ -4,6 +4,7 @@ import Alert, {alertTypes} from '@cdo/apps/componentLibrary/alert/Alert';
 import {useAppDispatch} from '@cdo/apps/util/reduxHooks';
 
 import {setModelCardProperty} from '../../redux/aichatRedux';
+import aichatI18n from '../../locale';
 import {Visibility} from '../../types';
 
 import MultiInputCustomization from './MultiInputCustomization';
@@ -35,7 +36,7 @@ const ExampleTopicsInputs: React.FunctionComponent<{
   const validationAlert = useMemo(() => {
     return (
       <Alert
-        text="Must add at least one example prompt"
+        text={aichatI18n.exampleTopicsValidationAlert()}
         type={alertTypes.warning}
         size="s"
         className={modelCustomizationStyles.examplePromptAlert}
