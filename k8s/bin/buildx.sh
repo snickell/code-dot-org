@@ -24,13 +24,14 @@ for platform in ${PLATFORMS//,/ }; do
   }
 done
 
-cache_from="--cache-from type=registry,ref=$IMAGE"
+CACHE_IMAGE_NAME="$IMAGE-cache"
+cache_from="--cache-from type=registry,ref=$CACHE_IMAGE_NAME"
 
 # Building for multiple platforms requires pushing to a registry
 # as the Docker Daemon cannot load multi-platform images. 
 if [ "$PUSH_IMAGE" = true ]; then
   args="--platform $PLATFORMS --push"
-  cache_to="--cache-to type=registry,ref=$IMAGE"
+  cache_to="--cache-to type=registry,ref=$CACHE_IMAGE_NAME"
 fi
 
 set -x # show the command
