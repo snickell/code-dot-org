@@ -1,0 +1,32 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+build:
+  tagPolicy:
+    gitCommit:
+      ignoreChanges: true
+  artifacts:
+  - image: cheap
+    hooks:
+      before:
+        - command:
+          - ps
+        - command:
+          - sh
+          - -cx
+          - |
+            export GIT_BOO="shame on you"
+            echo "GIT_BOO set"
+      after:
+        - command:
+          - sh
+          - -cx
+          - |
+            echo "Env vars:"
+            export
+            echo "DONE!"
+    docker:
+      dockerfile: ./cheap.dockerfile
+      cacheFrom:
+      - cheap
+  local:
+    useBuildkit: true

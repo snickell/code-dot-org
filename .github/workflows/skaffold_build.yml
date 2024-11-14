@@ -115,6 +115,19 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v4
 
+      - name: Cheap Skaffold Build
+        run: |
+          echo "Env vars:"
+          export
+          branch_name=${GITHUB_REF#refs/heads/}
+          branch_name=${branch_name:-$GITHUB_HEAD_REF}
+          export DOCKER_TAG=$(echo "$branch_name" | sed 's/[^a-zA-Z0-9_.-]/-/g')
+
+          skaffold build \
+            -v info \
+            --push \
+            --tag $DOCKER_TAG
+
       # - name: skaffold cache
       #   uses: actions/cache@v3
       #   with:
@@ -123,35 +136,35 @@ jobs:
       #     restore-keys: |
       #       skaffold-
 
-      - name: docker pull caching
-        run: |
-          docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org:latest || true
-          docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-core:latest || true
-          docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-db-seed:latest || true
-          docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-static:latest || true
+      # - name: docker pull caching
+      #   run: |
+      #     docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org:latest || true
+      #     docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-core:latest || true
+      #     docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-db-seed:latest || true
+      #     docker pull $SKAFFOLD_DEFAULT_REPO/code-dot-org-static:latest || true
 
       # - name: Free disk space
       #   run: |
       #     echo "Docker has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
       #     echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
 
-      - name: skaffold build
-        run: |
-          set -x
-          df -h
+      # - name: skaffold build
+      #   run: |
+      #     set -x
+      #     df -h
           
-          # export BUILDKIT_INLINE_CACHE=1
+      #     # export BUILDKIT_INLINE_CACHE=1
           
-          # Disabled because it takes 5x as long on GitHub AMD64 machines: --platform=linux/arm64,linux/amd64
-          echo "Starting skaffold build"
-          skaffold \
-            build \
-            -v info \
-            --push \
-            && true
-          echo "Done with skaffold build"
-          find ~/.skaffold/cache
-          du -h ~/.skaffold/cache
+      #     # Disabled because it takes 5x as long on GitHub AMD64 machines: --platform=linux/arm64,linux/amd64
+      #     echo "Starting skaffold build"
+      #     skaffold \
+      #       build \
+      #       -v info \
+      #       --push \
+      #       && true
+      #     echo "Done with skaffold build"
+      #     find ~/.skaffold/cache
+      #     du -h ~/.skaffold/cache
 
 
   # quicktest:

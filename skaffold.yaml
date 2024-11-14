@@ -13,6 +13,21 @@ build:
         - '**/*.js'
         - '**/*.jsx'
         - '**/*.json'
+    hooks:
+      before:
+        - command:
+          - ps
+        - command:
+          - export
+          - GIT_BOO="shame on you!"
+      after:
+        - command:
+            - sh
+            - -cx
+            - |
+              echo "Env vars:"
+              export
+              echo "DONE!"
     docker:
       dockerfile: ./k8s/docker/code-dot-org.dockerfile
       cacheFrom:
