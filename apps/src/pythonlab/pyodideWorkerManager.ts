@@ -18,6 +18,7 @@ import {PyodideMessage} from './types';
 
 let callbacks: {[key: number]: (event: PyodideMessage) => void} = {};
 let inputServiceWorker: ServiceWorker | undefined;
+let lastInputId = -1;
 
 const setUpPyodideWorker = () => {
   // @ts-expect-error because TypeScript does not like this syntax.
@@ -84,7 +85,7 @@ const setUpPyodideWorker = () => {
     if ('serviceWorker' in navigator) {
       try {
         const url = new URL(
-          '/pythonHelpers/inputServiceWorker',
+          './pythonHelpers/inputServiceWorker.ts',
           // @ts-expect-error because TypeScript does not like this syntax.
           import.meta.url
         );
@@ -116,6 +117,7 @@ const setUpPyodideWorker = () => {
             // Update the service worker reference, in case the service worker is different to the one we registered
             inputServiceWorker = event.source;
           }
+          lastInputId = event.data.id;
           // TODO: get input from the user here
           // setWorkerAwaitingInputIds(prev => new Set(prev).add(event.data.id));
           // setWorkerAwaitingInputPrompt(prev => {
@@ -170,7 +172,7 @@ const restartPyodideIfProgramIsRunning = () => {
   }
 };
 
-const sendInput = (id: string, value: string): void => {
+const sendInput = (value: string): void => {
   // if (!workerAwaitingInputIds.has(id)) {
   //   console.error('Worker not awaiting input')
   //   return
@@ -183,8 +185,8 @@ const sendInput = (id: string, value: string): void => {
 
   inputServiceWorker.postMessage({
     type: 'CDO_PY_INPUT',
-    id,
     value,
+    id: lastInputId,
   });
 
   // setWorkerAwaitingInputIds(prev => {

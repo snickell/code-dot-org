@@ -1,4 +1,7 @@
-import {resetOutput} from '@codebridge/redux/consoleRedux';
+import {
+  appendSystemInMessage,
+  resetOutput,
+} from '@codebridge/redux/consoleRedux';
 import {sendCodebridgeAnalyticsEvent} from '@codebridge/utils/analyticsReporterHelper';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
@@ -9,6 +12,7 @@ import useLifecycleNotifier from '@cdo/apps/lab2/hooks/useLifecycleNotifier';
 import {LifecycleEvent} from '@cdo/apps/lab2/utils/LifecycleNotifier';
 import PanelContainer from '@cdo/apps/lab2/views/components/PanelContainer';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import {sendInput} from '@cdo/apps/pythonlab/pyodideWorkerManager';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 import ControlButtons from './ControlButtons';
@@ -22,6 +26,7 @@ const Console: React.FunctionComponent = () => {
   const dispatch = useDispatch();
   const appName = useAppSelector(state => state.lab.levelProperties?.appName);
   const scrollAnchorRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [graphModalOpen, setGraphModalOpen] = useState(false);
   const [activeGraphIndex, setActiveGraphIndex] = useState(0);
@@ -58,6 +63,73 @@ const Console: React.FunctionComponent = () => {
     setGraphModalOpen(true);
   };
 
+  const getConsoleLines = () => {
+    return codeOutput.map((outputLine, index) => {
+      if (outputLine.type === 'img') {
+        return (
+          <span>
+            <img
+              src={`data:image/png;base64,${outputLine.contents}`}
+              alt="matplotlib_image"
+            />
+            <Button
+              color={buttonColors.black}
+              disabled={false}
+              icon={{
+                iconName: 'up-right-from-square',
+                iconStyle: 'solid',
+              }}
+              isIconOnly={true}
+              onClick={() => popOutGraph(index)}
+              size="xs"
+              type="primary"
+              aria-label="open matplotlib_image in pop-up"
+            />
+            {activeGraphIndex === index && graphModalOpen && (
+              <GraphModal
+                src={`data:image/png;base64,${outputLine.contents}`}
+                onClose={() => setGraphModalOpen(false)}
+              />
+            )}
+          </span>
+        );
+      } else if (
+        outputLine.type === 'system_out' ||
+        outputLine.type === 'system_in'
+      ) {
+        return <span>{outputLine.contents}</span>;
+      } else if (outputLine.type === 'error') {
+        return (
+          <span className={moduleStyles.errorLine}>{outputLine.contents}</span>
+        );
+      } else if (outputLine.type === 'system_error') {
+        return (
+          <span className={moduleStyles.errorLine}>
+            {systemMessagePrefix}
+            {codebridgeI18n.systemCodeError()}
+          </span>
+        );
+      } else {
+        return (
+          <span>
+            {systemMessagePrefix}
+            {outputLine.contents}
+          </span>
+        );
+      }
+    });
+  };
+
+  const onInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      const input = event.currentTarget.value;
+      event.preventDefault();
+      sendInput(input);
+      dispatch(appendSystemInMessage(input));
+    }
+  };
+
+  const consoleLines = getConsoleLines();
   return (
     <PanelContainer
       id="codebridge-console"
@@ -70,60 +142,23 @@ const Console: React.FunctionComponent = () => {
       headerClassName={moduleStyles.consoleHeader}
     >
       <div className={moduleStyles.console} id="uitest-codebridge-console">
-        {codeOutput.map((outputLine, index) => {
-          if (outputLine.type === 'img') {
+        {consoleLines.map((output, index) => {
+          if (index === consoleLines.length - 1) {
             return (
               <div key={index}>
-                <img
-                  src={`data:image/png;base64,${outputLine.contents}`}
-                  alt="matplotlib_image"
+                {output}
+                <input
+                  id="console-input"
+                  type="text"
+                  spellCheck="false"
+                  onKeyDown={onInputKeyDown}
+                  aria-label="console input"
+                  ref={inputRef}
                 />
-                <Button
-                  color={buttonColors.black}
-                  disabled={false}
-                  icon={{
-                    iconName: 'up-right-from-square',
-                    iconStyle: 'solid',
-                  }}
-                  isIconOnly={true}
-                  onClick={() => popOutGraph(index)}
-                  size="xs"
-                  type="primary"
-                  aria-label="open matplotlib_image in pop-up"
-                />
-                {activeGraphIndex === index && graphModalOpen && (
-                  <GraphModal
-                    src={`data:image/png;base64,${outputLine.contents}`}
-                    onClose={() => setGraphModalOpen(false)}
-                  />
-                )}
-              </div>
-            );
-          } else if (
-            outputLine.type === 'system_out' ||
-            outputLine.type === 'system_in'
-          ) {
-            return <div key={index}>{outputLine.contents}</div>;
-          } else if (outputLine.type === 'error') {
-            return (
-              <div key={index} className={moduleStyles.errorLine}>
-                {outputLine.contents}
-              </div>
-            );
-          } else if (outputLine.type === 'system_error') {
-            return (
-              <div key={index} className={moduleStyles.errorLine}>
-                {systemMessagePrefix}
-                {codebridgeI18n.systemCodeError()}
               </div>
             );
           } else {
-            return (
-              <div key={index}>
-                {systemMessagePrefix}
-                {outputLine.contents}
-              </div>
-            );
+            return <div key={index}>{output}</div>;
           }
         })}
         <div ref={scrollAnchorRef} />
