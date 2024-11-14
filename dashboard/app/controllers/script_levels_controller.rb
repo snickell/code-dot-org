@@ -630,10 +630,7 @@ class ScriptLevelsController < ApplicationController
   end
 
   private def can_show_ta_scores_alert?
-    course_version = @script_level&.script&.get_course_version
-    return false unless course_version&.course_offering&.key == 'csd'
-    return false unless ['2023', '2024'].include?(course_version.key)
     seen_ta_scores_map = current_user&.seen_ta_scores_map || {}
-    !seen_ta_scores_map[@script_level.lesson.absolute_position.to_s]
+    !seen_ta_scores_map[@script_level.lesson.id.to_s]
   end
 end

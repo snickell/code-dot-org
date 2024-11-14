@@ -129,11 +129,11 @@ function RubricFloatingActionButton({
     fetch(`/api/v1/users/set_seen_ta_scores`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({lesson_position: rubric.lesson.position}),
+      body: JSON.stringify({lesson_id: rubric.lesson.id}),
     }).catch(error => {
       console.error('Error setting seen TA scores:', error);
     });
-  }, [rubric.lesson.position]);
+  }, [rubric.lesson.id]);
 
   const viewScores = () => {
     setSeenTaScores();

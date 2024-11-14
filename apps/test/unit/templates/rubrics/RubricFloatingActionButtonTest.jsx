@@ -317,7 +317,7 @@ describe('RubricFloatingActionButton', () => {
       expect(fetch).toHaveBeenCalledWith('/api/v1/users/set_seen_ta_scores', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({lesson_position: 3}),
+        body: JSON.stringify({lesson_id: 33}),
       });
     });
 
@@ -350,7 +350,7 @@ describe('RubricFloatingActionButton', () => {
       expect(fetch).toHaveBeenCalledWith('/api/v1/users/set_seen_ta_scores', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({lesson_position: 3}),
+        body: JSON.stringify({lesson_id: 33}),
       });
     });
 
@@ -383,7 +383,7 @@ describe('RubricFloatingActionButton', () => {
       expect(fetch).toHaveBeenCalledWith('/api/v1/users/set_seen_ta_scores', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({lesson_position: 3}),
+        body: JSON.stringify({lesson_id: 33}),
       });
     });
 
@@ -413,7 +413,7 @@ describe('RubricFloatingActionButton', () => {
       expect(fetch).toHaveBeenCalledWith('/api/v1/users/set_seen_ta_scores', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({lesson_position: 3}),
+        body: JSON.stringify({lesson_id: 33}),
       });
     });
   });

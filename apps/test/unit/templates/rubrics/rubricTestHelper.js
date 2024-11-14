@@ -80,6 +80,7 @@ export const defaultRubric = {
     id: 42,
   },
   lesson: {
+    id: 33,
     position: 3,
     name: 'Data Structures',
   },

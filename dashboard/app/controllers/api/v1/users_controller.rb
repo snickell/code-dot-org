@@ -362,11 +362,11 @@ class Api::V1::UsersController < Api::V1::JSONApiController
     @user.save!
   end
 
-  # POST /api/v1/users/<user_id>/set_seen_ta_scores
+  # POST /api/v1/users/set_seen_ta_scores
   def set_seen_ta_scores
     return head :unauthorized unless current_user&.teacher?
     seen_ta_scores_map = current_user.seen_ta_scores_map || {}
-    seen_ta_scores_map[params[:lesson_position]] = true
+    seen_ta_scores_map[params[:lesson_id]] = true
     current_user.update!(seen_ta_scores_map: seen_ta_scores_map)
     head :no_content
   end
