@@ -25,6 +25,7 @@
 NATIVE_PLATFORM=$(docker info --format '{{.OSType}}/{{.Architecture}}' | sed -e 's/aarch64/arm64/' -e 's/x86_64/amd64/')
 PLATFORMS=${PLATFORMS:=$NATIVE_PLATFORM}
 
+# Make sure our `docker buildx` builder supports our target $PLATFORMS
 for platform in ${PLATFORMS//,/ }; do
   docker buildx inspect --bootstrap | grep '^Platforms' | grep $platform || {
     echo "Platform $platform is not supported by the current builder."

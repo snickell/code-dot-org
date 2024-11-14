@@ -9,15 +9,38 @@ permissions:
 jobs:
   build:
     name: build
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      matrix:
+        runs-on: [ubuntu-latest, skaffold-arm64]
     env:
       SKAFFOLD_DEFAULT_REPO: ghcr.io/${{ github.repository_owner }}
       BASE_COMMIT: 1e5e6230c17e962fc49c8f0e6b833845db816a49
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+      # build docker images with -amd64 or -arm64 suffix, we'll stitch them together later:
+      APPEND_ARCHITECTURE_TO_DOCKER_TAG: true
+    outputs:
+      docker_tag_amd64: ${{ steps.set_docker_tag.outputs.docker_tag_amd64 }}
+      docker_tag_arm64: ${{ steps.set_docker_tag.outputs.docker_tag_arm64 }}
+      docker_tag: ${{ steps.set_docker_tag.outputs.docker_tag }}
     defaults:
       run:
         shell: bash -ex {0}
     steps:
+      - name: Set Docker Tag
+        id: set_docker_tag
+        run: |
+          DOCKER_TAG="${BRANCH_NAME//[^a-zA-Z0-9_.-]/-}"
+          echo "docker_tag=$DOCKER_TAG" >> "$GITHUB_OUTPUT"
+
+          if [[ "$APPEND_ARCHITECTURE_TO_DOCKER_TAG" == "true" ]]; then
+            ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')
+            DOCKER_TAG="${DOCKER_TAG}-${ARCH}"
+            echo "docker_tag_${ARCH}=$DOCKER_TAG" >> "$GITHUB_OUTPUT"
+          fi
+          
+          echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
+
       - name: Set ENV vars
         run: |
           lsb_release -a
@@ -25,9 +48,6 @@ jobs:
           free -h
           echo "SKAFFOLD_DEFAULT_REPO=$SKAFFOLD_DEFAULT_REPO"
           echo "GITHUB_WORKFLOW=${GITHUB_WORKFLOW}"
-
-          DOCKER_TAG="${BRANCH_NAME//[^a-zA-Z0-9_.-]/-}"
-          echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
 
       # - name: ssh into the runner
       #   uses: mxschmitt/action-tmate@v3
@@ -66,19 +86,24 @@ jobs:
 
       - name: install skaffold
         run: |
-          curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
+          ARCH=$(uname -m)
+          if [[ "$ARCH" == "aarch64" ]]; then
+            curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-arm64
+          else
+            curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
+          fi
           sudo install skaffold /usr/local/bin/
 
       # Add support for more platforms with QEMU (optional)
       # https://github.com/docker/setup-qemu-action
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
+        # with:
           # platforms: linux/amd64,linux/arm64
-          platforms: linux/amd64
+          # platforms: linux/amd64
 
       # Login to GitHub Container Registry
       - name: Login to GitHub Container Registry
@@ -159,3 +184,39 @@ jobs:
         run: |
           find ~/.skaffold/cache
           du -h ~/.skaffold/cache
+
+  stitch:
+    name: Stitch Multi-Platform Image
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Parse DOCKER_TAGS JSON and prepare tag list
+        id: parse_tags
+        run: |
+          echo "OUTPUTS='${{ needs.build.outputs }}'"
+          # Convert all outputs from build job to JSON
+          DOCKER_TAGS_JSON='${{ toJSON(needs.build.outputs) }}'
+
+          # Extract tags prefixed with "docker_tag_" from the JSON list
+          TAGS=($(echo "$DOCKER_TAGS_JSON" | jq -r 'to_entries[] | select(.key | startswith("docker_tag_")) | .value'))
+
+          # Export tags as a space-separated list for the next step
+          echo "TAGS=${TAGS[*]}" >> "$GITHUB_ENV"
+
+      - name: Stitch platform images into a multi-platform image
+        run: |
+          # Define the target multi-platform image tag using one of the architecture tags as the base
+          MULTI_PLATFORM_TAG=ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ needs.build.outputs.docker_tag }}
+
+          # Use imagetools to stitch all platform-specific images into one multi-platform image
+          docker buildx imagetools create -t "$MULTI_PLATFORM_TAG" $TAGS
