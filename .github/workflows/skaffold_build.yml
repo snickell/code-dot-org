@@ -10,7 +10,7 @@ jobs:
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
     defaults:
       run:
-        shell: bash -ex
+        shell: bash -ex {0}
     steps:
       - name: Set ENV vars
         run: |
