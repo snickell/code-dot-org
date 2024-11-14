@@ -16,11 +16,17 @@ jobs:
     env:
       SKAFFOLD_DEFAULT_REPO: docker.io/snickellcdo
       BASE_COMMIT: 1e5e6230c17e962fc49c8f0e6b833845db816a49
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
     steps:
       - run: |
           echo hi
           echo "SKAFFOLD_DEFAULT_REPO=$SKAFFOLD_DEFAULT_REPO"
           echo "GITHUB_WORKFLOW=${GITHUB_WORKFLOW}"
+
+          # $DOCKER_TAG is $BRANCH_NAME with non-alphanumeric characters replaced with '-'
+          export DOCKER_TAG=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9_.-]/-/g')
+
+          echo "DOCKER_TAG=$DOCKER_TAG"
 
       # - name: ssh into the runner
       #   uses: mxschmitt/action-tmate@v3
@@ -119,10 +125,8 @@ jobs:
         run: |
           echo "Env vars:"
           export
-          branch_name=${GITHUB_REF#refs/heads/}
-          branch_name=${branch_name:-$GITHUB_HEAD_REF}
-          export DOCKER_TAG=$(echo "$branch_name" | sed 's/[^a-zA-Z0-9_.-]/-/g')
-
+          echo
+          
           skaffold build \
             -v info \
             --push \
