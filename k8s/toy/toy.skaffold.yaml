@@ -1,0 +1,19 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+build:
+  artifacts:
+  - image: toy
+    custom:
+      buildCommand: k8s/bin/buildx.sh -f k8s/toy/toy.dockerfile --build-arg CHEAP_BASE="$CHEAP_BASE"
+      dependencies:
+        dockerfile:
+          path: k8s/toy/toy.dockerfile
+    requires:
+    - image: toy-base
+      alias: CHEAP_BASE
+  - image: toy-base
+    custom:
+      buildCommand: echo $PWD && k8s/bin/buildx.sh -f k8s/toy/toy-base.dockerfile
+      dependencies:
+        dockerfile:
+          path: k8s/toy/toy-base.dockerfile

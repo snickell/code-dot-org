@@ -30,7 +30,5 @@ else
   args="--load"
 fi
 
-DOCKERFILE=${1:-"$BUILD_CONTEXT/Dockerfile"}
-
 set -x # show the command
-docker buildx build -f "$DOCKERFILE" --tag $IMAGE $args $cache_from $cache_to "$BUILD_CONTEXT"
+docker buildx build --tag $IMAGE $args $cache_from $cache_to "$BUILD_CONTEXT" $@
