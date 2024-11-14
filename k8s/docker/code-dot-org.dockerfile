@@ -70,7 +70,7 @@ RUN \
 <<EOF
   # yarn install
   cd apps
-  yarn install --frozen-lockfile --silent
+  CI=true yarn install --frozen-lockfile --silent
   ls -l | grep node_modules
 EOF
 
