@@ -8,7 +8,7 @@ class UrlConverter
   DASHBOARD_REGEX = /#{'//studio.code.org'}(?=$|\/)/
 
   # For reference, a 'host' is a domain and (optionally) port without a protocol.
-  # Examples: code.org, studio.code.org, studio.code.org.localhost:3000
+  # Examples: code.org, studio.code.org, localhost-studio.code.org:3000
   # @see https://developer.mozilla.org/en-US/docs/Web/API/Location
   def initialize(dashboard_host: nil, pegasus_host: nil, hourofcode_host: nil,
     csedweek_host: nil, advocacy_host: nil)
@@ -16,10 +16,6 @@ class UrlConverter
     @pegasus_host = pegasus_host
     @hourofcode_host = hourofcode_host
     @csedweek_host = csedweek_host
-  end
-
-  def localhost?(url)
-    URI.parse(url).host.end_with? '.localhost'
   end
 
   # An 'origin' is a protocol, domain, and (optional) port.  This method may
@@ -48,7 +44,7 @@ class UrlConverter
     end
 
     # Convert http to https
-    url = url.gsub(/^#{'http://'}/, 'https://') unless localhost? url
+    url = url.gsub(/^#{'http://'}/, 'https://') unless url.start_with? 'http://localhost'
     # Convert x.y.code.org to x-y.code.org
     url.gsub(/(\w+)\.(\w+)#{'.code.org'}/, '\1-\2.code.org')
   end
