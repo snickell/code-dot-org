@@ -22,13 +22,17 @@ class RubricsTest < ActionDispatch::IntegrationTest
   end
 
   test 'canShowTaScoresAlert is false after teacher submits feedback' do
-    create :learning_goal_teacher_evaluation, learning_goal: @rubric.learning_goals.first, teacher: @teacher
+    learning_goal = create :learning_goal_teacher_evaluation, learning_goal: @rubric.learning_goals.first, teacher: @teacher, understanding: nil
 
-    get build_script_level_path(@first_script_level)
+    # ignore learning goal without understanding
+    get build_script_level_path(@last_script_level)
     assert_response :success
     rubric_data = JSON.parse(css_select('script[data-rubricdata]').first.attribute('data-rubricdata').to_s)
-    refute rubric_data['canShowTaScoresAlert']
+    assert rubric_data['canShowTaScoresAlert']
 
+    learning_goal.update!(understanding: 1)
+
+    # can show alert after understanding is set
     get build_script_level_path(@last_script_level)
     assert_response :success
     rubric_data = JSON.parse(css_select('script[data-rubricdata]').first.attribute('data-rubricdata').to_s)
