@@ -54,14 +54,14 @@ const CopyToClipboardButton: React.FunctionComponent<{
       color="white"
       size="m"
       onClick={handleCopyToClipboard}
-      className={moduleStyles.projectButton}
+      className={moduleStyles.shareDialogButton}
     />
   );
 };
 
 const AfeCareerTourBlock: React.FunctionComponent = () => {
   const careersUrl =
-    'https://www.amazonfutureengineer.com/careertours/careervideos';
+    'https://www.amazonfutureengineer.com/musicsolo?utm_campaign=Code.Org&utm_medium=Musiclab&utm_source=US&utm_content=Career%20Tours&utm_term=2024';
 
   return (
     <div className={classNames(moduleStyles.block, moduleStyles.blockAfe)}>
@@ -73,7 +73,7 @@ const AfeCareerTourBlock: React.FunctionComponent = () => {
         {i18n.careerTourTitle()}
       </Typography>
       <img alt="" src="/shared/images/afe/afe-career-tours-0.jpg" />
-      {i18n.careerTourDescription()}
+      <div className={moduleStyles.afeText}>{i18n.careerTourDescription()}</div>
       <LinkButton
         ariaLabel={i18n.careerTourAction()}
         href={careersUrl}
@@ -87,7 +87,7 @@ const AfeCareerTourBlock: React.FunctionComponent = () => {
           iconStyle: 'solid',
           title: 'arrow-up-right-from-square',
         }}
-        className={moduleStyles.fullWidth}
+        className={moduleStyles.shareDialogButton}
       />
     </div>
   );
@@ -111,7 +111,7 @@ const SubmitButtonInfo: React.FunctionComponent<{
         color="white"
         size="m"
         onClick={onSubmitClick}
-        className={moduleStyles.projectButton}
+        className={moduleStyles.shareDialogButton}
       />
     );
   } else if (submissionStatus === ProjectSubmissionStatus.ALREADY_SUBMITTED) {
@@ -233,7 +233,6 @@ const ShareDialog: React.FunctionComponent<{
                   type="primary"
                   color="white"
                   size="m"
-                  className={moduleStyles.doneButton}
                 />
               </div>
             ) : (
@@ -244,7 +243,6 @@ const ShareDialog: React.FunctionComponent<{
                 color="white"
                 size="m"
                 onClick={handleClose}
-                className={moduleStyles.doneButton}
               />
             )}
           </div>
