@@ -204,6 +204,7 @@ export const READ_ONLY_PROPERTIES = [
   'hasCategories',
   'html',
   'Input',
+  'inputs',
   'INPUT_VALUE',
   'js',
   'MenuItem',

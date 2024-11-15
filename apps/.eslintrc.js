@@ -16,7 +16,7 @@ const rulesToEventuallyReenable = {
 };
 
 const accessibilityTestingMessage =
-  'Tests should resemble how the user interacts with the application and should not rely on technical details, see https://testing-library.com/docs/queries/about/#priority';
+  'Tests should resemble how the user interacts with the application and should not rely on technical details, see docs https://testing-library.com/docs/queries/about/#priority and playbook https://docs.google.com/document/d/1U4MRbH1kthYn40mbAFK59fOWWJNcvrMIDpAZzYd9q9Y/edit';
 
 const noDataTestIdMessage =
   'Attribute data-testid does not meet accessibility guidelines. ' +
