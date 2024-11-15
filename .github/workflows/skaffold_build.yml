@@ -136,6 +136,7 @@ jobs:
     needs: build
     env:
       IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/code-dot-org
+      MULTI_PLATFORM_IMAGE: ghcr.io/${{ github.repository_owner }}/code-dot-org:${{ needs.build.outputs.docker_tag }}
     defaults:
       run:
         shell: bash -ex {0}
@@ -154,30 +155,14 @@ jobs:
         id: parse_tags
         run: |
           # Extract tags prefixed with "docker_tag_" and prepend $IMAGE_NAME to each tag
-          DOCKER_TAGS_JSON='${{ toJSON(needs.build.outputs) }}'
-          
-          # Fix JSON format if needed
-          DOCKER_TAGS_JSON=$(echo "$DOCKER_TAGS_JSON" | sed 's/\([a-zA-Z_]\+\):/\\"\1\\":/g')
-          
-          # Proceed with jq processing
-          ARCH_IMAGES=$(echo "$DOCKER_TAGS_JSON" | jq -r --arg IMAGE_NAME "$IMAGE_NAME" \
-              'to_entries[] | select(.key | startswith("docker_tag_")) | "\($IMAGE_NAME):\(.value)"')
-          
-          echo "ARCH_IMAGES=$ARCH_IMAGES" >> "$GITHUB_ENV"
-
-          # Output ARCH_IMAGES to GITHUB_ENV
-          echo "ARCH_IMAGES=${ARCH_IMAGES}" >> "$GITHUB_ENV"
-
-          # Set MULTI_PLATFORM_IMAGE to the base docker tag
-          echo "MULTI_PLATFORM_IMAGE=$IMAGE_NAME:${{ needs.build.outputs.docker_tag }}" >> "$GITHUB_ENV"
+          DOCKER_TAGS_JSON='${{ toJSON(needs.build.outputs) }}'          
+          SINGLE_ARCH_IMAGES=$(jq -r --arg prefix "$IMAGE_NAME" 'to_entries | map(select(.key | test("^docker_tag_")) | "\($prefix):\(.value)") | join(" ")' <<< "$DOCKER_TAGS_JSON")
+          echo "SINGLE_ARCH_IMAGES=$SINGLE_ARCH_IMAGES" >> "$GITHUB_ENV"
 
       - name: Stitch platform images into a multi-platform image
         run: |
-          echo "MULTI_PLATFORM_IMAGE=$MULTI_PLATFORM_IMAGE"
-          echo "ARCH_IMAGES=$ARCH_IMAGES"
-
           # Use imagetools to stitch all platform-specific images into one multi-platform image
-          docker buildx imagetools create -t "$MULTI_PLATFORM_IMAGE" $ARCH_IMAGES
+          docker buildx imagetools create -t $MULTI_PLATFORM_IMAGE $SINGLE_ARCH_IMAGES
 
 # Grant the GITHUB_TOKEN the necessary permissions to publish to GitHub Packages
 permissions:
