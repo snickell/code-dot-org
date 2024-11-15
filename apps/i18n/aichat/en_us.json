@@ -46,8 +46,6 @@
   "modelCard_exampleTopicsEditTooltip": "Add example prompts the user could consider when using the chatbot. Type in each example prompt into the text box, then click “Add” for each one.",
   "modelCard_exampleTopicsDisplayTooltip": "Try some of these example prompts to get started.",
   "modelCardPanelHeader": "Model Card",
-  "modelComparisonSlot1": "choose-model-1",
-  "modelComparisonSlot2": "choose-model-2",
   "modelComparisonCompletionButton": "Finish",
   "modelCustomizationHeader": "Model Customization",
   "modelCustomization_comparisonHeader": "Selected model",
