@@ -2,15 +2,13 @@ import React from 'react';
 
 import Button, {buttonColors} from '@cdo/apps/componentLibrary/button/Button';
 import Link from '@cdo/apps/componentLibrary/link/Link';
-import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
 import {
   BodyOneText,
   BodyTwoText,
-  EmText,
   Heading3,
-  StrongText,
 } from '@cdo/apps/componentLibrary/typography';
 import AccessibleDialog from '@cdo/apps/sharedComponents/AccessibleDialog';
+import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
 import i18n from '@cdo/locale';
 
 import aichatI18n from '../locale';
