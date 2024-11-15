@@ -14,7 +14,6 @@ Feature: School Info Confirmation Dialog
 # 4. A year later after the user has completed school info, the user sees prompt to
 # confirm or update current school info.
 
-@no_safari
 Scenario: School Info Confirmation Dialog
   # Teacher account is created with partial school info
   Given I create a teacher named "Teacher_Chuba" and go home
@@ -52,4 +51,4 @@ Scenario: School Info Confirmation Dialog
   Then element "#uitest-country-dropdown" has value "US"
   Then element "#uitest-school-zip" has value "31513"
   # value is school_id for "Appling County High School"
-  Then element "#uitest-school-dropdown" has value "130006000010"
+  Then I wait until element "#uitest-school-dropdown" has the value "130006000010"
