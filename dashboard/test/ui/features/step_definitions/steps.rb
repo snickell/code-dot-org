@@ -42,6 +42,7 @@ rescue Selenium::WebDriver::Error::StaleElementReferenceError
   true
 rescue Selenium::WebDriver::Error::WebDriverError => exception
   return true if exception.message.include?('stale element reference') ||
+    exception.message.include?('is stale') ||
     exception.message.include?('no such element')
   puts "Unknown error: #{exception}"
   true
