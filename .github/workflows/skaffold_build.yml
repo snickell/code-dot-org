@@ -154,15 +154,16 @@ jobs:
         id: parse_tags
         run: |
           # Extract tags prefixed with "docker_tag_" and prepend $IMAGE_NAME to each tag
-          ARCH_IMAGES=$(echo "${{ toJSON(needs.build.outputs) }}" | jq -r --arg IMAGE_NAME "$IMAGE_NAME" \
-              'to_entries[] | select(.key | startswith("docker_tag_")) | "\($IMAGE_NAME):\(.value)"')
-
-          echo "ARCH_IMAGES1=$ARCH_IMAGES"
-
-          # Format ARCH_IMAGES as a unique, space-separated list for GitHub environment
-          ARCH_IMAGES=$(echo "$ARCH_IMAGES" | tr '\n' ' ' | xargs -n1 | sort -u | xargs)
+          DOCKER_TAGS_JSON='${{ toJSON(needs.build.outputs) }}'
           
-          echo "ARCH_IMAGES2=$ARCH_IMAGES"
+          # Fix JSON format if needed
+          DOCKER_TAGS_JSON=$(echo "$DOCKER_TAGS_JSON" | sed 's/\([a-zA-Z_]\+\):/\\"\1\\":/g')
+          
+          # Proceed with jq processing
+          ARCH_IMAGES=$(echo "$DOCKER_TAGS_JSON" | jq -r --arg IMAGE_NAME "$IMAGE_NAME" \
+              'to_entries[] | select(.key | startswith("docker_tag_")) | "\($IMAGE_NAME):\(.value)"')
+          
+          echo "ARCH_IMAGES=$ARCH_IMAGES" >> "$GITHUB_ENV"
 
           # Output ARCH_IMAGES to GITHUB_ENV
           echo "ARCH_IMAGES=${ARCH_IMAGES}" >> "$GITHUB_ENV"
