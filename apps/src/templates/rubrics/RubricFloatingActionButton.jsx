@@ -118,7 +118,7 @@ function RubricFloatingActionButton({
       ? EVENTS.TA_RUBRIC_CLOSED_FROM_FAB_EVENT
       : EVENTS.TA_RUBRIC_OPENED_FROM_FAB_EVENT;
     analyticsReporter.sendEvent(eventName, eventData);
-    if (!isOpen) {
+    if (!isOpen && showCountBubble) {
       setSeenTaScores();
     }
     setIsOpen(!isOpen);
