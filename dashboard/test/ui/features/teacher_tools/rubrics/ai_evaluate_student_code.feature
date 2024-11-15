@@ -27,7 +27,7 @@ Feature: Evaluate student code against rubrics using AI
     And I am on "http://studio.code.org/home"
     And I wait until element "#homepage-container" is visible
     And element "#sign_in_or_user" contains text "Teacher_Aiden"
-    And I am on "http://studio.code.org/s/allthethings/lessons/48/levels/2?enableExperiments=taNotifications"
+    And I am on "http://studio.code.org/s/allthethings/lessons/48/levels/2"
     And I wait for the lab page to fully load
     And element ".teacher-panel td:eq(1)" contains text "Aiden"
     And I click selector ".teacher-panel td:eq(1)" to load a new page
@@ -36,15 +36,12 @@ Feature: Evaluate student code against rubrics using AI
     And I click selector ".introjs-skipbutton" once I see it
     Then I verify progress in the header of the current page is "perfect_assessment" for level 2
     And element "#ui-floatingActionButton" is visible
-    And I wait until element ".uitest-count-bubble" is visible
-    And element ".uitest-dismissible-alert" is visible
 
     # Teacher views AI evaluation status in rubric header
     When I click selector "#ui-floatingActionButton"
     And I wait until element "#uitest-rubric-content" is visible
     And element ".uitest-run-ai-assessment" is disabled
     Then I wait until element ".uitest-rubric-tab-buttons .__react_component_tooltip" contains text "AI analysis already completed for this project."
-    And I wait until element ".uitest-dismissible-alert" is not visible
 
     # Teacher views AI evaluation results in rubric
     And I wait until element "#uitest-next-goal" is visible
@@ -54,12 +51,6 @@ Feature: Evaluate student code against rubrics using AI
     And I wait until element ".uitest-ai-assessment" is visible
     Then element ".uitest-ai-assessment" contains text "Aiden has achieved Extensive or Convincing Evidence"
     And element ".uitest-student-progress-status" contains text "Ready to review"
-
-    # dismissed alert does not come back on page reload
-    When I reload the page
-    And I wait until element "#ui-floatingActionButton" is visible
-    And I wait until element ".uitest-count-bubble" is visible
-    And element ".uitest-dismissible-alert" is not visible
 
   Scenario: Student code is evaluated by AI when teacher requests individual evaluation
     Given I create an authorized teacher-associated student named "Aiden"
@@ -171,3 +162,45 @@ Feature: Evaluate student code against rubrics using AI
     And I wait until element ".uitest-ai-assessment" is visible
     Then element ".uitest-ai-assessment" contains text "Aiden has achieved Extensive or Convincing Evidence"
     And element ".uitest-student-progress-status" contains text "Ready to review"
+
+  Scenario: Alerts are shown when AI scores are available to review
+    Given I create an authorized teacher-associated student named "Aiden"
+    And I get debug info for the current user
+    And I am on "http://studio.code.org/home"
+    And I wait until element "#homepage-container" is visible
+    And I am on "http://studio.code.org/s/allthethings/lessons/48/levels/2"
+    And I wait for the lab page to fully load
+    And I verify progress in the header of the current page is "not_tried" for level 2
+
+    # Student submits code
+    When I ensure droplet is in text mode
+    And I append text to droplet "// the quick brown fox jumped over the lazy dog.\n"
+    And I submit this gamelab level
+
+    # Teacher views floating action button on assessment level
+    When I sign in as "Teacher_Aiden"
+    And I am on "http://studio.code.org/home"
+    And I wait until element "#homepage-container" is visible
+    And element "#sign_in_or_user" contains text "Teacher_Aiden"
+    And I am on "http://studio.code.org/s/allthethings/lessons/48/levels/2?enableExperiments=taNotifications"
+    And I wait for the lab page to fully load
+    And element ".teacher-panel td:eq(1)" contains text "Aiden"
+    And I click selector ".teacher-panel td:eq(1)" to load a new page
+    And I wait for the lab page to fully load
+    And I wait until element "#ui-floatingActionButton" is visible
+    And I click selector ".introjs-skipbutton" once I see it
+    And element "#ui-floatingActionButton" is visible
+    And I wait until element ".uitest-count-bubble" is visible
+    And element ".uitest-dismissible-alert" is visible
+
+    # Teacher dismisses alert
+    When I click selector ".uitest-dismissible-alert .fa-close"
+    And I wait until element "#uitest-rubric-content" is visible
+    And I wait until element ".uitest-dismissible-alert" is not visible
+
+    # dismissed alert does not come back on page reload
+    When I reload the page
+    And I wait until element "#ui-floatingActionButton" is visible
+    And I wait until element ".uitest-count-bubble" is visible
+    And element ".uitest-dismissible-alert" is not visible
+
