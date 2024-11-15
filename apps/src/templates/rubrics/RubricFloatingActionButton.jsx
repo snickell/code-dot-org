@@ -95,6 +95,8 @@ function RubricFloatingActionButton({
 
   const [internalError, setInternalError] = useState(null);
 
+  const onLevelForEvaluation = currentLevelName === rubric.level.name;
+
   const readyStudentCount = useAppSelector(selectReadyStudentCount);
   const hasLoadedStudentStatus = useAppSelector(selectHasLoadedStudentStatus);
   const showCountBubble =
@@ -265,7 +267,7 @@ function RubricFloatingActionButton({
           rubric={rubric}
           studentLevelInfo={studentLevelInfo}
           reportingData={reportingData}
-          currentLevelName={currentLevelName}
+          onLevelForEvaluation={onLevelForEvaluation}
           teacherHasEnabledAi={aiEnabled}
           open={isOpen}
           closeRubric={handleClick}
