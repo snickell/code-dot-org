@@ -479,7 +479,6 @@ class TopInstructions extends Component {
       levelId: this.props.serverLevelId,
       scriptId: this.props.serverScriptId,
       interaction: UserLevelInteractions.click_help_and_tips,
-      codeVersion: 'how the heck am I going to get this?!?!',
     });
   };
 
