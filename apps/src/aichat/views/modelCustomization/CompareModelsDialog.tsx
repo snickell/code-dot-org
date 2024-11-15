@@ -39,12 +39,12 @@ const CompareModelsDialog: React.FunctionComponent<{
         <ModelDescriptionPanel
           initialSelectedModelId={chosenModelLeft}
           availableModels={availableModels}
-          dropdownName={aichatI18n.modelComparisonSlot1()}
+          dropdownName="choose-model-1"
         />
         <ModelDescriptionPanel
           initialSelectedModelId={chosenModelRight}
           availableModels={availableModels}
-          dropdownName={aichatI18n.modelComparisonSlot2()}
+          dropdownName="choose-model-2"
         />
       </div>
       <hr />
