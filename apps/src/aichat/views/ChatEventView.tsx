@@ -43,13 +43,11 @@ function formatModelUpdateText(update: ModelUpdate): string {
 
   const modelUpdateText = updatedToText
     ? aichatI18n.modelUpdateText({
-        // "[Temperature] has been updated to [0.7] {timestamp}"
         fieldLabel: fieldLabel,
         updatedToText: updatedToText.toString(),
         timestamp: timestampToLocalTime(timestamp),
       })
     : aichatI18n.modelUpdateText2({
-        // "{fieldLabel} has been updated. {timestamp}""
         fieldLabel: fieldLabel,
         timestamp: timestampToLocalTime(timestamp),
       });
