@@ -195,7 +195,8 @@ Feature: Evaluate student code against rubrics using AI
 
     # Teacher dismisses alert
     When I click selector ".uitest-dismissible-alert .fa-close"
-    And I wait until element ".uitest-dismissible-alert" is not visible
+    And I wait until element ".uitest-dismiss-confirmed" is visible
+    And element ".uitest-dismissible-alert" is not visible
 
     # dismissed alert does not come back on page reload
     When I reload the page

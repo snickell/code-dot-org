@@ -128,6 +128,8 @@ function RubricFloatingActionButton({
   const showScoresAlert =
     canShowTaScoresAlert && !hasSeenAlert && showCountBubble;
 
+  const [dismissConfirmed, setDismissConfirmed] = useState(false);
+
   const setSeenTaScores = useCallback(() => {
     setHasSeenAlert(true);
 
@@ -135,9 +137,13 @@ function RubricFloatingActionButton({
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({lesson_id: rubric.lesson.id}),
-    }).catch(error => {
-      console.error('Error setting seen TA scores:', error);
-    });
+    })
+      .then(response => {
+        setDismissConfirmed(true);
+      })
+      .catch(error => {
+        console.error('Error setting seen TA scores:', error);
+      });
   }, [rubric.lesson.id]);
 
   const viewScores = () => {
@@ -226,7 +232,11 @@ function RubricFloatingActionButton({
       {showCountBubble ? (
         <>
           <div
-            className={classnames(style.countOverlay, 'uitest-count-bubble')}
+            className={classnames(
+              style.countOverlay,
+              'uitest-count-bubble',
+              dismissConfirmed && 'uitest-dismiss-confirmed'
+            )}
           >
             <BodyFourText className={style.countText}>
               <StrongText>
