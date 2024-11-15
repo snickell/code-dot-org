@@ -3,12 +3,11 @@ import React, {useCallback} from 'react';
 import {Button} from '@cdo/apps/componentLibrary/button';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 
+import aichatI18n from '../../locale';
 import {
   selectHavePropertiesChanged,
   updateAiCustomization,
 } from '../../redux/aichatRedux';
-
-import aichatI18n from '../../locale';
 
 import styles from '../model-customization-workspace.module.scss';
 

@@ -9,9 +9,8 @@ import Slider, {SliderProps} from '@cdo/apps/componentLibrary/slider/Slider';
 import {isReadOnlyWorkspace} from '@cdo/apps/lab2/lab2Redux';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 
-import aichatI18n from '../../locale';
-
 import {modelDescriptions} from '../../constants';
+import aichatI18n from '../../locale';
 import {setAiCustomizationProperty} from '../../redux/aichatRedux';
 
 import CompareModelsDialog from './CompareModelsDialog';

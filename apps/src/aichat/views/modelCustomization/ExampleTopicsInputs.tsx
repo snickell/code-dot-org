@@ -3,8 +3,8 @@ import React, {useCallback, useMemo} from 'react';
 import Alert, {alertTypes} from '@cdo/apps/componentLibrary/alert/Alert';
 import {useAppDispatch} from '@cdo/apps/util/reduxHooks';
 
-import {setModelCardProperty} from '../../redux/aichatRedux';
 import aichatI18n from '../../locale';
+import {setModelCardProperty} from '../../redux/aichatRedux';
 import {Visibility} from '../../types';
 
 import MultiInputCustomization from './MultiInputCustomization';
