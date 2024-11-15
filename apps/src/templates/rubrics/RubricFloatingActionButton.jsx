@@ -100,7 +100,10 @@ function RubricFloatingActionButton({
   const readyStudentCount = useAppSelector(selectReadyStudentCount);
   const hasLoadedStudentStatus = useAppSelector(selectHasLoadedStudentStatus);
   const showCountBubble =
-    notificationsEnabled && hasLoadedStudentStatus && readyStudentCount > 0;
+    onLevelForEvaluation &&
+    notificationsEnabled &&
+    hasLoadedStudentStatus &&
+    readyStudentCount > 0;
 
   const eventData = useMemo(() => {
     return {

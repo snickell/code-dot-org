@@ -227,6 +227,30 @@ describe('RubricFloatingActionButton', () => {
         screen.queryByLabelText(i18n.aiEvaluationsToReview())
       ).not.toBeInTheDocument();
     });
+
+    it('does not render count bubble on non-assessment level', async () => {
+      stubFetch({
+        evalStatusForAll: successJsonAll,
+        teacherEvals: noEvals,
+      });
+
+      render(
+        <Provider store={store}>
+          <RubricFloatingActionButton
+            {...defaultProps}
+            sectionId={sectionId}
+            currentLevelName="non-assessment-level"
+          />
+        </Provider>
+      );
+
+      await wait();
+
+      expect(screen.getByRole('img', {name: 'TA overlay'})).toBeVisible();
+      expect(
+        screen.queryByLabelText(i18n.aiEvaluationsToReview())
+      ).not.toBeInTheDocument();
+    });
   });
 
   describe('student scores alert', () => {
