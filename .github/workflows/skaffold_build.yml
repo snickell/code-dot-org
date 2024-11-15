@@ -1,12 +1,8 @@
 name: skaffold
 on: [push]
 
-# Grant the GITHUB_TOKEN the necessary permissions to publish to GitHub Packages
-permissions:
-  contents: read
-  packages: write
-
 jobs:
+  # Step 1: build platform specific docker images: amd64, arm64
   build:
     name: build
     runs-on: ${{ matrix.runs-on }}
@@ -15,20 +11,19 @@ jobs:
         runs-on: [ubuntu-latest, skaffold-arm64]
     env:
       SKAFFOLD_DEFAULT_REPO: ghcr.io/${{ github.repository_owner }}
-      BASE_COMMIT: 1e5e6230c17e962fc49c8f0e6b833845db816a49
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
       # build docker images with -amd64 or -arm64 suffix, we'll stitch them together later:
       APPEND_ARCHITECTURE_TO_DOCKER_TAG: true
     outputs:
-      docker_tag_amd64: ${{ steps.set_docker_tag.outputs.docker_tag_amd64 }}
-      docker_tag_arm64: ${{ steps.set_docker_tag.outputs.docker_tag_arm64 }}
-      docker_tag: ${{ steps.set_docker_tag.outputs.docker_tag }}
+      docker_tag_amd64: ${{ steps.docker_tags.outputs.docker_tag_amd64 }}
+      docker_tag_arm64: ${{ steps.docker_tags.outputs.docker_tag_arm64 }}
+      docker_tag: ${{ steps.docker_tags.outputs.docker_tag }}
     defaults:
       run:
         shell: bash -ex {0}
     steps:
-      - name: Set Docker Tag
-        id: set_docker_tag
+      - name: Setup Docker Tags
+        id: docker_tags
         run: |
           DOCKER_TAG="${BRANCH_NAME//[^a-zA-Z0-9_.-]/-}"
           echo "docker_tag=$DOCKER_TAG" >> "$GITHUB_OUTPUT"
@@ -41,17 +36,12 @@ jobs:
           
           echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
 
-      - name: Set ENV vars
-        run: |
-          lsb_release -a
-          lscpu
-          free -h
-          echo "SKAFFOLD_DEFAULT_REPO=$SKAFFOLD_DEFAULT_REPO"
-          echo "GITHUB_WORKFLOW=${GITHUB_WORKFLOW}"
-
       # - name: ssh into the runner
       #   uses: mxschmitt/action-tmate@v3
       
+      # GitHub Runners didn't have a big enough disk for our giant Docker images
+      # but fortunately they have an empty tmp disk mounted at /mnt, we just need
+      # to symlink it into /var/lib/docker.
       - name: Put /var/lib/docker on the big empty temp disk
         run: |
           echo "Docker had `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
@@ -68,21 +58,6 @@ jobs:
           echo
           echo "Docker now has `sudo df -h /var/lib/docker | awk 'NR==2 {print $4}'` available"
           echo "Workspace has `sudo df -h $GITHUB_WORKSPACE | awk 'NR==2 {print $4}'` available"
-
-      # If we needed even MORE space for docker we could maybe use this:
-      #
-      # - name: Maximize build space
-      #   uses: easimon/maximize-build-space@master
-      #   with:
-      #     remove-dotnet: true
-      #     remove-android: true
-      #     remove-haskell: true
-      #     remove-codeql: true
-      #     # this needs to fit our git checkout:
-      #     root-reserve-mb: 2048
-      #     # because we're allocating all our maximized space to docker
-      #     build-mount-path: /var/lib/docker
-      #     build-mount-path-ownership: root:root
 
       - name: install skaffold
         run: |
@@ -103,7 +78,6 @@ jobs:
         uses: docker/setup-buildx-action@v3
         # with:
           # platforms: linux/amd64,linux/arm64
-          # platforms: linux/amd64
 
       # Login to GitHub Container Registry
       - name: Login to GitHub Container Registry
@@ -113,36 +87,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # # Pin a base git commit, and cache it + fastforward to the current commit to
-      # # speedup git checkout
-      # 
-      # - name: Restore Cache of Git Fetch
-      #   id: cache-git-fetch-restore
-      #   uses: actions/cache/restore@v3
-      #   with:
-      #     path: "${{ github.workspace }}/.git"
-      #     key: git-fetch-${{ hashFiles('**/FETCH_HEAD') }}
-      # - run: |
-      #     # git clone --branch $DRONE_SOURCE_BRANCH  --depth 1 $DRONE_GIT_HTTP_URL .
-      #     git init
-      #     git remote origin add https://github.com/code-dot-org/code-dot-org.git
-      #     git fetch --depth=1 origin $BASE_COMMIT
-      #     git checkout $BASE_COMMIT
-      # - name: Save Cache of Git Fetch
-      #   id: cache-git-fetch-save
-      #   uses: actions/cache/save@v3
-      #   with:
-      #     path: "${{ github.workspace }}/.git"
-      #     key: git-fetch-${{ hashFiles('**/FETCH_HEAD') }}
-      # - run: |
-      #     # FIXME: here is where (instead of actions/checkout@v3) we would use our 
-      #     # existing .git/ checkout to $BASE_COMMIT, and fast-forward it to 
-      #     # $GITHUB_SHA or $GITHUB_WORKFLOW_SHA instead of doing a raw checkout of sources
-      #     #
-      #     # These commands are NOT right, they re-download everything.... what IS right?
-      #     git fetch --depth=1 origin $GITHUB_WORKFLOW_SHA
-      #     git checkout $GITHUB_WORKFLOW_SHA
-
       - name: Checkout sources
         uses: actions/checkout@v4
 
@@ -150,7 +94,7 @@ jobs:
       #   uses: mxschmitt/action-tmate@v3
 
       - name: skaffold cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.skaffold/cache
           key: skaffold-${{ hashFiles('~/.skaffold/cache') }}
@@ -185,8 +129,9 @@ jobs:
           find ~/.skaffold/cache
           du -h ~/.skaffold/cache
 
-  stitch:
-    name: Stitch Multi-Platform Image
+  # Step 2: stitch the platform specific images into a multi-platform image
+  stitch-multi-platform:
+    name: Stitch a Multi-Platform Image from Platform-Specific Images
     runs-on: ubuntu-latest
     needs: build
     env:
@@ -208,19 +153,17 @@ jobs:
       - name: Parse DOCKER_TAGS JSON and prepare tag list
         id: parse_tags
         run: |
-          echo "OUTPUTS='${{ needs.build.outputs }}'"
-          DOCKER_TAGS_JSON='${{ toJSON(needs.build.outputs) }}'
-          echo "DOCKER_TAGS_JSON=$DOCKER_TAGS_JSON"
-
-          IMAGE_NAME="ghcr.io/code-dot-org/code-dot-org"
-
           # Extract tags prefixed with "docker_tag_" and prepend $IMAGE_NAME to each tag
-          ARCH_IMAGES=$(echo "$DOCKER_TAGS_JSON" | jq -r --arg IMAGE_NAME "$IMAGE_NAME" \
+          ARCH_IMAGES=$(echo "${{ toJSON(needs.build.outputs) }}" | jq -r --arg IMAGE_NAME "$IMAGE_NAME" \
               'to_entries[] | select(.key | startswith("docker_tag_")) | "\($IMAGE_NAME):\(.value)"')
+
+          echo "ARCH_IMAGES1=$ARCH_IMAGES"
 
           # Format ARCH_IMAGES as a unique, space-separated list for GitHub environment
           ARCH_IMAGES=$(echo "$ARCH_IMAGES" | tr '\n' ' ' | xargs -n1 | sort -u | xargs)
           
+          echo "ARCH_IMAGES2=$ARCH_IMAGES"
+
           # Output ARCH_IMAGES to GITHUB_ENV
           echo "ARCH_IMAGES=${ARCH_IMAGES}" >> "$GITHUB_ENV"
 
@@ -234,3 +177,8 @@ jobs:
 
           # Use imagetools to stitch all platform-specific images into one multi-platform image
           docker buildx imagetools create -t "$MULTI_PLATFORM_IMAGE" $ARCH_IMAGES
+
+# Grant the GITHUB_TOKEN the necessary permissions to publish to GitHub Packages
+permissions:
+  contents: read
+  packages: write
