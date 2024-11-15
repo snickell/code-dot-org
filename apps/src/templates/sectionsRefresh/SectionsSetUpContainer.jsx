@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
-import React, {useState, useCallback, useRef} from 'react';
+import React, {useState, useCallback, useRef, useEffect} from 'react';
 import {Provider} from 'react-redux';
 
 import {queryParams} from '@cdo/apps/code-studio/utils';
@@ -37,19 +37,19 @@ const NEW = 'New';
 // Currently, this hook returns two things:
 //   - sections: list of objects that represent the sections to create
 //   - updateSection: function to update the section at the given index
-const useSections = section => {
-  // added "default properties" for any new section
+
+const useSections = initialSection => {
   const [sections, setSections] = useState(
-    section
+    initialSection
       ? [
           {
-            ...Object.keys(section).reduce((acc, cur) => {
+            ...Object.keys(initialSection).reduce((acc, cur) => {
               if (cur !== 'stageExtras') {
-                acc[cur] = section[cur];
+                acc[cur] = initialSection[cur];
               }
               return acc;
             }, {}),
-            lessonExtras: section.stageExtras,
+            lessonExtras: initialSection.stageExtras,
           },
         ]
       : [
@@ -63,6 +63,34 @@ const useSections = section => {
           },
         ]
   );
+
+  useEffect(() => {
+    // Update sections whenever initialSection changes
+    setSections(
+      initialSection
+        ? [
+            {
+              ...Object.keys(initialSection).reduce((acc, cur) => {
+                if (cur !== 'stageExtras') {
+                  acc[cur] = initialSection[cur];
+                }
+                return acc;
+              }, {}),
+              lessonExtras: initialSection.stageExtras,
+            },
+          ]
+        : [
+            {
+              pairingAllowed: true,
+              restrictSection: false,
+              ttsAutoplayEnabled: false,
+              lessonExtras: true,
+              aiTutorEnabled: false,
+              course: {hasTextToSpeech: false, hasLessonExtras: false},
+            },
+          ]
+    );
+  }, [initialSection]); // Dependency on initialSection
 
   const updateSection = (sectionIdx, keyToUpdate, val) => {
     const newSections = sections.map((section, idx) => {
