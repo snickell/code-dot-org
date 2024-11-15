@@ -84,6 +84,36 @@ module LevelsHelper
     view_options(signed_replay_log_url: signed_url)
   end
 
+  def get_project_and_version_id(level_id, script_id)
+    result = {project_id: nil, version_id: nil, error: nil}
+    level = Level.find(level_id)
+    user_storage_id = storage_id_for_user_id(current_user.id)
+    if level
+      if level.channel_backed?
+        user_storage_id = storage_id_for_user_id(current_user.id)
+        if user_storage_id
+          channel_token = ChannelToken.find_channel_token(level, user_storage_id, script_id)
+          if channel_token
+            _owner_id, result[:project_id] = storage_decrypt_channel_id(channel_token.channel)
+            source_data = SourceBucket.new.get(channel_token.channel, "main.json")
+            if source_data[:status] == 'FOUND'
+              result[:version_id] = source_data[:version_id]
+            end
+          else
+            result[:error] = "Channel token not found"
+          end
+        else
+          result[:error] = "User storage id not found"
+        end
+      else
+        result[:error] = "Level is not channel backed"
+      end
+    else
+      result[:error] = "Level not found"
+    end
+    result
+  end
+
   # If given a user, find the channel associated with the given level/user.
   # Otherwise, gets the storage_id associated with the (potentially signed out)
   # current user, and either finds or creates a channel for the level

@@ -1,6 +1,7 @@
 require 'json'
 
 class UserLevelInteractionsController < ApplicationController
+  include LevelsHelper
   include Rails.application.routes.url_helpers
   before_action :authenticate_user!
   load_and_authorize_resource :user_level_interaction
@@ -27,10 +28,17 @@ class UserLevelInteractionsController < ApplicationController
     user_level_interaction_params[:school_year] = school_year
     unit = Unit.find(user_level_interaction_params[:script_id])
     level = Level.find(user_level_interaction_params[:level_id])
+    project_data = get_project_and_version_id(user_level_interaction_params[:level_id], user_level_interaction_params[:script_id])
+    unless project_data[:error]
+      user_level_interaction_params[:code_version] = project_data[:version_id]
+    end
     metadata = {
       course_offering: unit.properties["curriculum_umbrella"],
       unit: unit.name,
       level_type: level.type,
+      user_type: current_user.user_type,
+      project_id: project_data[:project_id],
+      project_version_error: project_data[:error],
     }.to_json
     user_level_interaction_params[:metadata] = metadata
     user_level_interaction_params

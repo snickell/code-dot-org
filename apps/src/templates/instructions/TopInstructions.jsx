@@ -15,6 +15,8 @@ import firehoseClient from '@cdo/apps/metrics/firehose';
 import TeacherFeedbackTab from '@cdo/apps/templates/instructions/teacherFeedback/TeacherFeedbackTab';
 import {rubricShape} from '@cdo/apps/templates/rubrics/rubricShapes';
 import StudentRubricView from '@cdo/apps/templates/rubrics/StudentRubricView';
+import {logUserLevelInteraction} from '@cdo/apps/userLevelInteractionsLogger/userLevelInteractionsApi';
+import {UserLevelInteractions} from '@cdo/generated-scripts/sharedConstants';
 import i18n from '@cdo/locale';
 
 import commonStyles from '../../commonStyles';
@@ -44,9 +46,6 @@ import TeacherOnlyMarkdown from './TeacherOnlyMarkdown';
 import * as topInstructionsDataApi from './topInstructionsDataApi';
 import TopInstructionsHeader from './TopInstructionsHeader';
 import {hasInstructions} from './utils';
-
-import {logUserLevelInteraction} from '@cdo/apps/userLevelInteractionsLogger/userLevelInteractionsApi';
-import {UserLevelInteractions} from '@cdo/generated-scripts/sharedConstants';
 
 const HEADER_HEIGHT = styleConstants['workspace-headers-height'];
 const RESIZER_HEIGHT = styleConstants['resize-bar-width'];
