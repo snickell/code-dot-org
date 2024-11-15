@@ -210,16 +210,21 @@ jobs:
         run: |
           echo "OUTPUTS='${{ needs.build.outputs }}'"
           DOCKER_TAGS_JSON='${{ toJSON(needs.build.outputs) }}'
-          echo DOCKER_TAGS_JSON="$DOCKER_TAGS_JSON"
+          echo "DOCKER_TAGS_JSON=$DOCKER_TAGS_JSON"
 
-          # Each arch produces a docker tag, get a list of tags
+          IMAGE_NAME="ghcr.io/code-dot-org/code-dot-org"
+
+          # Extract tags prefixed with "docker_tag_" and prepend $IMAGE_NAME to each tag
           ARCH_IMAGES=$(echo "$DOCKER_TAGS_JSON" | jq -r --arg IMAGE_NAME "$IMAGE_NAME" \
-                'to_entries[] | select(.key | startswith("docker_tag_")) | "\($IMAGE_NAME):\(.value)"')
+              'to_entries[] | select(.key | startswith("docker_tag_")) | "\($IMAGE_NAME):\(.value)"')
 
-          echo "ARCH_IMAGES=${ARCH_IMAGES[*]}"
-          echo "ARCH_IMAGES=${ARCH_IMAGES[*]}" >> "$GITHUB_ENV"
+          # Format ARCH_IMAGES as a unique, space-separated list for GitHub environment
+          ARCH_IMAGES=$(echo "$ARCH_IMAGES" | tr '\n' ' ' | xargs -n1 | sort -u | xargs)
+          
+          # Output ARCH_IMAGES to GITHUB_ENV
+          echo "ARCH_IMAGES=${ARCH_IMAGES}" >> "$GITHUB_ENV"
 
-          # Define the target multi-platform image tag using one of the architecture tags as the base
+          # Set MULTI_PLATFORM_IMAGE to the base docker tag
           echo "MULTI_PLATFORM_IMAGE=$IMAGE_NAME:${{ needs.build.outputs.docker_tag }}" >> "$GITHUB_ENV"
 
       - name: Stitch platform images into a multi-platform image
