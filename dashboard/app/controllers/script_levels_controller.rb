@@ -103,7 +103,9 @@ class ScriptLevelsController < ApplicationController
     end
 
     # will be true if the user is in any unarchived section where tts autoplay is enabled
-    @tts_autoplay_enabled = current_user&.sections_as_student&.where({hidden: false})&.map(&:tts_autoplay_enabled)&.reduce(false, :|)
+    ActiveRecord::Base.connected_to(role: :reading) do
+      @tts_autoplay_enabled = current_user&.sections_as_student&.where({hidden: false})&.map(&:tts_autoplay_enabled)&.reduce(false, :|)
+    end
 
     @public_caching = configure_caching(@script)
 
