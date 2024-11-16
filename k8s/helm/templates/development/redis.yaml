@@ -1,3 +1,5 @@
+{{- if eq .Values.environment "development" }}
+
 # NOTE: this redis config is intended for dev/testing only.
 # It does NOT persist data or permit replicas.
 
@@ -22,3 +24,4 @@ spec:
     image: redis
     ports:
     - containerPort: 6379
+{{- end }}

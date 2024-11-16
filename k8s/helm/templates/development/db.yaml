@@ -1,3 +1,4 @@
+{{- if eq .Values.environment "development" }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -45,3 +46,4 @@ spec:
       resources:
         requests:
           storage: 1Gi
+{{- end }}
