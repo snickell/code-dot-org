@@ -85,33 +85,36 @@ module LevelsHelper
   end
 
   def get_project_and_version_id(level_id, script_id)
-    result = {project_id: nil, version_id: nil, error: nil}
-    level = Level.find(level_id)
+    result = {project_id: nil, version_id: nil}
+
     user_storage_id = storage_id_for_user_id(current_user.id)
-    if level
-      if level.channel_backed?
-        user_storage_id = storage_id_for_user_id(current_user.id)
-        if user_storage_id
-          channel_token = ChannelToken.find_channel_token(level, user_storage_id, script_id)
-          if channel_token
-            _owner_id, result[:project_id] = storage_decrypt_channel_id(channel_token.channel)
-            source_data = SourceBucket.new.get(channel_token.channel, "main.json")
-            if source_data[:status] == 'FOUND'
-              result[:version_id] = source_data[:version_id]
-            end
-          else
-            result[:error] = "Channel token not found"
-          end
-        else
-          result[:error] = "User storage id not found"
-        end
-      else
-        result[:error] = "Level is not channel backed"
-      end
-    else
-      result[:error] = "Level not found"
+    return result unless user_storage_id
+
+    level = Level.find(level_id)
+    return result unless level
+
+    channel_token = ChannelToken.find_channel_token(level, user_storage_id, script_id)
+    return result unless channel_token
+
+    _owner_id, result[:project_id] = storage_decrypt_channel_id(channel_token.channel)
+    source_data = SourceBucket.new.get(channel_token.channel, "main.json")
+
+    if source_data[:status] == 'FOUND'
+      result[:version_id] = source_data[:version_id]
     end
+
     result
+  end
+
+  def stub_project_source_data(channel_id, code: 'fake-code', version_id: 'fake-version-id')
+    fake_main_json = {source: code}.to_json
+    fake_source_data = {
+      status: 'FOUND',
+      body: StringIO.new(fake_main_json),
+      version_id: version_id,
+      last_modified: DateTime.now
+    }
+    SourceBucket.any_instance.stubs(:get).with(channel_id, "main.json").returns(fake_source_data)
   end
 
   # If given a user, find the channel associated with the given level/user.
