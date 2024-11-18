@@ -210,6 +210,11 @@ class Policies::ChildAccount
     ((student_birthday + student_age.years > today) ? (student_age - 1) : student_age) <= policy[:max_age]
   end
 
+  def self.student_in_lockout?(user)
+    # The student is in a 'lockout' flow if they are underage and not unlocked
+    underage?(user) && !Policies::ChildAccount::ComplianceState.permission_granted?(user)
+  end
+
   # Whether or not the user can create/link new personal logins
   def self.can_link_new_personal_account?(user)
     return true unless user.student?
