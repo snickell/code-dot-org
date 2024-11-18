@@ -116,13 +116,12 @@ export const AccountInformation: React.FC<AccountInformationProps> = ({
       }),
     });
 
+    const result = await response.json();
     if (response.ok) {
-      const result = await response.json();
       setStudentLockedOut(result.student_in_lockout_flow);
       setShowAccountUpdateSuccess(true);
     } else {
-      const validationErrors = await response.json();
-      setErrors(validationErrors);
+      setErrors(result);
     }
   };
 
