@@ -92,6 +92,10 @@ describe('AccountInformation', () => {
   it('submits form with updated information and displays success alert', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
+      json: () =>
+        Promise.resolve({
+          student_in_lockout_flow: false,
+        }),
     });
 
     render(<AccountInformation {...defaultProps} />);
@@ -189,5 +193,35 @@ describe('AccountInformation', () => {
     );
     expect(screen.getByLabelText(/age/i)).toBeDisabled();
     expect(screen.getByLabelText(/state/i)).toBeDisabled();
+  });
+
+  it('disables student-specific fields when user update response puts student in lock out flow', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          student_in_lockout_flow: true,
+        }),
+    });
+    render(
+      <AccountInformation
+        {...defaultProps}
+        isStudent={true}
+        userType={'student'}
+        studentInLockoutFlow={false}
+      />
+    );
+
+    expect(screen.getByLabelText(/age/i)).toBeEnabled();
+    expect(screen.getByLabelText(/state/i)).toBeEnabled();
+
+    fireEvent.click(
+      screen.getByRole('button', {name: /update account information/i})
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/age/i)).toBeDisabled();
+      expect(screen.getByLabelText(/state/i)).toBeDisabled();
+    });
   });
 });
