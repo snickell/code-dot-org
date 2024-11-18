@@ -472,9 +472,7 @@ class RegistrationsController < Devise::RegistrationsController
 
     # A student is underage if they reside in a state with a CAP policy and are in the affected age range.
     underage = Policies::ChildAccount.underage?(current_user)
-
-    # The student is in a 'lockout' flow if they are potentially locked out and not unlocked
-    @student_in_lockout_flow = underage && !Policies::ChildAccount::ComplianceState.permission_granted?(current_user)
+    @student_in_lockout_flow = Policies::ChildAccount.student_in_lockout?(current_user)
 
     @personal_account_linking_enabled = Policies::ChildAccount.can_link_new_personal_account?(current_user) && !Policies::ChildAccount.partially_locked_out?(current_user)
 
@@ -521,7 +519,9 @@ class RegistrationsController < Devise::RegistrationsController
             redirect_to edit_registration_path(user)
           end
         end
-        format.any {head :no_content}
+
+        student_in_lockout_flow = Policies::ChildAccount.student_in_lockout?(current_user)
+        format.any {render json: {student_in_lockout_flow: student_in_lockout_flow}}
       else
         format.html {render "edit", formats: [:html]}
         format.any do
