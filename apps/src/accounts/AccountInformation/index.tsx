@@ -60,6 +60,8 @@ export const AccountInformation: React.FC<AccountInformationProps> = ({
     useState(false);
   const [showEmailUpdateSuccess, setShowEmailUpdateSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [studentLockedOut, setStudentLockedOut] =
+    useState(studentInLockoutFlow);
 
   const displayNameHelperMessage = useMemo(
     () =>
@@ -82,10 +84,10 @@ export const AccountInformation: React.FC<AccountInformationProps> = ({
 
   const lockedOutStudentMessage = useMemo(
     () =>
-      studentInLockoutFlow
+      studentLockedOut
         ? i18n.accountInformation_updateFieldParentPermissionRequired()
         : undefined,
-    [studentInLockoutFlow]
+    [studentLockedOut]
   );
 
   const handleSubmitAccountSettingsUpdate = async () => {
@@ -115,6 +117,8 @@ export const AccountInformation: React.FC<AccountInformationProps> = ({
     });
 
     if (response.ok) {
+      const result = await response.json();
+      setStudentLockedOut(result.student_in_lockout_flow);
       setShowAccountUpdateSuccess(true);
     } else {
       const validationErrors = await response.json();
@@ -376,7 +380,7 @@ export const AccountInformation: React.FC<AccountInformationProps> = ({
                   value: String(value),
                   text: String(value),
                 }))}
-                disabled={studentInLockoutFlow}
+                disabled={studentLockedOut}
                 dropdownTextThickness="thin"
                 className={commonStyles.input}
                 helperMessage={lockedOutStudentMessage}
@@ -408,7 +412,7 @@ export const AccountInformation: React.FC<AccountInformationProps> = ({
                     clearError('us_state');
                   }}
                   items={usStateOptions}
-                  disabled={studentInLockoutFlow}
+                  disabled={studentLockedOut}
                   dropdownTextThickness="thin"
                   className={commonStyles.input}
                   helperMessage={lockedOutStudentMessage}
