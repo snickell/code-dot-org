@@ -5,7 +5,7 @@ require 'uri'
 require 'redcarpet'
 require 'redcarpet/render_strip'
 
-TTS_BUCKET = 'cdo-tts'.freeze
+TTS_BUCKET = 'cdo-tts'.freeze unless defined? TTS_BUCKET
 
 class TTSSafe < Redcarpet::Render::StripDown
   def block_code(code, language)
