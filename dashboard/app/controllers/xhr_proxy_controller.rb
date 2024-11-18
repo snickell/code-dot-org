@@ -72,6 +72,7 @@ class XhrProxyController < ApplicationController
     api.weatherapi.com
     api.wolframalpha.com
     api.zippopotam.us
+    aviationweather.gov
     bible-api.com
     bnefoodtrucks.com.au
     ch.tetr.io
