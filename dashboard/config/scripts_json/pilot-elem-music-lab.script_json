@@ -10,7 +10,7 @@
     },
     "new_name": null,
     "family_name": "pilot-elem-music-lab",
-    "serialized_at": "2024-11-13 20:58:19 UTC",
+    "serialized_at": "2024-11-15 17:34:38 UTC",
     "published_state": "in_development",
     "instruction_type": "teacher_led",
     "instructor_audience": "teacher",
@@ -203,7 +203,7 @@
       "key": "4fdb49bb-5f26-4d1f-807f-a7f81a90d710",
       "position": 3,
       "properties": {
-        "progression_name": "Investigate & Modify "
+        "progression_name": "Customize"
       },
       "seeding_key": {
         "activity_section.key": "4fdb49bb-5f26-4d1f-807f-a7f81a90d710",
@@ -225,7 +225,7 @@
       "key": "464c611b-4641-4bf9-af07-b4b95490612e",
       "position": 5,
       "properties": {
-        "progression_name": "Investigate & Modify "
+        "progression_name": "Customize"
       },
       "seeding_key": {
         "activity_section.key": "464c611b-4641-4bf9-af07-b4b95490612e",
@@ -438,7 +438,7 @@
         "level_keys": [
           "music-intro-coding-seq-investigate"
         ],
-        "progression": "Investigate & Modify "
+        "progression": "Customize"
       },
       "bonus": false,
       "seeding_key": {
@@ -463,7 +463,7 @@
         "level_keys": [
           "music-intro-coding-seq-modify-rest"
         ],
-        "progression": "Investigate & Modify "
+        "progression": "Customize"
       },
       "bonus": false,
       "seeding_key": {
@@ -488,7 +488,7 @@
         "level_keys": [
           "music-intro-coding-seq-match"
         ],
-        "progression": "Investigate & Modify "
+        "progression": "Customize"
       },
       "bonus": false,
       "seeding_key": {
@@ -510,6 +510,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "music-intro-coding-seq-panel2"
+        ],
         "progression": "Predict & Run"
       },
       "bonus": false,
@@ -532,6 +535,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "music-intro-coding-seq-modify-together-run"
+        ],
         "progression": "Predict & Run"
       },
       "bonus": false,
@@ -554,7 +560,10 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
-        "progression": "Investigate & Modify "
+        "level_keys": [
+          "music-intro-coding-seq-modify-together"
+        ],
+        "progression": "Customize"
       },
       "bonus": false,
       "seeding_key": {
@@ -576,7 +585,10 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
-        "progression": "Investigate & Modify "
+        "level_keys": [
+          "music-intro-coding-seq-together2"
+        ],
+        "progression": "Customize"
       },
       "bonus": false,
       "seeding_key": {
