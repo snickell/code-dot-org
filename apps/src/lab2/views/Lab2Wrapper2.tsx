@@ -76,9 +76,10 @@ const Lab2Wrapper2: React.FC<Lab2WrapperProps> = (/* ... props ... */) => {
 
   // Use lab2EntryPoints to lazy load the lab view, i.e.:
   // const LabView = lab2EntryPoints[labData.levelProperties.appName].view;
+  // const labProps = {...labData, ...props};
   // return (
   //   <Suspense fallback={<Loading isLoading={true} />}>
-  //     <LabView />
+  //     <LabView {...labProps} />
   //   </Suspense>
   // );
   return null;
