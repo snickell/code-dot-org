@@ -95,10 +95,15 @@ function RubricFloatingActionButton({
 
   const [internalError, setInternalError] = useState(null);
 
+  const onLevelForEvaluation = currentLevelName === rubric.level.name;
+
   const readyStudentCount = useAppSelector(selectReadyStudentCount);
   const hasLoadedStudentStatus = useAppSelector(selectHasLoadedStudentStatus);
   const showCountBubble =
-    notificationsEnabled && hasLoadedStudentStatus && readyStudentCount > 0;
+    onLevelForEvaluation &&
+    notificationsEnabled &&
+    hasLoadedStudentStatus &&
+    readyStudentCount > 0;
 
   const eventData = useMemo(() => {
     return {
@@ -113,7 +118,7 @@ function RubricFloatingActionButton({
       ? EVENTS.TA_RUBRIC_CLOSED_FROM_FAB_EVENT
       : EVENTS.TA_RUBRIC_OPENED_FROM_FAB_EVENT;
     analyticsReporter.sendEvent(eventName, eventData);
-    if (!isOpen) {
+    if (!isOpen && showCountBubble) {
       setSeenTaScores();
     }
     setIsOpen(!isOpen);
@@ -123,6 +128,8 @@ function RubricFloatingActionButton({
   const showScoresAlert =
     canShowTaScoresAlert && !hasSeenAlert && showCountBubble;
 
+  const [dismissConfirmed, setDismissConfirmed] = useState(false);
+
   const setSeenTaScores = useCallback(() => {
     setHasSeenAlert(true);
 
@@ -130,9 +137,13 @@ function RubricFloatingActionButton({
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({lesson_id: rubric.lesson.id}),
-    }).catch(error => {
-      console.error('Error setting seen TA scores:', error);
-    });
+    })
+      .then(response => {
+        setDismissConfirmed(true);
+      })
+      .catch(error => {
+        console.error('Error setting seen TA scores:', error);
+      });
   }, [rubric.lesson.id]);
 
   const viewScores = () => {
@@ -220,7 +231,13 @@ function RubricFloatingActionButton({
       </button>
       {showCountBubble ? (
         <>
-          <div className={style.countOverlay}>
+          <div
+            className={classnames(
+              style.countOverlay,
+              'uitest-count-bubble',
+              dismissConfirmed && 'uitest-dismiss-confirmed'
+            )}
+          >
             <BodyFourText className={style.countText}>
               <StrongText>
                 <span aria-label={i18n.aiEvaluationsToReview()}>
@@ -263,7 +280,7 @@ function RubricFloatingActionButton({
           rubric={rubric}
           studentLevelInfo={studentLevelInfo}
           reportingData={reportingData}
-          currentLevelName={currentLevelName}
+          onLevelForEvaluation={onLevelForEvaluation}
           teacherHasEnabledAi={aiEnabled}
           open={isOpen}
           closeRubric={handleClick}
