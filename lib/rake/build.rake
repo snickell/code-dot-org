@@ -118,7 +118,11 @@ namespace :build do
         RakeUtils.system 'bin/delayed_job', 'stop'
         # Start new workers
         if rack_env?(:production)
-          RakeUtils.system 'bin/delayed_job', '--pool=mailjet', '--pool=default,mailers:10', 'start'
+          # mailjet is configured to only have 1 worker because we don't have a
+          # way to rate limit our calls to Mailjet across multiple workers.
+          RakeUtils.system 'bin/delayed_job', '--pool=mailjet', '--pool=default,mailers:150', 'start'
+        elsif CDO.test_system?
+          RakeUtils.system 'bin/delayed_job', '-n', '10', 'start'
         elsif !rack_env?(:development)
           RakeUtils.system 'bin/delayed_job', 'start'
         end

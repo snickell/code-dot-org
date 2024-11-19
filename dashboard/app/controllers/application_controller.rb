@@ -29,7 +29,7 @@ class ApplicationController < ActionController::Base
 
   before_action :clear_sign_up_session_vars
 
-  before_action :initialize_statsig_session
+  before_action :initialize_statsig_stable_id
 
   around_action :with_global_current_user
 
@@ -362,6 +362,9 @@ class ApplicationController < ActionController::Base
       policy_compliance_child_account_consent_path,
       # The age interstitial when the age isn't known will block the lockout page
       users_set_student_information_path,
+      # Allow students to join sections while locked out
+      student_user_new_path,
+      student_register_path,
     ].include?(request.path)
 
     redirect_to lockout_path
@@ -399,10 +402,10 @@ class ApplicationController < ActionController::Base
     redirect_to lti_v1_account_linking_landing_path
   end
 
-  # Creates a stable statsig id for use of session tracking (whether the user is logged in or not)
-  # Use this session variable when you want to track the user journey when the user is not logged in.
-  protected def initialize_statsig_session
-    session[:statsig_stable_id] ||= SecureRandom.uuid
+  # Creates a statsig stable id for use of signed-out user tracking.
+  # This cookie is used by the Statsig SDK for both JS and Ruby.
+  protected def initialize_statsig_stable_id
+    cookies[:statsig_stable_id] ||= {value: SecureRandom.uuid, domain: :all, path: '/'}
   end
 
   private def pairing_still_enabled

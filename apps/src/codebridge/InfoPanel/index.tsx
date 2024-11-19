@@ -12,7 +12,7 @@ import ForTeachersOnly from './ForTeachersOnly';
 import HelpAndTips from './HelpAndTips';
 
 import moduleStyles from './styles/info-panel.module.scss';
-import darkModeStyles from '@codebridge/styles/dark-mode.module.scss';
+import darkModeStyles from '@cdo/apps/lab2/styles/dark-mode.module.scss';
 
 enum Panels {
   Instructions = 'Instructions',
@@ -102,7 +102,7 @@ export const InfoPanel = React.memo(() => {
           ariaLabel={'Information panel dropdown'}
           size={'xs'}
           type={'tertiary'}
-          className={darkModeStyles.iconOnlyTertiaryButton}
+          className={darkModeStyles.tertiaryButton}
         />
       </div>
     ) : null;

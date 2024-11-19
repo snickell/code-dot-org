@@ -1,16 +1,15 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import {
   ObservableProcedureModel,
   ObservableParameterModel,
 } from '@blockly/block-shareable-procedures';
+import {installAllBlocks as installFieldColourBlocks} from '@blockly/field-colour';
 import {LineCursor, NavigationController} from '@blockly/keyboard-navigation';
 import {CrossTabCopyPaste} from '@blockly/plugin-cross-tab-copy-paste';
 import {
   ScrollBlockDragger,
   ScrollOptions,
 } from '@blockly/plugin-scroll-options';
-import {Options, Theme, Workspace} from 'blockly';
-import {FieldProto} from 'blockly/core/field';
+import * as GoogleBlockly from 'blockly/core';
 import {javascriptGenerator} from 'blockly/javascript';
 
 import {
@@ -67,6 +66,7 @@ import initializeBlocklyXml, {
 import {registerAllContextMenuItems} from './addons/contextMenu';
 import registerLogicCompareMutator from './addons/extensions/logic_compare';
 import FunctionEditor from './addons/functionEditor';
+import {filterFunctionArgVariables} from './addons/plusMinusBlocks/advancedProcedures';
 import registerIfMutator from './addons/plusMinusBlocks/if';
 import registerTextJoinMutator from './addons/plusMinusBlocks/text_join';
 import {UNKNOWN_BLOCK} from './addons/unknownBlock';
@@ -77,8 +77,10 @@ import {flyoutCategory as functionsFlyoutCategory} from './customBlocks/googleBl
 import {flyoutCategory as variablesFlyoutCategory} from './customBlocks/googleBlockly/variableBlocks';
 import {
   adjustCalloutsOnViewportChange,
+  bumpRTLBlocks,
   disableOrphans,
   reflowToolbox,
+  storeWorkspaceWidth,
   updateBlockLimits,
 } from './eventHandlers';
 import {
@@ -102,6 +104,7 @@ import {
   ExtendedBlocklyOptions,
   ExtendedConnection,
   ExtendedInput,
+  ExtendedJavascriptGenerator,
   ExtendedVariableMap,
   ExtendedWorkspace,
   ExtendedWorkspaceSvg,
@@ -234,7 +237,7 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
 
   const getWorkspaceCodeHelper = (
     retryCount: number,
-    hiddenWorkspace: Workspace | undefined
+    hiddenWorkspace: GoogleBlockly.Workspace | undefined
   ): string => {
     let workspaceCode = '';
     try {
@@ -267,16 +270,29 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
     blocklyWrapper.wrapReadOnlyProperty(prop);
   });
 
+  // Installs colour_picker, colour_rgb, colour_random, and colour_blend blocks.
+  // These are exclusively provided via the FieldColour plugin as of Blockly v11.
+  installFieldColourBlocks({javascript: javascriptGenerator});
+
+  type registrableFieldType = Pick<typeof GoogleBlockly.Field, 'prototype'>;
   // elements in this list should be structured as follows:
   // [field registry name for field, class name of field being overridden, class to use as override]
-  const fieldOverrides: [string, string, FieldProto][] = [
+  const fieldOverrides: [string, string, registrableFieldType][] = [
     ['field_variable', 'FieldVariable', CdoFieldVariable],
     ['field_dropdown', 'FieldDropdown', CdoFieldDropdown],
-    ['field_colour', 'FieldColour', CdoFieldColour],
     ['field_number', 'FieldNumber', CdoFieldNumber],
-    // CdoFieldBitmap extends from a JavaScript class without typing.
-    // We know it's a field, so it's safe to cast as unknown.
-    ['field_bitmap', 'FieldBitmap', CdoFieldBitmap as unknown as FieldProto],
+    // CdoFieldBitmap and CdoFieldColour extend from plugins.
+    // We know they're fields, so it's safe to cast as unknown.
+    [
+      'field_bitmap',
+      'FieldBitmap',
+      CdoFieldBitmap as unknown as registrableFieldType,
+    ],
+    [
+      'field_colour',
+      'FieldColour',
+      CdoFieldColour as unknown as registrableFieldType,
+    ],
     ['field_label', 'FieldLabel', CdoFieldLabel],
     ['field_parameter', 'FieldParameter', CdoFieldParameter],
   ];
@@ -389,6 +405,10 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
   SETTABLE_PROPERTIES.forEach(property =>
     blocklyWrapper.wrapSettableProperty(property)
   );
+
+  blocklyWrapper.ALIGN_CENTRE = blocklyWrapper.inputs.Align.CENTRE;
+  blocklyWrapper.ALIGN_LEFT = blocklyWrapper.inputs.Align.LEFT;
+  blocklyWrapper.ALIGN_RIGHT = blocklyWrapper.inputs.Align.RIGHT;
 
   // Allows for dynamically setting the workspace theme with workspace.setTheme()
   blocklyWrapper.themes = {
@@ -607,8 +627,12 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
   (blocklyWrapper.Flyout as any).configure = function () {};
 
   blocklyWrapper.getGenerator = function () {
-    return this.JavaScript;
+    // Additional methods are added to the generator when initializeGenerator is called,
+    // So it is safe to cast as unknown here.
+    return this.JavaScript as unknown as ExtendedJavascriptGenerator;
   };
+
+  blocklyWrapper.inputTypes = blocklyInstance.inputs.inputTypes;
 
   blocklyWrapper.addEmbeddedWorkspace = function (workspace) {
     this.embeddedWorkspaces.push(workspace.id);
@@ -656,14 +680,14 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
     xml,
     options = {}
   ) {
-    const theme = cdoUtils.getUserTheme(options.theme as Theme);
+    const theme = cdoUtils.getUserTheme(options.theme as GoogleBlockly.Theme);
     const workspace = new Blockly.WorkspaceSvg({
       readOnly: true,
       theme: theme,
       plugins: {},
       RTL: options.rtl,
       renderer: options.renderer || Renderers.DEFAULT,
-    } as Options);
+    } as GoogleBlockly.Options);
     // Track that this is and embedded workspace to avoid trying
     // to run logic on it to ensure things run properly (such as procedures).
     blocklyWrapper.addEmbeddedWorkspace(workspace);
@@ -724,7 +748,9 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
     const optOptionsExtended = opt_options as ExtendedBlocklyOptions;
     const options = {
       ...optOptionsExtended,
-      theme: cdoUtils.getUserTheme(optOptionsExtended.theme as Theme),
+      theme: cdoUtils.getUserTheme(
+        optOptionsExtended.theme as GoogleBlockly.Theme
+      ),
       trashcan: false, // Don't use default trashcan.
       move: {
         wheel: true,
@@ -777,6 +803,7 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
     blocklyWrapper.isStartMode = !!optOptionsExtended.editBlocks;
     blocklyWrapper.isToolboxMode =
       optOptionsExtended.editBlocks === 'toolbox_blocks';
+    blocklyWrapper.analyticsData = optOptionsExtended.analyticsData;
     blocklyWrapper.toolboxBlocks = options.toolbox;
     blocklyWrapper.showUnusedBlocks = options.showUnusedBlocks;
     blocklyWrapper.blockLimitMap = cdoUtils.createBlockLimitMap();
@@ -809,7 +836,7 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
       }
     };
 
-    if (!blocklyWrapper.isStartMode && !optOptionsExtended.isBlockEditMode) {
+    if (!blocklyWrapper.isToolboxMode && !optOptionsExtended.isBlockEditMode) {
       workspace.addChangeListener(disableOrphans);
     }
     if (blocklyWrapper.blockLimitMap && blocklyWrapper.blockLimitMap.size > 0) {
@@ -824,6 +851,12 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
       .getFlyout()
       ?.getWorkspace()
       ?.addChangeListener(adjustCalloutsOnViewportChange);
+
+    // We store the workspace width for RTL workspaces so that we can move
+    // blocks back to the correct positions after a browser window resize.
+    // See: https://github.com/google/blockly/issues/8637
+    workspace.addChangeListener(storeWorkspaceWidth);
+    window.addEventListener('resize', bumpRTLBlocks);
 
     initializeScrollbarPair(workspace);
 
@@ -841,7 +874,18 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
 
     blocklyWrapper.setMainWorkspace(workspace);
 
-    if (!optOptionsExtended.useBlocklyDynamicCategories) {
+    if (optOptionsExtended.useBlocklyDynamicCategories) {
+      const originalVariableFlyoutCategory =
+        workspace.getToolboxCategoryCallback('VARIABLE');
+      if (originalVariableFlyoutCategory) {
+        workspace.registerToolboxCategoryCallback('VARIABLE', workspace =>
+          filterFunctionArgVariables(
+            workspace,
+            originalVariableFlyoutCategory(workspace)
+          )
+        );
+      }
+    } else {
       // Same flyout callbacks are used for both main workspace categories
       // and categories when modal function editor is enabled.
       workspace.registerToolboxCategoryCallback(
@@ -940,7 +984,7 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
   initializeCss(blocklyWrapper);
 
   blocklyWrapper.Blocks.unknown = UNKNOWN_BLOCK;
-  blocklyWrapper.JavaScript.unknown = () => '/* unknown block */\n';
+  blocklyWrapper.JavaScript.forBlock.unknown = () => '/* unknown block */\n';
 
   blocklyWrapper.cdoUtils = cdoUtils;
   blocklyWrapper.getPointerBlockImageUrl = getPointerBlockImageUrl;

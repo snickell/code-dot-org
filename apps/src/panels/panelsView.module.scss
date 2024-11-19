@@ -2,20 +2,36 @@
 @import 'font.scss';
 @import '../mixins.scss';
 
+$text-offset-x: 2cqw;
+$text-offset-y: 2cqw;
+$text-vertical-padding: 1.8cqw;
+$text-horizontal-padding: 2.6cqw;
+
 @keyframes fade-in {
-  0%, 50% {
+  from {
     opacity: 0;
   }
-  100% {
+  to{
     opacity: 1;
   }
 }
 
+@keyframes slide-in {
+  from {
+    margin-top: $text-offset-y;
+    margin-bottom: -$text-offset-y;
+  }
+  to {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
 @keyframes delay-pointer-events {
-  0%, 49% {
+  from {
     pointer-events: none;
   }
-  50%, 100% {
+  to {
     pointer-events: initial;
   }
 }
@@ -34,6 +50,9 @@
   .panel {
     margin: 0 auto;
     position: relative;
+    container-name: panel;
+    container-type: inline-size;
+    overflow: hidden;
 
     .image {
       position: absolute;
@@ -45,54 +64,95 @@
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
-      animation: fade-in 0.5s;
+
+      &Current {
+        animation: 0.5s ease 0s fade-in;
+        animation-fill-mode: both;
+      }
+
+      &Invisible {
+        opacity: 0;
+      }
     }
 
-    .markdownText {
+    .text {
       background-color: $neutral_light;
+      color: $neutral_dark;
       border-radius: 5px;
       width: 40%;
       position: absolute;
-      padding: 20px;
-      animation: fade-in 1.5s;
+      padding: $text-vertical-padding $text-horizontal-padding;
+      animation: 0.5s ease 0.5s fade-in, 0.5s ease 0.5s slide-in;
+      animation-fill-mode: both;
+      font-size: 1.6cqw;
+      line-height: 1.4em;
+
+      &Dark {
+        background-color: $neutral_dark;
+        color: $light_white;
+      }
 
       h1, h2, h3, h4 {
-        margin: 0 0 10px 0;
+        margin: 0 0 1cqw 0;
         font-family: $barlowSemiCondensed-semibold;
-        font-size: 1.75em;
+        font-size: 3cqw;
         line-height: 1.2em;
       }
 
       p {
-        font-size: 16px;
-        line-height: 1.5;
-      }
+        font-size: 1.6cqw;
+        line-height: 1.4em;
 
-      &Small {
-        p {
-          font-size: 13px;
+        &:last-child {
+          margin-bottom: 0;
         }
       }
 
+      .invisiblePlaceholder {
+        opacity: 0;
+      }
+
+      code {
+        color: $light_primary_700;
+        font-size: 1.37cqw;
+      }
+
+      .typist {
+        position: absolute;
+        top: 1.8cqw;
+        width: calc(100% - 2 * $text-horizontal-padding);
+      }
+
       &TopLeft {
-        top: 40px;
-        left: -20px;
+        top: $text-offset-y;
+        left: $text-offset-x;
+      }
+
+      &TopCenter {
+        top: $text-offset-y;
+        left: 50%;
+        transform: translateX(-50%);
       }
 
       &TopRight {
-        top: 40px;
-        right: -20px;
+        top: $text-offset-y;
+        right: $text-offset-x;
       }
 
       &BottomLeft {
-        bottom: 40px;
-        left: -20px;
+        bottom: $text-offset-y;
+        left: $text-offset-x;
       }
 
+      &BottomCenter {
+        bottom: $text-offset-y;
+        left: 50%;
+        transform: translateX(-50%);
+      }
 
       &BottomRight {
-        bottom: 40px;
-        right: -20px;
+        bottom: $text-offset-y;
+        right: $text-offset-x;
       }
     }
   }
@@ -104,17 +164,21 @@
     position: relative;
 
     .button {
-      font-size: 14px;
-      background-color: $brand_secondary_default;
-      border-color: $brand_secondary_default;
-      color: $neutral_light;
-      padding: 5px 10px;
-      border-radius: 8px;
-      height: 38px;
-      margin: 0;
       position: absolute;
       right: 0;
-      animation: fade-in 3s, delay-pointer-events 3s;
+      height: 38px;
+
+      // After typing, the button will be ready.
+      &Ready {
+        animation: 0.5s ease 0s fade-in, 0.5s ease 0s delay-pointer-events;
+        animation-fill-mode: both;
+      }
+
+      // If no typing, the button appears with a delay.
+      &Delay {
+        animation: 0.5s ease 1.2s fade-in, 0.5s ease 1.2s delay-pointer-events;
+        animation-fill-mode: both;
+      }
     }
 
     .bubble {
