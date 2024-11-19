@@ -227,6 +227,30 @@ describe('RubricFloatingActionButton', () => {
         screen.queryByLabelText(i18n.aiEvaluationsToReview())
       ).not.toBeInTheDocument();
     });
+
+    it('does not render count bubble on non-assessment level', async () => {
+      stubFetch({
+        evalStatusForAll: successJsonAll,
+        teacherEvals: noEvals,
+      });
+
+      render(
+        <Provider store={store}>
+          <RubricFloatingActionButton
+            {...defaultProps}
+            sectionId={sectionId}
+            currentLevelName="non-assessment-level"
+          />
+        </Provider>
+      );
+
+      await wait();
+
+      expect(screen.getByRole('img', {name: 'TA overlay'})).toBeVisible();
+      expect(
+        screen.queryByLabelText(i18n.aiEvaluationsToReview())
+      ).not.toBeInTheDocument();
+    });
   });
 
   describe('student scores alert', () => {
@@ -372,7 +396,7 @@ describe('RubricFloatingActionButton', () => {
 
       await wait();
 
-      screen.getByText(alertMessage).closest('div');
+      screen.getByText(alertMessage);
       const fab = screen.getByRole('button', {
         name: i18n.openOrCloseTeachingAssistant(),
       });
@@ -385,6 +409,37 @@ describe('RubricFloatingActionButton', () => {
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({lesson_id: 33}),
       });
+    });
+
+    it('does not dismiss alert on fab click on non assessment level', async () => {
+      stubFetch({
+        evalStatusForAll: successJsonAll,
+        teacherEvals: noEvals,
+      });
+
+      render(
+        <Provider store={store}>
+          <RubricFloatingActionButton
+            {...defaultProps}
+            sectionId={sectionId}
+            currentLevelName="non-assessment-level"
+          />
+        </Provider>
+      );
+
+      await wait();
+
+      expect(screen.queryByText(alertMessage)).not.toBeInTheDocument();
+
+      const fab = screen.getByRole('button', {
+        name: i18n.openOrCloseTeachingAssistant(),
+      });
+      fireEvent.click(fab);
+
+      expect(fetch).not.toHaveBeenCalledWith(
+        '/api/v1/users/set_seen_ta_scores',
+        expect.anything()
+      );
     });
 
     it('dismisses alert when fab is open initially', async () => {
