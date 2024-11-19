@@ -75,25 +75,26 @@ def main
       path = ""
       level = Level.find(row.level_id)
       script_level = level.script_levels.find_by_script_id(row.script_id)
-      if script_level
-        # This handles chat requests that occurred on standard levels in a progression
-        path = script_level.path
-      else
-        # This handles chat requests that occurred on a sublevel
-        parent_levels = BubbleChoice.parent_levels(level.name)
-        parent_levels_in_script = parent_levels.filter do |pl|
-          pl.script_levels.any? {|sl| sl.script_id == row.script_id}
-        end
+      path = if script_level
+               # This handles chat requests that occurred on standard levels in a progression
+               script_level.path
+             else
+               # This handles chat requests that occurred on a sublevel
+               #parent_levels = BubbleChoice.parent_levels(level.name)
+               #parent_levels_in_script = parent_levels.filter do |pl|
+               #  pl.script_levels.any? {|sl| sl.script_id == row.script_id}
+               #end
+               row.level_id
 
-        if parent_levels_in_script
-          parent_level = parent_levels_in_script.first
-          sublevel_position = parent_level.sublevel_position(level)
-          path = parent_level.build_script_level_path(
-            parent_level.script_levels.first,
-            {sublevel_position: sublevel_position}
-          )
-        end
-      end
+               #if parent_levels_in_script
+               #  parent_level = parent_levels_in_script.first
+               #  sublevel_position = parent_level.sublevel_position(level)
+               #  path = parent_level.build_script_level_path(
+               #    parent_level.script_levels.first,
+               #    {sublevel_position: sublevel_position}
+               #  )
+               #end
+             end
 
       if execution_status == SharedConstants::AI_REQUEST_EXECUTION_STATUS[:USER_PROFANITY]
         # Parse response for openai/comprehend/blocklist/webpurify details for user message.
