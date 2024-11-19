@@ -180,3 +180,9 @@ pages:
       MarketingAnnouncementBanner: false
       TeacherResources: false
       IncubatorBanner: false
+  - path: /users/edit
+    components:
+      AccountInfoHeader: false
+      PersonalLoggingDeleteAccountDialog: false
+      DeleteAccountPersonalLoginInstructions: false
+

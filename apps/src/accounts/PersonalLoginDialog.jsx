@@ -4,6 +4,7 @@ import React from 'react';
 import Button from '@cdo/apps/legacySharedComponents/Button';
 import {ADD_A_PERSONAL_LOGIN_HELP_URL} from '@cdo/apps/lib/util/urlHelpers';
 import BaseDialog from '@cdo/apps/templates/BaseDialog';
+import GlobalRegionWrapper from '@cdo/apps/templates/GlobalRegionWrapper';
 import color from '@cdo/apps/util/color';
 import i18n from '@cdo/locale';
 
@@ -44,22 +45,29 @@ export default class PersonalLoginDialog extends React.Component {
               })}
             </strong>
           </p>
-          <p>
-            {i18n.personalLoginDialog_body3()}
-            <strong>{i18n.personalLoginDialog_body4()}</strong>
-            {i18n.personalLoginDialog_body5()}
-          </p>
-          <Button
-            __useDeprecatedTag
-            text={i18n.removeStudentSendHomeInstructions()}
-            target="_blank"
-            href={ADD_A_PERSONAL_LOGIN_HELP_URL}
-            color={Button.ButtonColor.blue}
-            size={Button.ButtonSize.large}
-            style={styles.button}
-            tabIndex="1"
+          <GlobalRegionWrapper
+            component={() => (
+              <div>
+                <p>
+                  {i18n.personalLoginDialog_body3()}
+                  <strong>{i18n.personalLoginDialog_body4()}</strong>
+                  {i18n.personalLoginDialog_body5()}
+                </p>
+                <Button
+                  __useDeprecatedTag
+                  text={i18n.removeStudentSendHomeInstructions()}
+                  target="_blank"
+                  href={ADD_A_PERSONAL_LOGIN_HELP_URL}
+                  color={Button.ButtonColor.blue}
+                  size={Button.ButtonSize.large}
+                  style={styles.button}
+                  tabIndex="1"
+                />
+                <p>{i18n.personalLoginDialog_body6()}</p>
+              </div>
+            )}
+            componentId="PersonalLoggingDeleteAccountDialog"
           />
-          <p>{i18n.personalLoginDialog_body6()}</p>
           <ConfirmCancelFooter
             confirmText={i18n.personalLoginDialog_button()}
             onConfirm={onConfirm}
