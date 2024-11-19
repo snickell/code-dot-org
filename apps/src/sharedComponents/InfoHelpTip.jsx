@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ReactTooltip from 'react-tooltip';
 
-import {BodyTwoText} from '@cdo/apps/componentLibrary/typography';
+import {BodyTwoText} from '@/typography';
 import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import color from '@cdo/apps/util/color';
 

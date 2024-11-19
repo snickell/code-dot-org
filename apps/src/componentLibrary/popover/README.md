@@ -11,7 +11,7 @@ It wraps `Popover` component and provides a way to add popover to any element, j
 ***Example*** how to use `WithPopover` component:
 
 ```javascript
-import {WithPopover} from '@cdo/apps/componentLibrary/popover';
+import {WithPopover} from '@/popover';
 
 const ComponentWithPopover = () => {
     const [showPopover, setShowPopover] = useState(false);
@@ -47,7 +47,7 @@ and you want to handle it's positioning by yourself. (`direction: 'none'`)
 ***Example*** how to use `Popover` component:
 
 ```javascript
-import Popover from '@cdo/apps/componentLibrary/popover';
+import Popover from '@/popover';
 
 const ScreenWithPopover = () => {
     const popoverProps = {

@@ -10,9 +10,9 @@ as `.scss, .ts` files.
   `@import`](https://sass-lang.com/documentation/at-rules/import). Internally, this package uses `@import` to maintain
   compatibility with all Sass implementations.
 - The import paths below use the "exports" field in `package.json`, which is a feature only available to Webpack 5+
-  consumers. If you use Webpack 4 or below, you should import this package as `@cdo/apps/componentLibrary/common` (which
+  consumers. If you use Webpack 4 or below, you should import this package as `@/common` (which
   corresponds to the "main" field in `package.json`), or point to a specific file in the package (e.g.,
-  `@cdo/apps/componentLibrary/common/styles/mixins`).
+  `@/common/styles/mixins`).
 
 ### SCSS
 
@@ -23,7 +23,7 @@ Common mixins.
 Usage example:
 
 ```scss
-@import "@cdo/apps/componentLibrary/common/styles/mixins";
+@import "@/common/styles/mixins";
 
 
 .custom-link-text {
@@ -39,7 +39,7 @@ Usage example:
 Common constants.
 
 ```ts 
-import {componentSizeToBodyTextSizeMap} from '@cdo/apps/componentLibrary/common/constants';
+import {componentSizeToBodyTextSizeMap} from '@/common/constants';
 // ...
 // ...
 // ...
@@ -51,7 +51,7 @@ const bodyTextSize = componentSizeToBodyTextSizeMap[size];
 Common types.
 
 ```ts 
-import {ComponentSizeXSToL} from '@cdo/apps/componentLibrary/common/types';
+import {ComponentSizeXSToL} from '@/common/types';
 // ...
 // ...
 // ...
@@ -65,9 +65,9 @@ type ComponentProps = {
 Common hooks.
 
 ```tsx
-import {useBodyScrollLock} from '@cdo/apps/componentLibrary/common/hooks';
+import {useBodyScrollLock} from '@/common/hooks';
 // OR
-import useBodyScrollLock from '@cdo/apps/componentLibrary/common/hooks/useBodyScrollLock';
+import useBodyScrollLock from '@/common/hooks/useBodyScrollLock';
 
 // ...
 // ...
@@ -80,7 +80,7 @@ useBodyScrollLock();
 Common contexts.
 
 ```tsx
-import {DropdownContext} from '@cdo/apps/componentLibrary/common/contexts';
+import {DropdownContext} from '@/common/contexts';
 // ...
 
 <DropdownContext.Provider value={dropdownContextValue}>

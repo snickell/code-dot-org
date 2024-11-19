@@ -5,7 +5,7 @@
 This package exports one styled React component: [TextField](TextField.tsx). You can import it like this:
 
 ```javascript
-import TextField from '@cdo/apps/componentLibrary/textField';
+import TextField from '@/textField';
 ```
 
 For guidelines on how to use these components and the features they

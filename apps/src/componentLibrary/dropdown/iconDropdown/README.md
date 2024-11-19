@@ -7,7 +7,7 @@
 This package exports one styled React component: [IconDropdown](IconDropdown.tsx). You can import it like this:
 
 ```javascript
-import {IconDropdown} from '@cdo/apps/componentLibrary/dropdown';
+import {IconDropdown} from '@/dropdown';
 ```
 
 For guidelines on how to use these components and the features they offer, [visit Storybook](https://code-dot-org.github.io/dsco_) 

@@ -2,12 +2,12 @@ import classNames from 'classnames';
 import React, {useMemo, useState} from 'react';
 
 import {hashEmail} from '@cdo/apps/code-studio/hashEmail';
-import Alert, {alertTypes} from '@cdo/apps/componentLibrary/alert/Alert';
-import {Button} from '@cdo/apps/componentLibrary/button';
-import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
-import Link from '@cdo/apps/componentLibrary/link/Link';
-import TextField from '@cdo/apps/componentLibrary/textField/TextField';
-import {Heading2} from '@cdo/apps/componentLibrary/typography';
+import Alert, {alertTypes} from '@/alert/Alert';
+import {Button} from '@/button';
+import {SimpleDropdown} from '@/dropdown';
+import Link from '@/link/Link';
+import TextField from '@/textField/TextField';
+import {Heading2} from '@/typography';
 import {getAuthenticityToken} from '@cdo/apps/util/AuthenticityTokenStore';
 import i18n from '@cdo/locale';
 

@@ -3,7 +3,7 @@ import FocusTrap from 'focus-trap-react';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import CloseButton from '@cdo/apps/componentLibrary/closeButton/CloseButton';
+import CloseButton from '@/closeButton/CloseButton';
 import CloseOnEscape from '@cdo/apps/templates/CloseOnEscape';
 import i18n from '@cdo/locale';
 

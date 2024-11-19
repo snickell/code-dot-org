@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 
-import Alert from '@cdo/apps/componentLibrary/alert/Alert';
-import {BodyTwoText, Heading2} from '@cdo/apps/componentLibrary/typography';
+import Alert from '@/alert/Alert';
+import {BodyTwoText, Heading2} from '@/typography';
 import CurriculumCatalogCard from '@cdo/apps/templates/curriculumCatalog/CurriculumCatalogCard';
 import i18n from '@cdo/locale';
 

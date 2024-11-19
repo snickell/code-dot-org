@@ -3,7 +3,7 @@ import React from 'react';
 import {
   SimpleDropdown,
   SimpleDropdownProps,
-} from '@cdo/apps/componentLibrary/dropdown';
+} from '@/dropdown';
 import currentLocale from '@cdo/apps/util/currentLocale';
 
 import './style.scss';

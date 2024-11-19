@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 
-import TextField from '@cdo/apps/componentLibrary/textField';
+import TextField from '@/textField';
 
 describe('Design System - TextField', () => {
   const renderTextField = props => {

@@ -6,13 +6,13 @@ import {
   Button,
   buttonColors,
   LinkButton,
-} from '@cdo/apps/componentLibrary/button';
-import Link from '@cdo/apps/componentLibrary/link';
+} from '@/button';
+import Link from '@/link';
 import {
   BodyTwoText,
   Heading3,
   Heading4,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@/typography';
 import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';

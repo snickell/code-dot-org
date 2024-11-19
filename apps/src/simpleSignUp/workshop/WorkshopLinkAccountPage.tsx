@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Link from '@cdo/apps/componentLibrary/link';
+import Link from '@/link';
 import AccountBanner from '@cdo/apps/templates/account/AccountBanner';
 import AccountCard from '@cdo/apps/templates/account/AccountCard';
 import i18n from '@cdo/locale';

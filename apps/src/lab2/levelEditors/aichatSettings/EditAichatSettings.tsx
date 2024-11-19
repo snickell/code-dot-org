@@ -17,12 +17,12 @@ import {
   MIN_TEMPERATURE,
   SET_TEMPERATURE_STEP,
 } from '@cdo/apps/aichat/views/modelCustomization/constants';
-import Checkbox from '@cdo/apps/componentLibrary/checkbox/Checkbox';
+import Checkbox from '@/checkbox/Checkbox';
 import {
   BodyFourText,
   BodyThreeText,
   BodyTwoText,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@/typography';
 import CollapsibleSection from '@cdo/apps/templates/CollapsibleSection';
 import MultiItemInput from '@cdo/apps/templates/MultiItemInput';
 import {getTypedKeys, ValueOf} from '@cdo/apps/types/utils';

@@ -2,10 +2,10 @@ import classNames from 'classnames';
 import {isEqual} from 'lodash';
 import React, {useCallback} from 'react';
 
-import Alert from '@cdo/apps/componentLibrary/alert/Alert';
-import Checkbox from '@cdo/apps/componentLibrary/checkbox/Checkbox';
-import SegmentedButtons from '@cdo/apps/componentLibrary/segmentedButtons/SegmentedButtons';
-import {BodyTwoText} from '@cdo/apps/componentLibrary/typography';
+import Alert from '@/alert/Alert';
+import Checkbox from '@/checkbox/Checkbox';
+import SegmentedButtons from '@/segmentedButtons/SegmentedButtons';
+import {BodyTwoText} from '@/typography';
 import {defaultMaps} from '@cdo/apps/music/blockly/toolbox/definitions';
 import {
   CategoryBlocksMap,

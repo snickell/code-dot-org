@@ -3,7 +3,7 @@ import React, {useState} from 'react';
 import {connect} from 'react-redux';
 
 import {disabledBubblesSupportArticle} from '@cdo/apps/code-studio/disabledBubbles';
-import Link from '@cdo/apps/componentLibrary/link';
+import Link from '@/link';
 import DCDO from '@cdo/apps/dcdo';
 import Button from '@cdo/apps/legacySharedComponents/Button';
 import {getStore} from '@cdo/apps/redux';

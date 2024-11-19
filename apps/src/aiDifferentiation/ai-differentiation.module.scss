@@ -1,7 +1,7 @@
 @import 'color';
 @import 'font';
-@import '@cdo/apps/componentLibrary/typography/typography.module';
-@import '@cdo/apps/componentLibrary/common/styles/mixins';
+@import '@/typography/typography.module';
+@import '@/common/styles/mixins';
 
 @keyframes pulse {
   0% {

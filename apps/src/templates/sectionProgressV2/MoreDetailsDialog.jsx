@@ -6,7 +6,7 @@ import {
   Heading6,
   StrongText,
   BodyThreeText,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@/typography';
 import AccessibleDialog from '@cdo/apps/sharedComponents/AccessibleDialog';
 import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
 import i18n from '@cdo/locale';

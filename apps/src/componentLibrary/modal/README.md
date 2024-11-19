@@ -6,7 +6,7 @@ This package exports one styled React component: [Modal](Modal.tsx).
 You can import it like this:
 
 ```javascript
-import Modal, {ModalProps} from '@cdo/apps/componentLibrary/modal';
+import Modal, {ModalProps} from '@/modal';
 ```
 
 For guidelines on how to use this component and the features it

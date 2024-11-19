@@ -13,7 +13,7 @@ import {
   Heading1,
   Heading2,
   Heading3,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@/typography';
 import i18n from '@cdo/locale';
 
 import BackToFrontConfetti from '../BackToFrontConfetti';

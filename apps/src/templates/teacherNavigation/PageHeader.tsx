@@ -3,7 +3,7 @@ import _ from 'lodash';
 import React from 'react';
 import {matchPath, useLocation} from 'react-router-dom';
 
-import {Heading1} from '@cdo/apps/componentLibrary/typography';
+import {Heading1} from '@/typography';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 import {selectedSectionSelector} from '../teacherDashboard/teacherSectionsReduxSelectors';

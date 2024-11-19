@@ -1,7 +1,7 @@
 import React, {useCallback, useContext} from 'react';
 
-import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon';
-import Typography from '@cdo/apps/componentLibrary/typography/Typography';
+import FontAwesomeV6Icon from '@/fontAwesomeV6Icon';
+import Typography from '@/typography/Typography';
 import codeLogo from '@cdo/apps/templates/images/codeLogo.svg';
 import i18n from '@cdo/locale';
 

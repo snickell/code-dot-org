@@ -8,9 +8,9 @@ import {
   selectHasFilledOutModelCard,
   selectHavePropertiesChanged,
 } from '@cdo/apps/aichat/redux/aichatRedux';
-import Alert, {AlertProps} from '@cdo/apps/componentLibrary/alert/Alert';
-import Button from '@cdo/apps/componentLibrary/button/Button';
-import {FontAwesomeV6IconProps} from '@cdo/apps/componentLibrary/fontAwesomeV6Icon';
+import Alert, {AlertProps} from '@/alert/Alert';
+import Button from '@/button/Button';
+import {FontAwesomeV6IconProps} from '@/fontAwesomeV6Icon';
 import {isReadOnlyWorkspace} from '@cdo/apps/lab2/lab2Redux';
 import {useAppSelector, useAppDispatch} from '@cdo/apps/util/reduxHooks';
 

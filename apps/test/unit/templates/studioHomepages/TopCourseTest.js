@@ -4,7 +4,7 @@ import {Provider} from 'react-redux';
 import {combineReducers, createStore} from 'redux';
 
 import isRtl from '@cdo/apps/code-studio/isRtlRedux';
-import Button from '@cdo/apps/componentLibrary/button/Button';
+import Button from '@/button/Button';
 import TopCourse from '@cdo/apps/templates/studioHomepages/TopCourse';
 import i18n from '@cdo/locale';
 

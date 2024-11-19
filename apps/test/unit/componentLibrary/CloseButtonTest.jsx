@@ -2,7 +2,7 @@ import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import CloseButton from '@cdo/apps/componentLibrary/closeButton';
+import CloseButton from '@/closeButton';
 
 describe('Design System - CloseButton', () => {
   it('renders with default props', () => {

@@ -12,7 +12,7 @@ tooltip.
 ***Here's a recommended way*** to use `WithTooltip` component and adding Tooltips where needed in general:
 
 ```javascript
-import {WithTooltip} from '@cdo/apps/componentLibrary/tooltip';
+import {WithTooltip} from '@/tooltip';
 
 const ComponentWithTooltip = () => (
     <WithTooltip tooltipProps={tooltipProps}>
@@ -45,7 +45,7 @@ you want to add tooltip to.
 You can import it like this:
 
 ```javascript
-import Tooltip, {TooltipOverlay} from '@cdo/apps/componentLibrary/tooltip';
+import Tooltip, {TooltipOverlay} from '@/tooltip';
 import moduleStyles from './styles.module.scss'; // some scss module with tooltip positioning styles
 
 const ComponentWithTooltip = () => {

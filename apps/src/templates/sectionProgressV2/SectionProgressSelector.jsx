@@ -5,7 +5,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {connect} from 'react-redux';
 
 import {queryParams} from '@cdo/apps/code-studio/utils';
-import Link from '@cdo/apps/componentLibrary/link';
+import Link from '@/link';
 import DCDO from '@cdo/apps/dcdo';
 import UserPreferences from '@cdo/apps/lib/util/UserPreferences';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';

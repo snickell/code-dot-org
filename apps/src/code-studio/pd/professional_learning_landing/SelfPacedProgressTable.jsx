@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import {LinkButton} from '@cdo/apps/componentLibrary/button';
-import Link from '@cdo/apps/componentLibrary/link';
+import {LinkButton} from '@/button';
+import Link from '@/link';
 import {
   BodyThreeText,
   BodyFourText,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@/typography';
 import {studio} from '@cdo/apps/lib/util/urlHelpers';
 import i18n from '@cdo/locale';
 

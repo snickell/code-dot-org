@@ -7,8 +7,8 @@ import React, {
   useState,
 } from 'react';
 
-import TextField from '@cdo/apps/componentLibrary/textField';
-import {BodyTwoText} from '@cdo/apps/componentLibrary/typography';
+import TextField from '@/textField';
+import {BodyTwoText} from '@/typography';
 import {Theme, ThemeContext} from '@cdo/apps/lab2/views/ThemeWrapper';
 
 import {useDialogControl} from './DialogControlContext';

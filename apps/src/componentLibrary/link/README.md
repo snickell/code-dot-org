@@ -7,7 +7,7 @@
 This package exports one styled React component: [Link](Link.tsx). You can import it like this:
 
 ```javascript
-import Link from '@cdo/apps/componentLibrary/link';
+import Link from '@/link';
 ```
 
 For guidelines on how to use these components and the features they

@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import React, {useState} from 'react';
 import Draggable, {DraggableEventHandler} from 'react-draggable';
 
-import Button from '@cdo/apps/componentLibrary/button';
+import Button from '@/button';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 import aiBotOutlineIcon from '@cdo/static/ai-bot-outline.png';
 

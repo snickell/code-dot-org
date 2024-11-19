@@ -2,11 +2,11 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useEffect} from 'react';
 
-import Alert from '@cdo/apps/componentLibrary/alert/Alert';
-import {Button, buttonColors} from '@cdo/apps/componentLibrary/button';
-import {ActionDropdown} from '@cdo/apps/componentLibrary/dropdown';
-import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
-import {Heading3} from '@cdo/apps/componentLibrary/typography';
+import Alert from '@/alert/Alert';
+import {Button, buttonColors} from '@/button';
+import {ActionDropdown} from '@/dropdown';
+import FontAwesomeV6Icon from '@/fontAwesomeV6Icon/FontAwesomeV6Icon';
+import {Heading3} from '@/typography';
 import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {getFullName} from '@cdo/apps/templates/manageStudents/utils.ts';

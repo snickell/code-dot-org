@@ -2,7 +2,7 @@ import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import RadioButton from '@cdo/apps/componentLibrary/radioButton';
+import RadioButton from '@/radioButton';
 
 describe('Design System - Radio Button', () => {
   it('RadioButton - renders with correct label', () => {

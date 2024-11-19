@@ -1,9 +1,9 @@
 import React, {useCallback} from 'react';
 
 import codebridgeI18n from '@cdo/apps/codebridge/locale';
-import Button from '@cdo/apps/componentLibrary/button';
-import {TooltipProps} from '@cdo/apps/componentLibrary/tooltip';
-import WithTooltip from '@cdo/apps/componentLibrary/tooltip/WithTooltip';
+import Button from '@/button';
+import {TooltipProps} from '@/tooltip';
+import WithTooltip from '@/tooltip/WithTooltip';
 
 import {useCodebridgeContext} from '../codebridgeContext';
 

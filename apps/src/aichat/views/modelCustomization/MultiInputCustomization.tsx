@@ -1,8 +1,8 @@
 import React, {useState, useCallback} from 'react';
 
-import Button from '@cdo/apps/componentLibrary/button/Button';
-import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
-import {StrongText} from '@cdo/apps/componentLibrary/typography/TypographyElements';
+import Button from '@/button/Button';
+import FontAwesomeV6Icon from '@/fontAwesomeV6Icon/FontAwesomeV6Icon';
+import {StrongText} from '@/typography/TypographyElements';
 
 import {Visibility} from '../../types';
 

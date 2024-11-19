@@ -6,7 +6,7 @@ This package exports two styled React components: [CloseButton](CloseButton.tsx)
 You can import it like this:
 
 ```javascript
-import CloseButton, {CloseButtonProps} from '@cdo/apps/componentLibrary/closeButton';
+import CloseButton, {CloseButtonProps} from '@/closeButton';
 ```
 
 For guidelines on how to use these components and the features they

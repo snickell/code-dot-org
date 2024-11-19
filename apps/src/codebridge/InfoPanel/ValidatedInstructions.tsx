@@ -9,8 +9,8 @@ import {
   nextLevelId,
 } from '@cdo/apps/code-studio/progressReduxSelectors';
 import codebridgeI18n from '@cdo/apps/codebridge/locale';
-import {Button} from '@cdo/apps/componentLibrary/button';
-import {FontAwesomeV6IconProps} from '@cdo/apps/componentLibrary/fontAwesomeV6Icon';
+import {Button} from '@/button';
+import {FontAwesomeV6IconProps} from '@/fontAwesomeV6Icon';
 import continueOrFinishLesson from '@cdo/apps/lab2/progress/continueOrFinishLesson';
 import {
   isPredictAnswerLocked,

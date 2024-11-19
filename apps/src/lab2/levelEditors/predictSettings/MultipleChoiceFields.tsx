@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {Button} from '@cdo/apps/componentLibrary/button';
-import Checkbox from '@cdo/apps/componentLibrary/checkbox';
+import {Button} from '@/button';
+import Checkbox from '@/checkbox';
 
 import {LevelPredictSettings} from '../types';
 

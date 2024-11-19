@@ -3,7 +3,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {useParams} from 'react-router-dom';
 
-import {Heading1, Heading6} from '@cdo/apps/componentLibrary/typography';
+import {Heading1, Heading6} from '@/typography';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import i18n from '@cdo/locale';

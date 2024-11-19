@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {BodyThreeText, StrongText} from '@cdo/apps/componentLibrary/typography';
+import {BodyThreeText, StrongText} from '@/typography';
 
 import InfoTooltipIcon from '../InfoTooltipIcon';
 

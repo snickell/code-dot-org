@@ -2,7 +2,7 @@ import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import Button from '@cdo/apps/componentLibrary/button/_baseButton/_BaseButton';
+import Button from '@/button/_baseButton/_BaseButton';
 
 describe('Design System - Button', () => {
   it('Button - renders with correct text', () => {

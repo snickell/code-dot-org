@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {connect} from 'react-redux';
 
-import {BodyFourText, StrongText} from '@cdo/apps/componentLibrary/typography';
+import {BodyFourText, StrongText} from '@/typography';
 import ErrorBoundary from '@cdo/apps/lab2/ErrorBoundary';
 import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';

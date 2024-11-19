@@ -2,8 +2,8 @@ import classNames from 'classnames';
 import React, {useCallback, useState, useRef, useContext} from 'react';
 import {FocusOn} from 'react-focus-on';
 
-import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
-import Typography from '@cdo/apps/componentLibrary/typography';
+import FontAwesomeV6Icon from '@/fontAwesomeV6Icon/FontAwesomeV6Icon';
+import Typography from '@/typography';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 import {DEFAULT_PACK} from '../constants';

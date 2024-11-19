@@ -6,11 +6,11 @@ This package exports two styled React components: [RadioButton](RadioButton.tsx)
 You can import it like this:
 
 ```javascript
-import {RadioButton, RadioButtonGroup} from '@cdo/apps/componentLibrary/radioButton';
+import {RadioButton, RadioButtonGroup} from '@/radioButton';
 
 // OR
 
-import RadioButton from '@cdo/apps/componentLibrary/radioButton/RadioButton';
+import RadioButton from '@/radioButton/RadioButton';
 ```
 
 For guidelines on how to use these components and the features they offer, [visit Storybook](https://code-dot-org.github.io/dsco_)

@@ -8,8 +8,8 @@ They are identical visually, the only difference is that ```Button``` render ```
 You can import them like this:
 
 ```javascript
-import Button from '@cdo/apps/componentLibrary/button';
-import {Button, LinkButton} from '@cdo/apps/componentLibrary/button';
+import Button from '@/button';
+import {Button, LinkButton} from '@/button';
 ```
 
 Both of [Button](Button.tsx) and [LinkButton](LinkButton.tsx) are actually aliases for [_BaseButton](./_baseButton/_BaseButton.tsx) component which handles all the logic and styles,

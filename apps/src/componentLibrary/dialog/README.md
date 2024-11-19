@@ -6,7 +6,7 @@ This package exports one styled React component: [Dialog](Dialog.tsx).
 You can import it like this:
 
 ```javascript
-import Dialog, {DialogProps} from '@cdo/apps/componentLibrary/dialog';
+import Dialog, {DialogProps} from '@/dialog';
 ```
 
 For guidelines on how to use this component and the features it

@@ -1,7 +1,7 @@
 import {render, screen} from '@testing-library/react';
 import React from 'react';
 
-import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon';
+import FontAwesomeV6Icon from '@/fontAwesomeV6Icon';
 
 describe('Design System - FontAwesomeV6Icon', () => {
   it('FontAwesomeV6Icon - renders with correct classNames and title', () => {

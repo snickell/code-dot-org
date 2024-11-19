@@ -2,7 +2,7 @@ import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import Chips from '@cdo/apps/componentLibrary/chips';
+import Chips from '@/chips';
 
 const options = [
   {value: 'chip1', label: 'Chip1'},

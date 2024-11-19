@@ -7,7 +7,7 @@
 This package exports one styled React component: [ActionDropdown](ActionDropdown.tsx). You can import it like this:
 
 ```javascript
-import {ActionDropdown} from '@cdo/apps/componentLibrary/dropdown';
+import {ActionDropdown} from '@/dropdown';
 ```
 
 For guidelines on how to use these components and the features they

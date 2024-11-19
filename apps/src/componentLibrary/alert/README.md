@@ -6,7 +6,7 @@ This package exports one styled React component: [Alert](Alert.tsx).
 You can import it like this:
 
 ```javascript
-import Alert, {AlertProps} from '@cdo/apps/componentLibrary/alert';
+import Alert, {AlertProps} from '@/alert';
 ```
 
 For guidelines on how to use this component and the features it

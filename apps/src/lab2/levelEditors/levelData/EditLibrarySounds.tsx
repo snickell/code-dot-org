@@ -1,8 +1,8 @@
 import React, {useCallback} from 'react';
 
-import {Button} from '@cdo/apps/componentLibrary/button';
-import Checkbox from '@cdo/apps/componentLibrary/checkbox/Checkbox';
-import {BodyTwoText, StrongText} from '@cdo/apps/componentLibrary/typography';
+import {Button} from '@/button';
+import Checkbox from '@/checkbox/Checkbox';
+import {BodyTwoText, StrongText} from '@/typography';
 import MusicLibrary, {Sounds} from '@cdo/apps/music/player/MusicLibrary';
 import CollapsibleSection from '@cdo/apps/templates/CollapsibleSection';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {BodyThreeText, Heading1} from '@cdo/apps/componentLibrary/typography';
+import {BodyThreeText, Heading1} from '@/typography';
 import {
   LevelPredictSettings,
   PredictQuestionType,

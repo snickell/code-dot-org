@@ -1,8 +1,8 @@
 import React from 'react';
 import {Fade} from 'react-bootstrap'; // eslint-disable-line no-restricted-imports
 
-import {Button, buttonColors} from '@cdo/apps/componentLibrary/button';
-import Typography from '@cdo/apps/componentLibrary/typography/Typography';
+import {Button, buttonColors} from '@/button';
+import Typography from '@/typography/Typography';
 import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import AccessibleDialog from '@cdo/apps/sharedComponents/AccessibleDialog';

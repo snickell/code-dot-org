@@ -6,15 +6,15 @@ This package exports two styled React components: [Chip](Chip.tsx) and [ChipsGro
 You can import it like this:
 
 ```javascript
-import {ChipsGroup} from '@cdo/apps/componentLibrary/chips';
+import {ChipsGroup} from '@/chips';
 
 // OR
 
-import Chips from '@cdo/apps/componentLibrary/chips';
+import Chips from '@/chips';
 
 // OR
 
-import Chips from '@cdo/apps/componentLibrary/chips/ChipsGrpup';
+import Chips from '@/chips/ChipsGrpup';
 ```
 
 For guidelines on how to use these components and the features they offer, [visit Storybook](https://code-dot-org.github.io/dsco_)

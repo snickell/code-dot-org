@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 
 import Breadcrumbs, {
   BreadcrumbsProps,
-} from '@cdo/apps/componentLibrary/breadcrumbs';
+} from '@/breadcrumbs';
 
 describe('Breadcrumbs Component', () => {
   const breadcrumbsData = [

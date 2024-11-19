@@ -1,11 +1,11 @@
 import React from 'react';
 
-import Button, {buttonColors} from '@cdo/apps/componentLibrary/button/Button';
+import Button, {buttonColors} from '@/button/Button';
 import {
   BodyTwoText,
   Heading3,
   StrongText,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@/typography';
 import AccessibleDialog from '@cdo/apps/sharedComponents/AccessibleDialog';
 import i18n from '@cdo/locale';
 

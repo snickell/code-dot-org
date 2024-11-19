@@ -5,7 +5,7 @@
 This package exports one styled React component: [Tabs](Tabs.tsx). You can import it like this:
 
 ```javascript
-import Tabs from '@cdo/apps/componentLibrary/tabs';
+import Tabs from '@/tabs';
 ```
 
 For guidelines on how to use these components and the features they offer, [visit Storybook](https://code-dot-org.github.io/dsco_) 

@@ -1,7 +1,7 @@
 import React from 'react';
 
-import Button from '@cdo/apps/componentLibrary/button/Button';
-import {Heading3} from '@cdo/apps/componentLibrary/typography';
+import Button from '@/button/Button';
+import {Heading3} from '@/typography';
 import AccessibleDialog from '@cdo/apps/sharedComponents/AccessibleDialog';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 

@@ -4,7 +4,7 @@ import React from 'react';
 import * as Table from 'reactabular-table';
 import * as sort from 'sortabular';
 
-import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
+import {SimpleDropdown} from '@/dropdown';
 import PopUpMenu, {MenuBreak} from '@cdo/apps/sharedComponents/PopUpMenu';
 import experiments from '@cdo/apps/util/experiments';
 import HttpClient from '@cdo/apps/util/HttpClient';

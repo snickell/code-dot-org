@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 
-import Button, {buttonColors} from '@cdo/apps/componentLibrary/button/Button';
+import Button, {buttonColors} from '@/button/Button';
 import i18n from '@cdo/locale';
 
 import {saveFeedback, FeedbackData} from '../interactionsApi';

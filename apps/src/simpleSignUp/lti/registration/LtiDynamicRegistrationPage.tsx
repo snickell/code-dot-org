@@ -1,8 +1,8 @@
 import $ from 'jquery';
 import React, {useState} from 'react';
 
-import {Button} from '@cdo/apps/componentLibrary/button';
-import Typography from '@cdo/apps/componentLibrary/typography';
+import {Button} from '@/button';
+import Typography from '@/typography';
 import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import i18n from '@cdo/locale';

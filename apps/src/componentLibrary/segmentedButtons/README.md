@@ -6,7 +6,7 @@ This package exports one styled React component: [SegmentedButtons](SegmentedBut
 You can import it like this:
 
 ```javascript
-import SegmentedButtons from '@cdo/apps/componentLibrary/segmentedButtons';
+import SegmentedButtons from '@/segmentedButtons';
 ```
 
 For guidelines on how to use these components and the features they offer, [visit Storybook](https://code-dot-org.github.io/dsco_)

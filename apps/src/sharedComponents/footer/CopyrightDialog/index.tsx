@@ -1,7 +1,7 @@
 import React from 'react';
 
-import Link from '@cdo/apps/componentLibrary/link';
-import {BodyThreeText, Heading3} from '@cdo/apps/componentLibrary/typography';
+import Link from '@/link';
+import {BodyThreeText, Heading3} from '@/typography';
 import {pegasus} from '@cdo/apps/lib/util/urlHelpers';
 import AccessibleDialog from '@cdo/apps/sharedComponents/AccessibleDialog';
 import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';

@@ -5,7 +5,7 @@
 This package exports one styled React component: [Toggle](Toggle.tsx). You can import it like this:
 
 ```javascript
-import Toggle from '@cdo/apps/componentLibrary/toggle';
+import Toggle from '@/toggle';
 ```
 
 For guidelines on how to use these components and the features they offer, [visit Storybook](https://code-dot-org.github.io/dsco_)

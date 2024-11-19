@@ -2,12 +2,12 @@ import classNames from 'classnames';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {sendCodebridgeAnalyticsEvent} from '@cdo/apps/codebridge/utils/analyticsReporterHelper';
-import Alert from '@cdo/apps/componentLibrary/alert/Alert';
-import {Button} from '@cdo/apps/componentLibrary/button';
-import CloseButton from '@cdo/apps/componentLibrary/closeButton/CloseButton';
-import {RadioButton} from '@cdo/apps/componentLibrary/radioButton';
-import Tags from '@cdo/apps/componentLibrary/tags';
-import {Heading6} from '@cdo/apps/componentLibrary/typography';
+import Alert from '@/alert/Alert';
+import {Button} from '@/button';
+import CloseButton from '@/closeButton/CloseButton';
+import {RadioButton} from '@/radioButton';
+import Tags from '@/tags';
+import {Heading6} from '@/typography';
 import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
 import lab2I18n from '@cdo/apps/lab2/locale';
 import {

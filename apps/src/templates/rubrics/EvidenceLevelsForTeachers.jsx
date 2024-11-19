@@ -2,12 +2,12 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import RadioButton from '@cdo/apps/componentLibrary/radioButton/RadioButton';
+import RadioButton from '@/radioButton/RadioButton';
 import {
   BodyThreeText,
   StrongText,
   Heading6,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@/typography';
 import i18n from '@cdo/locale';
 
 import {UNDERSTANDING_LEVEL_STRINGS} from './rubricHelpers';

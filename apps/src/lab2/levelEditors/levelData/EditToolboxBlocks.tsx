@@ -2,9 +2,9 @@ import classNames from 'classnames';
 import {isEqual} from 'lodash';
 import React, {useCallback} from 'react';
 
-import {Button} from '@cdo/apps/componentLibrary/button';
-import Checkbox from '@cdo/apps/componentLibrary/checkbox/Checkbox';
-import {BodyTwoText} from '@cdo/apps/componentLibrary/typography';
+import {Button} from '@/button';
+import Checkbox from '@/checkbox/Checkbox';
+import {BodyTwoText} from '@/typography';
 import {BlockTypes} from '@cdo/apps/music/blockly/blockTypes';
 import {
   categoryTypeToLocalizedName,

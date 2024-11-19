@@ -1,7 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/react';
 import React from 'react';
 
-import {buttonColors, LinkButton} from '@cdo/apps/componentLibrary/button';
+import {buttonColors, LinkButton} from '@/button';
 import {CardActions} from '@cdo/apps/sharedComponents/card/CardActions';
 import {CardContent} from '@cdo/apps/sharedComponents/card/CardContent';
 import {CardHeader} from '@cdo/apps/sharedComponents/card/CardHeader';

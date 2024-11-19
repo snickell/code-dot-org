@@ -2,8 +2,8 @@ import SwapLayoutDropdown from '@codebridge/components/SwapLayoutDropdown';
 import React from 'react';
 
 import codebridgeI18n from '@cdo/apps/codebridge/locale';
-import Button from '@cdo/apps/componentLibrary/button';
-import {TooltipProps, WithTooltip} from '@cdo/apps/componentLibrary/tooltip';
+import Button from '@/button';
+import {TooltipProps, WithTooltip} from '@/tooltip';
 
 import moduleStyles from './right-buttons.module.scss';
 import darkModeStyles from '@cdo/apps/lab2/styles/dark-mode.module.scss';

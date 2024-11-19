@@ -1,9 +1,9 @@
 import React, {useCallback, useEffect, useState} from 'react';
 
-import Alert from '@cdo/apps/componentLibrary/alert/Alert';
-import Button from '@cdo/apps/componentLibrary/button/Button';
-import Link from '@cdo/apps/componentLibrary/link/Link';
-import {BodyTwoText, Heading3} from '@cdo/apps/componentLibrary/typography';
+import Alert from '@/alert/Alert';
+import Button from '@/button/Button';
+import Link from '@/link/Link';
+import {BodyTwoText, Heading3} from '@/typography';
 import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {MetricEvent} from '@cdo/apps/metrics/events';

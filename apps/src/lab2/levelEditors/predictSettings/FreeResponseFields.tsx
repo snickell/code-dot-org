@@ -1,6 +1,6 @@
 import React from 'react';
 
-import TextField from '@cdo/apps/componentLibrary/textField';
+import TextField from '@/textField';
 
 import {PREDICT_FREE_RESPONSE_DEFAULT_HEIGHT} from '../../constants';
 import {LevelPredictSettings} from '../types';

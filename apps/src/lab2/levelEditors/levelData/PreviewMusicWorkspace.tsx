@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import React, {useEffect, useRef} from 'react';
 
-import Alert from '@cdo/apps/componentLibrary/alert/Alert';
+import Alert from '@/alert/Alert';
 import MusicBlocklyWorkspace from '@cdo/apps/music/blockly/MusicBlocklyWorkspace';
 import {ToolboxData} from '@cdo/apps/music/blockly/toolbox/types';
 import {BlockMode} from '@cdo/apps/music/constants';

@@ -2,11 +2,11 @@
 
 import React, {useCallback, useEffect} from 'react';
 
-import Button from '@cdo/apps/componentLibrary/button/Button';
-import ActionDropdown from '@cdo/apps/componentLibrary/dropdown/actionDropdown/ActionDropdown';
+import Button from '@/button/Button';
+import ActionDropdown from '@/dropdown/actionDropdown/ActionDropdown';
 import SegmentedButtons, {
   SegmentedButtonsProps,
-} from '@cdo/apps/componentLibrary/segmentedButtons/SegmentedButtons';
+} from '@/segmentedButtons/SegmentedButtons';
 import {isProjectTemplateLevel} from '@cdo/apps/lab2/lab2Redux';
 import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
 import Instructions from '@cdo/apps/lab2/views/components/Instructions';

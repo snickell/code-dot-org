@@ -2,7 +2,7 @@ import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import Checkbox from '@cdo/apps/componentLibrary/checkbox';
+import Checkbox from '@/checkbox';
 
 describe('Design System - Checkbox', () => {
   it('Checkbox - renders with correct label', () => {

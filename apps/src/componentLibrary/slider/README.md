@@ -5,7 +5,7 @@
 This package exports one styled React component: [Slider](Slider.tsx). You can import it like this:
 
 ```javascript
-import Slider from '@cdo/apps/componentLibrary/slider';
+import Slider from '@/slider';
 ```
 
 For guidelines on how to use these components and the features they

@@ -6,8 +6,8 @@ import {
   Button,
   LinkButton,
   buttonColors,
-} from '@cdo/apps/componentLibrary/button';
-import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon';
+} from '@/button';
+import FontAwesomeV6Icon from '@/fontAwesomeV6Icon';
 import {
   Card,
   CardActions,

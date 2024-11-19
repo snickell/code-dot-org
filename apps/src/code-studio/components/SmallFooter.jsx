@@ -10,7 +10,7 @@ import debounce from 'lodash/debounce';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import {Button} from '@cdo/apps/componentLibrary/button';
+import {Button} from '@/button';
 import {userAlreadyReportedAbuse} from '@cdo/apps/reportAbuse';
 import CopyrightDialog from '@cdo/apps/sharedComponents/footer/CopyrightDialog/index';
 import I18nDropdown from '@cdo/apps/sharedComponents/footer/I18nDropdown/index';
