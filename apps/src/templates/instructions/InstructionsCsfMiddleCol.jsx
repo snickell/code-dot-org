@@ -170,7 +170,7 @@ class InstructionsCsfMiddleCol extends React.Component {
               <SafeMarkdown markdown={this.props.shortInstructions2} />
             </div>
           )}
-          {true && (
+          {this.props.overlayVisible && (
             <div>
               <hr />
               <Button
