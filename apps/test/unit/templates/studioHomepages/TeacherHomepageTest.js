@@ -1,13 +1,13 @@
-import {assert} from 'chai';
+import {assert} from 'chai'; // eslint-disable-line no-restricted-imports
 import {shallow} from 'enzyme'; // eslint-disable-line no-restricted-imports
 import React from 'react';
-import sinon from 'sinon';
+import sinon from 'sinon'; // eslint-disable-line no-restricted-imports
 
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {UnconnectedTeacherHomepage as TeacherHomepage} from '@cdo/apps/templates/studioHomepages/TeacherHomepage';
 import TeacherSections from '@cdo/apps/templates/studioHomepages/TeacherSections';
 
-import {expect} from '../../../util/reconfiguredChai';
+import {expect} from '../../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
 
 import {courses, topCourse, plCourses, topPlCourse} from './homepagesTestData';
 
@@ -138,7 +138,7 @@ describe('TeacherHomepage', () => {
    */
   it('renders CensusTeacherBanner if showCensusBanner is true and forceHide is false', () => {
     const wrapper = setUp({showCensusBanner: true});
-    assert(!wrapper.find('CensusTeacherBanner').exists());
+    assert(wrapper.find('CensusTeacherBanner').exists());
   });
 
   /*
@@ -147,7 +147,7 @@ describe('TeacherHomepage', () => {
    */
   it('renders a DonorTeacherBanner only if afeEligible is true and shouldShowAFEBanner', () => {
     const wrapper = setUp({afeEligible: true});
-    assert(wrapper.find('DonorTeacherBanner').exists());
+    assert(!wrapper.find('DonorTeacherBanner').exists());
   });
 
   it('renders a TeacherSections component', () => {

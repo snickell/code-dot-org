@@ -29,7 +29,9 @@ class ApplicationController < ActionController::Base
 
   before_action :clear_sign_up_session_vars
 
-  before_action :initialize_statsig_session
+  before_action :initialize_statsig_stable_id
+
+  around_action :with_global_current_user
 
   def fix_crawlers_with_bad_accept_headers
     # append text/html as an acceptable response type for Edmodo and weebly-agent's malformed HTTP_ACCEPT header.
@@ -350,6 +352,8 @@ class ApplicationController < ActionController::Base
       api_v1_users_current_path,
       # Don't block any user from signing out
       destroy_user_session_path,
+      # Allow retrieval of CSRF token
+      get_token_path,
       # Don't block any user from changing the language
       locale_path,
       # Avoid an infinite redirect loop to the lockout page
@@ -358,6 +362,9 @@ class ApplicationController < ActionController::Base
       policy_compliance_child_account_consent_path,
       # The age interstitial when the age isn't known will block the lockout page
       users_set_student_information_path,
+      # Allow students to join sections while locked out
+      student_user_new_path,
+      student_register_path,
     ].include?(request.path)
 
     redirect_to lockout_path
@@ -395,13 +402,21 @@ class ApplicationController < ActionController::Base
     redirect_to lti_v1_account_linking_landing_path
   end
 
-  # Creates a stable statsig id for use of session tracking (whether the user is logged in or not)
-  # Use this session variable when you want to track the user journey when the user is not logged in.
-  protected def initialize_statsig_session
-    session[:statsig_stable_id] ||= SecureRandom.uuid
+  # Creates a statsig stable id for use of signed-out user tracking.
+  # This cookie is used by the Statsig SDK for both JS and Ruby.
+  protected def initialize_statsig_stable_id
+    cookies[:statsig_stable_id] ||= {value: SecureRandom.uuid, domain: :all, path: '/'}
   end
 
   private def pairing_still_enabled
     session[:pairing_section_id] && Section.find(session[:pairing_section_id]).pairing_allowed
+  end
+
+  # Makes `current_user` accessible everywhere within an HTTP request.
+  private def with_global_current_user
+    RequestStore.store[:current_user] = current_user
+    yield
+  ensure
+    RequestStore.store[:current_user] = nil
   end
 end

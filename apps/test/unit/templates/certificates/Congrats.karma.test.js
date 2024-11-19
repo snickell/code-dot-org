@@ -5,7 +5,7 @@ import Certificate from '@cdo/apps/templates/certificates/Certificate';
 import Congrats from '@cdo/apps/templates/certificates/Congrats';
 import GraduateToNextLevel from '@cdo/apps/templates/certificates/GraduateToNextLevel';
 
-import {expect} from '../../../util/reconfiguredChai';
+import {expect} from '../../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
 
 describe('Congrats', () => {
   const userTypes = ['signedOut', 'teacher', 'student'];
@@ -135,6 +135,22 @@ describe('Congrats', () => {
     ).to.be.false;
     expect(wrapper.find('a[href="https://code.org/apply"]').exists()).to.be
       .true;
+  });
+
+  it('renders SuggestedAssignableCourses when there are assignable course suggestions', () => {
+    const assignableCourses = [
+      {
+        courseDisplayName: 'CS Discoveries',
+      },
+    ];
+    const wrapper = shallow(
+      <Congrats
+        {...plProps}
+        assignableCourseSuggestions={assignableCourses}
+        curriculumUrl="/s/self-paced-pl3-2023"
+      />
+    );
+    expect(wrapper.find('SuggestedAssignableCourses').exists()).to.be.true;
   });
 
   it('renders a message when there is no certificateData', () => {

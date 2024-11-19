@@ -19,7 +19,7 @@ class Pd::RegionalPartnerMiniContact < ApplicationRecord
   include Pd::Form
 
   # Most unmatched contacts are from an international source
-  UNMATCHED_FORM_EMAIL = 'international@code.org'
+  UNMATCHED_FORM_EMAIL = 'team-global@code.org'
 
   belongs_to :user, optional: true
   belongs_to :regional_partner, optional: true
@@ -48,8 +48,6 @@ class Pd::RegionalPartnerMiniContact < ApplicationRecord
           Pd::RegionalPartnerMiniContactMailer.matched(form, rp_pm).deliver_now
         end
       end
-    else
-      Pd::RegionalPartnerMiniContactMailer.unmatched(form, UNMATCHED_FORM_EMAIL).deliver_now
     end
 
     Pd::RegionalPartnerMiniContactMailer.receipt(form, regional_partner).deliver_now

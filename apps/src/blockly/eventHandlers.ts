@@ -1,6 +1,5 @@
 // Event Handlers for Google Blockly.
 
-import {Block, WorkspaceSvg} from 'blockly';
 import * as GoogleBlockly from 'blockly/core';
 
 import {handleWorkspaceResizeOrScroll} from '@cdo/apps/code-studio/callouts';
@@ -80,7 +79,7 @@ export function disableOrphans(event: GoogleBlockly.Events.Abstract) {
   }
 }
 
-function updateBlockEnabled(block: Block) {
+function updateBlockEnabled(block: GoogleBlockly.Block) {
   // Changing blocks as part of this event shouldn't be undoable.
   const initialUndoFlag = Blockly.Events.getRecordUndo();
   try {
@@ -92,7 +91,7 @@ function updateBlockEnabled(block: Block) {
         child.setEnabled(true);
       }
     } else if (block.outputConnection || block.previousConnection) {
-      let currentBlock: Block | null = block;
+      let currentBlock: GoogleBlockly.Block | null = block;
       do {
         currentBlock.setEnabled(false);
         currentBlock = currentBlock.getNextBlock();
@@ -115,13 +114,53 @@ export function adjustCalloutsOnViewportChange(
 
 // When the browser is resized, we need to re-adjust the width of any open flyout.
 export function reflowToolbox() {
-  const mainWorkspace = Blockly.getMainWorkspace() as WorkspaceSvg;
+  const mainWorkspace =
+    Blockly.getMainWorkspace() as GoogleBlockly.WorkspaceSvg;
   mainWorkspace?.getFlyout()?.reflow();
 
   if (Blockly.functionEditor) {
-    const modalWorkspace = Blockly.getFunctionEditorWorkspace() as WorkspaceSvg;
+    const modalWorkspace =
+      Blockly.getFunctionEditorWorkspace() as GoogleBlockly.WorkspaceSvg;
     modalWorkspace?.getFlyout()?.reflow();
   }
+}
+
+// We store the workspace width for RTL workspaces so that we can move
+// blocks back to the correct positions after a browser window resize.
+// See: https://github.com/google/blockly/issues/8637
+export function storeWorkspaceWidth(e: GoogleBlockly.Events.Abstract) {
+  if (e.type === Blockly.Events.FINISHED_LOADING && e.workspaceId) {
+    const workspace = Blockly.Workspace.getById(
+      `${e.workspaceId}`
+    ) as ExtendedWorkspaceSvg;
+    if (workspace?.RTL && workspace?.rendered) {
+      workspace.previousViewWidth = workspace?.getMetrics().viewWidth;
+    }
+  }
+}
+
+// Blockly always anchors the workspace to the left, which causes it to
+// scroll unexpectedly when the browser is resized. We need to move RTL
+// over by the change in workspace width to compensate.
+// See: https://github.com/google/blockly/issues/8637
+export function bumpRTLBlocks() {
+  const studentWorkspaces = [
+    Blockly.getMainWorkspace(),
+    Blockly.getFunctionEditorWorkspace(),
+  ];
+
+  studentWorkspaces.forEach(workspace => {
+    if (workspace?.RTL && workspace?.rendered) {
+      if (typeof workspace.previousViewWidth === 'number') {
+        const newViewWidth = workspace.getMetrics().viewWidth;
+        const widthChange = newViewWidth - workspace.previousViewWidth;
+        workspace.getTopBlocks().forEach(block => {
+          block.moveBy(widthChange, 0);
+        });
+        workspace.previousViewWidth = newViewWidth;
+      }
+    }
+  });
 }
 
 // When blocks on the main workspace are changed, update the block limits indicators.

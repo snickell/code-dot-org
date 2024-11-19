@@ -1,15 +1,25 @@
 import LabMetricsReporter from '@cdo/apps/lab2/Lab2MetricsReporter';
-import {DEFAULT_CHORD_LENGTH, DEFAULT_PATTERN_LENGTH} from '../../constants';
+import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
+
+import {findParentStatementInputTypes} from '../../blockly/blockUtils';
+import {
+  DEFAULT_CHORD_LENGTH,
+  DEFAULT_PATTERN_LENGTH,
+  DEFAULT_TUNE_LENGTH,
+} from '../../constants';
 import {ChordEvent, ChordEventValue} from '../interfaces/ChordEvent';
 import {Effects, EffectValue} from '../interfaces/Effects';
-import {PatternEvent, PatternEventValue} from '../interfaces/PatternEvent';
-import {PlaybackEvent} from '../interfaces/PlaybackEvent';
 import {FunctionEvents} from '../interfaces/FunctionEvents';
+import {
+  InstrumentEvent,
+  InstrumentEventValue,
+} from '../interfaces/InstrumentEvent';
+import {PlaybackEvent} from '../interfaces/PlaybackEvent';
 import {SkipContext} from '../interfaces/SkipContext';
 import {SoundEvent} from '../interfaces/SoundEvent';
 import MusicLibrary from '../MusicLibrary';
+
 import Sequencer from './Sequencer';
-import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
 
 interface SequenceFrame {
   measure: number;
@@ -109,11 +119,12 @@ export default class Simple2Sequencer extends Sequencer {
   /**
    * Starts a new function context.
    */
-  startFunctionContext(functionName: string) {
+  startFunctionContext(functionName: string, procedureID?: string) {
     const uniqueId = this.getUniqueInvocationId();
 
     this.functionMap[uniqueId] = {
       name: functionName,
+      procedureID,
       uniqueInvocationId: uniqueId,
       startMeasure: this.getCurrentMeasure(),
       endMeasure: this.getCurrentMeasure(),
@@ -212,21 +223,24 @@ export default class Simple2Sequencer extends Sequencer {
       length: soundData.length,
       soundType: soundData.type,
       blockId,
-      ...this.getCommonEventFields(),
+      ...this.getCommonEventFields(blockId),
     });
   }
 
   /**
    * Play a pattern event at the current location.
    */
-  playPattern(value: PatternEventValue, blockId: string) {
-    this.addNewEvent<PatternEvent>({
-      type: 'pattern',
+  playPattern(value: InstrumentEventValue, blockId: string) {
+    const length = value.length || DEFAULT_PATTERN_LENGTH;
+
+    this.addNewEvent<InstrumentEvent>({
+      type: 'instrument',
+      instrumentType: 'drums',
       id: JSON.stringify(value),
       value,
       blockId,
-      length: DEFAULT_PATTERN_LENGTH,
-      ...this.getCommonEventFields(),
+      length,
+      ...this.getCommonEventFields(blockId),
     });
   }
 
@@ -240,7 +254,22 @@ export default class Simple2Sequencer extends Sequencer {
       value,
       length: DEFAULT_CHORD_LENGTH,
       blockId,
-      ...this.getCommonEventFields(),
+      ...this.getCommonEventFields(blockId),
+    });
+  }
+
+  /**
+   * Play a tune event at the current location.
+   */
+  playTune(value: InstrumentEventValue, blockId: string) {
+    this.addNewEvent<InstrumentEvent>({
+      type: 'instrument',
+      instrumentType: 'melodic',
+      id: JSON.stringify(value),
+      value,
+      length: value.length || DEFAULT_TUNE_LENGTH,
+      blockId,
+      ...this.getCommonEventFields(blockId),
     });
   }
 
@@ -267,6 +296,7 @@ export default class Simple2Sequencer extends Sequencer {
             ...playbackEvent,
             functionContext: {
               name: functionEvent.name,
+              procedureID: functionEvent.procedureID,
               uniqueInvocationId: functionEvent.uniqueInvocationId,
             },
           };
@@ -275,7 +305,7 @@ export default class Simple2Sequencer extends Sequencer {
       .flat();
   }
 
-  private getCommonEventFields() {
+  private getCommonEventFields(blockId: string) {
     const effects = this.getCurrentEffects();
     return {
       triggered: this.inTrigger,
@@ -283,6 +313,9 @@ export default class Simple2Sequencer extends Sequencer {
       // Snapshot the current value of effects
       effects: effects ? {...effects} : undefined,
       skipContext: this.getCurrentSkipContext(),
+      validationInfo: {
+        parentControlTypes: findParentStatementInputTypes(blockId),
+      },
     };
   }
 

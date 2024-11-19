@@ -8,9 +8,9 @@ import {connect, useDispatch} from 'react-redux';
 import Tabs from '@cdo/apps/componentLibrary/tabs';
 import {Heading2} from '@cdo/apps/componentLibrary/typography';
 import DCDO from '@cdo/apps/dcdo';
-import {EVENTS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
 import {pegasus} from '@cdo/apps/lib/util/urlHelpers';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import HeaderBannerNoImage from '@cdo/apps/templates/HeaderBannerNoImage';
 import ActionBlocksWrapper from '@cdo/apps/templates/studioHomepages/ActionBlocksWrapper';
 import BorderedCallToAction from '@cdo/apps/templates/studioHomepages/BorderedCallToAction';
@@ -24,8 +24,8 @@ import OwnedSections from '@cdo/apps/templates/teacherDashboard/OwnedSections';
 import {
   asyncLoadSectionData,
   asyncLoadCoteacherInvite,
-  hiddenPlSectionIds,
 } from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
+import {hiddenPlSectionIds} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
 import i18n from '@cdo/locale';
 
 import {queryParams, updateQueryParam} from '../../utils';
@@ -35,6 +35,7 @@ import {
   COURSE_CSP,
   COURSE_CSA,
 } from '../workshop_dashboard/workshopConstants';
+import WorkshopEnrollmentCelebrationDialog from '../workshop_enrollment/WorkshopEnrollmentCelebrationDialog';
 
 import {EnrolledWorkshops, WorkshopsTable} from './EnrolledWorkshops';
 import SelfPacedProgressTable from './SelfPacedProgressTable';
@@ -84,6 +85,26 @@ const getAvailableTabs = permissions => {
   return tabs;
 };
 
+const getEnrollSucessWorkshopName = () => {
+  // If sent here from successfully enrolling in a workshop, log WORKSHOP_ENROLLMENT_COMPLETED_EVENT.
+  const urlParams = queryParams();
+  if (urlParams && Object.keys(urlParams).includes('wsCourse')) {
+    const workshopCourseName = urlParams['wsCourse'];
+
+    analyticsReporter.sendEvent(EVENTS.WORKSHOP_ENROLLMENT_COMPLETED_EVENT, {
+      'regional partner': urlParams['rpName'],
+      'workshop course': workshopCourseName,
+      'workshop subject': urlParams['wsSubject'],
+    });
+
+    updateQueryParam('rpName', undefined, false);
+    updateQueryParam('wsCourse', undefined, false);
+    updateQueryParam('wsSubject', undefined, false);
+
+    return workshopCourseName;
+  }
+};
+
 function LandingPage({
   lastWorkshopSurveyUrl,
   lastWorkshopSurveyCourse,
@@ -102,9 +123,10 @@ function LandingPage({
   hiddenPlSectionIds,
 }) {
   const availableTabs = getAvailableTabs(userPermissions);
+  const [enrollSuccessWorkshopName, setEnrollSuccessWorkshopName] = useState(
+    getEnrollSucessWorkshopName()
+  );
   const [currentTab, setCurrentTab] = useState(availableTabs[0].value);
-  const [showEnrollmentSuccessMessage, setShowEnrollmentSuccessMessage] =
-    useState(false);
   const headerContainerStyles =
     availableTabs.length > 1
       ? style.headerWithTabsContainer
@@ -112,22 +134,6 @@ function LandingPage({
 
   const joinedPlSectionsStyling =
     joinedPlSections?.length > 0 ? '' : style.joinedPlSectionsWithNoSections;
-
-  // If sent here from successfully enrolling in a workshop, log WORKSHOP_ENROLLMENT_COMPLETED_EVENT.
-  const urlParams = queryParams();
-  if (urlParams && Object.keys(urlParams).includes('rpName')) {
-    analyticsReporter.sendEvent(EVENTS.WORKSHOP_ENROLLMENT_COMPLETED_EVENT, {
-      'regional partner': urlParams['rpName'],
-      'workshop course': urlParams['wsCourse'],
-      'workshop subject': urlParams['wsSubject'],
-    });
-
-    updateQueryParam('rpName', undefined, false);
-    updateQueryParam('wsCourse', undefined, false);
-    updateQueryParam('wsSubject', undefined, false);
-
-    setShowEnrollmentSuccessMessage(true);
-  }
 
   // Load PL section info into redux
   const dispatch = useDispatch();
@@ -367,22 +373,11 @@ function LandingPage({
   const RenderMyPlTab = () => {
     return (
       <>
-        {showEnrollmentSuccessMessage && (
-          <div style={successMessageStyling.successContainer}>
-            <div style={successMessageStyling.successMessage}>
-              <p style={successMessageStyling.text}>
-                You successfully enrolled in a Build Your Own workshop!
-              </p>
-              <button
-                aria-label="close success message"
-                onClick={() => setShowEnrollmentSuccessMessage(false)}
-                type="button"
-                style={successMessageStyling.button}
-              >
-                <strong>X</strong>
-              </button>
-            </div>
-          </div>
+        {enrollSuccessWorkshopName && (
+          <WorkshopEnrollmentCelebrationDialog
+            workshopName={enrollSuccessWorkshopName}
+            onClose={() => setEnrollSuccessWorkshopName(null)}
+          />
         )}
         {RenderBanner()}
         {plCoursesStarted?.length >= 1 && RenderSelfPacedPL()}
@@ -499,35 +494,6 @@ function LandingPage({
     </>
   );
 }
-
-const successMessageStyling = {
-  successContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-  },
-  successMessage: {
-    display: 'flex',
-    minWidth: '250px',
-    backgroundColor: 'green',
-    textAlign: 'center',
-    borderRadius: '5px',
-    position: 'fixed',
-    zIndex: 4,
-    top: '240px',
-  },
-  button: {
-    maxHeight: '1.5em',
-    margin: '3px 6px',
-    padding: 0,
-    backgroundColor: 'transparent',
-    border: 'none',
-    fontSize: '12px',
-  },
-  text: {
-    margin: '16px',
-    color: 'black',
-  },
-};
 
 export const UnconnectedLandingPage = LandingPage;
 

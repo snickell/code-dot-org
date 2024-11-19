@@ -19,8 +19,6 @@ import teacherSections, {
   setSections,
 } from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
 
-import {expect} from '../../../util/reconfiguredChai';
-
 const STUDENT_1 = {id: 1, name: 'Student 1', familyName: 'FamNameB'};
 const STUDENT_2 = {id: 2, name: 'Student 2', familyName: 'FamNameA'};
 const STUDENTS = [STUDENT_1, STUDENT_2];
@@ -81,35 +79,46 @@ describe('SkeletonProgressDataColumn', () => {
   it('Shows skeleton if fake lesson', () => {
     renderDefault({lesson: {id: 1, isFake: true}});
 
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(getTestId(1, STUDENT_1.id));
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(getTestId(1, STUDENT_2.id));
     screen.getByLabelText('Loading lesson');
     expect(
+      // eslint-disable-next-line no-restricted-properties
       screen.getAllByTestId('lesson-skeleton-cell', {exact: false})
-    ).to.have.length(2);
+    ).toHaveLength(2);
   });
 
   it('Shows real header', () => {
     renderDefault();
 
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(getTestId(LESSON.id, STUDENT_1.id));
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(getTestId(LESSON.id, STUDENT_2.id));
-    expect(screen.queryByLabelText('Loading lesson')).to.not.exist;
+    expect(screen.queryByLabelText('Loading lesson')).toBeFalsy();
     expect(
+      // eslint-disable-next-line no-restricted-properties
       screen.getAllByTestId('lesson-skeleton-cell', {exact: false})
-    ).to.have.length(2);
+    ).toHaveLength(2);
   });
 
   it('Shows expanded metadata rows', () => {
     renderDefault({expandedMetadataStudentIds: [1]});
     store.dispatch(expandMetadataForStudents([STUDENT_1.id]));
 
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(getTestId(LESSON.id, STUDENT_1.id));
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(getTestId(LESSON.id, STUDENT_1.id, '-last-updated'));
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(getTestId(LESSON.id, STUDENT_1.id, '-time-spent'));
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(getTestId(LESSON.id, STUDENT_2.id));
     expect(
+      // eslint-disable-next-line no-restricted-properties
       screen.getAllByTestId('lesson-skeleton-cell', {exact: false})
-    ).to.have.length(4);
+    ).toHaveLength(4);
   });
 });

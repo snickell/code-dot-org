@@ -6,21 +6,25 @@
 
 import React, {useEffect} from 'react';
 import {useSelector} from 'react-redux';
-import Lab2Registry from '../Lab2Registry';
+
+import header from '@cdo/apps/code-studio/header';
+import {clearHeader} from '@cdo/apps/code-studio/headerRedux';
+import {
+  getCurrentScriptLevelId,
+  getLevelPropertiesPath,
+} from '@cdo/apps/code-studio/progressReduxSelectors';
+import useLifecycleNotifier from '@cdo/apps/lab2/hooks/useLifecycleNotifier';
 import {
   isReadOnlyWorkspace,
   setUpWithLevel,
   setUpWithoutLevel,
   shouldHideShareAndRemix,
-} from '../lab2Redux';
+} from '@cdo/apps/lab2/lab2Redux';
+import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
+import {resetProjectMetadata} from '@cdo/apps/lab2/redux/lab2ProjectRedux';
+import {AppName} from '@cdo/apps/lab2/types';
+import {LifecycleEvent} from '@cdo/apps/lab2/utils';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
-import {
-  getCurrentScriptLevelId,
-  getLevelPropertiesPath,
-} from '@cdo/apps/code-studio/progressReduxSelectors';
-import header from '@cdo/apps/code-studio/header';
-import {clearHeader} from '@cdo/apps/code-studio/headerRedux';
-import {AppName} from '../types';
 
 const ProjectContainer: React.FunctionComponent<ProjectContainerProps> = ({
   children,
@@ -51,6 +55,11 @@ const ProjectContainer: React.FunctionComponent<ProjectContainerProps> = ({
 
   const dispatch = useAppDispatch();
   const isReadOnly = useAppSelector(isReadOnlyWorkspace);
+
+  // When the level changes, reset metadata relating to the project in redux.
+  useLifecycleNotifier(LifecycleEvent.LevelLoadStarted, () =>
+    dispatch(resetProjectMetadata())
+  );
 
   useEffect(() => {
     // The redux types are very complicated, so in order to re-use this variable

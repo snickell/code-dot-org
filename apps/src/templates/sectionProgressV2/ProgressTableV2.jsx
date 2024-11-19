@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
 
-import {studentShape} from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
+import {studentShape} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
 import stringKeyComparator from '@cdo/apps/util/stringKeyComparator';
 
 import {studentLevelProgressType} from '../progress/progressTypes';
@@ -12,6 +12,7 @@ import {loadUnitProgress} from '../sectionProgress/sectionProgressLoader';
 import {getCurrentUnitData} from '../sectionProgress/sectionProgressRedux';
 
 import ExpandedProgressDataColumn from './ExpandedProgressDataColumn';
+import FloatingHeader from './floatingHeader/FloatingHeader';
 import FloatingScrollbar from './floatingScrollbar/FloatingScrollbar';
 import LessonProgressDataColumn from './LessonProgressDataColumn';
 import SkeletonProgressDataColumn from './SkeletonProgressDataColumn';
@@ -34,7 +35,12 @@ function ProgressTableV2({
   isSkeleton,
   unitId,
   levelProgressByStudent,
+  isLoadingSectionData,
 }) {
+  const outsideTableRef = React.useRef();
+
+  const [scrollCallback, setScrollCallback] = React.useState(undefined);
+
   // Filter out all students without progress and reload unit data.
   // This is most likely because a new student was added.
   const filteredStudents = React.useMemo(() => {
@@ -44,10 +50,10 @@ function ProgressTableV2({
   }, [students, levelProgressByStudent, isSkeleton]);
 
   React.useEffect(() => {
-    if (filteredStudents.length !== students.length) {
+    if (!isSkeleton && filteredStudents.length !== students.length) {
       loadUnitProgress(unitId, sectionId);
     }
-  }, [filteredStudents, students, unitId, sectionId]);
+  }, [filteredStudents, students, unitId, sectionId, isSkeleton]);
 
   const sortedStudents = React.useMemo(() => {
     if (isSkeleton && filteredStudents.length === 0) {
@@ -93,7 +99,7 @@ function ProgressTableV2({
   );
 
   const table = React.useMemo(() => {
-    if (isSkeleton && unitData === undefined) {
+    if (isSkeleton && (isLoadingSectionData || unitData === undefined)) {
       const lessons = LESSON_SKELETON_DATA.map(id => ({id, isFake: true}));
       return (
         <div className={styles.tableLoading}>
@@ -108,21 +114,39 @@ function ProgressTableV2({
     }
 
     return (
-      <FloatingScrollbar childRef={tableRef}>
-        <div
-          className={classNames(
-            styles.table,
-            isSkeleton && styles.tableLoading
-          )}
-          ref={tableRef}
-        >
-          <div className={styles.tableInterior}>
-            {unitData.lessons.map(getRenderedColumn)}
+      <div ref={outsideTableRef} className={styles.outerTable}>
+        <FloatingScrollbar childRef={tableRef} scrollCallback={scrollCallback}>
+          <div
+            className={classNames(
+              styles.table,
+              isSkeleton && styles.tableLoading
+            )}
+            ref={tableRef}
+          >
+            <FloatingHeader
+              setScrollCallback={setScrollCallback}
+              sortedStudents={sortedStudents}
+              outsideTableRef={outsideTableRef}
+            >
+              <div className={styles.tableInterior}>
+                {unitData.lessons.map(getRenderedColumn)}
+              </div>
+            </FloatingHeader>
           </div>
-        </div>
-      </FloatingScrollbar>
+        </FloatingScrollbar>
+      </div>
     );
-  }, [isSkeleton, getRenderedColumn, unitData, tableRef]);
+  }, [
+    isLoadingSectionData,
+    isSkeleton,
+    getRenderedColumn,
+    unitData,
+    tableRef,
+    setScrollCallback,
+    sortedStudents,
+    outsideTableRef,
+    scrollCallback,
+  ]);
 
   return (
     <div className={styles.progressTableV2} id="ui-test-progress-table-v2">
@@ -130,7 +154,9 @@ function ProgressTableV2({
         sortedStudents={sortedStudents}
         unitName={unitData?.title}
         sectionId={sectionId}
-        isSkeleton={isSkeleton && students.length === 0}
+        isSkeleton={
+          isSkeleton && (students.length === 0 || isLoadingSectionData)
+        }
       />
       {table}
     </div>
@@ -148,6 +174,7 @@ ProgressTableV2.propTypes = {
   levelProgressByStudent: PropTypes.objectOf(
     PropTypes.objectOf(studentLevelProgressType)
   ),
+  isLoadingSectionData: PropTypes.bool.isRequired,
 };
 
 export default connect(state => ({
@@ -164,4 +191,5 @@ export default connect(state => ({
     state.sectionProgress.expandedLessonIds[
       state.teacherSections.selectedSectionId
     ] || [],
+  isLoadingSectionData: state.teacherSections.isLoadingSectionData,
 }))(ProgressTableV2);

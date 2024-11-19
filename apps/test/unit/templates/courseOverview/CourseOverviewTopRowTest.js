@@ -1,9 +1,8 @@
 import {shallow} from 'enzyme'; // eslint-disable-line no-restricted-imports
 import React from 'react';
 
+import DCDO from '@cdo/apps/dcdo';
 import CourseOverviewTopRow from '@cdo/apps/templates/courseOverview/CourseOverviewTopRow';
-
-import {assert} from '../../../util/reconfiguredChai';
 
 const defaultProps = {
   sectionsForDropdown: [],
@@ -34,42 +33,47 @@ const defaultProps = {
 describe('CourseOverviewTopRow', () => {
   it('contains a SectionAssigner for a teacher', () => {
     const wrapper = shallow(<CourseOverviewTopRow {...defaultProps} />);
-    assert.equal(wrapper.find('Connect(SectionAssigner)').length, 1);
+    expect(wrapper.find('Connect(SectionAssigner)').length).toEqual(1);
   });
 
   it('does not contain a SectionAssigner for a student', () => {
     const wrapper = shallow(
       <CourseOverviewTopRow {...defaultProps} isInstructor={false} />
     );
-    assert.equal(wrapper.find('Connect(SectionAssigner)').length, 0);
+    expect(wrapper.find('Connect(SectionAssigner)').length).toEqual(0);
+  });
+
+  it('does not contain a SectionAssigner if showV2TeacherDashboard is true', () => {
+    DCDO.set('teacher-local-nav-v2', true);
+    const wrapper = shallow(
+      <CourseOverviewTopRow {...defaultProps} isInstructor={false} />
+    );
+    expect(wrapper.find('Connect(SectionAssigner)').length).toEqual(0);
+    DCDO.set('teacher-local-nav-v2', false);
   });
 
   it('renders teacher resource dropdown', () => {
     const wrapper = shallow(<CourseOverviewTopRow {...defaultProps} />);
-    assert.equal(wrapper.find('ResourcesDropdown').length, 1);
-    assert.equal(wrapper.find('ResourcesDropdown').props().resources.length, 3);
-    assert.equal(
-      wrapper.find('ResourcesDropdown').props().resources[0].name,
+    expect(wrapper.find('ResourcesDropdown').length).toEqual(1);
+    expect(wrapper.find('ResourcesDropdown').props().resources.length).toEqual(
+      3
+    );
+    expect(wrapper.find('ResourcesDropdown').props().resources[0].name).toEqual(
       'Curriculum'
     );
-    assert.equal(
-      wrapper.find('ResourcesDropdown').props().resources[0].url,
+    expect(wrapper.find('ResourcesDropdown').props().resources[0].url).toEqual(
       '/link/to/curriculum'
     );
-    assert.equal(
-      wrapper.find('ResourcesDropdown').props().resources[1].name,
+    expect(wrapper.find('ResourcesDropdown').props().resources[1].name).toEqual(
       'Professional Learning'
     );
-    assert.equal(
-      wrapper.find('ResourcesDropdown').props().resources[1].url,
+    expect(wrapper.find('ResourcesDropdown').props().resources[1].url).toEqual(
       '/link/to/professional/learning'
     );
-    assert.equal(
-      wrapper.find('ResourcesDropdown').props().resources[2].name,
+    expect(wrapper.find('ResourcesDropdown').props().resources[2].name).toEqual(
       'Teacher Forum'
     );
-    assert.equal(
-      wrapper.find('ResourcesDropdown').props().resources[2].url,
+    expect(wrapper.find('ResourcesDropdown').props().resources[2].url).toEqual(
       'https://forum.code.org/'
     );
   });
@@ -98,7 +102,7 @@ describe('CourseOverviewTopRow', () => {
         isInstructor={false}
       />
     );
-    assert.equal(wrapper.find('ResourcesDropdown').length, 0);
+    expect(wrapper.find('ResourcesDropdown').length).toEqual(0);
   });
 
   it('renders student resource dropdown for students', () => {
@@ -125,30 +129,26 @@ describe('CourseOverviewTopRow', () => {
         isInstructor={false}
       />
     );
-    assert.equal(wrapper.find('ResourcesDropdown').length, 1);
-    assert.equal(wrapper.find('ResourcesDropdown').props().resources.length, 3);
-    assert.equal(
-      wrapper.find('ResourcesDropdown').props().resources[0].name,
+    expect(wrapper.find('ResourcesDropdown').length).toEqual(1);
+    expect(wrapper.find('ResourcesDropdown').props().resources.length).toEqual(
+      3
+    );
+    expect(wrapper.find('ResourcesDropdown').props().resources[0].name).toEqual(
       'Curriculum'
     );
-    assert.equal(
-      wrapper.find('ResourcesDropdown').props().resources[0].url,
+    expect(wrapper.find('ResourcesDropdown').props().resources[0].url).toEqual(
       '/link/to/curriculum'
     );
-    assert.equal(
-      wrapper.find('ResourcesDropdown').props().resources[1].name,
+    expect(wrapper.find('ResourcesDropdown').props().resources[1].name).toEqual(
       'Professional Learning'
     );
-    assert.equal(
-      wrapper.find('ResourcesDropdown').props().resources[1].url,
+    expect(wrapper.find('ResourcesDropdown').props().resources[1].url).toEqual(
       '/link/to/professional/learning'
     );
-    assert.equal(
-      wrapper.find('ResourcesDropdown').props().resources[2].name,
+    expect(wrapper.find('ResourcesDropdown').props().resources[2].name).toEqual(
       'Teacher Forum'
     );
-    assert.equal(
-      wrapper.find('ResourcesDropdown').props().resources[2].url,
+    expect(wrapper.find('ResourcesDropdown').props().resources[2].url).toEqual(
       'https://forum.code.org/'
     );
   });

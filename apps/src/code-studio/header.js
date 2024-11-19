@@ -107,7 +107,9 @@ header.build = function (
 
   // Set up a navigation handler, in case we contain levels that don't
   // require a page reload when switching between them.
-  setupNavigationHandler(lessonData);
+  if (lessonData.levels.some(level => level.uses_lab2)) {
+    setupNavigationHandler(currentLevelId);
+  }
 
   // Hold off on rendering HeaderMiddle.  This will allow the "app load"
   // to potentially begin before we first render HeaderMiddle, giving HeaderMiddle
@@ -126,6 +128,21 @@ header.build = function (
     // Only render sign in callout if the course is CSF and the user is
     // not signed in
     if (scriptData.show_sign_in_callout && signedIn === false) {
+      // Additionally, update those urls to return user to level after
+      const currentUrl = window.location.pathname;
+      const buttons = [
+        document.querySelector('#signin_button'),
+        document.querySelector('#create_account_button'),
+      ];
+
+      buttons.forEach(button => {
+        if (button) {
+          const url = new URL(button.href);
+          url.searchParams.set('user_return_to', currentUrl);
+          button.href = url.toString();
+        }
+      });
+
       ReactDOM.render(
         <SignInCalloutWrapper />,
         document.querySelector('.signin_callout_wrapper')

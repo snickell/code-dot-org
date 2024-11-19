@@ -43,6 +43,7 @@ function LessonDataCell({
           href={teacherDashboardUrl(sectionId, '/assessments')}
           openInNewTab
           external
+          // eslint-disable-next-line react/forbid-component-props
           data-testid={'lesson-data-cell-' + lesson.id + '-' + studentId}
         >
           {children}
@@ -59,6 +60,7 @@ function LessonDataCell({
           interactive && styles.lessonInteractive
         )}
         onClick={expandLesson}
+        // eslint-disable-next-line react/forbid-dom-props
         data-testid={'lesson-data-cell-' + lesson.id + '-' + studentId}
       >
         {children}
@@ -82,10 +84,17 @@ function LessonDataCell({
     return (
       <div className={styles.lessonDataCellExpanded}>
         {lessonCellUnexpanded}
-        <div className={classNames(styles.gridBox, styles.gridBoxMetadata)}>
+        <div
+          className={classNames(styles.gridBox, styles.gridBoxMetadata, {
+            [`ui-test-time-spent-${lesson.relative_position}`]: true,
+          })}
+        >
           {formatTimeSpent(studentLessonProgress)}
         </div>
-        <div className={classNames(styles.gridBox, styles.gridBoxMetadata)}>
+        <div
+          id={'ui-test-last-updated-' + lesson.relative_position}
+          className={classNames(styles.gridBox, styles.gridBoxMetadata)}
+        >
           {formatLastUpdated(studentLessonProgress)}
         </div>
       </div>

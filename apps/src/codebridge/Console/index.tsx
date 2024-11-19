@@ -1,54 +1,61 @@
 import {resetOutput} from '@codebridge/redux/consoleRedux';
-import SwapLayoutButton from '@codebridge/SwapLayoutButton';
-import React, {useEffect, useRef, useState} from 'react';
+import {sendCodebridgeAnalyticsEvent} from '@codebridge/utils/analyticsReporterHelper';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
 
+import codebridgeI18n from '@cdo/apps/codebridge/locale';
 import Button, {buttonColors} from '@cdo/apps/componentLibrary/button';
+import useLifecycleNotifier from '@cdo/apps/lab2/hooks/useLifecycleNotifier';
+import {LifecycleEvent} from '@cdo/apps/lab2/utils/LifecycleNotifier';
 import PanelContainer from '@cdo/apps/lab2/views/components/PanelContainer';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
+import ControlButtons from './ControlButtons';
 import GraphModal from './GraphModal';
+import RightButtons from './RightButtons';
 
 import moduleStyles from './console.module.scss';
 
 const Console: React.FunctionComponent = () => {
   const codeOutput = useAppSelector(state => state.codebridgeConsole.output);
   const dispatch = useDispatch();
-  const levelId = useAppSelector(state => state.lab.levelProperties?.id);
-  const previousLevelId = useRef(levelId);
   const appName = useAppSelector(state => state.lab.levelProperties?.appName);
+  const scrollAnchorRef = useRef<HTMLDivElement>(null);
 
   const [graphModalOpen, setGraphModalOpen] = useState(false);
+  const [activeGraphIndex, setActiveGraphIndex] = useState(0);
 
   // TODO: Update this with other apps that use the console as needed.
   const systemMessagePrefix = appName === 'pythonlab' ? '[PYTHON LAB] ' : '';
 
-  useEffect(() => {
-    // If the level changes, clear the console.
-    if (previousLevelId.current !== levelId) {
+  const clearOutput = useCallback(
+    (sendAnalytics: boolean) => {
       dispatch(resetOutput());
-      previousLevelId.current = levelId;
-    }
-  }, [dispatch, levelId]);
+      if (sendAnalytics) {
+        sendCodebridgeAnalyticsEvent(EVENTS.CODEBRIDGE_CLEAR_CONSOLE, appName);
+      }
+      setGraphModalOpen(false);
+    },
+    [dispatch, appName]
+  );
 
-  const clearOutput = () => {
-    dispatch(resetOutput());
-  };
+  // Clear console when we change levels. Don't send an analytics event
+  // as the user did not initiate this action.
+  useLifecycleNotifier(LifecycleEvent.LevelLoadCompleted, () =>
+    clearOutput(false)
+  );
 
-  const headerButton = () => {
-    return (
-      <>
-        <Button
-          isIconOnly
-          color={'black'}
-          icon={{iconStyle: 'solid', iconName: 'eraser'}}
-          ariaLabel="clear console"
-          onClick={clearOutput}
-          size={'xs'}
-        />
-        <SwapLayoutButton />
-      </>
-    );
+  useEffect(() => {
+    scrollAnchorRef.current?.scrollIntoView({
+      behavior: 'smooth',
+    });
+  }, [codeOutput]);
+
+  const popOutGraph = (index: number) => {
+    sendCodebridgeAnalyticsEvent(EVENTS.CODEBRIDGE_POP_OUT_IMAGE, appName);
+    setActiveGraphIndex(index);
+    setGraphModalOpen(true);
   };
 
   return (
@@ -56,9 +63,13 @@ const Console: React.FunctionComponent = () => {
       id="codebridge-console"
       className={moduleStyles.consoleContainer}
       headerContent={'Console'}
-      rightHeaderContent={headerButton()}
+      rightHeaderContent={
+        <RightButtons clearOutput={() => clearOutput(true)} />
+      }
+      leftHeaderContent={<ControlButtons />}
+      headerClassName={moduleStyles.consoleHeader}
     >
-      <div className={moduleStyles.console}>
+      <div className={moduleStyles.console} id="uitest-codebridge-console">
         {codeOutput.map((outputLine, index) => {
           if (outputLine.type === 'img') {
             return (
@@ -70,14 +81,17 @@ const Console: React.FunctionComponent = () => {
                 <Button
                   color={buttonColors.black}
                   disabled={false}
-                  icon={{iconName: 'up-right-from-square', iconStyle: 'solid'}}
+                  icon={{
+                    iconName: 'up-right-from-square',
+                    iconStyle: 'solid',
+                  }}
                   isIconOnly={true}
-                  onClick={() => setGraphModalOpen(true)}
+                  onClick={() => popOutGraph(index)}
                   size="xs"
                   type="primary"
                   aria-label="open matplotlib_image in pop-up"
                 />
-                {graphModalOpen && (
+                {activeGraphIndex === index && graphModalOpen && (
                   <GraphModal
                     src={`data:image/png;base64,${outputLine.contents}`}
                     onClose={() => setGraphModalOpen(false)}
@@ -96,6 +110,13 @@ const Console: React.FunctionComponent = () => {
                 {outputLine.contents}
               </div>
             );
+          } else if (outputLine.type === 'system_error') {
+            return (
+              <div key={index} className={moduleStyles.errorLine}>
+                {systemMessagePrefix}
+                {codebridgeI18n.systemCodeError()}
+              </div>
+            );
           } else {
             return (
               <div key={index}>
@@ -105,6 +126,7 @@ const Console: React.FunctionComponent = () => {
             );
           }
         })}
+        <div ref={scrollAnchorRef} />
       </div>
     </PanelContainer>
   );

@@ -8,13 +8,15 @@ require 'policies/lti'
 require 'queries/lti'
 
 class RegistrationsController < Devise::RegistrationsController
+  before_action :require_no_authentication, only: [:account_type, :login_type, :finish_student_account, :finish_teacher_account, :new, :create, :cancel]
+
   respond_to :json
   prepend_before_action :authenticate_scope!, only: [
     :edit, :update, :destroy, :upgrade, :set_email, :set_user_type,
     :migrate_to_multi_auth, :demigrate_from_multi_auth
   ]
   skip_before_action :verify_authenticity_token, only: [:set_student_information]
-  skip_before_action :clear_sign_up_session_vars, only: [:new, :begin_sign_up, :cancel, :create]
+  skip_before_action :clear_sign_up_session_vars, only: [:new, :begin_sign_up, :begin_creating_user, :cancel, :create]
 
   #
   # GET /users/sign_up
@@ -24,13 +26,8 @@ class RegistrationsController < Devise::RegistrationsController
     if PartialRegistration.in_progress?(session)
       user_params = params[:user] || ActionController::Parameters.new
       user_params[:user_type] ||= session[:default_sign_up_user_type]
-      if DCDO.get('student-email-post-enabled', false)
-        user_params[:email] ||= params[:email]
-
-        @user = User.new_with_session(user_params.permit(:user_type, :email), session)
-      else
-        @user = User.new_with_session(user_params.permit(:user_type), session)
-      end
+      user_params[:email] ||= params[:email]
+      @user = User.new_with_session(user_params.permit(:user_type, :email), session)
     else
       save_default_sign_up_user_type
       SignUpTracking.begin_sign_up_tracking(session, split_test: true)
@@ -58,15 +55,75 @@ class RegistrationsController < Devise::RegistrationsController
   def begin_sign_up
     @user = User.new(begin_sign_up_params)
     @user.validate_for_finish_sign_up
-    SignUpTracking.log_begin_sign_up(@user, session)
-    is_signup_post_enabled = DCDO.get('student-email-post-enabled', false)
+
+    if params[:new_sign_up].present?
+      SignUpTracking.begin_sign_up_tracking session
+      SignUpTracking.log_load_sign_up request
+    end
+    SignUpTracking.log_begin_sign_up(@user, request)
 
     if @user.errors.blank?
       PartialRegistration.persist_attributes(session, @user)
-      redirect_to new_user_registration_path and return unless is_signup_post_enabled
+    else
+      if params[:new_sign_up].present?
+        render json: {
+          error: @user.errors.as_json(full_messages: true)
+        }, status: :bad_request
+      end
     end
 
-    render 'new'
+    if params[:new_sign_up].blank?
+      render 'new'
+    end
+  end
+
+  #
+  # Get /users/new_sign_up/account_type
+  #
+  def account_type
+    view_options(full_width: true, responsive_content: true)
+  end
+
+  #
+  # Get /users/new_sign_up/login_type
+  #
+  def login_type
+    view_options(full_width: true, responsive_content: true)
+    render 'login_type'
+  end
+
+  #
+  # Get /users/gdpr_check
+  #
+  def gdpr_check
+    render json: {gdpr: request.gdpr?, force_in_eu: request.params['force_in_eu']}
+  end
+
+  #
+  # Get /users/new_sign_up/finish_student_account
+  #
+  def finish_student_account
+    @age_options = [{value: '', text: ''}] + User::AGE_DROPDOWN_OPTIONS.map do |age|
+      {value: age.to_s, text: age.to_s}
+    end
+    location = Geocoder.search(request.ip).try(:first)
+    @country_code = location&.country_code.to_s.upcase
+    @us_ip = ['US', 'RD'].include?(@country_code)
+    @us_state_options = [{value: '', text: ''}] + User.us_state_dropdown_options.map do |code, name|
+      {value: code, text: name}
+    end
+
+    render 'finish_student_account'
+  end
+
+  #
+  # Get /users/new_sign_up/finish_teacher_account
+  #
+  def finish_teacher_account
+    location = Geocoder.search(request.ip).try(:first)
+    @country_code = location&.country_code.to_s.upcase
+    @us_ip = ['US', 'RD'].include?(@country_code)
+    render 'finish_teacher_account'
   end
 
   #
@@ -76,7 +133,7 @@ class RegistrationsController < Devise::RegistrationsController
   #
   def cancel
     provider = PartialRegistration.get_provider(session) || 'email'
-    SignUpTracking.log_cancel_finish_sign_up(session, provider)
+    SignUpTracking.log_cancel_finish_sign_up(request, provider)
     SignUpTracking.end_sign_up_tracking(session)
 
     PartialRegistration.delete(session)
@@ -120,15 +177,31 @@ class RegistrationsController < Devise::RegistrationsController
           error_message: "retry ##{retries} failed with exception: #{exception}"
         )
       end
-      super
+
+      if ActiveModel::Type::Boolean.new.cast(params[:new_sign_up])
+        session[:user_return_to] ||= params[:user_return_to]
+        @user = Services::PartialRegistration::UserBuilder.call(request: request)
+        SignUpTracking.log_load_finish_sign_up request, (@user.providers&.first || 'email')
+        sign_in @user
+      else
+        super
+      end
     end
 
     if current_user && current_user.errors.blank?
       if current_user.teacher?
-        if MailJet.enabled? && request.locale != 'es-MX'
-          MailJet.create_contact_and_send_welcome_email(current_user)
-        else
-          TeacherMailer.new_teacher_email(current_user, request.locale).deliver_now
+        begin
+          MailJet.create_contact_and_add_to_welcome_series(current_user, request.locale)
+        rescue => exception
+          # If we can't add the user to the welcome series, we don't want to disrupt
+          # sign up, but we do want to know about it.
+          Honeybadger.notify(
+            exception,
+            error_message: 'Failed to add user to welcome series',
+            context: {
+              locale: request.locale,
+            }
+          )
         end
       end
       ParentMailer.parent_email_added_to_student_account(current_user.parent_email, current_user).deliver_now if current_user.parent_email.present?
@@ -137,10 +210,12 @@ class RegistrationsController < Devise::RegistrationsController
       current_user.generate_progress_from_storage_id(storage_id) if storage_id
       PartialRegistration.delete session
       if Policies::Lti.lti? current_user
+        current_user.verify_teacher! if Policies::Lti.unverified_teacher?(current_user)
         lms_name = Queries::Lti.get_lms_name_from_user(current_user)
         metadata = {
           'user_type' => current_user.user_type,
           'lms_name' => lms_name,
+          'context' => 'registration_controller'
         }
         Metrics::Events.log_event(
           user: current_user,
@@ -160,7 +235,7 @@ class RegistrationsController < Devise::RegistrationsController
       )
     end
 
-    SignUpTracking.log_sign_up_result resource, session
+    SignUpTracking.log_sign_up_result resource, request
   end
 
   #
@@ -254,11 +329,11 @@ class RegistrationsController < Devise::RegistrationsController
     student_information = {}
 
     student_information[:age] = params[:user][:age] if current_user.age.blank?
-    student_information[:us_state] = params[:user][:us_state] unless current_user.user_provided_us_state
+    us_state_param = params[:user][:us_state]
+    student_information[:us_state] = us_state_param if us_state_param.present? && !current_user.user_provided_us_state
     student_information[:user_provided_us_state] = params[:user][:us_state].present? unless current_user.user_provided_us_state
     student_information[:gender_student_input] = params[:user][:gender_student_input] if current_user.gender.blank?
     student_information[:country_code] = params[:user][:country_code] if current_user.country_code.blank?
-
     current_user.update(student_information) unless student_information.empty?
   end
 
@@ -388,41 +463,26 @@ class RegistrationsController < Devise::RegistrationsController
   # GET /users/edit
   #
   def edit
-    @permission_status = current_user.child_account_compliance_state
+    @permission_status = current_user.cap_status
 
     # Get the request location
     location = Geocoder.search(request.ip).try(:first)
     @country_code = location&.country_code.to_s.upcase
     @is_usa = ['US', 'RD'].include?(@country_code)
 
-    # We determine if the student is potentially locked by looking at their age
-    # If they are older (or there is no policy for them) they are unlocked
-    # This ignores them being explicitly unlocked by parental permission so we
-    # can show the 'Granted' status of that permission later.
-    @potentially_locked = Policies::ChildAccount.underage?(current_user)
+    # A student is underage if they reside in a state with a CAP policy and are in the affected age range.
+    underage = Policies::ChildAccount.underage?(current_user)
 
     # The student is in a 'lockout' flow if they are potentially locked out and not unlocked
-    @student_in_lockout_flow = @potentially_locked && !Policies::ChildAccount::ComplianceState.permission_granted?(current_user)
-    # We need to also account for the case when the US State is not specified
-    # All students are locked out of account settings features until they specify these
-    @locked = @student_in_lockout_flow || current_user.country_code.nil? || current_user.us_state.nil?
-    # Only for students
-    @locked &&= current_user.student?
-    # Only for US-based requests
-    @locked &&= @is_usa
-    # Put this behind an experiment flag for now
-    @locked &&= !!experiment_value('cpa-partial-lockout', request)
+    @student_in_lockout_flow = underage && !Policies::ChildAccount::ComplianceState.permission_granted?(current_user)
 
-    @personal_account_linking_enabled = !@locked
+    @personal_account_linking_enabled = Policies::ChildAccount.can_link_new_personal_account?(current_user) && !Policies::ChildAccount.partially_locked_out?(current_user)
 
     # Handle users who aren't locked out, but still need parent permission to link personal accounts.
-    if @potentially_locked
+    if underage || !Policies::ChildAccount.has_required_information?(current_user)
       permission_request = current_user.latest_parental_permission_request
       @pending_email = permission_request&.parent_email
       @request_date = permission_request&.updated_at || Date.new
-
-      partially_locked = Policies::ChildAccount.partially_locked_out?(current_user) && experiment_value('cpa-partial-lockout', request)
-      @personal_account_linking_enabled = false if partially_locked
     end
   end
 
@@ -625,5 +685,12 @@ class RegistrationsController < Devise::RegistrationsController
     User.ignore_deleted_at_index.destroy(user_ids_to_destroy)
 
     log_account_deletion_to_firehose(current_user, dependent_users)
+  end
+
+  private def us_ip?
+    # Get the request location
+    location = Geocoder.search(request.ip).try(:first)
+    country_code = location&.country_code.to_s.upcase
+    ['US', 'RD'].include?(country_code)
   end
 end

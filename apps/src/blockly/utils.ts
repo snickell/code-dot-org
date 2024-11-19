@@ -1,9 +1,9 @@
-import {Block, BlockSvg, WorkspaceSvg} from 'blockly';
+import * as GoogleBlockly from 'blockly/core';
 import _ from 'lodash';
 
 import {SOUND_PREFIX} from '@cdo/apps/assetManagement/assetPrefix';
-import {MetricEvent} from '@cdo/apps/lib/metrics/events';
-import MetricsReporter from '@cdo/apps/lib/metrics/MetricsReporter';
+import {MetricEvent} from '@cdo/apps/metrics/events';
+import MetricsReporter from '@cdo/apps/metrics/MetricsReporter';
 import {getStore} from '@cdo/apps/redux';
 import {setFailedToGenerateCode} from '@cdo/apps/redux/blockly';
 
@@ -14,7 +14,7 @@ type xmlAttribute = string | null;
 type InputTuple = [string, string, number];
 type InputCallback = () => void;
 type InputArgs = [...(InputTuple | InputCallback)[], number];
-type BlockList = Array<Block | BlockSvg>;
+type BlockList = Array<GoogleBlockly.Block | GoogleBlockly.BlockSvg>;
 
 // Considers an attribute true only if it is explicitly set to 'true' (i.e. defaults to false if unset).
 export const FALSEY_DEFAULT = (attributeValue: xmlAttribute) =>
@@ -35,7 +35,7 @@ export const TRUTHY_DEFAULT = (attributeValue: xmlAttribute) =>
 export function readBooleanAttribute(
   xmlElement: Element,
   attribute: string,
-  callback = FALSEY_DEFAULT
+  callback: (attributeValue: xmlAttribute) => boolean = FALSEY_DEFAULT
 ) {
   const attributeValue = xmlElement.getAttribute(attribute);
   return callback(attributeValue);
@@ -123,7 +123,9 @@ export function numberListToString(numberList: number[]) {
  * @param {Blockly.WorkspaceSvg} workspace - The workspace to be checked for serialization as hidden.
  * @returns {boolean} Returns `true` if the hidden workspace should be skipped, otherwise `false`.
  */
-export function shouldSkipHiddenWorkspace(workspace: WorkspaceSvg) {
+export function shouldSkipHiddenWorkspace(
+  workspace: GoogleBlockly.WorkspaceSvg
+) {
   return (
     !Blockly.getHiddenDefinitionWorkspace ||
     Blockly.getMainWorkspace().id !== workspace.id ||

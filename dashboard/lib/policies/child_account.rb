@@ -3,7 +3,7 @@ require 'cpa'
 require 'date'
 
 class Policies::ChildAccount
-  # Values for the `child_account_compliance_state` attribute
+  # Values for the `cap_status` attribute
   module ComplianceState
     # The period for "existing" users before their accounts locked out.
     GRACE_PERIOD = SharedConstants::CHILD_ACCOUNT_COMPLIANCE_STATES.GRACE_PERIOD
@@ -19,7 +19,7 @@ class Policies::ChildAccount
     # def self.permission_granted?(student)
     SharedConstants::CHILD_ACCOUNT_COMPLIANCE_STATES.to_h.each do |key, value|
       define_singleton_method("#{key.downcase}?") do |student|
-        student.child_account_compliance_state == value
+        student.cap_status == value
       end
     end
   end
@@ -33,6 +33,10 @@ class Policies::ChildAccount
 
   # The maximum number of times a student can resend a request to a parent.
   MAX_PARENT_PERMISSION_RESENDS = 3
+
+  # The maximum number of days a student should be age-gated before
+  # a teacher stops receiving warnings about the sections the student is following.
+  TEACHER_WARNING_PERIOD = 30.days
 
   # Is this user compliant with our Child Account Policy(cap)?
   # For students under-13, in Colorado, with a personal email login: we require
@@ -67,17 +71,11 @@ class Policies::ChildAccount
     user_state_policy = state_policy(user)
     return false unless user_state_policy
 
-    if user_state_policy[:name] == Cpa::NAME
-      # Accounts created before 5/26/2024 should have been locked upon creation,
-      # but they weren't because their state wasn't collected.
-      # To avoid immediate lockout after the state banner rollout,
-      # their lockout was postponed to the start of the "all-user lockout" phase.
-      return true if user.created_at < Cpa::CREATED_AT_EXCEPTION_DATE
-
-      # Due to a leaky bucket issue, roster-synced Google accounts weren't being locked out as intended.
-      # Therefore, it was decided to move their locking out to the "all-user lockout" phase.
-      return true if user.created_at < user_state_policy[:lockout_date] && user.authentication_options.any?(&:google?)
-    end
+    # Due to a leaky bucket issue, roster-synced Google accounts weren't being locked out as intended.
+    # Therefore, it was decided to move their locking out to the "all-user lockout" phase.
+    return true if user_state_policy[:name] == Cpa::NAME &&
+      user.created_at < user_state_policy[:lockout_date] &&
+      user.authentication_options.any?(&:google?)
 
     user.created_at < user_state_policy[:start_date]
   end
@@ -92,7 +90,7 @@ class Policies::ChildAccount
     grace_period_duration = user_state_policy[:grace_period_duration]
     return unless grace_period_duration
 
-    start_date = DateTime.parse(user.child_account_compliance_state_last_updated) if ComplianceState.grace_period?(user)
+    start_date = user.cap_status_date if ComplianceState.grace_period?(user)
     start_date = user_state_policy[:lockout_date] if approximate && start_date.nil?
 
     start_date&.since(grace_period_duration)
@@ -120,25 +118,42 @@ class Policies::ChildAccount
     user_predates_policy?(user) && !ComplianceState.permission_granted?(user)
   end
 
-  # Authentication option types which we consider to be "owned" by the school
+  # Authentication option types which we always consider to be "owned" by the school
   # the student attends because the school has admin control of the account.
-  SCHOOL_OWNED_TYPES = [AuthenticationOption::CLEVER, AuthenticationOption::LTI_V1].freeze
+  SCHOOL_OWNED_TYPES = Set[AuthenticationOption::CLEVER, AuthenticationOption::LTI_V1].freeze
+
+  # Login types that are considered school owned only if the user is in a section or was created via
+  # roster sync from an LMS.
+  CONDITIONALLY_SCHOOL_OWNED_TYPES = Set[AuthenticationOption::GOOGLE, AuthenticationOption::MICROSOFT].freeze
+
+  # Login types that are always considered personal logins.
+  PERSONAL_LOGIN_TYPES = Set[AuthenticationOption::EMAIL, AuthenticationOption::FACEBOOK].freeze
 
   # Does the user login using credentials they personally control?
   # For example, some accounts are created and owned by schools (Clever).
   def self.personal_account?(user)
+    # Sponsored accounts are always managed by the teacher.
     return false if user.sponsored?
-    # List of credential types which we believe schools have ownership of.
-    # Does the user have an authentication method which is not controlled by
-    # their school? The presence of at least one authentication method which
-    # is owned by the student/parent means this is a "personal account".
-    if user.migrated?
-      user.authentication_options.any? do |option|
-        SCHOOL_OWNED_TYPES.exclude?(option.credential_type)
-      end
-    else
-      SCHOOL_OWNED_TYPES.exclude?(user.provider)
+
+    # Email + password logins are always personal logins.
+    return true if user.encrypted_password.present?
+
+    providers = user.migrated? ? Set.new(user.authentication_options.pluck(:credential_type)) : Set.new([user.provider])
+    return true if providers.empty?
+
+    # Email and Facebook are always personal logins.
+    return true if providers.intersect?(PERSONAL_LOGIN_TYPES)
+
+    # Clever and LTI are never personal logins if no other login types are present.
+    return false if providers.subset?(SCHOOL_OWNED_TYPES)
+
+    # Google and Microsoft are considered school owned for users who are in sections and/or
+    # if the user was created via a roster sync.
+    if providers.intersect?(CONDITIONALLY_SCHOOL_OWNED_TYPES)
+      return !conditionally_school_managed?(user)
     end
+
+    return true
   end
 
   def self.state_policies
@@ -198,11 +213,16 @@ class Policies::ChildAccount
   # Whether or not the user can create/link new personal logins
   def self.can_link_new_personal_account?(user)
     return true unless user.student?
-    return false unless user.us_state && user.country_code
-    return true unless user.birthday
+    return false unless has_required_information?(user)
+    return true unless ['US', 'RD'].include?(user.country_code)
     return true unless underage?(user)
 
     ComplianceState.permission_granted?(user)
+  end
+
+  # Returns true if the user has provided the minimum information we need to decide if their account is affected by our Child Account Policy.
+  def self.has_required_information?(user)
+    [user.us_state, user.country_code, user.birthday].all?(&:present?)
   end
 
   # Check if parent permission is required for this account according to our
@@ -222,5 +242,9 @@ class Policies::ChildAccount
     return false unless underage?(user)
 
     personal_account?(user)
+  end
+
+  def self.conditionally_school_managed?(user)
+    user.sections_as_student.exists? || user.roster_synced
   end
 end

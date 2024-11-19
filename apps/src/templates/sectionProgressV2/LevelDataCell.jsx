@@ -5,8 +5,8 @@ import queryString from 'query-string';
 import React from 'react';
 import {connect} from 'react-redux';
 
-import {EVENTS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {LevelStatus} from '@cdo/generated-scripts/sharedConstants';
 import i18n from '@cdo/locale';
 
@@ -97,7 +97,8 @@ function LevelDataCell({
       studentLevelProgress.status === LevelStatus.perfect ||
       studentLevelProgress.status === LevelStatus.submitted ||
       studentLevelProgress.status === LevelStatus.free_play_complete ||
-      studentLevelProgress.status === LevelStatus.completed_assessment
+      studentLevelProgress.status === LevelStatus.completed_assessment ||
+      studentLevelProgress.status === LevelStatus.passed
     ) {
       if (level.isValidated) {
         return ITEM_TYPE.VALIDATED;
@@ -105,10 +106,7 @@ function LevelDataCell({
         return ITEM_TYPE.SUBMITTED;
       }
     }
-    if (
-      studentLevelProgress.status === LevelStatus.attempted ||
-      studentLevelProgress.status === LevelStatus.passed
-    ) {
+    if (studentLevelProgress.status === LevelStatus.attempted) {
       return ITEM_TYPE.IN_PROGRESS;
     }
     return ITEM_TYPE.NO_PROGRESS;

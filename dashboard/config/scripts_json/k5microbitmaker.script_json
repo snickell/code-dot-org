@@ -4,15 +4,20 @@
     "wrapup_video_id": null,
     "login_required": true,
     "properties": {
+      "content_area": "self_paced_pl_k_5",
       "curriculum_umbrella": "CSF Self Paced PL",
       "has_verified_resources": true,
       "hideable_lessons": true,
       "is_migrated": true,
-      "student_detail_progress_view": true
+      "student_detail_progress_view": true,
+      "topic_tags": [
+        "maker"
+      ],
+      "tts": true
     },
     "new_name": null,
     "family_name": null,
-    "serialized_at": "2024-07-10 21:06:36 UTC",
+    "serialized_at": "2024-11-19 01:18:58 UTC",
     "published_state": null,
     "instruction_type": null,
     "instructor_audience": null,
@@ -204,6 +209,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "Intro to Conditionals_1_prod"
+        ],
         "progression": "Conditionals Unplugged"
       },
       "bonus": false,
@@ -226,6 +234,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "PLdancepartyPL_prod"
+        ],
         "progression": "Conditionals Unplugged"
       },
       "bonus": false,
@@ -248,6 +259,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "PLConditionalsWithCards-Unplugged2022_maker_grade3_prod"
+        ],
         "progression": "Conditionals Unplugged"
       },
       "bonus": false,
@@ -270,6 +284,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "courseD_bee_conditionalsVid1_2023MB_prod"
+        ],
         "progression": "Conditionals with Bee"
       },
       "bonus": false,
@@ -292,6 +309,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "courseD_bee_conditionals1_predict1_makerMB_prod"
+        ],
         "progression": "Conditionals with Bee"
       },
       "bonus": false,
@@ -314,6 +334,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "courseD_bee_conditionals2_2023MB_prod"
+        ],
         "progression": "Conditionals with Bee"
       },
       "bonus": false,
@@ -336,6 +359,9 @@
       "activity_section_position": 4,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "courseD_bee_conditionals3_makerMB_prod"
+        ],
         "progression": "Conditionals with Bee"
       },
       "bonus": false,
@@ -358,6 +384,9 @@
       "activity_section_position": 5,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "courseD_bee_conditionals4_makerMB_prod"
+        ],
         "progression": "Conditionals with Bee"
       },
       "bonus": false,
@@ -380,6 +409,9 @@
       "activity_section_position": 6,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "PLcourseD_bee_conditionalsVidIfElse_prod"
+        ],
         "progression": "Conditionals with Bee"
       },
       "bonus": false,
@@ -402,6 +434,9 @@
       "activity_section_position": 7,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "PLcourseD_bee_conditionals7_prod"
+        ],
         "progression": "Conditionals with Bee"
       },
       "bonus": false,
@@ -424,6 +459,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "PLIntro to Events_1_pl_prod"
+        ],
         "progression": "Ecosystems Simulation"
       },
       "bonus": false,
@@ -446,6 +484,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "pl-k5-2-eventsvideo_prod"
+        ],
         "progression": "Ecosystems Simulation"
       },
       "bonus": false,
@@ -468,6 +509,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "csc_ecosystems_ocean_fish_prod"
+        ],
         "progression": "Ecosystems Simulation"
       },
       "bonus": false,
@@ -490,6 +534,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "csc_ecosystems_ocean_algae_prod"
+        ],
         "progression": "Food Chain Setup"
       },
       "bonus": false,
@@ -512,6 +559,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "csc_ecosystems_ocean_boat_prod"
+        ],
         "progression": "Food Chain Setup"
       },
       "bonus": false,
@@ -534,6 +584,9 @@
       "activity_section_position": 3,
       "assessment": true,
       "properties": {
+        "level_keys": [
+          "csc_ecosystems_matching_events_maker_grade3_pl_prod"
+        ],
         "progression": "Food Chain Setup"
       },
       "bonus": false,
@@ -556,6 +609,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "csc_ecosystems_conditionals_overview_maker_grade3_pl_prod"
+        ],
         "progression": "If... then... Conditional Statements"
       },
       "bonus": false,
@@ -578,6 +634,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "csc_ecosystems_ocean_coral_prod"
+        ],
         "progression": "If... then... Conditional Statements"
       },
       "bonus": false,
@@ -600,6 +659,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "csc_ecosystems_ocean_coral_health_prod"
+        ],
         "progression": "If... then... Conditional Statements"
       },
       "bonus": false,
@@ -622,6 +684,9 @@
       "activity_section_position": 4,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "csc_ecosystems_ocean_justright_algae_prod"
+        ],
         "progression": "If... then... Conditional Statements"
       },
       "bonus": false,
@@ -644,6 +709,9 @@
       "activity_section_position": 5,
       "assessment": true,
       "properties": {
+        "level_keys": [
+          "csc_ecosystems_matching_conditionals_maker_grade3_pl_prod"
+        ],
         "progression": "If... then... Conditional Statements"
       },
       "bonus": false,
@@ -666,6 +734,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "csc_ecosystems_algae_freeplay_prod"
+        ],
         "progression": "Free Play"
       },
       "bonus": false,
@@ -688,6 +759,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSF_maker_microbit_PL_end_naviagtion_D_pl_prod"
+        ],
         "progression": "Next Steps"
       },
       "bonus": false,

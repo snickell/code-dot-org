@@ -1,11 +1,16 @@
 import {ProjectType, ReducerAction, FileId, FolderId} from '@codebridge/types';
-import {sortFilesByName} from '@codebridge/utils';
+import {sortFilesByName, getOpenFileIds} from '@codebridge/utils';
 
 import {getActiveFileForProject} from '@cdo/apps/lab2/projects/utils';
 import {ProjectFileType} from '@cdo/apps/lab2/types';
 
 import {PROJECT_REDUCER_ACTIONS} from './constants';
-import {findFiles, findSubFolders} from './utils';
+import {
+  findFiles,
+  findSubFolders,
+  getNextFileId,
+  getNextFolderId,
+} from './utils';
 type DefaultFilePayload = {
   fileId: FileId;
 };
@@ -14,7 +19,10 @@ type DefaultFolderPayload = {
   folderId: FolderId;
 };
 
-export const projectReducer = (project: ProjectType, action: ReducerAction) => {
+export const projectReducer = (
+  project: ProjectType,
+  action: ReducerAction
+): ProjectType => {
   switch (action.type) {
     case PROJECT_REDUCER_ACTIONS.REPLACE_PROJECT: {
       const {project: newProject} = action.payload as {
@@ -23,18 +31,23 @@ export const projectReducer = (project: ProjectType, action: ReducerAction) => {
       return newProject;
     }
     case PROJECT_REDUCER_ACTIONS.NEW_FILE: {
-      const {fileId, fileName, folderId, contents = ''} = <
+      const {fileName, folderId, contents = '', validationFileId} = <
         DefaultFilePayload & {
           fileName: string;
           contents?: string;
           folderId: FolderId;
+          validationFileId?: string;
         }
       >action.payload;
 
+      const fileId = getNextFileId(
+        Object.values(project.files),
+        validationFileId
+      );
+
       const newProject = {...project, files: {...project.files}};
 
-      /* eslint-disable-next-line */
-      const [_, extension] = fileName.split('.');
+      const [, extension] = fileName.split('.');
 
       newProject.files[fileId] = {
         id: fileId,
@@ -45,7 +58,10 @@ export const projectReducer = (project: ProjectType, action: ReducerAction) => {
         folderId,
       };
 
-      return newProject;
+      return projectReducer(newProject, {
+        type: PROJECT_REDUCER_ACTIONS.ACTIVATE_FILE,
+        payload: {fileId},
+      });
     }
 
     case PROJECT_REDUCER_ACTIONS.RENAME_FILE: {
@@ -104,12 +120,18 @@ export const projectReducer = (project: ProjectType, action: ReducerAction) => {
         return project;
       }
 
+      const newOpenFileIds = getOpenFileIds(project);
+      if (!newOpenFileIds.find(openFileId => openFileId === fileId)) {
+        newOpenFileIds.push(fileId);
+      }
+
       const newProject = {
         ...project,
         files: {
           ...project.files,
           [fileId]: {...project.files[fileId], active: true, open: true},
         },
+        openFiles: newOpenFileIds,
       };
 
       if (activeFile) {
@@ -133,6 +155,9 @@ export const projectReducer = (project: ProjectType, action: ReducerAction) => {
           ...project.files,
           [fileId]: {...project.files[fileId], open: false, active: false},
         },
+        openFiles: project.openFiles?.filter(
+          openFileId => openFileId !== fileId
+        ),
       };
 
       // if the file -was- active, then we want to activate whatever file was next to it.
@@ -171,11 +196,19 @@ export const projectReducer = (project: ProjectType, action: ReducerAction) => {
     case PROJECT_REDUCER_ACTIONS.DELETE_FILE: {
       const {fileId} = <DefaultFilePayload>action.payload;
 
+      const openFileIds = getOpenFileIds(project);
+      const newOpenFileIds = openFileIds.find(
+        openFileId => openFileId === fileId
+      )
+        ? openFileIds.filter(openFileId => openFileId !== fileId)
+        : openFileIds;
+
       const newProject = {
         ...project,
         files: {
           ...project.files,
         },
+        openFiles: newOpenFileIds,
       };
 
       delete newProject.files[fileId];
@@ -196,13 +229,33 @@ export const projectReducer = (project: ProjectType, action: ReducerAction) => {
       };
     }
 
+    case PROJECT_REDUCER_ACTIONS.MOVE_FOLDER: {
+      const {folderId, parentId} = <
+        DefaultFolderPayload & {parentId: FolderId}
+      >action.payload;
+
+      if (folderId === parentId) {
+        return project;
+      }
+
+      return {
+        ...project,
+        folders: {
+          ...project.folders,
+          [folderId]: {...project.folders[folderId], parentId},
+        },
+      };
+    }
+
     case PROJECT_REDUCER_ACTIONS.NEW_FOLDER: {
-      const {folderId, folderName, parentId} = <
+      const {folderName, parentId} = <
         DefaultFolderPayload & {
           folderName: string;
           parentId: string;
         }
       >action.payload;
+
+      const folderId = getNextFolderId(Object.values(project.folders));
 
       const newProject = {...project, folders: {...project.folders}};
 
@@ -262,6 +315,12 @@ export const projectReducer = (project: ProjectType, action: ReducerAction) => {
         Object.values(newProject.files)
           .filter(f => files.has(f.id))
           .forEach(f => delete newProject.files[f.id]);
+        if (newProject.openFiles) {
+          // Delete files from the list of open files.
+          newProject.openFiles = newProject.openFiles.filter(
+            fileId => !files.has(fileId)
+          );
+        }
       }
 
       return newProject;
@@ -279,6 +338,15 @@ export const projectReducer = (project: ProjectType, action: ReducerAction) => {
         },
       };
     }
+
+    case PROJECT_REDUCER_ACTIONS.REARRANGE_FILES: {
+      const {fileIds} = <{fileIds: FileId[]}>action.payload;
+      return {
+        ...project,
+        openFiles: fileIds,
+      };
+    }
+
     default:
       return project;
   }

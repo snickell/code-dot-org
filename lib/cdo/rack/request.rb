@@ -3,6 +3,7 @@ require 'rack/session/abstract/id'
 require 'ipaddr'
 require 'json'
 require 'country_codes'
+require 'cdo/global_edition'
 
 module Cdo
   module RequestExtension
@@ -59,8 +60,8 @@ module Cdo
       host_parts.sub!('-', '.') unless rack_env?(:production)
       parts = host_parts.split('.')
 
-      if parts.count >= 3
-        domains = (%w(studio learn advocacy) + CDO.partners).map {|x| x + '.code.org'}
+      if parts.count >= 2
+        domains = (%w(studio learn) + CDO.partners).map {|x| x + '.code.org'}
         domain = parts.last(3).join('.').split(':').first
         return domain if domains.include? domain
       end
@@ -120,8 +121,16 @@ module Cdo
         location&.country_code
     end
 
+    def country_code
+      country.to_s.strip.upcase.presence
+    end
+
     def gdpr?
       gdpr_country_code?(country)
+    end
+
+    def ge_region
+      Cdo::GlobalEdition.current_region
     end
 
     # Initialize a private instance of the SessionStore used in Dashboard, so

@@ -3,7 +3,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 import {ViewType} from '@cdo/apps/code-studio/viewAsRedux';
-import Button from '@cdo/apps/templates/Button';
+import Button from '@cdo/apps/legacySharedComponents/Button';
 import i18n from '@cdo/locale';
 
 import styles from './summary-entry-point.module.scss';
@@ -44,6 +44,7 @@ const SummaryEntryPoint = ({scriptData, students, selectedSection}) => {
           </div>
           <div
             className={styles.responseCounter}
+            // eslint-disable-next-line react/forbid-dom-props
             data-testid={'response-counter'}
           >
             <p>
