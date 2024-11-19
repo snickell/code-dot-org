@@ -166,6 +166,7 @@ class User < ApplicationRecord
     failed_attempts
     locked_at
     has_seen_ai_assessments_announcement
+    seen_ta_scores_map
     roster_synced
   )
 
@@ -1720,7 +1721,11 @@ class User < ApplicationRecord
 
   def self.send_reset_password_instructions(attributes = {})
     # override of Devise method
-    Services::User::PasswordResetter.call(email: attributes[:email])
+    if attributes[:username].present? && RequestStore.store[:current_user]&.admin?
+      Services::User::PasswordResetterByUsername.call(username: attributes[:username])
+    else
+      Services::User::PasswordResetterByEmail.call(email: attributes[:email])
+    end
   end
 
   def reset_secrets
