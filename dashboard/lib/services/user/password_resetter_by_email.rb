@@ -1,6 +1,6 @@
 module Services
   module User
-    class PasswordResetter < Services::Base
+    class PasswordResetterByEmail < Services::Base
       attr_reader :email
 
       def initialize(email:)
