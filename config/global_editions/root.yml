@@ -1,6 +1,6 @@
 # This is the configuration for the main code.org/ root
 
-locale: en-US
+locales: [en-US]
 
 # This is the configuration for /global/root
 # (which is mirroring the main site at the moment)
