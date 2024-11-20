@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'request_store'
+require 'cdo'
 
 module Cdo
   # Lazily loads global configurations for regional pages
