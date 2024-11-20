@@ -175,7 +175,6 @@ class InstructionsCsfMiddleCol extends React.Component {
               <hr />
               <Button
                 color={buttonColors.purple}
-                disabled={false}
                 text={i18n.dialogOK()}
                 onClick={this.closeOverlay}
                 size="m"
