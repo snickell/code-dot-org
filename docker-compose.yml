@@ -1,6 +1,7 @@
 # Our entry into our docker development environment is described here.
 
-# For an overview of how to use the Docker Development Environment see `DOCKER.md`
+# For an overview of how to use the Docker Development Environment,
+# see `./docker/developers/README.md`
 
 # It is split among a few different files that are then merged together via
 # the following `include` section.
