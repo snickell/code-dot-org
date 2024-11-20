@@ -1,7 +1,7 @@
 import {render, screen, fireEvent} from '@testing-library/react';
 import React from 'react';
 
-import {WithPopover} from '@cdo/apps/componentLibrary/popover';
+import {WithPopover} from '@code-dot-org/dsco/popover';
 
 describe('Design System - WithPopover Component', () => {
   const popoverProps = {
@@ -34,7 +34,7 @@ describe('Design System - WithPopover Component', () => {
 
   it('updates popover position on window resize', () => {
     const updatePositionSpy = jest.spyOn(
-      require('@cdo/apps/componentLibrary/common/helpers'),
+      require('@code-dot-org/dsco/common/helpers'),
       'updatePositionedElementStyles'
     );
 

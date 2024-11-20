@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
-import Button, {buttonColors} from '@cdo/apps/componentLibrary/button';
+import Button, {buttonColors} from '@code-dot-org/dsco/button';
 import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import PopUpMenu, {MenuBreak} from '@cdo/apps/sharedComponents/PopUpMenu';
 import color from '@cdo/apps/util/color';

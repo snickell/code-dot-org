@@ -1,7 +1,7 @@
 import React from 'react';
 
 import ChatMessage from '@cdo/apps/aiComponentLibrary/chatMessage/ChatMessage';
-import Alert from '@cdo/apps/componentLibrary/alert/Alert';
+import Alert from '@code-dot-org/dsco/alert';
 import {commonI18n} from '@cdo/apps/types/locale';
 import {useAppDispatch} from '@cdo/apps/util/reduxHooks';
 

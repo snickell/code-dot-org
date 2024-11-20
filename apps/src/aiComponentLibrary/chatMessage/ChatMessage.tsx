@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import React, {useMemo, useState} from 'react';
 
-import Button from '@cdo/apps/componentLibrary/button/Button';
+import Button from '@code-dot-org/dsco/button';
 import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
 import {commonI18n} from '@cdo/apps/types/locale';
 import {AiInteractionStatus as Status} from '@cdo/generated-scripts/sharedConstants';

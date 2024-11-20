@@ -2,17 +2,17 @@ import classNames from 'classnames';
 import cookies from 'js-cookie';
 import React, {useState, useEffect, useMemo} from 'react';
 
-import {Button, buttonColors} from '@cdo/apps/componentLibrary/button';
-import Checkbox from '@cdo/apps/componentLibrary/checkbox/Checkbox';
-import CloseButton from '@cdo/apps/componentLibrary/closeButton/CloseButton';
-import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
-import TextField from '@cdo/apps/componentLibrary/textField/TextField';
+import {Button, buttonColors} from '@code-dot-org/dsco/button';
+import Checkbox from '@code-dot-org/dsco/checkbox';
+import CloseButton from '@code-dot-org/dsco/closeButton';
+import FontAwesomeV6Icon from '@code-dot-org/dsco/fontAwesomeV6Icon';
+import TextField from '@code-dot-org/dsco/textField';
 import {
   BodyThreeText,
   BodyFourText,
   BodyTwoText,
   Heading2,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@code-dot-org/dsco/typography';
 import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';

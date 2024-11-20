@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import Draggable, {DraggableEventHandler} from 'react-draggable';
 
-import CloseButton from '@cdo/apps/componentLibrary/closeButton/CloseButton';
+import CloseButton from '@code-dot-org/dsco/closeButton';
 import i18n from '@cdo/locale';
 
 import styles from './console.module.scss';

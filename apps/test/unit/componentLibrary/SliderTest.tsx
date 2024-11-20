@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import '@testing-library/jest-dom';
-import Slider, {SliderProps} from '@cdo/apps/componentLibrary/slider';
+import Slider, {SliderProps} from '@code-dot-org/dsco/slider';
 
 describe('Slider Component', () => {
   const renderComponent = (props: Partial<SliderProps> = {}) => {

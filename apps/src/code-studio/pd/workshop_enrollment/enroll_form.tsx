@@ -5,7 +5,7 @@ import React, {useState} from 'react';
 import {FormGroup, ControlLabel, HelpBlock, Alert} from 'react-bootstrap'; // eslint-disable-line no-restricted-imports
 import Select, {Option} from 'react-select';
 
-import {Button, buttonColors} from '@cdo/apps/componentLibrary/button';
+import {Button, buttonColors} from '@code-dot-org/dsco/button';
 import {SubjectNames} from '@cdo/apps/generated/pd/sharedWorkshopConstants';
 import {getAuthenticityToken} from '@cdo/apps/util/AuthenticityTokenStore';
 import color from '@cdo/apps/util/color';

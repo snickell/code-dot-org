@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import Select from 'react-select';
 
 import {updateQueryParam} from '@cdo/apps/code-studio/utils';
-import {BodyThreeText, EmText} from '@cdo/apps/componentLibrary/typography';
+import {BodyThreeText, EmText} from '@code-dot-org/dsco/typography';
 import {selectSection} from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
 import {sectionsNameAndId} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
 import {reload} from '@cdo/apps/utils';

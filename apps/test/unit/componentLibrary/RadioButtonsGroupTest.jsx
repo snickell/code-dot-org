@@ -2,7 +2,7 @@ import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import {RadioButtonsGroup} from '@cdo/apps/componentLibrary/radioButton';
+import {RadioButtonsGroup} from '@code-dot-org/dsco/radioButton';
 
 const radioButtonsData = [
   {

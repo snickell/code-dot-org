@@ -5,8 +5,8 @@ import classNames from 'classnames';
 import React from 'react';
 
 import codebridgeI18n from '@cdo/apps/codebridge/locale';
-import CloseButton from '@cdo/apps/componentLibrary/closeButton/CloseButton';
-import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
+import CloseButton from '@code-dot-org/dsco/closeButton';
+import FontAwesomeV6Icon from '@code-dot-org/dsco/fontAwesomeV6Icon';
 import {getActiveFileForProject} from '@cdo/apps/lab2/projects/utils';
 
 import moduleStyles from './styles/fileTabs.module.scss';

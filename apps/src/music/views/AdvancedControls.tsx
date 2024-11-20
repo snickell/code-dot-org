@@ -1,8 +1,8 @@
 import classNames from 'classnames';
 import React, {useCallback} from 'react';
 
-import Checkbox from '@cdo/apps/componentLibrary/checkbox/Checkbox';
-import {Heading5} from '@cdo/apps/componentLibrary/typography';
+import Checkbox from '@code-dot-org/dsco/checkbox';
+import {Heading5} from '@code-dot-org/dsco/typography';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 import {MAX_BPM, MIN_BPM} from '../constants';

@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import React, {useContext} from 'react';
 
 import {AiCustomizations} from '@cdo/apps/aichat/types';
-import {BodyFourText} from '@cdo/apps/componentLibrary/typography';
+import {BodyFourText} from '@code-dot-org/dsco/typography';
 
 import {UpdateContext} from './UpdateContext';
 import VisibilityDropdown from './VisibilityDropdown';

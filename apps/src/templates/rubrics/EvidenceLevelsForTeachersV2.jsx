@@ -12,7 +12,7 @@ import {
   BodyThreeText,
   BodyFourText,
   StrongText,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@code-dot-org/dsco/typography';
 import {RubricUnderstandingLevels} from '@cdo/generated-scripts/sharedConstants';
 import i18n from '@cdo/locale';
 

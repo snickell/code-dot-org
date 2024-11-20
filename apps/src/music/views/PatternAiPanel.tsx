@@ -22,10 +22,10 @@ const aiBotGeneratingImages = [
 
 const arrowImage = require(`@cdo/static/music/music-callout-arrow.png`);
 
-import {Button} from '@cdo/apps/componentLibrary/button';
-import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
-import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
-import Slider from '@cdo/apps/componentLibrary/slider/Slider';
+import {Button} from '@code-dot-org/dsco/button';
+import {SimpleDropdown} from '@code-dot-org/dsco/dropdown';
+import FontAwesomeV6Icon from '@code-dot-org/dsco/fontAwesomeV6Icon';
+import Slider from '@code-dot-org/dsco/slider';
 import {useInterval} from '@cdo/apps/util/useInterval';
 
 import {generatePattern} from '../ai/patternAi';

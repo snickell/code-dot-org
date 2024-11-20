@@ -2,8 +2,8 @@ import classNames from 'classnames';
 import FocusTrap from 'focus-trap-react';
 import React, {useMemo, useContext} from 'react';
 
-import Button, {buttonColors} from '@cdo/apps/componentLibrary/button/Button';
-import {BodyTwoText, Heading3} from '@cdo/apps/componentLibrary/typography';
+import Button, {buttonColors} from '@code-dot-org/dsco/button';
+import {BodyTwoText, Heading3} from '@code-dot-org/dsco/typography';
 import {
   useEnterKeyboardTrap,
   useEscapeKeyboardTrap,

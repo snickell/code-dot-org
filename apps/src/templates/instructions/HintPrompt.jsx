@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import {Button, buttonColors} from '@cdo/apps/componentLibrary/button';
+import {Button, buttonColors} from '@code-dot-org/dsco/button';
 import msg from '@cdo/locale';
 
 import ChatBubble from './ChatBubble';

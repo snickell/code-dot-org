@@ -1,8 +1,8 @@
 import React, {useEffect} from 'react';
 import {connect, useSelector} from 'react-redux';
 
-import Link from '@cdo/apps/componentLibrary/link';
-import Typography from '@cdo/apps/componentLibrary/typography';
+import Link from '@code-dot-org/dsco/link';
+import Typography from '@code-dot-org/dsco/typography';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import Spinner from '@cdo/apps/sharedComponents/Spinner';

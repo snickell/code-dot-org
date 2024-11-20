@@ -1,10 +1,10 @@
 import cookies from 'js-cookie';
 import React, {useState, useEffect} from 'react';
 
-import Button from '@cdo/apps/componentLibrary/button';
-import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon';
-import TextField from '@cdo/apps/componentLibrary/textField/TextField';
-import {Heading3, BodyThreeText} from '@cdo/apps/componentLibrary/typography';
+import Button from '@code-dot-org/dsco/button';
+import FontAwesomeV6Icon from '@code-dot-org/dsco/fontAwesomeV6Icon';
+import TextField from '@code-dot-org/dsco/textField';
+import {Heading3, BodyThreeText} from '@code-dot-org/dsco/typography';
 import OldButton from '@cdo/apps/legacySharedComponents/Button';
 import {studio} from '@cdo/apps/lib/util/urlHelpers';
 import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';

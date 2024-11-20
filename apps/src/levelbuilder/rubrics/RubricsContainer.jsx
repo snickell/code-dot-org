@@ -5,7 +5,7 @@ import {
   BodyThreeText,
   BodyTwoText,
   Heading1,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@code-dot-org/dsco/typography';
 import Button from '@cdo/apps/legacySharedComponents/Button';
 import {RubricUnderstandingLevels} from '@cdo/generated-scripts/sharedConstants';
 

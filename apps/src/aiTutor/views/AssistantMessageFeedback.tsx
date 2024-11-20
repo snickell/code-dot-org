@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 
-import Button, {buttonColors} from '@cdo/apps/componentLibrary/button/Button';
+import Button, {buttonColors} from '@code-dot-org/dsco/button';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';

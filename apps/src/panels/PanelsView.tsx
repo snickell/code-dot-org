@@ -3,7 +3,7 @@ import markdownToTxt from 'markdown-to-txt';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import Typist from 'react-typist';
 
-import {Button} from '@cdo/apps/componentLibrary/button';
+import {Button} from '@code-dot-org/dsco/button';
 import TextToSpeech from '@cdo/apps/lab2/views/components/TextToSpeech';
 
 import {queryParams} from '../code-studio/utils';

@@ -1,14 +1,14 @@
 import React from 'react';
 
-import Button, {buttonColors} from '@cdo/apps/componentLibrary/button/Button';
-import Link from '@cdo/apps/componentLibrary/link/Link';
+import Button, {buttonColors} from '@code-dot-org/dsco/button';
+import Link from '@code-dot-org/dsco/link';
 import {
   BodyOneText,
   BodyTwoText,
   EmText,
   Heading3,
   StrongText,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@code-dot-org/dsco/typography';
 import AccessibleDialog from '@cdo/apps/sharedComponents/AccessibleDialog';
 import i18n from '@cdo/locale';
 

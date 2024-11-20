@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import {Heading4} from '@cdo/apps/componentLibrary/typography';
+import {Heading4} from '@code-dot-org/dsco/typography';
 import {assignmentCourseOfferingShape} from '@cdo/apps/templates/teacherDashboard/shapes';
 import i18n from '@cdo/locale';
 

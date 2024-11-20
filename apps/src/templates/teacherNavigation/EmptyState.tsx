@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Heading3, BodyTwoText} from '@cdo/apps/componentLibrary/typography';
+import {Heading3, BodyTwoText} from '@code-dot-org/dsco/typography';
 
 import styles from './teacher-navigation.module.scss';
 import dashboardStyles from '@cdo/apps/templates/teacherDashboard/teacher-dashboard.module.scss';

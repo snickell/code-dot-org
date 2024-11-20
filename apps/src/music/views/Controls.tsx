@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import React, {useCallback} from 'react';
 import {useDispatch} from 'react-redux';
 
-import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
+import FontAwesomeV6Icon from '@code-dot-org/dsco/fontAwesomeV6Icon';
 import {Triggers} from '@cdo/apps/music/constants';
 import {commonI18n} from '@cdo/apps/types/locale';
 

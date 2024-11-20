@@ -6,13 +6,13 @@ import {
   Button,
   buttonColors,
   LinkButton,
-} from '@cdo/apps/componentLibrary/button';
-import Link from '@cdo/apps/componentLibrary/link';
+} from '@code-dot-org/dsco/button';
+import Link from '@code-dot-org/dsco/link';
 import {
   BodyTwoText,
   Heading3,
   Heading4,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@code-dot-org/dsco/typography';
 import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';

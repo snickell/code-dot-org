@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
 
-import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
-import Link from '@cdo/apps/componentLibrary/link/Link';
-import {RadioButtonsGroup} from '@cdo/apps/componentLibrary/radioButton';
-import TextField from '@cdo/apps/componentLibrary/textField/TextField';
-import Typography from '@cdo/apps/componentLibrary/typography/Typography';
+import FontAwesomeV6Icon from '@code-dot-org/dsco/fontAwesomeV6Icon';
+import Link from '@code-dot-org/dsco/link';
+import {RadioButtonsGroup} from '@code-dot-org/dsco/radioButton';
+import TextField from '@code-dot-org/dsco/textField';
+import Typography from '@code-dot-org/dsco/typography';
 import {UserTypes} from '@cdo/generated-scripts/sharedConstants';
 import i18n from '@cdo/locale';
 

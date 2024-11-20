@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
-import Button, {buttonColors} from '@cdo/apps/componentLibrary/button/Button';
+import Button, {buttonColors} from '@code-dot-org/dsco/button';
 import i18n from '@cdo/locale';
 
 import ProjectCardGrid from './ProjectCardGrid';

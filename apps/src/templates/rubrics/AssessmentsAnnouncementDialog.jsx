@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 
-import Button from '@cdo/apps/componentLibrary/button/Button';
-import {Heading2, BodyTwoText} from '@cdo/apps/componentLibrary/typography';
+import Button from '@code-dot-org/dsco/button';
+import {Heading2, BodyTwoText} from '@code-dot-org/dsco/typography';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import AccessibleDialog from '@cdo/apps/sharedComponents/AccessibleDialog';

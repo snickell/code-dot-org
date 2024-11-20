@@ -1,9 +1,9 @@
 import classNames from 'classnames';
 import React, {useEffect, useMemo, useState} from 'react';
 
-import Alert from '@cdo/apps/componentLibrary/alert/Alert';
-import Checkbox from '@cdo/apps/componentLibrary/checkbox/Checkbox';
-import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
+import Alert from '@code-dot-org/dsco/alert';
+import Checkbox from '@code-dot-org/dsco/checkbox';
+import {SimpleDropdown} from '@code-dot-org/dsco/dropdown';
 import {installFunctionBlocks} from '@cdo/apps/music/blockly/blockUtils';
 import {setUpBlocklyForMusicLab} from '@cdo/apps/music/blockly/setup';
 import {

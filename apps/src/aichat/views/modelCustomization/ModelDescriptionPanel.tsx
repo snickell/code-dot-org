@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 
-import SimpleDropdown from '@cdo/apps/componentLibrary/dropdown/simpleDropdown';
-import {BodyThreeText, StrongText} from '@cdo/apps/componentLibrary/typography';
+import { SimpleDropdown } from '@code-dot-org/dsco/dropdown';
+import {BodyThreeText, StrongText} from '@code-dot-org/dsco/typography';
 
 import {ModelDescription} from '../../types';
 

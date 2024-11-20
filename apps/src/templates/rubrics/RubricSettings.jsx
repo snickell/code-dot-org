@@ -5,15 +5,15 @@ import React, {useEffect, useState, useMemo, useCallback} from 'react';
 import {CSVLink} from 'react-csv';
 import {connect} from 'react-redux';
 
-import Link from '@cdo/apps/componentLibrary/link/Link';
-import Toggle from '@cdo/apps/componentLibrary/toggle/Toggle';
+import Link from '@code-dot-org/dsco/link';
+import Toggle from '@code-dot-org/dsco/toggle';
 import {
   BodyTwoText,
   BodyThreeText,
   Heading3,
   Heading4,
   StrongText,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@code-dot-org/dsco/typography';
 import Button from '@cdo/apps/legacySharedComponents/Button';
 import UserPreferences from '@cdo/apps/lib/util/UserPreferences';
 import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';

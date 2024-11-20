@@ -6,7 +6,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import Typography from '@cdo/apps/componentLibrary/typography';
+import Typography from '@code-dot-org/dsco/typography';
 
 import style from './header-banner.module.scss';
 

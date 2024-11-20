@@ -4,8 +4,8 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 import {announcementShape} from '@cdo/apps/code-studio/announcementsRedux';
-import {Chips} from '@cdo/apps/componentLibrary/chips';
-import Link from '@cdo/apps/componentLibrary/link/Link';
+import {Chips} from '@code-dot-org/dsco/chips';
+import Link from '@code-dot-org/dsco/link';
 import {
   InstructionType,
   PublishedState,

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import sinon from 'sinon'; // eslint-disable-line no-restricted-imports
 
-import Tabs from '@cdo/apps/componentLibrary/tabs';
+import Tabs from '@code-dot-org/dsco/tabs';
 
 import {expect} from '../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
 

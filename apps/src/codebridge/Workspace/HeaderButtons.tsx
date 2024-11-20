@@ -1,8 +1,8 @@
 import {sendCodebridgeAnalyticsEvent} from '@codebridge/utils/analyticsReporterHelper';
 import React, {useCallback} from 'react';
 
-import {Button, buttonColors} from '@cdo/apps/componentLibrary/button';
-import {TooltipProps, WithTooltip} from '@cdo/apps/componentLibrary/tooltip';
+import {Button, buttonColors} from '@code-dot-org/dsco/button';
+import {TooltipProps, WithTooltip} from '@code-dot-org/dsco/tooltip';
 import VersionHistoryButton from '@cdo/apps/lab2/views/components/versionHistory/VersionHistoryButton';
 import {useDialogControl, DialogType} from '@cdo/apps/lab2/views/dialogs';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';

@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import {Button} from '@cdo/apps/componentLibrary/button';
-import {Heading3, BodyThreeText} from '@cdo/apps/componentLibrary/typography';
+import {Button} from '@code-dot-org/dsco/button';
+import {Heading3, BodyThreeText} from '@code-dot-org/dsco/typography';
 
 import styles from './borderedCallToAction.module.scss';
 

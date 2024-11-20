@@ -7,7 +7,7 @@ import classnames from 'classnames';
 import React from 'react';
 
 import codebridgeI18n from '@cdo/apps/codebridge/locale';
-import Alert from '@cdo/apps/componentLibrary/alert/Alert';
+import Alert from '@code-dot-org/dsco/alert';
 import {START_SOURCES, WARNING_BANNER_MESSAGES} from '@cdo/apps/lab2/constants';
 import {isProjectTemplateLevel} from '@cdo/apps/lab2/lab2Redux';
 import {getAppOptionsEditBlocks} from '@cdo/apps/lab2/projects/utils';

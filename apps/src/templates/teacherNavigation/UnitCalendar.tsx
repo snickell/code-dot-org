@@ -7,7 +7,7 @@ import {
   initializeRedux,
   UnitSummaryResponse,
 } from '@cdo/apps/code-studio/components/progress/TeacherUnitOverview';
-import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
+import {SimpleDropdown} from '@code-dot-org/dsco/dropdown';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import Spinner from '@cdo/apps/sharedComponents/Spinner';

@@ -1,6 +1,6 @@
 import React, {useCallback} from 'react';
 
-import {Button} from '@cdo/apps/componentLibrary/button';
+import {Button} from '@code-dot-org/dsco/button';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 import {

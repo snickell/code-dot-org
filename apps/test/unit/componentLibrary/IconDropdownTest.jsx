@@ -2,7 +2,7 @@ import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import {IconDropdown} from '@cdo/apps/componentLibrary/dropdown';
+import {IconDropdown} from '@code-dot-org/dsco/dropdown';
 
 const allOptions = [
   {

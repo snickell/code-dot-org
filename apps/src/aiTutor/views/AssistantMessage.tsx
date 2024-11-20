@@ -5,7 +5,7 @@ import {
   ChatCompletionMessage,
   AITutorInteractionStatus as Status,
 } from '@cdo/apps/aiTutor/types';
-import Typography from '@cdo/apps/componentLibrary/typography/Typography';
+import Typography from '@code-dot-org/dsco/typography';
 import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
 
 import AssistantMessageFeedback from './AssistantMessageFeedback';

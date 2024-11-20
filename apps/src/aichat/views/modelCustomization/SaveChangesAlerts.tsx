@@ -5,7 +5,7 @@ import {
   selectHavePropertiesChanged,
   selectSavedCustomizationsMatchInitial,
 } from '@cdo/apps/aichat/redux/aichatRedux';
-import Alert, {alertTypes} from '@cdo/apps/componentLibrary/alert/Alert';
+import Alert, {alertTypes} from '@code-dot-org/dsco/alert';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 import styles from '../model-customization-workspace.module.scss';

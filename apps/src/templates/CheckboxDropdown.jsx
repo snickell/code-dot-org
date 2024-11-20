@@ -2,8 +2,8 @@ import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useCallback} from 'react';
 
-import Checkbox from '@cdo/apps/componentLibrary/checkbox';
-import Typography from '@cdo/apps/componentLibrary/typography';
+import Checkbox from '@code-dot-org/dsco/checkbox';
+import Typography from '@code-dot-org/dsco/typography';
 import Button from '@cdo/apps/legacySharedComponents/Button';
 import i18n from '@cdo/locale';
 

@@ -3,7 +3,7 @@ import React from 'react';
 
 import '@testing-library/jest-dom';
 
-import Dialog, {DialogProps} from '@cdo/apps/componentLibrary/dialog';
+import Dialog, {DialogProps} from '@code-dot-org/dsco/dialog';
 
 describe('Dialog Component', () => {
   const defaultProps: DialogProps = {

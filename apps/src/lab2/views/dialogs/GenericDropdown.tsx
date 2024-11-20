@@ -3,8 +3,8 @@ import React, {useCallback, useEffect} from 'react';
 import {
   SimpleDropdown,
   SimpleDropdownProps,
-} from '@cdo/apps/componentLibrary/dropdown';
-import {BodyTwoText} from '@cdo/apps/componentLibrary/typography';
+} from '@code-dot-org/dsco/dropdown';
+import {BodyTwoText} from '@code-dot-org/dsco/typography';
 
 import {useDialogControl} from './DialogControlContext';
 import GenericDialog, {GenericDialogProps} from './GenericDialog';

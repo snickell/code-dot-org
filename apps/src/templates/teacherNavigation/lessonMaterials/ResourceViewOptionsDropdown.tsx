@@ -1,6 +1,6 @@
 import React, {useMemo} from 'react';
 
-import {ActionDropdown} from '@cdo/apps/componentLibrary/dropdown';
+import {ActionDropdown} from '@code-dot-org/dsco/dropdown';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {

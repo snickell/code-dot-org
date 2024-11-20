@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
-import Alert from '@cdo/apps/componentLibrary/alert/Alert';
-import {Button} from '@cdo/apps/componentLibrary/button';
+import Alert from '@code-dot-org/dsco/alert';
+import {Button} from '@code-dot-org/dsco/button';
 
 import moduleStyles from './edit-music-level-data.module.scss';
 

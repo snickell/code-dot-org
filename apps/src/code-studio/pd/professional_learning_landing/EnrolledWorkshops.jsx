@@ -4,7 +4,7 @@ import React from 'react';
 import {Table, Button, Modal} from 'react-bootstrap'; // eslint-disable-line no-restricted-imports
 import ReactTooltip from 'react-tooltip';
 
-import {Heading2} from '@cdo/apps/componentLibrary/typography';
+import {Heading2} from '@code-dot-org/dsco/typography';
 import i18n from '@cdo/locale';
 
 import * as utils from '../../../utils';

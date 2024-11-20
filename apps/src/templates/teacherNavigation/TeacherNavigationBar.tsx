@@ -8,8 +8,8 @@ import {
   useParams,
 } from 'react-router-dom';
 
-import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
-import Typography from '@cdo/apps/componentLibrary/typography';
+import {SimpleDropdown} from '@code-dot-org/dsco/dropdown';
+import Typography from '@code-dot-org/dsco/typography';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import SidebarOption from '@cdo/apps/templates/teacherNavigation/SidebarOption';

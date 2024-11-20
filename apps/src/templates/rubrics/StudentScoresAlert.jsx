@@ -2,8 +2,8 @@ import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import CloseButton from '@cdo/apps/componentLibrary/closeButton/CloseButton';
-import {BodyThreeText} from '@cdo/apps/componentLibrary/typography';
+import CloseButton from '@code-dot-org/dsco/closeButton';
+import {BodyThreeText} from '@code-dot-org/dsco/typography';
 import {selectedSectionSelector} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 import i18n from '@cdo/locale';

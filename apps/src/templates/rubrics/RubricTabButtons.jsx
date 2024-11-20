@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import ReactTooltip from 'react-tooltip';
 
-import SegmentedButtons from '@cdo/apps/componentLibrary/segmentedButtons/SegmentedButtons';
+import SegmentedButtons from '@code-dot-org/dsco/segmentedButtons';
 import {RubricAiEvaluationLimits} from '@cdo/generated-scripts/sharedConstants';
 import i18n from '@cdo/locale';
 

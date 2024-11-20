@@ -3,9 +3,9 @@ import React, {useState, useMemo} from 'react';
 import {useSelector} from 'react-redux';
 
 import {AichatLevelProperties, ModelDescription} from '@cdo/apps/aichat/types';
-import Button from '@cdo/apps/componentLibrary/button/Button';
-import SimpleDropdown from '@cdo/apps/componentLibrary/dropdown/simpleDropdown/SimpleDropdown';
-import Slider, {SliderProps} from '@cdo/apps/componentLibrary/slider/Slider';
+import Button from '@code-dot-org/dsco/button';
+import { SimpleDropdown } from '@code-dot-org/dsco/dropdown';
+import Slider, {SliderProps} from '@code-dot-org/dsco/slider';
 import {isReadOnlyWorkspace} from '@cdo/apps/lab2/lab2Redux';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 

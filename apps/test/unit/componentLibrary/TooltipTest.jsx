@@ -2,7 +2,7 @@ import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import {WithTooltip} from '@cdo/apps/componentLibrary/tooltip';
+import {WithTooltip} from '@code-dot-org/dsco/tooltip';
 
 describe('Design System - Tooltip', () => {
   it('Tooltip - renders with correct label', async () => {

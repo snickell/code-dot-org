@@ -2,7 +2,7 @@ import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import Link from '@cdo/apps/componentLibrary/link';
+import Link from '@code-dot-org/dsco/link';
 
 describe('Design System - Link', () => {
   it('Link - renders with correct text when passed as children prop', () => {

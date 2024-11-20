@@ -13,7 +13,7 @@ import {
   LmsLoginTypeNames,
   LmsLoginInstructionUrls,
 } from '@cdo/apps/accounts/constants';
-import Typography from '@cdo/apps/componentLibrary/typography/Typography';
+import Typography from '@code-dot-org/dsco/typography';
 import fontConstants from '@cdo/apps/fontConstants';
 import Button from '@cdo/apps/legacySharedComponents/Button';
 import {Heading3} from '@cdo/apps/legacySharedComponents/Headings';

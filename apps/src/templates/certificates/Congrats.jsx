@@ -6,7 +6,7 @@ import {
   BodyTwoText,
   Heading3,
   Heading4,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@code-dot-org/dsco/typography';
 import {pegasus} from '@cdo/apps/lib/util/urlHelpers';
 import GraduateToNextLevel from '@cdo/apps/templates/certificates/GraduateToNextLevel';
 import InlineMarkdown from '@cdo/apps/templates/InlineMarkdown';
