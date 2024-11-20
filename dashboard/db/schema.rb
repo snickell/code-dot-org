@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_11_16_044924) do
+ActiveRecord::Schema.define(version: 2024_11_19_235506) do
 
   create_table "activities", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
     t.integer "user_id"
@@ -761,7 +761,7 @@ ActiveRecord::Schema.define(version: 2024_11_16_044924) do
     t.integer "ai_confidence"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.text "observations"
+    t.text "observations", size: :medium, collation: "utf8mb4_unicode_ci"
     t.integer "ai_confidence_exact_match"
     t.text "evidence"
     t.index ["learning_goal_id"], name: "index_learning_goal_ai_evaluations_on_learning_goal_id"
