@@ -31,6 +31,33 @@ class GlobalEditionTest < ActionDispatch::IntegrationTest
         _(path).must_equal international_page_path
       end
 
+      context 'when region locked locale is set via params' do
+        let(:params) {{set_locale: ge_region_locale}}
+        let(:extra_params) {{foo: 'bar'}}
+
+        before do
+          params.merge!(extra_params)
+        end
+
+        it 'redirects to regional page with extra params' do
+          get_international_page
+
+          must_respond_with 302
+          must_redirect_to "#{international_page_path}?#{extra_params.merge(ge_region: ge_region).to_query}"
+
+          follow_redirect!
+
+          must_respond_with 302
+          must_redirect_to "#{regional_page_path}?#{extra_params.to_query}"
+
+          follow_redirect!
+
+          must_respond_with 200
+          _(path).must_equal regional_page_path
+          _(request.params[:foo]).must_equal extra_params[:foo]
+        end
+      end
+
       context 'when ge_region param is set' do
         let(:params) {{ge_region: ge_region}}
         let(:extra_params) {{foo: 'bar'}}

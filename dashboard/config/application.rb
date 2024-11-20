@@ -128,9 +128,9 @@ module Dashboard
     config.i18n.load_path += Dir[Rails.root.join('config', 'locales', '*.json').to_s]
     config.i18n.backend = CDO.i18n_backend
     config.i18n.enforce_available_locales = false
-    config.i18n.available_locales = [SharedConstants::DEFAULT_LOCALE]
-    config.i18n.fallbacks[:defaults] = [SharedConstants::DEFAULT_LOCALE]
-    config.i18n.default_locale = SharedConstants::DEFAULT_LOCALE
+    config.i18n.available_locales = [Cdo::I18n::DEFAULT_LOCALE]
+    config.i18n.fallbacks[:defaults] = [Cdo::I18n::DEFAULT_LOCALE]
+    config.i18n.default_locale = Cdo::I18n::DEFAULT_LOCALE
     LOCALES = Cdo::I18n::LOCALE_CONFIGS
     Cdo::I18n.available_languages.each do |language|
       locale = language[:locale_s]

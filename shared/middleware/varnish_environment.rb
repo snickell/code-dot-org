@@ -1,7 +1,7 @@
 require 'sinatra/base'
 
+require 'cdo/global_edition'
 require 'cdo/i18n'
-require 'cdo/shared_constants'
 require 'cdo/rack/global_edition'
 require 'helpers/cookies'
 
@@ -19,7 +19,7 @@ class VarnishEnvironment < Sinatra::Base
   end
 
   before do
-    env['cdo.locale'] = param_locale || varnish_locale || cookie_locale || default_locale
+    request.locale = param_locale || varnish_locale || cookie_locale || default_locale
   end
 
   after do
@@ -29,7 +29,14 @@ class VarnishEnvironment < Sinatra::Base
       redirect_uri = URI(request.path)
       redirect_params = request.params.except(LOCALE_PARAM_KEY)
 
-      unless param_ge_region == request.ge_region
+      param_ge_region =
+        if redirect_params.key?(Rack::GlobalEdition::REGION_KEY)
+          redirect_params.delete(Rack::GlobalEdition::REGION_KEY)
+        else
+          Cdo::GlobalEdition.region_locked_locales[param_locale]
+        end
+
+      unless param_ge_region == request.cookies[Rack::GlobalEdition::REGION_KEY]
         redirect_params[Rack::GlobalEdition::REGION_KEY] = param_ge_region
 
         Metrics::Events.log_event(
@@ -61,17 +68,11 @@ class VarnishEnvironment < Sinatra::Base
     end
 
     def param_locale
-      return @param_locale if defined? @param_locale
-      @param_locale ||= language_to_locale(request.params[LOCALE_PARAM_KEY]&.split('|')&.first)
-    end
-
-    def param_ge_region
-      return @param_ge_region if defined? @param_ge_region
-      @param_ge_region = request.params[LOCALE_PARAM_KEY]&.split('|')&.second
+      language_to_locale(request.params[LOCALE_PARAM_KEY])
     end
 
     def default_locale
-      ::SharedConstants::DEFAULT_LOCALE
+      Cdo::I18n::DEFAULT_LOCALE
     end
 
     def language_to_locale(language)

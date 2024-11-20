@@ -36,7 +36,6 @@ export default class SmallFooter extends React.Component {
         text: PropTypes.string,
       })
     ),
-    groupedLocaleOptions: PropTypes.object,
     copyrightInBase: PropTypes.bool.isRequired,
     baseMoreMenuString: PropTypes.string.isRequired,
     baseStyle: PropTypes.object,
@@ -182,7 +181,6 @@ export default class SmallFooter extends React.Component {
               localeUrl={this.props.localeUrl}
               selected={this.props.currentLocale}
               options={this.props.localeOptions}
-              groupedOptions={this.props.groupedLocaleOptions}
             />
           )}
           {this.props.copyrightInBase && this.renderCopyright()}

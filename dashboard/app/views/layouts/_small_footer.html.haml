@@ -4,11 +4,8 @@
   reactProps = {
     i18nDropdownInBase: view_options[:has_i18n],
     localeUrl: locale_url,
-    currentLocale: Cdo::I18n.current_locale_option(locale, request.ge_region),
+    currentLocale: locale,
     localeOptions: Cdo::I18n.locale_options.map {|(text, value)| {text: text, value: value}},
-    groupedLocaleOptions: Cdo::I18n.grouped_ge_regions_locale_options.map do |group_name, options|
-      {label: group_name, groupItems: options.map {|(text, value)| {text: text, value: value}}}
-    end,
     privacyPolicyInBase: true,
     copyrightInBase: true,
     baseMoreMenuString: I18n.t('footer.more'),

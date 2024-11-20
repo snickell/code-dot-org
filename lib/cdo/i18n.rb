@@ -5,10 +5,12 @@ require 'i18n'
 require 'uri'
 require 'yaml'
 
-require 'cdo/global_edition'
+require 'cdo/shared_constants'
 
 module Cdo
   module I18n
+    DEFAULT_LOCALE = SharedConstants::DEFAULT_LOCALE
+
     # @see https://docs.google.com/spreadsheets/d/10dS5PJKRt846ol9f9L3pKh03JfZkN7UIEcwMmiGS4i0
     CDO_LANGUAGES = CSV.read(CDO.dir('pegasus/data/cdo-languages.csv'), headers: true, header_converters: :symbol).freeze
 
@@ -34,6 +36,10 @@ module Cdo
         @available_languages_by_locale ||= available_languages.index_by {|cdo_language| cdo_language[:locale_s]}.freeze
       end
 
+      def available_locale?(locale)
+        available_languages_by_locale.key?(locale.to_s)
+      end
+
       def language_name(locale)
         cdo_language = available_languages_by_locale[locale.to_s]
         return unless cdo_language
@@ -53,43 +59,15 @@ module Cdo
         end.sort_by(&:second).freeze
       end
 
-      def ge_region_locale_options(ge_region)
-        @ge_region_locale_options ||= {}
-
-        @ge_region_locale_options[ge_region] ||= Cdo::GlobalEdition.region_locales(ge_region).filter_map do |locale|
-          cdo_language = available_languages_by_locale[locale]
-          [language_name(locale), "#{locale}|#{ge_region}"] if cdo_language
-        end.freeze
-      end
-
-      def grouped_ge_regions_locale_options
-        return {} unless DCDO.get('global_edition_enabled', false)
-
-        @grouped_ge_regions_locale_options ||= begin
-          grouped_options = {}
-
-          Cdo::GlobalEdition::REGIONS.excluding('en', 'root').each do |ge_region|
-            region_name = ::I18n.t(ge_region, scope: %i[global_edition regions])
-            grouped_options[region_name] = ge_region_locale_options(ge_region)
-          end
-
-          grouped_options.freeze
-        end
-      end
-
-      def current_locale_option(locale, ge_region = nil)
-        ge_region.nil? || ge_region.empty? ? locale.to_s : "#{locale}|#{ge_region}"
-      end
-
       def locale_direction(locale)
         LOCALE_CONFIGS.dig(locale.to_s, :dir) || TEXT_DIRECTION_LTR
       end
 
-      def language_change_url(url, locale, ge_region = nil)
+      def language_change_url(url, locale)
         uri = URI.parse(url)
 
         params = URI.decode_www_form(uri.query.to_s).to_h
-        params[VarnishEnvironment::LOCALE_PARAM_KEY] = [locale, ge_region].compact.join('|')
+        params[VarnishEnvironment::LOCALE_PARAM_KEY] = locale
         uri.query = URI.encode_www_form(params)
 
         uri.to_s

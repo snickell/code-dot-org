@@ -58,6 +58,26 @@ module Cdo
       configuration_for(region)&.dig(:locales)
     end
 
+    def self.main_region_locale(region)
+      region_locales(region)&.first
+    end
+
+    def self.locale_lock?(region)
+      configuration_for(region)&.dig(:locale_lock)
+    end
+
+    def self.region_locked_locales
+      @region_locked_locales ||= begin
+        region_locked_locales = {}
+        REGIONS.each do |region|
+          next unless locale_lock?(region)
+          locale = main_region_locale(region)
+          region_locked_locales[locale] = region
+        end
+        region_locked_locales
+      end.freeze
+    end
+
     def self.region_change_url(url, region = nil)
       uri = URI.parse(url)
 

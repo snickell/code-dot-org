@@ -9,7 +9,6 @@ export default {
     localeUrl: {control: 'text'},
     selected: {control: 'text'},
     options: {control: 'object'},
-    groupedOptions: {control: 'object'},
   },
 } as Meta;
 
@@ -29,17 +28,4 @@ Default.args = {};
 export const WithSelectedLocale = Template.bind({});
 WithSelectedLocale.args = {
   selected: 'es',
-};
-
-export const WithGroupedLocales = Template.bind({});
-WithGroupedLocales.args = {
-  groupedOptions: [
-    {
-      label: 'Farsi',
-      groupItems: [
-        {value: 'fa-IR|fa', text: 'Persian'},
-        {value: 'en-US|fa', text: 'English'},
-      ],
-    },
-  ],
 };

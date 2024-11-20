@@ -25,10 +25,6 @@ module LocaleHelper
     locale_code.to_s.downcase.tr('-', '_')
   end
 
-  def options_for_locale_select
-    Cdo::I18n.locale_options
-  end
-
   def options_for_locale_code_select
     options = []
     I18n.available_locales.each do |locale|
