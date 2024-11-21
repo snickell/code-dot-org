@@ -4,40 +4,66 @@
 
 * Run development server requirements such as MySQL and Redis in containers.
 
+## Running a Native Dashboard Server
+
+If you want to run the server code natively, but leverage Docker to run the dependent
+services, you can follow these instructions.
+
+First, install docker using [the instructions below](#installing-docker). Then follow the
+normal [SETUP.md](../../SETUP.md) instructions for your platform.  You can skip over many
+steps that are related to running mysql and redis.
+
+Instead, once you have a working Ruby and Node environment, you can then use this command
+to spin up the database and redis servers:
+
+```shell
+docker compose run dashboard-services
+```
+
+This will tell you which items you will need to place in your `locals.yml` file for the
+server to connect to the contained database.
+
+Just copy those lines into your `locals.yml` and start your Dashboard server via:
+
+```shell
+./bin/dashboard-server
+```
+
 ## Installing Docker
 
 Our Docker development environment requires at least [Docker
-Compose](https://docs.docker.com/compose/) version 2.23 or higher, as well as a
-compatible installation of [Docker Engine](https://docs.docker.com/engine/). If
-you'd like a GUI interface and a one-click installation process, consider
-[Docker Desktop](https://docs.docker.com/desktop/) as an optional alternative
-to manual installation.
+Compose](https://docs.docker.com/compose/) version 2.23 or higher, as well as a compatible
+installation of [Docker Engine](https://docs.docker.com/engine/). If you'd like a GUI
+interface and a one-click installation process, consider [Docker
+Desktop](https://docs.docker.com/desktop/) as an optional alternative to manual
+installation.
 
 ### Official Installation Instructions
 
 The official documentation for each service will be the most up-to-date and
-officially-supported way to install each service, but may not cover every edge
-case for your local development environment:
+officially-supported way to install each service, but may not cover every edge case for
+your local development environment:
 
 - [Docker Engine](https://docs.docker.com/engine/install/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
-- Docker Desktop ([Mac](https://docs.docker.com/desktop/setup/install/mac-install/), [Windows](https://docs.docker.com/desktop/setup/install/windows-install/), [Linux](https://docs.docker.com/desktop/setup/install/linux/))
+- Docker Desktop ([Mac](https://docs.docker.com/desktop/setup/install/mac-install/),
+  [Windows](https://docs.docker.com/desktop/setup/install/windows-install/),
+  [Linux](https://docs.docker.com/desktop/setup/install/linux/))
 
 Alternatively, consider consulting your package management for your OS.
 
 ### Code.org Installation Instructions
 
-Below are installation steps which have worked for other code.org engineers to
-install the specific requirements needed for our setup. See the appropriate
-section below: [macOS](#macos), [Ubuntu](#ubuntu), [Windows](#windows)
+Below are installation steps which have worked for other code.org engineers to install the
+specific requirements needed for our setup. See the appropriate section below:
+[macOS](#macos), [Ubuntu](#ubuntu), [Windows](#windows)
 
 ### macOS
 
-> **Note** Mac support is currently limited; in part because of the performance
-> issues when trying to run our stack within the hypervisor that MacOS runs
-> docker inside of, in part because of the architectural differences between
-> different Apple chips, and in part because of the lack of test devices among
-> developers who have worked on this so far.
+> **Note** Mac support is currently limited; in part because of the performance issues
+> when trying to run our stack within the hypervisor that MacOS runs docker inside of, in
+> part because of the architectural differences between different Apple chips, and in part
+> because of the lack of test devices among developers who have worked on this so far.
 
 1. Install Docker itself:
 ```shell
@@ -93,13 +119,19 @@ sudo usermod -aG docker ${USER}
 
 ### Windows
 
-Docker on Windows is facilitated with the Docker Desktop application which you can find [here](https://www.docker.com/products/docker-desktop/).
+Docker on Windows is facilitated with the Docker Desktop application which you can find
+[here](https://www.docker.com/products/docker-desktop/).
 
-When you install that, you will need to follow the instructions in that app to enable Docker, which may require updating some system settings. There are other instructions found [here](https://docs.docker.com/desktop/install/windows-install/) that may help.
+When you install that, you will need to follow the instructions in that app to enable
+Docker, which may require updating some system settings. There are other instructions
+found [here](https://docs.docker.com/desktop/install/windows-install/) that may help.
 
-1. Install Docker Desktop from [here](https://www.docker.com/products/docker-desktop/). Using instructions found [here](https://docs.docker.com/desktop/install/windows-install/).
+1. Install Docker Desktop from [here](https://www.docker.com/products/docker-desktop/).
+   Using instructions found
+   [here](https://docs.docker.com/desktop/install/windows-install/).
 
-1. Start Docker Desktop. It will say "Engine running" in the lower-left corner of the Docker Desktop window.
+1. Start Docker Desktop. It will say "Engine running" in the lower-left corner of the
+   Docker Desktop window.
 
 1. Start your WSL Ubuntu session.
 
@@ -115,25 +147,4 @@ docker run --rm hello-world
 1. Verify Docker Compose version is at least 2.23.
 ```shell
 docker compose version
-```
-
-## Running a Native Dashboard Server
-
-If you want to run the server code natively, but leverage Docker to run the dependent services, you can follow these instructions.
-
-First, you want to follow the normal [SETUP.md](../../SETUP.md) instructions for your platform.
-You can skip over many steps that are related to running mysql and redis.
-
-Instead, once you have a working Ruby and Node environment, you can then use this command to spin up the database and redis servers:
-
-```shell
-docker compose run dashboard-services
-```
-
-This will tell you which items you will need to place in your `locals.yml` file for the server to connect to the contained database.
-
-Just copy those lines into your `locals.yml` and start your Dashboard server via:
-
-```shell
-./bin/dashboard-server
 ```
