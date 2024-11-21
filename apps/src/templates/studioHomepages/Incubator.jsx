@@ -74,6 +74,22 @@ class Incubator extends Component {
               },
             ]}
           />
+          <TwoColumnActionBlock
+            imageUrl="shared/images/teacher-announcement/incubator-genai-graphic.png"
+            subHeading={i18n.incubator_genai_title()}
+            description={<span>{i18n.incubator_genai_desc()}</span>}
+            marginBottom="20px"
+            buttons={[
+              {
+                url: 'https://studio.code.org/courses/exploring-gen-ai-2024?section_id=5618725',
+                text: i18n.incubator_genai_course_button(),
+              },
+              {
+                url: 'https://code.org/curriculum/generative-ai',
+                text: i18n.incubator_genai_marketing_button(),
+              },
+            ]}
+          />
         </div>
       </div>
     );
