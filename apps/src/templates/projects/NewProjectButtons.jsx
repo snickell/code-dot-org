@@ -6,6 +6,7 @@ import {connect} from 'react-redux';
 
 import fontConstants from '@cdo/apps/fontConstants';
 import i18n from '@cdo/locale';
+import {pegasus} from '@cdo/apps/lib/util/urlHelpers';
 
 import styleConstants from '../../styleConstants';
 import color from '../../util/color';
@@ -120,7 +121,7 @@ const PROJECT_INFO = {
   music: {
     label: i18n.projectTypeMusic(),
     thumbnail: '/shared/images/fill-70x70/courses/logo_music.png',
-    urlOverride: '/s/music-intro-2024/reset',
+    urlOverride: pegasus('/music'),
   },
 };
 
