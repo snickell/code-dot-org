@@ -1,19 +1,37 @@
 {
   "name": "@code-dot-org/dsco",
+  "version": "0.0.0-alpha.0",
   "keywords": [
     "design-system",
     "code.org"
   ],
-  "version": "0.0.0-alpha.0",
+  "homepage": "https://github.com/code-dot-org/code-dot-org/blob/staging/frontend/packages/dsco/#readme",
+  "bugs": {
+    "url": "https://github.com/code-dot-org/code-dot-org/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/code-dot-org/code-dot-org.git",
+    "directory": "frontend/packages/dsco"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "sideEffects": false,
+  "main": "components/index.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "NODE_OPTIONS='--max-old-space-size=8192' tsup --dts",
     "build:fast": "tsup",
-    "dev": "yarn build:fast --watch",
     "clean": "rimraf dist .turbo",
-    "typecheck": "tsc --noEmit",
+    "dev": "yarn build:fast --watch",
+    "lint": "eslint . && prettier --check .",
+    "lint:fix": "eslint --fix . && prettier --write .",
     "prepack": "clean-package",
-    "postpack": "clean-package restore"
+    "postpack": "clean-package restore",
+    "typecheck": "tsc --noEmit"
   },
+  "prettier": "@code-dot-org/lint-config/prettier",
   "dependencies": {
     "classnames": "^2.5.1",
     "lodash": "^4.17.21",
@@ -21,6 +39,7 @@
   },
   "devDependencies": {
     "@code-dot-org/legacy-css": "workspace:*",
+    "@code-dot-org/lint-config": "workspace:*",
     "@testing-library/jest-dom": "^6.6.3",
     "@types/lodash": "^4",
     "@types/node": "^22.9.0",
@@ -29,35 +48,21 @@
     "glob": "^11.0.0",
     "postcss": "^8.4.49",
     "postcss-modules": "^6.0.1",
+    "prettier": "3.3.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "rimraf": "^6.0.1",
     "tsup": "^8.3.5"
   },
-  "homepage": "https://github.com/code-dot-org/code-dot-org/blob/staging/frontend/packages/dsco/#readme",
-  "license": "SEE LICENSE IN LICENSE",
-  "main": "components/index.ts",
-  "sideEffects": false,
-  "files": [
-    "dist"
-  ],
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/code-dot-org/code-dot-org.git",
-    "directory": "frontend/packages/dsco"
-  },
-  "bugs": {
-    "url": "https://github.com/code-dot-org/code-dot-org/issues"
+  "peerDependencies": {
+    "react": ">=16",
+    "react-dom": ">=16"
   },
   "engines": {
     "node": ">=22"
   },
-  "peerDependencies": {
-    "react": ">=16",
-    "react-dom": ">=16"
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "clean-package": "./clean-package.config.js"
 }
