@@ -11,10 +11,18 @@ services, you can follow these instructions.
 
 First, install docker using [the instructions below](#installing-docker). Then follow the
 normal [SETUP.md](../../SETUP.md) instructions for your platform.  You can skip over many
-steps that are related to running mysql and redis.
+steps that are related to running MySQL and Redis.
 
-Instead, once you have a working Ruby and Node environment, you can then use this command
-to spin up the database and redis servers:
+> **Note** If you are already running MySQL and/or Redis natively, you may
+> depending on your operating system need to stop those services or the `docker
+> compose run` command below will fail due to in-use ports:
+> ```shell
+> sudo systemctl stop mysql
+> sudo systemctl stop redis
+> ```
+
+Once you have a working Ruby and Node environment, you can then use this command to spin
+up the database and Redis servers:
 
 ```shell
 docker compose run dashboard-services
@@ -23,7 +31,7 @@ docker compose run dashboard-services
 This will tell you which items you will need to place in your `locals.yml` file for the
 server to connect to the contained database.
 
-Just copy those lines into your `locals.yml` and start your Dashboard server via:
+Just copy those lines into your `locals.yml` and start your Dashboard server as normal via:
 
 ```shell
 ./bin/dashboard-server
