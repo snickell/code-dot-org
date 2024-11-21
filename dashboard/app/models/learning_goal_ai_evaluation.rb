@@ -9,7 +9,7 @@
 #  ai_confidence             :integer
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
-#  observations              :text(16777215)
+#  observations              :text(65535)
 #  ai_confidence_exact_match :integer
 #  evidence                  :text(65535)
 #
