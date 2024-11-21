@@ -6,14 +6,38 @@
 
 ## Installing Docker
 
-Our Docker development environment requires at least Docker Compose version 2.23 or higher.
-These instructions will walk you through installing a compatible version.
+Our Docker development environment requires at least [Docker
+Compose](https://docs.docker.com/compose/) version 2.23 or higher, as well as a
+compatible installation of [Docker Engine](https://docs.docker.com/engine/). If
+you'd like a GUI interface and a one-click installation process, consider
+[Docker Desktop](https://docs.docker.com/desktop/) as an optional alternative
+to manual installation.
 
-To install Docker, see the appropriate section below:
-[macOS](#macos), [Ubuntu](#ubuntu), [Windows](#windows)
-or consult your package management for your OS.
+### Official Installation Instructions
+
+The official documentation for each service will be the most up-to-date and
+officially-supported way to install each service, but may not cover every edge
+case for your local development environment:
+
+- [Docker Engine](https://docs.docker.com/engine/install/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+- Docker Desktop ([Mac](https://docs.docker.com/desktop/setup/install/mac-install/), [Windows](https://docs.docker.com/desktop/setup/install/windows-install/), [Linux](https://docs.docker.com/desktop/setup/install/linux/))
+
+Alternatively, consider consulting your package management for your OS.
+
+### Code.org Installation Instructions
+
+Below are installation steps which have worked for other code.org engineers to
+install the specific requirements needed for our setup. See the appropriate
+section below: [macOS](#macos), [Ubuntu](#ubuntu), [Windows](#windows)
 
 ### macOS
+
+> **Note** Mac support is currently limited; in part because of the performance
+> issues when trying to run our stack within the hypervisor that MacOS runs
+> docker inside of, in part because of the architectural differences between
+> different Apple chips, and in part because of the lack of test devices among
+> developers who have worked on this so far.
 
 1. Install Docker itself:
 ```shell
@@ -21,13 +45,12 @@ brew install docker
 ```
 
 1. Install Docker Compose:
-    1. ```shell
-       export DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
-       mkdir -p $DOCKER_CONFIG/cli-plugins
-       curl -SL https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-darwin-$(uname -m) -o $DOCKER_CONFIG/cli-plugins/docker-compose
-       chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
-       ```
-    1. You can inspect that the version is appropriate by running `docker compose version` and inspecting the result.
+    - ```shell
+      export DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+      mkdir -p $DOCKER_CONFIG/cli-plugins
+      curl -SL https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-darwin-$(uname -m) -o $DOCKER_CONFIG/cli-plugins/docker-compose
+      chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+      ```
 
 1. Install Colima as a container runtime:
 ```shell
@@ -37,11 +60,6 @@ brew install colima
 1. Start the Colima service (and have it start on login)
 ```shell
 brew services start colima
-```
-
-1. Verify that Docker works
-```shell
-docker run --rm hello-world
 ```
 
 ### Ubuntu
@@ -65,19 +83,13 @@ sudo systemctl start docker
 sudo usermod -aG docker ${USER}
 ```
 
-1. Verify that Docker works without root (You may need to restart your terminal session.)
-```shell
-docker run hello-world
-```
-
 1. Install Docker Compose:
-    1. ```shell
-       export DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
-       mkdir -p $DOCKER_CONFIG/cli-plugins
-       curl -SL https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-linux-$(uname -m) -o $DOCKER_CONFIG/cli-plugins/docker-compose
-       chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
-       ```
-    1. You can inspect that the version is appropriate by running `docker compose version` and inspecting the result.
+    - ```shell
+      export DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+      mkdir -p $DOCKER_CONFIG/cli-plugins
+      curl -SL https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-linux-$(uname -m) -o $DOCKER_CONFIG/cli-plugins/docker-compose
+      chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+      ```
 
 ### Windows
 
@@ -91,9 +103,13 @@ When you install that, you will need to follow the instructions in that app to e
 
 1. Start your WSL Ubuntu session.
 
-1. Verify Docker works:
+## Verifying Successful Installation
+
+Once Docker with Docker Compose has been installed:
+
+1. Verify Docker works without root (you may need to restart your terminal session):
 ```shell
-docker run hello-world
+docker run --rm hello-world
 ```
 
 1. Verify Docker Compose version is at least 2.23.
@@ -105,7 +121,7 @@ docker compose version
 
 If you want to run the server code natively, but leverage Docker to run the dependent services, you can follow these instructions.
 
-First, you want to follow the normal [SETUP.md](SETUP.md) instructions for your platform.
+First, you want to follow the normal [SETUP.md](../../SETUP.md) instructions for your platform.
 You can skip over many steps that are related to running mysql and redis.
 
 Instead, once you have a working Ruby and Node environment, you can then use this command to spin up the database and redis servers:
