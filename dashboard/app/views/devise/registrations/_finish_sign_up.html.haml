@@ -1,6 +1,6 @@
 - require '../shared/middleware/helpers/experiments'
 - require 'policies/lti'
-- SignUpTracking.log_load_finish_sign_up session, (@user.provider || 'email')
+- SignUpTracking.log_load_finish_sign_up request, (@user.provider || 'email')
 - require 'cpa'
 - require 'geocoder'
 - location = Geocoder.search(request.ip).try(:first)
@@ -248,7 +248,8 @@
   script_data = {
     signup: {
       usIp: us_ip,
-      signUpUID: "#{session[:sign_up_uid]}"
+      signUpUID: "#{session[:sign_up_uid]}",
+      isLTI: is_lti
     }.to_json
   }
 %script{src: webpack_asset_path('js/devise/registrations/_finish_sign_up.js'), data: script_data}

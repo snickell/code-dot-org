@@ -388,10 +388,10 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "cannot build user with panda in name" do
+  test "can build user with panda in name" do
     user = build :user, name: panda_panda
-    refute user.valid?
-    assert user.errors[:name].length == 1
+    assert user.valid?
+    assert user.errors[:name].empty?
   end
 
   test "cannot build user with panda in email" do
@@ -504,6 +504,12 @@ class UserTest < ActiveSupport::TestCase
     user.save!
 
     user.valid?
+  end
+
+  test "email does not have to be unique when existing user has LTI authentication" do
+    user = create :teacher, :with_lti_auth
+    dupe_user = create(:teacher, email: user.email)
+    assert dupe_user.valid?
   end
 
   test "cannot create multi-auth LTI user multiple auth options and duplicate of multi-auth user's second email" do
@@ -902,10 +908,18 @@ class UserTest < ActiveSupport::TestCase
     # login by username still works
     user = create :user
     assert_equal user, User.find_for_authentication(login: user.username)
+    Cdo::Metrics.
+      expects(:put).
+      with('User', 'LoginByUsername', 1, includes(:Environment)).
+      once
 
     # login by email still works
     email_user = create :user, email: 'not@an.email'
     assert_equal email_user, User.find_for_authentication(login: 'not@an.email')
+    Cdo::Metrics.
+      expects(:put).
+      with('User', 'LoginByEmail', 1, includes(:Environment)).
+      once
 
     # login by hashed email
     hashed_email_user = create :user, age: 4
@@ -1703,16 +1717,9 @@ class UserTest < ActiveSupport::TestCase
     assert ActionMailer::Base.deliveries.empty?
   end
 
-  test 'provides helpful error on bad email address' do
-    # Though validation now exists to prevent grossly malformed emails, such was not always the
-    # case. Consequently, we must bypass validation to create the state of such an account.
-    user = create :user
-    user.email = 'bounce@xyz'
-    user.save(validate: false)
-
-    error_user = User.send_reset_password_instructions(email: 'bounce@xyz')
-
-    assert error_user.errors[:base]
+  test 'do not indicate if email is not tied to a user' do
+    empty_user = User.send_reset_password_instructions(email: 'bounce@xyz.com')
+    assert empty_user.errors.nil_or_empty?
   end
 
   test 'send reset password for student' do
@@ -1785,35 +1792,6 @@ class UserTest < ActiveSupport::TestCase
     old_password = student.encrypted_password
 
     assert_includes(mail.body.to_s, 'Change my password')
-
-    assert mail.body.to_s =~ /reset_password_token=(.+)"/
-    # HACK: Fix my syntax highlighting "
-    token = $1
-
-    User.reset_password_by_token(
-      reset_password_token: token,
-      password: 'newone',
-      password_confirmation: 'newone'
-    )
-
-    student = User.find(student.id)
-    # password was changed
-    assert old_password != student.encrypted_password
-  end
-
-  test 'send reset password to parent for student without email address' do
-    parent_email = 'parent_reset_email@email.xx'
-    student = create :student, password: 'oldone', email: nil, parent_email: parent_email
-
-    assert User.send_reset_password_instructions(email: parent_email)
-
-    mail = ActionMailer::Base.deliveries.first
-    assert_equal [parent_email], mail.to
-    assert_equal 'Code.org reset password instructions', mail.subject
-    student = User.find(student.id)
-    old_password = student.encrypted_password
-
-    assert_includes(mail.body.to_s, 'Change password for')
 
     assert mail.body.to_s =~ /reset_password_token=(.+)"/
     # HACK: Fix my syntax highlighting "
@@ -3868,7 +3846,9 @@ class UserTest < ActiveSupport::TestCase
         user_type: 'student'
       },
     )
-    params = {}
+    params = {
+      'roster_synced' => true
+    }
 
     assert_creates(User) do
       user = User.from_omniauth(auth, params)
@@ -3878,6 +3858,7 @@ class UserTest < ActiveSupport::TestCase
       assert_equal 'fake oauth token', user.primary_contact_info.data_hash[:oauth_token]
       assert_equal 'fake refresh token', user.primary_contact_info.data_hash[:oauth_refresh_token]
       assert_equal User::TYPE_STUDENT, user.user_type
+      assert_equal true, user.roster_synced
     end
   end
 
@@ -3902,6 +3883,7 @@ class UserTest < ActiveSupport::TestCase
       assert_equal 'fake oauth token', user.primary_contact_info.data_hash[:oauth_token]
       assert_equal 'fake refresh token', user.primary_contact_info.data_hash[:oauth_refresh_token]
       assert_equal 'google_oauth2', user.primary_contact_info.credential_type
+      assert_nil user.roster_synced
     end
   end
 

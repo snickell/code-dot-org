@@ -86,7 +86,6 @@ class HttpCache
     starwarsblocks
     mc
     frozen
-    gumball
     minecraft
     hero
     sports
@@ -101,6 +100,7 @@ class HttpCache
     hello-world-emoji-2021
     hello-world-space-2022
     hello-world-soccer-2022
+    music-jam-2024
     outbreak
   ).map do |script_name|
     # Most scripts use the default route pattern.
@@ -149,6 +149,10 @@ class HttpCache
       default_cookies << Rack::GeolocationOverride::KEY
     end
 
+    # Allows setting of Global Edition Region via cookies. See: Rack::GlobalEdition
+    require 'cdo/rack/global_edition'
+    default_cookies << Rack::GlobalEdition::REGION_KEY
+
     # These cookies are allowlisted on all session-specific (not cached) pages.
     allowlisted_cookies = [
       'hour_of_code',
@@ -160,8 +164,10 @@ class HttpCache
       'rack.session',
       'remember_user_token',
       '__profilin', # Used by rack-mini-profiler
+      'statsig_stable_id',
       session_key,
       storage_id,
+      'new_sign_up_user_type',
     ].concat(default_cookies)
 
     {
