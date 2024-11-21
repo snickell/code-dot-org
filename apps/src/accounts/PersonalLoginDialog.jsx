@@ -25,7 +25,26 @@ export default class PersonalLoginDialog extends React.Component {
 
   render() {
     const {isOpen, dependentStudentsCount, onCancel, onConfirm} = this.props;
-
+    const PersonalLoggingDeleteAccountDialog = () => (
+      <>
+        <p>
+          {i18n.personalLoginDialog_body3()}
+          <strong>{i18n.personalLoginDialog_body4()}</strong>
+          {i18n.personalLoginDialog_body5()}
+        </p>
+        <Button
+          __useDeprecatedTag
+          text={i18n.removeStudentSendHomeInstructions()}
+          target="_blank"
+          href={ADD_A_PERSONAL_LOGIN_HELP_URL}
+          color={Button.ButtonColor.blue}
+          size={Button.ButtonSize.large}
+          style={styles.button}
+          tabIndex="1"
+        />
+        <p>{i18n.personalLoginDialog_body6()}</p>
+      </>
+    );
     return (
       <BaseDialog
         useUpdatedStyles
@@ -46,26 +65,7 @@ export default class PersonalLoginDialog extends React.Component {
             </strong>
           </p>
           <GlobalRegionWrapper
-            component={() => (
-              <div>
-                <p>
-                  {i18n.personalLoginDialog_body3()}
-                  <strong>{i18n.personalLoginDialog_body4()}</strong>
-                  {i18n.personalLoginDialog_body5()}
-                </p>
-                <Button
-                  __useDeprecatedTag
-                  text={i18n.removeStudentSendHomeInstructions()}
-                  target="_blank"
-                  href={ADD_A_PERSONAL_LOGIN_HELP_URL}
-                  color={Button.ButtonColor.blue}
-                  size={Button.ButtonSize.large}
-                  style={styles.button}
-                  tabIndex="1"
-                />
-                <p>{i18n.personalLoginDialog_body6()}</p>
-              </div>
-            )}
+            component={PersonalLoggingDeleteAccountDialog}
             componentId="PersonalLoggingDeleteAccountDialog"
           />
           <ConfirmCancelFooter

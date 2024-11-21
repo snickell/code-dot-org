@@ -182,7 +182,7 @@ pages:
       IncubatorBanner: false
   - path: /users/edit
     components:
-      AccountInfoHeader: false
+      LtiRosterSyncSettings: false
       PersonalLoggingDeleteAccountDialog: false
       DeleteAccountPersonalLoginInstructions: false
 

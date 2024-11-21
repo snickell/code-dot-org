@@ -8,7 +8,6 @@ import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
 import Link from '@cdo/apps/componentLibrary/link/Link';
 import TextField from '@cdo/apps/componentLibrary/textField/TextField';
 import {Heading2} from '@cdo/apps/componentLibrary/typography';
-import GlobalRegionWrapper from '@cdo/apps/templates/GlobalRegionWrapper';
 import {getAuthenticityToken} from '@cdo/apps/util/AuthenticityTokenStore';
 import i18n from '@cdo/locale';
 
@@ -220,21 +219,12 @@ export const AccountInformation: React.FC<AccountInformationProps> = ({
   return (
     <>
       <hr />
-      <GlobalRegionWrapper
-        component={() => (
-          <Heading2
-            visualAppearance="heading-sm"
-            className={commonStyles.sectionHeader}
-          >
-            {i18n.accountInformation_accountInformation()}
-          </Heading2>
-        )}
-        componentId="AccountInfoHeader"
-        props={{
-          isInV1Navigaton: false,
-        }}
-      />
-
+      <Heading2
+        visualAppearance="heading-sm"
+        className={commonStyles.sectionHeader}
+      >
+        {i18n.accountInformation_accountInformation()}
+      </Heading2>
       <form name="account-information-form" className={styles.accountForm}>
         <div className={commonStyles.inputContainer}>
           {/* verified teacher account */}

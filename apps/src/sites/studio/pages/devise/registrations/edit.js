@@ -16,6 +16,7 @@ import {SchoolInformation} from '@cdo/apps/accounts/SchoolInformation';
 import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {getStore} from '@cdo/apps/redux';
+import GlobalRegionWrapper from '@cdo/apps/templates/GlobalRegionWrapper';
 import LockoutLinkedAccounts from '@cdo/apps/templates/policy_compliance/LockoutLinkedAccounts';
 import color from '@cdo/apps/util/color';
 import getScriptData from '@cdo/apps/util/getScriptData';
@@ -109,14 +110,17 @@ $(document).ready(() => {
     document.getElementById('lti-sync-settings');
   if (ltiSyncSettingsMountPoint) {
     ReactDOM.render(
-      <LtiRosterSyncSettings
-        ltiRosterSyncEnabled={
-          ltiSyncSettingsMountPoint.getAttribute(
-            'data-lti-roster-sync-enabled'
-          ) === 'true'
-        }
-        formId={'lti-sync-settings-form'}
-        lmsName={lmsName}
+      <GlobalRegionWrapper
+        component={LtiRosterSyncSettings}
+        componentId="LtiRosterSyncSettings"
+        props={{
+          ltiRosterSyncEnabled:
+            ltiSyncSettingsMountPoint.getAttribute(
+              'data-lti-roster-sync-enabled'
+            ) === 'true',
+          formId: 'lti-sync-settings-form',
+          lmsName: lmsName,
+        }}
       />,
       ltiSyncSettingsMountPoint
     );
