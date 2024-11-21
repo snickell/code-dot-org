@@ -46,6 +46,7 @@ module SharedConstants
     {
       click_help_and_tips: "click_help_and_tips",
       click_run: "click_run",
+      click_finish: "click_finish",
     }
   ).freeze
 

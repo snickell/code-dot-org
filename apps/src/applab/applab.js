@@ -1299,6 +1299,13 @@ function onInterfaceModeChange(mode) {
 }
 
 Applab.onPuzzleFinish = function () {
+  const levelId = studioApp().config.serverLevelId;
+  const scriptId = studioApp().config.serverScriptId;
+  logUserLevelInteraction({
+    levelId: levelId,
+    scriptId: scriptId,
+    interaction: UserLevelInteractions.click_finish,
+  });
   Applab.onPuzzleComplete(false); // complete without submitting
 };
 
