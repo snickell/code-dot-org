@@ -1222,6 +1222,7 @@
   "enterYourSchoolZip": "Enter your school's zip code:",
   "enrollmentCelebrationTitle": "You've been enrolled!",
   "enrollmentCelebrationBody": "You've successfully been enrolled for {workshopName}. You can see the workshop and additional information in your professional learning center.",
+  "enrollmentCelebrationAddToCalendar": "Add to your calendar:",
   "enrollmentCelebrationCallToAction": "Go to my professional learning",
   "enrollmentDescription": "Join your teacher's classroom by entering their section code below. Teachers will be able to see your course progress, projects, and reset your password in case you forget it.",
   "equalTo": "Equal to",
