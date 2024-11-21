@@ -81,7 +81,7 @@ class Incubator extends Component {
             marginBottom="20px"
             buttons={[
               {
-                url: 'https://studio.code.org/courses/exploring-gen-ai-2024?section_id=5618725',
+                url: '/courses/exploring-gen-ai-2024',
                 text: i18n.incubator_genai_course_button(),
               },
               {
