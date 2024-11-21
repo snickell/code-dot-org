@@ -1,6 +1,6 @@
 - require 'cdo/footer'
 - full_width = local_assigns[:full_width]
-- options = {ge_region: params[:ge_region]}
+- options = {ge_region: request.ge_region}
 - footer_contents = Cdo::Footer.get_footer_contents(options)
 - locale_options = Cdo::Footer.get_locale_options(options)
 .navbar-static-top.footer
