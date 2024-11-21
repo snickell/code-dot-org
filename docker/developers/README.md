@@ -13,9 +13,12 @@ First, install docker using [the instructions below](#installing-docker). Then f
 normal [SETUP.md](../../SETUP.md) instructions for your platform.  You can skip over many
 steps that are related to running MySQL and Redis.
 
-> **Note** If you are already running MySQL and/or Redis natively, you may
-> depending on your operating system need to stop those services or the `docker
-> compose run` command below will fail due to in-use ports:
+> **Note**
+>
+> If you are already running MySQL and/or Redis natively, you may depending on your
+> operating system need to stop those services or the `docker compose run` command below
+> will fail due to in-use ports:
+>
 > ```shell
 > sudo systemctl stop mysql
 > sudo systemctl stop redis
@@ -68,66 +71,67 @@ specific requirements needed for our setup. See the appropriate section below:
 
 ### macOS
 
-> **Note** Mac support is currently limited; in part because of the performance issues
-> when trying to run our stack within the hypervisor that MacOS runs docker inside of, in
-> part because of the architectural differences between different Apple chips, and in part
-> because of the lack of test devices among developers who have worked on this so far.
+> **Note**
+>
+> Mac support is currently limited; in part because of the performance issues when trying
+> to run our stack within the hypervisor that MacOS runs docker inside of, in part because
+> of the architectural differences between different Apple chips, and in part because of
+> the lack of test devices among developers who have worked on this so far.
 
 1. Install Docker itself:
-```shell
-brew install docker
-```
+   ```shell
+   brew install docker
+   ```
 
 1. Install Docker Compose:
-    - ```shell
-      export DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
-      mkdir -p $DOCKER_CONFIG/cli-plugins
-      curl -SL https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-darwin-$(uname -m) -o $DOCKER_CONFIG/cli-plugins/docker-compose
-      chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
-      ```
+   ```shell
+   export DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+   mkdir -p $DOCKER_CONFIG/cli-plugins
+   curl -SL https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-darwin-$(uname -m) -o $DOCKER_CONFIG/cli-plugins/docker-compose
+   chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+   ```
 
 1. Install Colima as a container runtime:
-```shell
-brew install colima
-```
+   ```shell
+   brew install colima
+   ```
 
 1. Start the Colima service (and have it start on login)
-```shell
-brew services start colima
-```
+   ```shell
+   brew services start colima
+   ```
 
 ### Ubuntu
 
 1. Open a terminal.
 
 1. Install Docker via `apt`:
-
-```shell
-sudo apt update && sudo apt install docker.io
-```
+   ```shell
+   sudo apt update && sudo apt install docker.io
+   ```
 
 1. Enable and start the Docker service
-```shell
-sudo systemctl enable docker
-sudo systemctl start docker
-```
+   ```shell
+   sudo systemctl enable docker
+   sudo systemctl start docker
+   ```
 
 1. Give your account privileges to run Docker
-```shell
-sudo usermod -aG docker ${USER}
-```
+   ```shell
+   sudo usermod -aG docker ${USER}
+   ```
 
 1. Install Docker Compose:
-    - ```shell
-      export DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
-      mkdir -p $DOCKER_CONFIG/cli-plugins
-      curl -SL https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-linux-$(uname -m) -o $DOCKER_CONFIG/cli-plugins/docker-compose
-      chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
-      ```
+   ```shell
+   export DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+   mkdir -p $DOCKER_CONFIG/cli-plugins
+   curl -SL https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-linux-$(uname -m) -o $DOCKER_CONFIG/cli-plugins/docker-compose
+   chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+   ```
 
 ### Windows
 
-Docker on Windows is facilitated with the Docker Desktop application which you can find
+Docker on Windows is facilitated with the Docker Desktop application, which you can find
 [here](https://www.docker.com/products/docker-desktop/).
 
 When you install that, you will need to follow the instructions in that app to enable
@@ -148,11 +152,11 @@ found [here](https://docs.docker.com/desktop/install/windows-install/) that may 
 Once Docker with Docker Compose has been installed:
 
 1. Verify Docker works without root (you may need to restart your terminal session):
-```shell
-docker run --rm hello-world
-```
+   ```shell
+   docker run --rm hello-world
+   ```
 
 1. Verify Docker Compose version is at least 2.23.
-```shell
-docker compose version
-```
+   ```shell
+   docker compose version
+   ```
