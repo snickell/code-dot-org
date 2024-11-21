@@ -1,4 +1,4 @@
-require 'cdo/global'
+require 'cdo/global_edition'
 
 module Cdo
   class Footer
