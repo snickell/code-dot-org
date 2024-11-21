@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 
 import Button from '@cdo/apps/legacySharedComponents/Button';
+import {pegasus} from '@cdo/apps/lib/util/urlHelpers';
 import TwoColumnActionBlock from '@cdo/apps/templates/studioHomepages/TwoColumnActionBlock';
 import i18n from '@cdo/locale';
 
@@ -85,7 +86,7 @@ class Incubator extends Component {
                 text: i18n.incubator_genai_course_button(),
               },
               {
-                url: 'https://code.org/curriculum/generative-ai',
+                url: pegasus('/curriculum/generative-ai'),
                 text: i18n.incubator_genai_marketing_button(),
               },
             ]}
