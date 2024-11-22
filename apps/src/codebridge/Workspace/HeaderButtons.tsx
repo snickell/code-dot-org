@@ -122,7 +122,6 @@ const WorkspaceHeaderButtons: React.FunctionComponent = () => {
     microbitFileSystem.write('main.py', pythonCode);
     const hexStrWithFiles = microbitFileSystem.getIntelHex();
 
-    // For now just flash the microPython without the user Python code and header code.
     // Intel Hex is currently in ASCII, do a 1-to-1 conversion from chars to bytes
     const hexAsBytes = new TextEncoder().encode(hexStrWithFiles);
     try {
