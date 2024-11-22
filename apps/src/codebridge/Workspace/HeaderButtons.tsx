@@ -4,6 +4,8 @@ import React, {useCallback} from 'react';
 
 import {Button, buttonColors} from '@cdo/apps/componentLibrary/button';
 import {TooltipProps, WithTooltip} from '@cdo/apps/componentLibrary/tooltip';
+import {MAIN_PYTHON_FILE} from '@cdo/apps/lab2/constants';
+import {MultiFileSource} from '@cdo/apps/lab2/types';
 import VersionHistoryButton from '@cdo/apps/lab2/views/components/versionHistory/VersionHistoryButton';
 import {useDialogControl, DialogType} from '@cdo/apps/lab2/views/dialogs';
 import {
@@ -31,7 +33,17 @@ const WorkspaceHeaderButtons: React.FunctionComponent = () => {
   const appName = useAppSelector(state => state.lab.levelProperties?.appName);
   const skipUrl = useAppSelector(state => state.lab.levelProperties?.skipUrl);
   const dialogControl = useDialogControl();
-
+  const source = useAppSelector(
+    state => state.lab2Project.projectSource?.source
+  ) as MultiFileSource | undefined;
+  const files = source?.files || {};
+  let pythonCode = '';
+  for (const file of Object.values(files as object)) {
+    if (file.name === MAIN_PYTHON_FILE) {
+      pythonCode = file.contents;
+    }
+  }
+  console.log('pythonCode', pythonCode);
   const feedbackTooltipProps: TooltipProps = {
     text: commonI18n.feedback(),
     direction: 'onLeft',
@@ -83,15 +95,16 @@ const WorkspaceHeaderButtons: React.FunctionComponent = () => {
       console.log('target', target);
       // TODO: Implement update percent.
 
-      /* TODO: Get updated .hex file that includes: 
+      /* TODO: Get modified .hex file that includes: 
         1. An identical copy of the base MicroPython .hex code file;
         2. A small header which marks a region as a MicroPython script (followed by the length of the script in bytes);
-        3. A verbatim copy of your Python program, complete with comments and any spaces.
-        Use uFlash package. https://github.com/ntoll/uflash
+        3. A verbatim copy of user's Python program, complete with comments and any spaces.
+        Ref: uFlash package (python implementation). https://github.com/ntoll/uflash
         See uflash implementation for mu editor at https://github.com/mu-editor/mu/blob/master/mu/modes/microbit.py
-      */
-
-      // For now just flash the Code.org Firmata
+        TS implementation in https://github.com/microbit-foundation/python-editor-v3
+        */
+      // Python code stored in pythonCode.
+      // For now just flash the Code.org Firmata.
       const firmataUrl =
         microBitVersion === MICROBIT_V1
           ? MICROBIT_FIRMATA_V1_URL
@@ -115,7 +128,7 @@ const WorkspaceHeaderButtons: React.FunctionComponent = () => {
   return (
     <div className={moduleStyles.rightHeaderButtons}>
       <Button
-        iconRight={{iconStyle: 'solid', iconName: 'exchange'}}
+        iconRight={{iconStyle: 'solid', iconName: 'arrow-right-from-arc'}}
         onClick={onClickFlash}
         size={'xs'}
         type={'tertiary'}
