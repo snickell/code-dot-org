@@ -43,7 +43,6 @@ const WorkspaceHeaderButtons: React.FunctionComponent = () => {
       pythonCode = file.contents;
     }
   }
-  console.log('pythonCode', pythonCode);
   const feedbackTooltipProps: TooltipProps = {
     text: commonI18n.feedback(),
     direction: 'onLeft',
@@ -73,8 +72,7 @@ const WorkspaceHeaderButtons: React.FunctionComponent = () => {
   }, [appName, dialogControl, skipUrl]);
 
   const onClickFlash = async () => {
-    console.log('flash micro:bit');
-    console.log('appName', appName);
+    console.log('flash file onto micro:bit');
     const device = await navigator.usb.requestDevice({
       filters: [{vendorId: MICROBIT_VENDOR_ID, productId: MICROBIT_PRODUCT_ID}],
     });
@@ -89,11 +87,16 @@ const WorkspaceHeaderButtons: React.FunctionComponent = () => {
       if (microBitVersion === null) {
         throw new Error('micro:bit version not detected correctly.');
       }
-      console.log('microbitId microBitVersion', microBitId, microBitVersion);
       const transport = new WebUSB(device);
       const target = new DAPLink(transport);
-      console.log('target', target);
-      // TODO: Implement update percent.
+      target.on(DAPLink.EVENT_PROGRESS, progress => {
+        if (Math.floor(progress * 100) % 10 === 0) {
+          console.log('progress percent', Math.floor(progress * 100));
+        }
+        if (progress === 1) {
+          console.log('FLASH COMPLETE');
+        }
+      });
 
       /* TODO: Get modified .hex file that includes: 
         1. An identical copy of the base MicroPython .hex code file;
@@ -104,6 +107,7 @@ const WorkspaceHeaderButtons: React.FunctionComponent = () => {
         TS implementation in https://github.com/microbit-foundation/python-editor-v3
         */
       // Python code stored in pythonCode.
+      console.log('pythonCode', pythonCode);
       // For now just flash the Code.org Firmata.
       const firmataUrl =
         microBitVersion === MICROBIT_V1
