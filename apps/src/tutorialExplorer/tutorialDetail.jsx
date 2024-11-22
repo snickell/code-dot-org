@@ -120,9 +120,7 @@ export default class TutorialDetail extends React.Component {
       // Reserve key 8 for the optional standards.
     ];
 
-    const imageSrc = this.props.item.image
-      .replace('/images/', '/images/fill-480x360/')
-      .replace('.png', '.jpg');
+    const imageSrc = this.props.item.image.replace('.png', '.jpg');
 
     const imageComponent = (
       <div style={styles.tutorialDetailImageBounds}>
