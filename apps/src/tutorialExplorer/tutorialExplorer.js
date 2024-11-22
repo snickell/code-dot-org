@@ -793,6 +793,14 @@ function getUrlParameters(filters) {
 
 window.TutorialExplorerManager = function (options) {
   options.mobile = mobileCheck();
+  options.tutorials.forEach(tutorial => {
+    if (
+      ['Code.org', 'Mojang, Microsoft and Code.org'].includes(tutorial.orgname)
+    ) {
+      tutorial.tags = 'do-not-show';
+    }
+  });
+
   let {filters, initialFilters, hideFilters} = getFilters(options);
 
   // Check for URL-based override of initialFilters.
