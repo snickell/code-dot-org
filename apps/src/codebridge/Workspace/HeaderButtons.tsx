@@ -15,8 +15,8 @@ import {
   MICROBIT_IDS_V2,
   MICROBIT_V1,
   MICROBIT_V2,
-  MICROBIT_FIRMATA_V1_URL,
-  MICROBIT_FIRMATA_V2_URL,
+  MICROBIT_MICROPYTHON_V1_URL,
+  MICROBIT_MICROPYTHON_V2_URL,
 } from '@cdo/apps/maker/boards/microBit/MicroBitConstants';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
@@ -77,55 +77,56 @@ const WorkspaceHeaderButtons: React.FunctionComponent = () => {
       filters: [{vendorId: MICROBIT_VENDOR_ID, productId: MICROBIT_PRODUCT_ID}],
     });
     const microBitId = device.serialNumber?.substring(0, 4);
-    if (microBitId) {
-      let microBitVersion = null;
-      if (MICROBIT_IDS_V1.includes(microBitId)) {
-        microBitVersion = MICROBIT_V1;
-      } else if (MICROBIT_IDS_V2.includes(microBitId)) {
-        microBitVersion = MICROBIT_V2;
-      }
-      if (microBitVersion === null) {
-        throw new Error('micro:bit version not detected correctly.');
-      }
-      const transport = new WebUSB(device);
-      const target = new DAPLink(transport);
-      target.on(DAPLink.EVENT_PROGRESS, progress => {
-        if (Math.floor(progress * 100) % 10 === 0) {
-          console.log('progress percent', Math.floor(progress * 100));
-        }
-        if (progress === 1) {
-          console.log('FLASH COMPLETE');
-        }
-      });
+    if (!microBitId) {
+      throw new Error('micro:bit version not detected correctly.');
+    }
 
-      /* TODO: Get modified .hex file that includes: 
-        1. An identical copy of the base MicroPython .hex code file;
-        2. A small header which marks a region as a MicroPython script (followed by the length of the script in bytes);
-        3. A verbatim copy of user's Python program, complete with comments and any spaces.
-        Ref: uFlash package (python implementation). https://github.com/ntoll/uflash
-        See uflash implementation for mu editor at https://github.com/mu-editor/mu/blob/master/mu/modes/microbit.py
-        TS implementation in https://github.com/microbit-foundation/python-editor-v3
-        */
-      // Python code stored in pythonCode.
-      console.log('pythonCode', pythonCode);
-      // For now just flash the Code.org Firmata.
-      const firmataUrl =
-        microBitVersion === MICROBIT_V1
-          ? MICROBIT_FIRMATA_V1_URL
-          : MICROBIT_FIRMATA_V2_URL;
-      const result = await fetch(firmataUrl);
-      const hexStr = await result.text();
-      // Intel Hex is currently in ASCII, do a 1-to-1 conversion from chars to bytes
-      const hexAsBytes = new TextEncoder().encode(hexStr);
-      try {
-        // Push binary to board
-        await target.connect();
-        await target.flash(hexAsBytes);
-        await target.disconnect();
-      } catch (error) {
-        console.log(error);
-        return Promise.reject('Failed to send program to micro:bit.');
+    let microBitVersion = null;
+    if (MICROBIT_IDS_V1.includes(microBitId)) {
+      microBitVersion = MICROBIT_V1;
+    } else if (MICROBIT_IDS_V2.includes(microBitId)) {
+      microBitVersion = MICROBIT_V2;
+    }
+    if (microBitVersion === null) {
+      throw new Error('micro:bit version not detected correctly.');
+    }
+    const transport = new WebUSB(device);
+    const target = new DAPLink(transport);
+    target.on(DAPLink.EVENT_PROGRESS, progress => {
+      if (Math.floor(progress * 100) % 10 === 0) {
+        console.log('progress percent', Math.floor(progress * 100));
       }
+      if (progress === 1) {
+        console.log('FLASH COMPLETE');
+      }
+    });
+
+    /* TODO: Get modified .hex file that includes: 
+        1. An identical copy of the base MicroPython .hex code file,
+        2. A small header which marks a region as a MicroPython script (followed by the length of the script in bytes),
+        3. A verbatim copy of user's Python program, complete with comments and any spaces.
+    */
+    // Python code stored in pythonCode.
+    const microPythonUrl =
+      microBitVersion === MICROBIT_V1
+        ? MICROBIT_MICROPYTHON_V1_URL
+        : MICROBIT_MICROPYTHON_V2_URL;
+    const microPython = await fetch(microPythonUrl);
+    const hexStr = await microPython.text();
+    console.log('hexStr', hexStr.substring(0, 100));
+
+    console.log('pythonCode', pythonCode);
+    // For now just flash the microPython without the user Python code and header code.
+    // Intel Hex is currently in ASCII, do a 1-to-1 conversion from chars to bytes
+    const hexAsBytes = new TextEncoder().encode(hexStr);
+    try {
+      // Push binary to board
+      await target.connect();
+      await target.flash(hexAsBytes);
+      await target.disconnect();
+    } catch (error) {
+      console.log(error);
+      return Promise.reject('Failed to send program to micro:bit.');
     }
   };
 
