@@ -196,7 +196,7 @@ class HomeControllerTest < ActionController::TestCase
 
     get :set_locale, params: {user_return_to: "/blahblah", locale: "es-ES"}
 
-    assert_redirected_to 'http://studio.code.org/blahblah?set_locale=es-ES&lang=es-ES'
+    assert_redirected_to 'http://studio.code.org/blahblah?set_locale=es-ES&lang=es-ES&ge_region'
   end
 
   test "handle nonsense in user_return_to by returning to home" do
@@ -215,13 +215,13 @@ class HomeControllerTest < ActionController::TestCase
       user_return_to: "http://blah.com/blerg",
       locale: "es-ES"
     }
-    assert_redirected_to 'http://studio.code.org/blerg?set_locale=es-ES&lang=es-ES'
+    assert_redirected_to 'http://studio.code.org/blerg?set_locale=es-ES&lang=es-ES&ge_region'
   end
 
   test "if user_return_to in set_locale is nil redirects to homepage" do
     request.host = "studio.code.org"
     get :set_locale, params: {user_return_to: nil, locale: "es-ES"}
-    assert_redirected_to 'http://studio.code.org?set_locale=es-ES&lang=es-ES'
+    assert_redirected_to 'http://studio.code.org?set_locale=es-ES&lang=es-ES&ge_region'
   end
 
   test "should get index with edmodo header" do
