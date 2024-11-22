@@ -3,10 +3,6 @@
  *
  * SPDX-License-Identifier: MIT
  */
-import {
-  IntelHexWithId,
-  // getIntelHexAppendedScript,
-  // MicropythonFsHex,
-} from '@microbit/microbit-fs';
+import {IntelHexWithId} from '@microbit/microbit-fs';
 
 export type MicroPythonSource = () => Promise<IntelHexWithId[]>;

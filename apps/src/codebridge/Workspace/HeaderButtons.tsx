@@ -1,4 +1,5 @@
 import {sendCodebridgeAnalyticsEvent} from '@codebridge/utils/analyticsReporterHelper';
+import {MicropythonFsHex} from '@microbit/microbit-fs';
 import {DAPLink, WebUSB} from 'dapjs';
 import React, {useCallback} from 'react';
 
@@ -101,8 +102,8 @@ const WorkspaceHeaderButtons: React.FunctionComponent = () => {
       }
     });
 
-    /* TODO: Get modified .hex file that includes: 
-        1. An identical copy of the base MicroPython .hex code file,
+    /* Get modified .hex file that includes: 
+        1. An copy of the base MicroPython .hex code file,
         2. A small header which marks a region as a MicroPython script (followed by the length of the script in bytes),
         3. A verbatim copy of user's Python program, complete with comments and any spaces.
     */
@@ -112,13 +113,18 @@ const WorkspaceHeaderButtons: React.FunctionComponent = () => {
         ? MICROBIT_MICROPYTHON_V1_URL
         : MICROBIT_MICROPYTHON_V2_URL;
     const microPython = await fetch(microPythonUrl);
-    const hexStr = await microPython.text();
-    console.log('hexStr', hexStr.substring(0, 100));
+    const microPythonHexStr = await microPython.text();
 
-    console.log('pythonCode', pythonCode);
+    const commonFsSize = 20 * 1024;
+    const microbitFileSystem = new MicropythonFsHex(microPythonHexStr, {
+      maxFsSize: commonFsSize,
+    });
+    microbitFileSystem.write('main.py', pythonCode);
+    const hexStrWithFiles = microbitFileSystem.getIntelHex();
+
     // For now just flash the microPython without the user Python code and header code.
     // Intel Hex is currently in ASCII, do a 1-to-1 conversion from chars to bytes
-    const hexAsBytes = new TextEncoder().encode(hexStr);
+    const hexAsBytes = new TextEncoder().encode(hexStrWithFiles);
     try {
       // Push binary to board
       await target.connect();
