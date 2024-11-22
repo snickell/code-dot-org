@@ -8,6 +8,12 @@
   overflow: hidden;
   background: linear-gradient(110deg, #6977CD -10.82%, #BCDEDE 43.13%, #34DFE5 68.88%, #688AED 95.85%); }
 
+#pagefooter,
+#pageheader,
+section.banner p {
+  display: none;
+}
+
 #pageheader {
   background-color: rgba(255, 255, 255, 0.9); }
 
