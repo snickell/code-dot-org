@@ -5,7 +5,7 @@
 
 .controlsContainer {
   display: flex;
-  background-color: $neutral_dark90;
+  background-color: $light_gray_950;
   z-index: 70;
   border-radius: $default-border-radius;
   position: relative;
@@ -66,10 +66,7 @@
   background-color: #fca401;
   color: $neutral_light;
   margin: 0;
-
-  .text {
-    padding-left: 10px;
-  }
+  gap: 10px;
 
   .text,
   .icon {

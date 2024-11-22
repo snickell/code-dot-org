@@ -1,5 +1,6 @@
 require 'json'
 require_relative 'http_cache'
+require_relative '../state_abbr'
 
 # This is the source of truth for a set of constants that are shared between JS
 # and ruby code. generateSharedConstants.rb is the file that processes this and
@@ -10,6 +11,8 @@ require_relative 'http_cache'
 # result in changes to these other files.
 
 module SharedConstants
+  DEFAULT_LOCALE = 'en-US'.freeze
+
   # Used to communicate different types of levels
   LEVEL_KIND = OpenStruct.new(
     {
@@ -101,6 +104,8 @@ module SharedConstants
     poetry
     poetry_hoc
     thebadguys
+    music
+    pythonlab
   ).freeze
 
   # For privacy reasons, App Lab and Game Lab can only be shared if certain conditions are met. These project types can be shared if: the user is >= 13 years old and their teacher has NOT disabled sharing OR the user is < 13 and their teacher has enabled sharing.
@@ -631,7 +636,21 @@ module SharedConstants
     PII_VIOLATION: 1001,
     # Profanity Failure
     PROFANITY_VIOLATION: 1002,
+    # Request Too Large
+    REQUEST_TOO_LARGE: 1003,
+    # Student exceeded max number of evaluations per project
+    STUDENT_LIMIT_EXCEEDED: 1004,
+    # Teacher exceeded max number of evaluations per student per project
+    TEACHER_LIMIT_EXCEEDED: 1005,
   }.freeze
+
+  RUBRIC_AI_EVALUATION_LIMITS = {
+    # Maximum number of evaluations we will automatically run for a student per project
+    STUDENT_LIMIT: 10,
+
+    # Maximum number of evaluations a teacher can request for a rubric per student
+    TEACHER_LIMIT: 10
+  }
 
   EMAIL_LINKS = OpenStruct.new(
     {
@@ -646,8 +665,8 @@ module SharedConstants
 
   CHILD_ACCOUNT_COMPLIANCE_STATES = OpenStruct.new(
     {
+      GRACE_PERIOD: 'p',
       LOCKED_OUT: 'l',
-      REQUEST_SENT: 's',
       PERMISSION_GRANTED: 'g'
     }
   ).freeze
@@ -680,54 +699,107 @@ module SharedConstants
     },
   }.freeze
   CENSUS_CONSTANTS = OpenStruct.new(
-    {CURRENT_CENSUS_SCHOOL_YEAR: 2023}
+    {CURRENT_CENSUS_SCHOOL_YEAR: 2024}
+  )
+
+  CAP_LINKS = OpenStruct.new(
+    PARENTAL_CONSENT_GUIDE_URL: 'https://support.code.org/hc/en-us/articles/15465423491085-How-do-I-obtain-parent-or-guardian-permission-for-student-accounts',
   )
 
   LMS_LINKS = OpenStruct.new(
     {
       INTEGRATION_GUIDE_URL: 'https://support.code.org/hc/en-us/articles/23120014459405-Learning-Management-System-LMS-and-Single-Sign-On-SSO-Integrations-and-Support-for-Code-org',
       INSTALL_INSTRUCTIONS_URL: 'https://support.code.org/hc/en-us/articles/23621907533965-Install-Code-org-Integrations-for-your-Learning-Management-System',
-      INSTALL_GUIDE_FOR_CANVAS_URL: 'https://support.code.org/hc/en-us/articles/23123273783437-Install-the-Code-org-Integration-for-Canvas',
       ROSTER_SYNC_INSTRUCTIONS_URL: 'https://support.code.org/hc/en-us/articles/23621978654605-Sync-Rosters-with-your-Learning-Management-System',
-      INTEGRATION_EARLY_ACCESS_URL: 'https://docs.google.com/forms/d/e/1FAIpQLScjfVR4CZs8Utf5vI4mz3e1q8vdH6RNIgTUWygZXN0oovBSQg/viewform',
-      INTEGRATION_BUG_REPORT_URL: 'https://support.code.org/hc/en-us/requests/new?ticket_form_id=14998494738829&tf_23889708=lms_eaf',
       ADDITIONAL_FEEDBACK_URL: 'https://studio.code.org/form/lms_integration_modal_feedback',
+      # TODO(P20-873): Replace SUPPORTED_METHODS_URL with the link to the supported methods documentation
+      SUPPORTED_METHODS_URL: 'https://github.com/code-dot-org/code-dot-org/blob/staging/docs/lti-integration.md#option-2-manual-entry',
     }
   ).freeze
 
   # Current song manifest file name for Dance Party. Note that different manifests
   # can be tested using query params (?manifest=...), but once this value is updated
   # the default manifest will change for all users.
-  DANCE_SONG_MANIFEST_FILENAME = 'songManifest2024_v2.json'
+  DANCE_SONG_MANIFEST_FILENAME = 'songManifest2024_v4.json'
 
   # We should always specify a version for the LLM so the results don't unexpectedly change.
   # reference: https://platform.openai.com/docs/models/gpt-3-5
-  AI_TUTOR_CHAT_MODEL_VERISON = 'gpt-3.5-turbo-1106'
+  AI_TUTOR_CHAT_MODEL_VERISON = 'gpt-4o-2024-05-13'
+  AICHAT_SAFETY_MODEL_VERSION = 'gpt-4o-mini-2024-07-18'
 
-  # These reflect the 'status' of an AI Tutor Interaction
-  AI_TUTOR_INTERACTION_STATUS = {
+  # These reflect the 'status' of an AI Interaction,
+  # and are used in both AI Tutor and AI Chat.
+  AI_INTERACTION_STATUS = {
     ERROR: 'error',
     PII_VIOLATION: 'pii_violation',
     PROFANITY_VIOLATION: 'profanity_violation',
+    USER_INPUT_TOO_LARGE: 'user_input_too_large',
     OK: 'ok',
     UNKNOWN: 'unknown',
   }.freeze
 
-  # These are the types of assistance AI Tutor can provide
+  AI_TUTOR_INTERACTION_STATUS = AI_INTERACTION_STATUS
+
   AI_TUTOR_TYPES = {
     COMPILATION: 'compilation',
     VALIDATION: 'validation',
     GENERAL_CHAT: 'general_chat',
-  }.freeze
-
-  PII_TYPES = {
-    EMAIL: 'email',
-    PHONE: 'phone',
-    ADDRESS: 'address',
+    COMPLETION: 'completion',
   }.freeze
 
   USER_TYPES = OpenStruct.new(
     STUDENT: 'student',
     TEACHER: 'teacher',
   ).freeze
+
+  NON_SCHOOL_OPTIONS = OpenStruct.new(
+    SELECT_A_SCHOOL: 'selectASchool',
+    CLICK_TO_ADD: 'clickToAdd',
+    NO_SCHOOL_SETTING: 'noSchoolSetting'
+  ).freeze
+
+  AI_REQUEST_EXECUTION_STATUS = {
+    # The request has been created but has not yet been processed.
+    NOT_STARTED: 0,
+    # The request has been queued for processing.
+    QUEUED: 1,
+    # The request is currently being processed.
+    RUNNING: 2,
+    # The request was successfully processed.
+    SUCCESS: 3,
+    # The request failed to process for an unexpected reason.
+    FAILURE: 1000,
+    # Profanity detected in the user's input.
+    USER_PROFANITY: 1001,
+    # PII detected in the user's input.
+    USER_PII: 1002,
+    # Profanity detected in the model's output.
+    MODEL_PROFANITY: 1003,
+    # PII detected in the model's output.
+    MODEL_PII: 1004,
+    # The user input request exceeded the maximum token size allowed.
+    USER_INPUT_TOO_LARGE: 1005
+  }
+
+  AI_CHAT_MODEL_IDS = {
+    ARITHMO: "gen-ai-arithmo2-mistral-7b",
+    BIOMISTRAL: "gen-ai-biomistral-7b",
+    MISTRAL: "gen-ai-mistral-7b-inst-v01",
+    KAREN: "gen-ai-karen-creative-mistral-7b",
+    PIRATE: "gen-ai-mistral-pirate-7b"
+  }
+
+  AICHAT_METRICS_NAMESPACE = 'GenAICurriculum'.freeze
+
+  US_STATES = STATE_ABBR_WITH_DC_HASH.merge(DC: 'Washington, D.C.').sort_by(&:last).to_h.freeze
+
+  PROJECT_SUBMISSION_STATUS = {
+    CAN_SUBMIT: 'can_submit',
+    ALREADY_SUBMITTED: 'already_submitted',
+    PROJECT_TYPE_NOT_ALLOWED: 'project_type_not_allowed',
+    RESTRICTED_SHARE_MODE: 'restricted_share_mode',
+    SHARING_DISABLED: 'sharing_disabled',
+    OWNER_TOO_NEW: 'owner_too_new',
+    PROJECT_TOO_NEW: 'project_too_new',
+  }
 end

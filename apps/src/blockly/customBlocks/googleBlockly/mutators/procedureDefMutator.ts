@@ -14,13 +14,15 @@ import {
   ObservableParameterModel,
   isProcedureBlock,
 } from '@blockly/block-shareable-procedures';
+import * as GoogleBlockly from 'blockly/core';
+
+import {ProcedureBlock} from '@cdo/apps/blockly/types';
 import {FALSEY_DEFAULT, readBooleanAttribute} from '@cdo/apps/blockly/utils';
+
 import {
   getBlockDescription,
   setBlockDescription,
 } from './functionMutatorHelpers';
-import {ProcedureBlock} from '@cdo/apps/blockly/types';
-import {Block} from 'blockly';
 
 export const procedureDefMutator = {
   hasStatements_: true,
@@ -46,6 +48,9 @@ export const procedureDefMutator = {
     // Save whether the statement input is visible.
     if (!this.hasStatements_) {
       container.setAttribute('statements', 'false');
+    }
+    if (this.invisible) {
+      container.setAttribute('invisible', 'true');
     }
     return container;
   },
@@ -82,6 +87,11 @@ export const procedureDefMutator = {
       'userCreated',
       FALSEY_DEFAULT
     );
+    this.invisible = readBooleanAttribute(
+      xmlElement,
+      'invisible',
+      FALSEY_DEFAULT
+    );
     this.setStatements_(xmlElement.getAttribute('statements') !== 'false');
     if (!this.description) {
       // Google Blockly projects store descriptions in a separate field.
@@ -101,6 +111,7 @@ export const procedureDefMutator = {
     state['initialEditConfig'] = this.isEditable();
     state['initialMoveConfig'] = this.isMovable();
     state['userCreated'] = this.userCreated;
+    state['invisible'] = this.invisible;
 
     const params =
       this.getProcedureModel().getParameters() as ObservableParameterModel[];
@@ -157,11 +168,14 @@ export const procedureDefMutator = {
 
     setBlockDescription(this, state['description']);
     this.doProcedureUpdate();
-    this.setDeletable(state['initialDeleteConfig'] === false ? false : true);
-    this.setEditable(state['initialEditConfig'] === false ? false : true);
-    this.setMovable(state['initialMoveConfig'] === false ? false : true);
+    if (!Blockly.useModalFunctionEditor) {
+      this.setDeletable(state['initialDeleteConfig'] === false ? false : true);
+      this.setEditable(state['initialEditConfig'] === false ? false : true);
+      this.setMovable(state['initialMoveConfig'] === false ? false : true);
+    }
     this.setStatements_(state['hasStatements'] === false ? false : true);
     this.userCreated = state['userCreated'];
+    this.invisible = state['invisible'];
   },
 
   /**
@@ -191,7 +205,7 @@ export const procedureDefMutator = {
    */
   deleteParamsFromModel_: function (
     this: ProcedureBlock,
-    containerBlock: Block
+    containerBlock: GoogleBlockly.Block
   ) {
     const ids = new Set(
       containerBlock.getDescendants(/*ordered*/ false).map(b => b.id)
@@ -210,7 +224,10 @@ export const procedureDefMutator = {
    * blocks have been renamed.
    * @param containerBlock Root block in the mutator.
    */
-  renameParamsInModel_: function (this: ProcedureBlock, containerBlock: Block) {
+  renameParamsInModel_: function (
+    this: ProcedureBlock,
+    containerBlock: GoogleBlockly.Block
+  ) {
     const model = this.getProcedureModel();
 
     let i = 0;
@@ -235,7 +252,10 @@ export const procedureDefMutator = {
    * blocks.
    * @param containerBlock Root block in the mutator.
    */
-  addParamsToModel_: function (this: ProcedureBlock, containerBlock: Block) {
+  addParamsToModel_: function (
+    this: ProcedureBlock,
+    containerBlock: GoogleBlockly.Block
+  ) {
     const model = this.getProcedureModel();
 
     let i = 0;

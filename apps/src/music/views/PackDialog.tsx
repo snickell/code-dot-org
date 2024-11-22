@@ -1,54 +1,62 @@
-import React, {useCallback, useState, useRef} from 'react';
-import Typography from '@cdo/apps/componentLibrary/typography';
-import FocusLock from 'react-focus-lock';
-import styles from './PackDialog.module.scss';
-import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
-import {setPackId} from '../redux/musicRedux';
-import MusicLibrary, {SoundFolder} from '../player/MusicLibrary';
-import {getBaseAssetUrl} from '../appConfig';
 import classNames from 'classnames';
-import FontAwesome from '@cdo/apps/templates/FontAwesome';
+import React, {useCallback, useState, useRef, useContext} from 'react';
+import {FocusOn} from 'react-focus-on';
+
+import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
+import Typography from '@cdo/apps/componentLibrary/typography';
+import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
+
+import {DEFAULT_PACK} from '../constants';
+import {AnalyticsContext} from '../context';
+import musicI18n from '../locale';
+import MusicLibrary, {SoundFolder} from '../player/MusicLibrary';
 import MusicPlayer from '../player/MusicPlayer';
+import {setPackId} from '../redux/musicRedux';
+
+import styles from './PackDialog.module.scss';
 
 interface PackEntryProps {
-  libraryGroupPath: string;
   playingPreview: string | null;
   folder: SoundFolder;
+  isSelected: boolean;
   onSelect: (path: SoundFolder) => void;
   onPreview: (path: string) => void;
+  onStopPreview: () => void;
 }
 
 const PackEntry: React.FunctionComponent<PackEntryProps> = ({
-  libraryGroupPath,
   playingPreview,
   folder,
+  isSelected,
   onSelect,
   onPreview,
+  onStopPreview,
 }) => {
+  const library = MusicLibrary.getInstance();
+
   const previewSound = folder.sounds.find(sound => sound.type === 'preview');
   const soundPath = previewSound && folder.id + '/' + previewSound.src;
   const isPlayingPreview = previewSound && playingPreview === soundPath;
-  const imageSrc =
-    folder.imageSrc &&
-    `${getBaseAssetUrl()}${libraryGroupPath}/${folder.path}/${folder.imageSrc}`;
+  const imageSrc = library?.getPackImageUrl(folder.id);
+  const imageAttributionAuthor = folder.imageAttribution?.author;
+  const imageAttributionColor = folder.imageAttribution?.color;
+  const packImageAttributionLeft = folder.imageAttribution?.position === 'left';
 
-  const onPreviewClick = useCallback(
-    (e: Event) => {
-      if (soundPath && !isPlayingPreview) {
-        onPreview(soundPath);
-      }
-      e.stopPropagation();
-    },
-    [isPlayingPreview, onPreview, soundPath]
-  );
+  const onEntryClick = useCallback(() => {
+    onSelect(folder);
+
+    if (soundPath && !isPlayingPreview) {
+      onPreview(soundPath);
+    }
+  }, [folder, isPlayingPreview, onPreview, onSelect, soundPath]);
 
   return (
     <div
-      className={classNames(styles.pack, classNames(styles.folderRow))}
-      onClick={() => onSelect(folder)}
+      className={classNames(styles.pack, isSelected && styles.packSelected)}
+      onClick={onEntryClick}
       onKeyDown={event => {
         if (event.key === 'Enter') {
-          onSelect(folder);
+          onEntryClick();
         }
       }}
       aria-label={folder.name}
@@ -56,7 +64,44 @@ const PackEntry: React.FunctionComponent<PackEntryProps> = ({
       role="button"
     >
       <div className={styles.packImageContainer}>
-        {imageSrc && <img src={imageSrc} className={styles.packImage} alt="" />}
+        {imageSrc && (
+          <div
+            className={classNames(
+              styles.packImageContainer,
+              isSelected && styles.packImageContainerSelected
+            )}
+          >
+            <img
+              className={styles.packImage}
+              src={imageSrc}
+              alt=""
+              draggable={false}
+            />
+            {imageAttributionAuthor && (
+              <div
+                className={classNames(
+                  styles.packImageAttribution,
+                  packImageAttributionLeft && styles.packImageAttributionLeft
+                )}
+                style={{color: imageAttributionColor}}
+              >
+                <FontAwesomeV6Icon
+                  iconName={'brands fa-creative-commons'}
+                  iconStyle="solid"
+                  className={styles.icon}
+                />
+                &nbsp;
+                <FontAwesomeV6Icon
+                  iconName={'brands fa-creative-commons-by'}
+                  iconStyle="solid"
+                  className={styles.icon}
+                />
+                &nbsp;
+                {imageAttributionAuthor}
+              </div>
+            )}
+          </div>
+        )}
       </div>
       <div className={styles.packFooter}>
         <div>
@@ -65,19 +110,6 @@ const PackEntry: React.FunctionComponent<PackEntryProps> = ({
             <div className={styles.packFooteArtist}>{folder.artist}</div>
           )}
         </div>
-        {previewSound && (
-          <div className={styles.packFooterPreview}>
-            <FontAwesome
-              title={undefined}
-              icon={'play-circle'}
-              className={classNames(
-                styles.preview,
-                isPlayingPreview && styles.previewPlaying
-              )}
-              onClick={onPreviewClick}
-            />
-          </div>
-        )}
       </div>
     </div>
   );
@@ -106,40 +138,85 @@ const PackDialog: React.FunctionComponent<PackDialogProps> = ({player}) => {
     null
   );
 
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+
+  const analyticsReporter = useContext(AnalyticsContext);
+
+  const handleSelectFolder = useCallback(
+    (folder: SoundFolder) => {
+      if (!library) {
+        return;
+      }
+
+      if (selectedFolderId === folder.id) {
+        setSelectedFolderId(null);
+      } else {
+        setSelectedFolderId(folder.id);
+      }
+    },
+    [selectedFolderId, library]
+  );
+
+  const selectPack = useCallback(
+    (packId: string) => {
+      if (!library) {
+        return;
+      }
+
+      player.cancelPreviews();
+      dispatch(setPackId(packId));
+      library.setCurrentPackId(packId);
+      setSelectedFolderId(null);
+      analyticsReporter?.onPackSelected(packId);
+    },
+    [library, dispatch, player, analyticsReporter]
+  );
+
+  const setPackToDefault = useCallback(() => {
+    selectPack(DEFAULT_PACK);
+  }, [selectPack]);
+
+  const setPackToSelectedFolder = useCallback(() => {
+    if (selectedFolderId) {
+      selectPack(selectedFolderId);
+    }
+  }, [selectPack, selectedFolderId]);
+
+  const onPreview = useCallback(
+    (id: string) => {
+      playingPreview.current = id;
+      setPlayingPreviewState(id);
+
+      player.previewSound(id, () => {
+        // If the user starts another preview while one is
+        // already playing, it will have started playing before
+        // we get this stop event.  We want to wait until the
+        // new preview stops before we reactivate the button, and
+        // so we don't clear out playingPreview unless the
+        // stop event coming in is for the actively playing preview.
+        if (playingPreview.current === id) {
+          playingPreview.current = null;
+          setPlayingPreviewState(null);
+        }
+      });
+    },
+    [player]
+  );
+
+  const onStopPreview = useCallback(() => {
+    player.cancelPreviews();
+  }, [player]);
+
   if (!library) return null;
 
-  const folders = library.getAllowedSounds(undefined, true);
-  const libraryGroupPath = library.libraryJson.path;
-
-  const setSelectedFolder = (folder: SoundFolder) => {
-    dispatch(setPackId(folder.id));
-    library.setCurrentPackId(folder.id);
-  };
-
-  const onPreview = (id: string) => {
-    playingPreview.current = id;
-    setPlayingPreviewState(id);
-
-    player.previewSound(id, () => {
-      // If the user starts another preview while one is
-      // already playing, it will have started playing before
-      // we get this stop event.  We want to wait until the
-      // new preview stops before we reactivate the button, and
-      // so we don't clear out playingPreview unless the
-      // stop event coming in is for the actively playing preview.
-      if (playingPreview.current === id) {
-        playingPreview.current = null;
-        setPlayingPreviewState(null);
-      }
-    });
-  };
+  const folders = library.getRestrictedPacks();
 
   if (currentPackId) {
     return null;
   }
 
   return (
-    <FocusLock className={styles.focusLock}>
+    <FocusOn className={styles.focusLock}>
       <div className={styles.dialogContainer}>
         <div id="pack-dialog" className={styles.packDialog}>
           <div id="hidden-item" tabIndex={0} role="button" />
@@ -148,26 +225,53 @@ const PackDialog: React.FunctionComponent<PackDialogProps> = ({player}) => {
             visualAppearance="heading-lg"
             className={styles.heading}
           >
-            Choose Pack
+            {musicI18n.packDialogTitle()}
           </Typography>
 
-          <div className={styles.packs}>
-            {folders.map((folder, folderIndex) => {
-              return (
-                <PackEntry
-                  key={folderIndex}
-                  libraryGroupPath={libraryGroupPath}
-                  playingPreview={playingPreviewState}
-                  folder={folder}
-                  onSelect={setSelectedFolder}
-                  onPreview={onPreview}
-                />
-              );
-            })}
+          <div className={styles.body}>{musicI18n.packDialogBody()}</div>
+
+          <div className={styles.packsContainer}>
+            <div className={styles.packs}>
+              {folders.map((folder, folderIndex) => {
+                return (
+                  <PackEntry
+                    key={folderIndex}
+                    playingPreview={playingPreviewState}
+                    folder={folder}
+                    isSelected={folder.id === selectedFolderId}
+                    onSelect={handleSelectFolder}
+                    onPreview={onPreview}
+                    onStopPreview={onStopPreview}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          <div className={styles.buttonContainer}>
+            <button
+              onClick={setPackToDefault}
+              className={classNames('skip-button', styles.skip)}
+              type="button"
+            >
+              {musicI18n.skip()}
+            </button>
+            <button
+              onClick={setPackToSelectedFolder}
+              className={classNames(
+                styles.continue,
+                styles.button,
+                !selectedFolderId && styles.continueDisabled
+              )}
+              disabled={!selectedFolderId}
+              type="button"
+            >
+              {musicI18n.select()}
+            </button>
           </div>
         </div>
       </div>
-    </FocusLock>
+    </FocusOn>
   );
 };
 

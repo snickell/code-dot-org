@@ -20,13 +20,24 @@ services:
       - 6379
 
 steps:
-  - name: info
+  - name: bin/drone/shell
     image: curlimages/curl
     commands:
+      - set +x
       # If running on EC2, get hostname from ec2 metadata
       - "IMDS_TOKEN=$(curl -s -X PUT http://169.254.169.254/latest/api/token -H \"X-aws-ec2-metadata-token-ttl-seconds: 21600\")"
       - "hostname=$(curl -s -H \"X-aws-ec2-metadata-token: $IMDS_TOKEN\" http://169.254.169.254/latest/meta-data/public-hostname)"
-      - echo "Running on $hostname"
+      - |
+        cat <<EOF
+
+        Running on hostname: $hostname
+        
+        To "ssh" into this drone instance, wait until the 'unit-tests' step starts and run:
+        bin/drone/shell $hostname
+
+        You can also open a VSCode tunnel into drone to edit live:
+        bin/drone/vscode $hostname
+        EOF
 
   # We cache a clone of staging in the `cache-staging-clone` pipeline
   - name: get-cached-staging
@@ -69,8 +80,9 @@ steps:
       filename: unit-tests-cache-ubuntu-20.tar
 
   - name: unit-tests
-    # see: docker/dockerfiles/Dockerfile
-    image: codedotorg/code-dot-org:1.9.3
+    # see: docker/continuous-integration/Dockerfile
+    # TODO: switch to codedotorg/cdo-ci
+    image: codedotorg/code-dot-org:1.11.0
     pull: always
     volumes:
       - name: rbenv
@@ -139,13 +151,24 @@ services:
       - 6379
 
 steps:
-  - name: info
+  - name: bin/drone/shell
     image: curlimages/curl
     commands:
+      - set +x
       # If running on EC2, get hostname from ec2 metadata
       - "IMDS_TOKEN=$(curl -s -X PUT http://169.254.169.254/latest/api/token -H \"X-aws-ec2-metadata-token-ttl-seconds: 21600\")"
       - "hostname=$(curl -s -H \"X-aws-ec2-metadata-token: $IMDS_TOKEN\" http://169.254.169.254/latest/meta-data/public-hostname)"
-      - echo "Running on $hostname"
+      - |
+        cat <<EOF
+
+        Running on hostname: $hostname
+        
+        To "ssh" into this drone instance, wait until the 'ui-tests' step starts and run:
+        bin/drone/shell $hostname
+
+        You can also open a VSCode tunnel into drone to edit live:
+        bin/drone/vscode $hostname
+        EOF
 
   # We cache a clone of staging in the `cache-staging-clone` pipeline
   - name: get-cached-staging
@@ -188,8 +211,9 @@ steps:
       filename: ui-tests-cache-ubuntu-20.tar
 
   - name: ui-tests
-    # see: docker/dockerfiles/Dockerfile
-    image: codedotorg/code-dot-org:1.9.3
+    # see: docker/continuous-integration/Dockerfile
+    # TODO: switch to codedotorg/cdo-ci
+    image: codedotorg/code-dot-org:1.11.0
     pull: always
     volumes:
       - name: rbenv
@@ -204,12 +228,6 @@ steps:
         from_secret: CLOUDFRONT_PRIVATE_KEY
       PROPERTIES_ENCRYPTION_KEY:
         from_secret: PROPERTIES_ENCRYPTION_KEY
-      FIREBASE_NAME:
-        from_secret: FIREBASE_NAME
-      FIREBASE_SECRET:
-        from_secret: FIREBASE_SECRET
-      FIREBASE_SHARED_SECRET:
-        from_secret: FIREBASE_SHARED_SECRET
       SAUCE_USERNAME:
         from_secret: SAUCE_USERNAME
       SAUCE_ACCESS_KEY:
@@ -293,6 +311,6 @@ trigger:
     - push
 ---
 kind: signature
-hmac: 5915b545321c2aef2d8e34bcb394aa9929c4b48eb9c54bfb4d3c561c61c12a12
+hmac: 408f9a12af586157de45d55991717dae12d3e96fc2034525a41b793a0412a713
 
 ...

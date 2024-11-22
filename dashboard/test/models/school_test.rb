@@ -18,6 +18,7 @@ class SchoolTest < ActiveSupport::TestCase
         state: 'AL',
         zip: '35950',
         school_type: 'public',
+        last_known_school_year_open: '2022-2023'
       }
     )
   end
@@ -92,7 +93,7 @@ class SchoolTest < ActiveSupport::TestCase
     assert school.afe_high_needs?
   end
 
-  test 'AFE high needs true when urm percent above 40 percent of students' do
+  test 'AFE high needs true when urm percent above 30 percent of students' do
     school = create :school
     school.school_stats_by_year << SchoolStatsByYear.new(
       {
@@ -106,7 +107,7 @@ class SchoolTest < ActiveSupport::TestCase
     assert school.afe_high_needs?
   end
 
-  test 'AFE high needs false when urm percent below 40 percent of students' do
+  test 'AFE high needs false when urm percent below 30 percent of students' do
     school = create :school
     school.school_stats_by_year << SchoolStatsByYear.new(
       {
@@ -127,6 +128,19 @@ class SchoolTest < ActiveSupport::TestCase
         school_id: school.id,
         school_year: '1998-1999',
         title_i_status: '5'
+      }
+    )
+    school.save!
+    assert school.afe_high_needs?
+  end
+
+  test 'AFE high needs true when school is rural' do
+    school = create :school
+    school.school_stats_by_year << SchoolStatsByYear.new(
+      {
+        school_id: school.id,
+        school_year: '1998-1999',
+        community_type: 'rural_distant'
       }
     )
     school.save!

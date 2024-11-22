@@ -1,14 +1,14 @@
+import * as GoogleBlockly from 'blockly/core';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import ChordPanel, {ChordPanelProps} from '../views/ChordPanel';
-import GoogleBlockly, {BlockSvg, DropDownDiv, Field} from 'blockly/core';
+
 import {ChordEventValue} from '../player/interfaces/ChordEvent';
-import MusicLibrary from '../player/MusicLibrary';
-import {getNoteName} from '../utils/Notes';
 import {generateGraphDataFromChord, ChordGraphNote} from '../utils/Chords';
-import {LoadFinishedCallback} from '../types';
-const experiments = require('@cdo/apps/util/experiments');
+import {getNoteName} from '../utils/Notes';
+import ChordPanel, {ChordPanelProps} from '../views/ChordPanel';
+
 const color = require('@cdo/apps/util/color');
+const experiments = require('@cdo/apps/util/experiments');
 
 const MAX_DISPLAY_NOTES = 3;
 const FIELD_WIDTH = 51;
@@ -16,28 +16,16 @@ const FIELD_HEIGHT = 18;
 const FIELD_PADDING = 2;
 
 interface FieldChordOptions {
-  getLibrary: () => MusicLibrary;
-  previewChord: (value: ChordEventValue) => void;
-  previewNote: (note: number, instrument: string, onStop?: () => void) => void;
-  cancelPreviews: () => void;
   currentValue: ChordEventValue;
-  setupSampler: (
-    instrument: string,
-    onLoadFinished?: LoadFinishedCallback
-  ) => void;
-  isInstrumentLoading: (instrument: string) => boolean;
-  isInstrumentLoaded: (instrument: string) => boolean;
-  registerInstrumentLoadCallback: (
-    callback: (instrumentName: string) => void
-  ) => void;
 }
 
 /**
  * A custom field that renders the chord selection UI, used in the
  * "play_chord" block. The UI is rendered by {@link ChordPanel}.
  */
-export default class FieldChord extends Field {
-  static fromJson(options: FieldChordOptions) {
+export default class FieldChord extends GoogleBlockly.Field {
+  static fromJson(_options: GoogleBlockly.FieldConfig) {
+    const options = _options as FieldChordOptions;
     return new FieldChord(options);
   }
 
@@ -83,7 +71,7 @@ export default class FieldChord extends Field {
   }
 
   applyColour() {
-    const style = (this.sourceBlock_ as BlockSvg).style;
+    const style = (this.sourceBlock_ as GoogleBlockly.BlockSvg).style;
     if (this.borderRect_) {
       this.borderRect_.setAttribute('stroke', style.colourTertiary);
       this.borderRect_.setAttribute('fill', 'transparent');
@@ -165,12 +153,18 @@ export default class FieldChord extends Field {
     super.showEditor_();
 
     const editor = this.createDropdown();
-    DropDownDiv.getContentDiv().appendChild(editor);
+    GoogleBlockly.DropDownDiv.getContentDiv().appendChild(editor);
 
-    const style = (this.sourceBlock_ as BlockSvg).style;
-    DropDownDiv.setColour(style.colourPrimary, style.colourTertiary);
+    const style = (this.sourceBlock_ as GoogleBlockly.BlockSvg).style;
+    GoogleBlockly.DropDownDiv.setColour(
+      style.colourPrimary,
+      style.colourTertiary
+    );
 
-    DropDownDiv.showPositionedByField(this, this.disposeDropdown.bind(this));
+    GoogleBlockly.DropDownDiv.showPositionedByField(
+      this,
+      this.disposeDropdown.bind(this)
+    );
   }
 
   private createDropdown(): HTMLDivElement {
@@ -193,16 +187,19 @@ export default class FieldChord extends Field {
 
     ReactDOM.render(
       React.createElement<ChordPanelProps>(ChordPanel, {
-        library: this.options.getLibrary(),
         initValue: this.getValue(),
         onChange: this.onValueChange,
-        ...this.options,
       }),
       this.newDiv
     );
   }
 
   private disposeDropdown() {
+    if (!this.newDiv) {
+      return;
+    }
+
+    ReactDOM.unmountComponentAtNode(this.newDiv);
     this.newDiv = null;
   }
 

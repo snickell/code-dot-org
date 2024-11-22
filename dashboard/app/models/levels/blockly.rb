@@ -89,9 +89,30 @@ class Blockly < Level
   # DCDO key for turning this feature on or off.
   BLOCKLY_I18N_IN_TEXT_DCDO_KEY = 'blockly_i18n_in_text'.freeze
 
-  def summarize_for_lab2_properties(script)
+  def self.migrated_skins
+    [
+      # Star Wars
+      "hoc2015", "hoc2015x",
+      # Maze
+      "birds", "pvz", "scrat",
+      # Karel
+      "farmer", "farmer_night", "bee", "bee_night", "collector", "harvester", "planter",
+      # Spelling Bee
+      "letters",
+      # Artist
+      "artist", "artist_zombie", "elsa", "anna"
+    ]
+  end
+
+  def uses_google_blockly?
+    skin = properties['skin']
+    self.class.migrated_skins.include?(skin)
+  end
+
+  def summarize_for_lab2_properties(script, script_level = nil, current_user = nil)
     level_properties = super
     level_properties[:sharedBlocks] = localized_blockly_level_options(script)["sharedBlocks"]
+    level_properties[:levelData] = localized_blockly_level_options_for_lab2(script)["levelData"]
     level_properties
   end
 
@@ -359,6 +380,33 @@ class Blockly < Level
     options.freeze
   end
 
+  def localized_blockly_level_options_for_lab2(script)
+    options = Rails.cache.fetch("#{cache_key}/#{script.try(:cache_key)}/#{I18n.locale}/localized_blockly_level_options_for_lab2", force: !Unit.should_cache?) do
+      level_options = blockly_level_options.dup
+
+      functions = level_options.
+        dig("levelData", "startSources", "blocks", "blocks")&.
+        filter {|block| block["type"] == "procedures_defnoreturn"}
+
+      functions&.each do |function|
+        function_name = function.dig("fields", "NAME")
+        next unless function_name
+
+        localized_name = I18n.t(
+          "name",
+          scope: [:data, :function_definitions, name, function_name],
+          default: function_name,
+          smart: true
+        )
+
+        function["fields"]["NAME"] = localized_name
+      end
+
+      level_options
+    end
+    options.freeze
+  end
+
   # Return a Blockly-formatted 'appOptions' hash derived from the level contents
   def blockly_level_options
     options = Rails.cache.fetch("#{cache_key}/blockly_level_options/v2") do
@@ -457,11 +505,18 @@ class Blockly < Level
     get_localized_property('failure_message_override')
   end
 
+  # Retrieve the localized property for "long_instructions",
+  # @return [String] the localized long_instructions property
   def localized_long_instructions
     localized_long_instructions = get_localized_property("long_instructions")
-    localized_blockly_in_text(localized_long_instructions)
+    unescaped_codeblocks = unescape_codeblocks(localized_long_instructions)
+    localized_blockly_in_text(unescaped_codeblocks)
   end
 
+  # Processes and localizes the TRANSLATIONTEXT from i18n start libraries content.
+  # @param start_libraries [String] JSON-encoded string representing an array of library objects.
+  # Each library object should contain a name and source field.
+  # @return [String] JSON-encoded string representing the localized start libraries.
   def localized_start_libraries(start_libraries)
     return unless start_libraries
     level_libraries = JSON.parse(start_libraries)
@@ -842,7 +897,7 @@ class Blockly < Level
 
   def self.asset_host_prefix
     host = ActionController::Base.asset_host
-    (host.blank?) ? "" : "//#{host}"
+    host.blank? ? "" : "//#{host}"
   end
 
   # If true, don't autoplay videos before this level (but do keep them in the
@@ -995,5 +1050,13 @@ class Blockly < Level
         skin: skin
       }
     )
+  end
+
+  # Unescapes the backticks used to format codeblocks in the given text.
+  # @param text [String] the text to unescape.
+  # @return [String] the text with unescaped backticks. If the text is nil or empty, it will be returned as is.
+  private def unescape_codeblocks(text)
+    return text if text.blank?
+    text.gsub('\\`', '`')
   end
 end

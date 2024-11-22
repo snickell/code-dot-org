@@ -13,6 +13,8 @@ require:
   - './tools/customLinters/rubocop_dashboard_db_usage.rb'
   - './tools/customLinters/rubocop_pegasus_requires.rb'
   - './tools/customLinters/rubocop_dashboard_requires.rb'
+  - './tools/customLinters/rubocop_grouped_inline_private_methods.rb'
+  - './tools/customLinters/rubocop_dashboard_webmock_require_order.rb'
 
 AllCops:
   SuggestExtensions: false
@@ -21,7 +23,7 @@ AllCops:
     - 'dashboard/db/schema.rb'
     - 'pegasus/test/test_string.rb' # Parser does not support non-utf8 escape sequences
   DisplayCopNames: true
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.3
 
 Rails:
   Enabled: true
@@ -88,6 +90,14 @@ Style/EmptyElse:
 
 Style/EmptyMethod:
   EnforcedStyle: expanded
+
+Style/FormatStringToken:
+  EnforcedStyle: template
+
+Style/InverseMethods:
+  InverseBlocks:
+    :select: null
+    :select!: null
 
 Style/NumericLiterals:
   MinDigits: 7

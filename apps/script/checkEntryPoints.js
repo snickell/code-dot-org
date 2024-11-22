@@ -46,10 +46,8 @@ const SILENCED = [
   'ailab',
   'applab',
   'bounce',
-  'calc',
   'craft',
   'dance',
-  'eval',
   'fish',
   'flappy',
   'gamelab',
@@ -85,6 +83,7 @@ const SILENCED = [
   'cookieBanner',
   'userHeaderEventLogger',
   'regionalPartnerMiniContact',
+  'statsigWebAnalytics',
 
   // other entry points
   'blockly',

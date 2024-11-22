@@ -3,10 +3,15 @@ import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 
+import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import Notification, {
+  NotificationType,
+} from '@cdo/apps/sharedComponents/Notification';
 import ParticipantFeedbackNotification from '@cdo/apps/templates/feedback/ParticipantFeedbackNotification';
-import Notification, {NotificationType} from '@cdo/apps/templates/Notification';
 import ProjectWidgetWithData from '@cdo/apps/templates/projects/ProjectWidgetWithData';
 import JoinSectionArea from '@cdo/apps/templates/studioHomepages/JoinSectionArea';
+import {tryGetSessionStorage, trySetSessionStorage} from '@cdo/apps/utils';
 import i18n from '@cdo/locale';
 
 import HeaderBanner from '../HeaderBanner';
@@ -15,6 +20,8 @@ import ProtectedStatefulDiv from '../ProtectedStatefulDiv';
 import MarketingAnnouncementBanner from './MarketingAnnouncementBanner';
 import RecentCourses from './RecentCourses';
 import shapes from './shapes';
+
+const LOGGED_STUDENT_SESSION = 'logged_student_session';
 
 export default class StudentHomepage extends Component {
   static propTypes = {
@@ -26,6 +33,7 @@ export default class StudentHomepage extends Component {
     studentId: PropTypes.number.isRequired,
     showVerifiedTeacherWarning: PropTypes.bool,
     specialAnnouncement: shapes.specialAnnouncement,
+    topComponents: PropTypes.arrayOf(PropTypes.node),
   };
 
   componentDidMount() {
@@ -41,10 +49,26 @@ export default class StudentHomepage extends Component {
       hasFeedback,
       showVerifiedTeacherWarning,
       specialAnnouncement,
+      topComponents,
     } = this.props;
     const {canViewAdvancedTools, studentId} = this.props;
     // Verify background image works for both LTR and RTL languages.
     const backgroundUrl = '/shared/images/banners/teacher-homepage-hero.jpg';
+
+    // Send one analytics event when a student logs in. Use session storage to determine
+    // whether they've just logged in.
+    if (
+      !!studentId &&
+      tryGetSessionStorage(LOGGED_STUDENT_SESSION, 'false') !== 'true'
+    ) {
+      trySetSessionStorage(LOGGED_STUDENT_SESSION, 'true');
+
+      analyticsReporter.sendEvent(
+        EVENTS.STUDENT_LOGIN_EVENT,
+        {},
+        PLATFORMS.BOTH
+      );
+    }
 
     return (
       <div>
@@ -54,6 +78,8 @@ export default class StudentHomepage extends Component {
           backgroundImageStyling={{backgroundPosition: '90% 30%'}}
         />
         <div className={'container main'}>
+          {topComponents && topComponents.map(component => component)}
+
           <ProtectedStatefulDiv ref="flashes" />
           {specialAnnouncement && (
             <MarketingAnnouncementBanner

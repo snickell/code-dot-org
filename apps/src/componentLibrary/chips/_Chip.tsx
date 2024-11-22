@@ -1,10 +1,11 @@
-import React, {useEffect, useRef, memo} from 'react';
+import classNames from 'classnames';
+import React, {useEffect, useRef, memo, HTMLAttributes} from 'react';
 
 import moduleStyles from './chip.module.scss';
 
 const commonI18n = require('@cdo/locale');
 
-interface ChipProps {
+interface ChipProps extends HTMLAttributes<HTMLInputElement> {
   /** Chip label */
   label: string;
   /** Chip name*/
@@ -13,6 +14,8 @@ interface ChipProps {
   value: string;
   /** Chip checked state */
   checked: boolean;
+  /** Chip text type (thickness) */
+  textThickness: 'thick' | 'thin';
   /** Chip required state */
   required: boolean;
   /** Chip disabled state */
@@ -27,8 +30,10 @@ const Chip: React.FunctionComponent<ChipProps> = ({
   value,
   checked,
   required,
+  textThickness,
   disabled,
   onCheckedChange,
+  ...HTMLAttributes
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -43,7 +48,12 @@ const Chip: React.FunctionComponent<ChipProps> = ({
 
   return (
     <div>
-      <label className={moduleStyles.chip}>
+      <label
+        className={classNames(
+          moduleStyles.chip,
+          moduleStyles[`chip-${textThickness}`]
+        )}
+      >
         <input
           ref={inputRef}
           type="checkbox"
@@ -62,6 +72,7 @@ const Chip: React.FunctionComponent<ChipProps> = ({
               commonI18n.chooseAtLeastOne()
             );
           }}
+          {...HTMLAttributes}
         />
         {label}
       </label>

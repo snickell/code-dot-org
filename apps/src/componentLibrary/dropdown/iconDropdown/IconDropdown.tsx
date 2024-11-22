@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, {useCallback, memo} from 'react';
+import React, {useCallback, memo, AriaAttributes} from 'react';
 
 import {dropdownColors} from '@cdo/apps/componentLibrary/common/constants';
 import {
@@ -9,31 +9,37 @@ import {
 import {
   ComponentSizeXSToL,
   DropdownColor,
+  DropdownFormFieldRelatedProps,
 } from '@cdo/apps/componentLibrary/common/types';
-import CustomDropdown from '@cdo/apps/componentLibrary/dropdown/_CustomDropdown';
+import CustomDropdown, {
+  _CustomDropdownOption,
+} from '@cdo/apps/componentLibrary/dropdown/_CustomDropdown';
 import FontAwesomeV6Icon, {
   FontAwesomeV6IconProps,
 } from '@cdo/apps/componentLibrary/fontAwesomeV6Icon';
 
 import moduleStyles from '@cdo/apps/componentLibrary/dropdown/customDropdown.module.scss';
 
-export interface IconDropdownOption {
-  value: string;
-  label: string;
-  isOptionDisabled?: boolean;
+export interface IconDropdownOption extends _CustomDropdownOption {
   icon: FontAwesomeV6IconProps;
 }
 
-export interface IconDropdownProps {
+export interface IconDropdownProps
+  extends DropdownFormFieldRelatedProps,
+    AriaAttributes {
   /** IconDropdown name.
    * Name of the dropdown, used as unique identifier of the dropdown's HTML element */
   name: string;
+  /** IconDropdown custom class name */
+  className?: string;
   /** IconDropdown color */
   color?: DropdownColor;
   /** IconDropdown size */
   size: ComponentSizeXSToL;
   /** IconDropdown disabled state */
   disabled?: boolean;
+  /** IconDropdown readOnly state */
+  readOnly?: boolean;
   /** IconDropdown label
    * The user-facing label of the dropdown */
   labelText: string;
@@ -49,14 +55,21 @@ export interface IconDropdownProps {
 
 const IconDropdown: React.FunctionComponent<IconDropdownProps> = ({
   name,
+  className,
   labelText,
   labelType = 'thick',
   options,
   selectedOption = {},
   onChange,
   disabled = false,
+  readOnly = false,
   color = dropdownColors.black,
   size = 'm',
+  helperMessage,
+  helperIcon,
+  errorMessage,
+  styleAsFormField = false,
+  ...rest
 }) => {
   const {setActiveDropdownName} = useDropdownContext();
   const onOptionClick = useCallback(
@@ -72,14 +85,22 @@ const IconDropdown: React.FunctionComponent<IconDropdownProps> = ({
   return (
     <CustomDropdown
       name={name}
+      className={className}
       labelText={labelText}
       labelType={labelType}
       disabled={disabled}
+      readOnly={readOnly}
       color={color}
       icon={selectedOption?.icon}
       size={size}
+      helperMessage={helperMessage}
+      helperIcon={helperIcon}
+      errorMessage={errorMessage}
+      styleAsFormField={styleAsFormField}
+      selectedValueText={selectedOption?.label}
+      {...rest}
     >
-      <form className={moduleStyles.dropdownMenuContainer}>
+      <div className={moduleStyles.dropdownMenuContainer}>
         <ul>
           {options.map(option => {
             const {
@@ -118,7 +139,7 @@ const IconDropdown: React.FunctionComponent<IconDropdownProps> = ({
             );
           })}
         </ul>
-      </form>
+      </div>
     </CustomDropdown>
   );
 };

@@ -1,10 +1,14 @@
+import * as GoogleBlockly from 'blockly/core';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import SoundsPanel from '../views/SoundsPanel';
-import GoogleBlockly from 'blockly/core';
-import experiments from '@cdo/apps/util/experiments';
+
 import color from '@cdo/apps/util/color';
+import experiments from '@cdo/apps/util/experiments';
+
+import MusicRegistry from '../MusicRegistry';
+import MusicLibrary from '../player/MusicLibrary';
 import SoundStyle from '../utils/SoundStyle';
+import SoundsPanel from '../views/SoundsPanel';
 
 const FIELD_HEIGHT = 20;
 const FIELD_PADDING = 2;
@@ -16,7 +20,7 @@ const FIELD_PADDING = 2;
 class FieldSounds extends GoogleBlockly.Field {
   constructor(options) {
     const currentValue =
-      options.currentValue || options.getLibrary().getDefaultSound();
+      options.currentValue || MusicLibrary.getInstance().getDefaultSound();
 
     super(currentValue);
 
@@ -113,15 +117,15 @@ class FieldSounds extends GoogleBlockly.Field {
 
     ReactDOM.render(
       <SoundsPanel
-        library={this.options.getLibrary()}
+        library={MusicLibrary.getInstance()}
         currentValue={this.getValue()}
         playingPreview={this.playingPreview}
-        showSoundFilters={this.options.getShowSoundFilters()}
+        showSoundFilters={MusicRegistry.showSoundFilters}
         onPreview={value => {
           this.playingPreview = value;
           this.renderContent();
 
-          this.options.playPreview(value, () => {
+          MusicRegistry.player.previewSound(value, () => {
             // If the user starts another preview while one is
             // already playing, it will have started playing before
             // we get this stop event.  We want to wait until the
@@ -134,16 +138,15 @@ class FieldSounds extends GoogleBlockly.Field {
             this.renderContent();
           });
         }}
-        onSelect={value => {
-          this.setValue(value);
-          this.hide_();
-        }}
+        onSelect={value => this.setValue(value)}
       />,
       this.newDiv_
     );
   }
 
   dropdownDispose_() {
+    MusicRegistry.player.cancelPreviews();
+
     this.newDiv_ = null;
     this.showingEditor = false;
   }
@@ -171,9 +174,9 @@ class FieldSounds extends GoogleBlockly.Field {
       height: 20,
     });
 
-    const soundType = this.options
-      .getLibrary()
-      .getSoundForId(this.getValue())?.type;
+    const soundType = MusicLibrary.getInstance().getSoundForId(
+      this.getValue()
+    )?.type;
 
     if (soundType === 'vocal') {
       textElement.setAttribute('font-style', 'italic');
@@ -250,7 +253,9 @@ class FieldSounds extends GoogleBlockly.Field {
   }
 
   getText() {
-    return this.options.getLibrary().getSoundForId(this.getValue())?.name || '';
+    return (
+      MusicLibrary.getInstance().getSoundForId(this.getValue())?.name || ''
+    );
   }
 
   updateSize_() {

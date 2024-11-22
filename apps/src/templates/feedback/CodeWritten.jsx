@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import Radium from 'radium'; // eslint-disable-line no-restricted-imports
 import React from 'react';
+
 import msg from '@cdo/locale';
-import trackEvent from '../../util/trackEvent';
 
 class CodeWritten extends React.Component {
   static propTypes = {
@@ -35,7 +35,6 @@ class CodeWritten extends React.Component {
             ...styles.summary,
             ...(useChallengeStyles ? styles.challengeSummary : {}),
           }}
-          onClick={() => trackEvent('showCode', 'click', 'dialog')}
         >
           <b>{msg.showGeneratedCode()}</b>
         </summary>

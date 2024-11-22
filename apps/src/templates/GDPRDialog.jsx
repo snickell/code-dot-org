@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
-import Button from './Button';
+
+import Button from '@cdo/apps/legacySharedComponents/Button';
+import {pegasus} from '@cdo/apps/lib/util/urlHelpers';
 import i18n from '@cdo/locale';
+
 import BaseDialog from './BaseDialog';
 import DialogFooter from './teacherDashboard/DialogFooter';
-import {pegasus} from '@cdo/apps/lib/util/urlHelpers';
 
 export default class GDPRDialog extends Component {
   static propTypes = {
@@ -20,8 +22,13 @@ export default class GDPRDialog extends Component {
 
   handleYesClick = () => {
     this.setState({isDialogOpen: false});
-    $.post(`/dashboardapi/v1/users/accept_data_transfer_agreement`, {
+    $.post('/dashboardapi/v1/users/accept_data_transfer_agreement', {
       user_id: this.props.currentUserId,
+    }).then(() => {
+      const gdprDataScript = document.querySelector('script[data-gdpr]');
+      const gdprData = JSON.parse(gdprDataScript.dataset['gdpr']);
+      gdprData.show_gdpr_dialog = false;
+      gdprDataScript.dataset['gdpr'] = JSON.stringify(gdprData);
     });
   };
 

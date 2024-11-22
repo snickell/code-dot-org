@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import React, {
   ChangeEvent,
   useCallback,
@@ -5,29 +6,23 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import classNames from 'classnames';
-import styles from './patternPanel.module.scss';
-import PreviewControls from './PreviewControls';
-import MusicLibrary, {SoundData} from '../player/MusicLibrary';
-import {PatternEventValue} from '../player/interfaces/PatternEvent';
+
+import {TICKS_PER_MEASURE} from '../constants';
+import MusicRegistry from '../MusicRegistry';
+import {InstrumentEventValue} from '../player/interfaces/InstrumentEvent';
+import MusicLibrary from '../player/MusicLibrary';
+
 import LoadingOverlay from './LoadingOverlay';
-import {LoadFinishedCallback} from '../types';
+import PreviewControls from './PreviewControls';
+
+import styles from './patternPanel.module.scss';
 
 // Generate an array containing tick numbers from 1..16.
-const arrayOfTicks = Array.from({length: 16}, (_, i) => i + 1);
+const arrayOfTicks = Array.from({length: TICKS_PER_MEASURE}, (_, i) => i + 1);
 
 interface PatternPanelProps {
-  bpm: number;
-  library: MusicLibrary;
-  initValue: PatternEventValue;
-  onChange: (value: PatternEventValue) => void;
-  previewSound: (path: string) => void;
-  previewPattern: (pattern: PatternEventValue, onStop: () => void) => void;
-  cancelPreviews: () => void;
-  setupSampler: (kit: string, onLoadFinished?: LoadFinishedCallback) => void;
-  isInstrumentLoading: (kit: string) => boolean;
-  isInstrumentLoaded: (kit: string) => boolean;
-  registerInstrumentLoadCallback: (callback: (kit: string) => void) => void;
+  initValue: InstrumentEventValue;
+  onChange: (value: InstrumentEventValue) => void;
 }
 
 /*
@@ -35,68 +30,75 @@ interface PatternPanelProps {
  * custom Blockly Field {@link FieldPattern}
  */
 const PatternPanel: React.FunctionComponent<PatternPanelProps> = ({
-  bpm,
-  library,
   initValue,
   onChange,
-  previewSound,
-  previewPattern,
-  cancelPreviews,
-  setupSampler,
-  isInstrumentLoading,
-  isInstrumentLoaded,
-  registerInstrumentLoadCallback,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   // Make a copy of the value object so that we don't overwrite Blockly's
   // data.
-  const currentValue: PatternEventValue = JSON.parse(JSON.stringify(initValue));
+  const currentValue: InstrumentEventValue = JSON.parse(
+    JSON.stringify(initValue)
+  );
 
-  const availableKits = useMemo(() => {
-    return library.libraryJson.kits;
-  }, [library.libraryJson.kits]);
+  const availableKits = useMemo(
+    () => MusicLibrary.getInstance()?.kits || [],
+    []
+  );
 
   const currentFolder = useMemo(() => {
     // Default to the first available kit if the current kit is not found in this library.
     return (
-      availableKits.find(kit => kit.id === currentValue.kit) || availableKits[0]
+      availableKits?.find(kit => kit.id === currentValue.instrument) ||
+      availableKits?.[0]
     );
-  }, [availableKits, currentValue.kit]);
+  }, [availableKits, currentValue.instrument]);
   const [currentPreviewTick, setCurrentPreviewTick] = useState(0);
 
+  const previewNote = useCallback(
+    (note: number) => {
+      // Don't preview the note if we're previewing the whole pattern
+      if (currentPreviewTick > 0) {
+        return;
+      }
+
+      MusicRegistry.player.previewNote(note, currentValue.instrument);
+    },
+    [currentValue.instrument, currentPreviewTick]
+  );
+
   const toggleEvent = useCallback(
-    (sound: SoundData, tick: number, note: number) => {
+    (tick: number, note: number) => {
       const index = currentValue.events.findIndex(
-        event => event.src === sound.src && event.tick === tick
+        event => event.note === note && event.tick === tick
       );
       if (index !== -1) {
         // If found, delete.
         currentValue.events.splice(index, 1);
       } else {
         // Not found, so add.
-        currentValue.events.push({src: sound.src, tick, note});
-        previewSound(`${currentValue.kit}/${sound.src}`);
+        currentValue.events.push({tick, note});
+        previewNote(note);
       }
 
       onChange(currentValue);
     },
-    [onChange, previewSound, currentValue]
+    [onChange, currentValue, previewNote]
   );
 
-  const hasEvent = (sound: SoundData, tick: number) => {
+  const hasEvent = (note: number, tick: number) => {
     const element = currentValue.events.find(
-      event => event.src === sound.src && event.tick === tick
+      event => event.note === note && event.tick === tick
     );
     return !!element;
   };
 
   const handleFolderChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    currentValue.kit = event.target.value;
+    currentValue.instrument = event.target.value;
     onChange(currentValue);
   };
 
-  const getCellClasses = (sound: SoundData, tick: number) => {
-    const isSet = hasEvent(sound, tick);
+  const getCellClasses = (note: number, tick: number) => {
+    const isSet = hasEvent(note, tick);
     const isHighlighted = !isSet && (tick - 1) % 4 === 0;
 
     return classNames(
@@ -112,45 +114,47 @@ const PatternPanel: React.FunctionComponent<PatternPanelProps> = ({
   }, [onChange, currentValue]);
 
   const startPreview = useCallback(() => {
-    setCurrentPreviewTick(1);
-    const intervalId = setInterval(
-      () => setCurrentPreviewTick(tick => tick + 1),
-      // Tick forward every 16th note, i.e. 4 times per beat.
-      (60 / bpm / 4) * 1000
+    MusicRegistry.player.previewNotes(
+      currentValue,
+      (tick: number) => setCurrentPreviewTick(tick),
+      () => setCurrentPreviewTick(0)
     );
-    previewPattern(currentValue, () => {
-      clearInterval(intervalId);
-      setCurrentPreviewTick(0);
-    });
-  }, [previewPattern, bpm, setCurrentPreviewTick, currentValue]);
+  }, [setCurrentPreviewTick, currentValue]);
+
+  const stopPreview = useCallback(() => {
+    setCurrentPreviewTick(0);
+    MusicRegistry.player.cancelPreviews();
+  }, [setCurrentPreviewTick]);
 
   useEffect(() => {
-    if (!isInstrumentLoaded(currentValue.kit)) {
+    // On unmount.
+    return () => {
+      stopPreview();
+    };
+  }, [stopPreview]);
+
+  useEffect(() => {
+    if (!MusicRegistry.player.isInstrumentLoaded(currentValue.instrument)) {
       setIsLoading(true);
-      if (isInstrumentLoading(currentValue.kit)) {
+      if (MusicRegistry.player.isInstrumentLoading(currentValue.instrument)) {
         // If the instrument is already loading, register a callback and wait for it to finish.
-        registerInstrumentLoadCallback(kit => {
-          if (kit === currentValue.kit) {
+        MusicRegistry.player.registerCallback('InstrumentLoaded', kit => {
+          if (kit === currentValue.instrument) {
             setIsLoading(false);
           }
         });
       } else {
         // Otherwise, initiate the load.
-        setupSampler(currentValue.kit, () => setIsLoading(false));
+        MusicRegistry.player.setupSampler(currentValue.instrument, () =>
+          setIsLoading(false)
+        );
       }
     }
-  }, [
-    setupSampler,
-    isInstrumentLoading,
-    isInstrumentLoaded,
-    currentValue.kit,
-    setIsLoading,
-    registerInstrumentLoadCallback,
-  ]);
+  }, [currentValue.instrument, setIsLoading]);
 
   return (
     <div className={styles.patternPanel}>
-      <select value={currentValue.kit} onChange={handleFolderChange}>
+      <select value={currentValue.instrument} onChange={handleFolderChange}>
         {availableKits.map(folder => (
           <option key={folder.id} value={folder.id}>
             {folder.name}
@@ -158,15 +162,15 @@ const PatternPanel: React.FunctionComponent<PatternPanelProps> = ({
         ))}
       </select>
       <LoadingOverlay show={isLoading} />
-      {currentFolder.sounds.map((sound, index) => {
+      {currentFolder.sounds.map(({name, note}, index) => {
         return (
-          <div className={styles.row} key={sound.src}>
+          <div className={styles.row} key={note}>
             <div className={styles.nameContainer}>
               <span
                 className={styles.name}
-                onClick={() => previewSound(`${currentValue.kit}/${sound.src}`)}
+                onClick={() => previewNote(note || index)}
               >
-                {sound.name}
+                {name}
               </span>
             </div>
             {arrayOfTicks.map(tick => {
@@ -176,10 +180,10 @@ const PatternPanel: React.FunctionComponent<PatternPanelProps> = ({
                     styles.outerCell,
                     tick === currentPreviewTick && styles.outerCellPlaying
                   )}
-                  onClick={() => toggleEvent(sound, tick, index)}
+                  onClick={() => toggleEvent(tick, note || index)}
                   key={tick}
                 >
-                  <div className={getCellClasses(sound, tick)} />
+                  <div className={getCellClasses(note || index, tick)} />
                 </div>
               );
             })}
@@ -190,7 +194,8 @@ const PatternPanel: React.FunctionComponent<PatternPanelProps> = ({
         enabled={currentValue.events.length > 0}
         playPreview={startPreview}
         onClickClear={onClear}
-        cancelPreviews={cancelPreviews}
+        cancelPreviews={stopPreview}
+        isPlayingPreview={currentPreviewTick > 0}
       />
     </div>
   );

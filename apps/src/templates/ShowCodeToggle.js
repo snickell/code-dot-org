@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
-import logToCloud from '../logToCloud';
-import trackEvent from '../util/trackEvent';
-import {singleton as studioApp} from '../StudioApp';
-import {PaneButton} from './PaneHeader';
+
 import msg from '@cdo/locale';
-import UserPreferences from '../lib/util/UserPreferences';
+
 import project from '../code-studio/initApp/project';
+import UserPreferences from '../lib/util/UserPreferences';
+import logToCloud from '../logToCloud';
+import {singleton as studioApp} from '../StudioApp';
+
+import {PaneButton} from './PaneHeader';
 
 const BLOCKS_GLYPH_DARK =
   'data:image/gif;base64,R0lGODlhEAAQAIAAAE1XX01XXyH+GkNyZWF0ZWQgd2l0aCBHSU1QIG9uIGEgTWFjACH5BAEKAAEALAAAAAAQABAAAAIdjI+py40AowRp2molznBzB3LTIWpGGZEoda7gCxYAOw==';
@@ -34,7 +36,6 @@ class ShowCodeButton extends Component {
   };
 
   onClick() {
-    trackEvent('showCode', 'click', 'header');
     this.props.onClick();
   }
 

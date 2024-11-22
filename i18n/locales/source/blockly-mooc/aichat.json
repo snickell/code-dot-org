@@ -1,14 +1,13 @@
 {
+  "aboutAichatLab": "About AI Chat Lab",
   "aichatWorkspaceHeader": "AI Chat",
-  "allMessagesSentAreRecorded": "All messages sent to AI Chat are recorded.",
-  "anythingPersonalCanNotBeSubmitted": "In order to protect your privacy, anything considered personal information (name, phone number, address, etc.) should not be submitted to AI chat.",
+  "chatComponentsHeader": "AI Chat Components",
   "continue": "Continue",
-  "inappropriateMessagesAreFlagged": "Inappropriate messages will be flagged and your teacher will be notified.",
-  "inappropriateUserMessage": "This message has been flagged as inappropriate.",
-  "tooPersonalUserMessage": "This message has been flagged as too personal.",
-  "userChatMessagePlaceholder": "Add a chat message...",
+  "learnMoreHereInBrackets": "[Learn more here.]",
+  "startOverAichatModelCustomizations": "This will reset this level to its start state and remove any model customizations or model card information you’ve added or changed.",
+  "teacherOnboardingModal_warning": "While Code.org's content moderation policy reviews both student customizations and chat messages, violations will be flagged accordingly. However, because this is a generative AI tool, we cannot fully predict or guarantee that the chatbot's output will always be free from disruption.",
+  "teacherOnboardingModal_chatHistoryAccess": "As a teacher, you have access to all of your students' chat history and customizations. ",
   "waitingForChatResponse": "Waiting for a response...",
-  "warningModalHeader": "Remember to chat responsibly!",
-  "warningModalOkButtonText": "Start chatting", 
+  "welcomeToAichatLab": "Welcome to AI Chat Lab",
   "whatIsPersonalInformation": "What is considered personal information?"
 }

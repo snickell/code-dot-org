@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_04_03_074309) do
+ActiveRecord::Schema.define(version: 2024_10_24_180714) do
 
   create_table "activities", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
     t.integer "user_id"
@@ -46,6 +46,7 @@ ActiveRecord::Schema.define(version: 2024_04_03_074309) do
     t.boolean "thumbs_down"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.text "details"
     t.index ["ai_tutor_interaction_id", "user_id"], name: "index_ai_tutor_feedback_on_interaction_and_user", unique: true
     t.index ["user_id"], name: "fk_rails_105c1f9428"
   end
@@ -67,6 +68,67 @@ ActiveRecord::Schema.define(version: 2024_04_03_074309) do
     t.index ["script_id"], name: "index_ai_tutor_interactions_on_script_id"
     t.index ["user_id", "level_id", "script_id"], name: "index_ati_user_level_script"
     t.index ["user_id"], name: "index_ai_tutor_interactions_on_user_id"
+  end
+
+  create_table "aichat_events", charset: "utf8mb4", collation: "utf8mb4_bin", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "level_id"
+    t.integer "script_id"
+    t.integer "project_id"
+    t.json "aichat_event"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id", "level_id", "script_id"], name: "index_ace_user_level_script"
+  end
+
+  create_table "aichat_messages", charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
+    t.bigint "aichat_thread_id", null: false
+    t.text "external_id", null: false
+    t.integer "role", null: false
+    t.text "content", null: false
+    t.boolean "is_preset", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["aichat_thread_id"], name: "index_aichat_messages_on_aichat_thread_id"
+  end
+
+  create_table "aichat_requests", charset: "utf8mb4", collation: "utf8mb4_bin", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "level_id"
+    t.integer "script_id"
+    t.integer "project_id"
+    t.json "model_customizations", null: false
+    t.json "stored_messages", null: false
+    t.json "new_message", null: false
+    t.integer "execution_status", null: false
+    t.text "response"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["execution_status"], name: "index_aichat_requests_on_execution_status"
+  end
+
+  create_table "aichat_sessions", charset: "utf8mb4", collation: "utf8mb4_bin", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "level_id"
+    t.integer "script_id"
+    t.integer "project_id"
+    t.json "model_customizations"
+    t.json "messages"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id", "level_id", "script_id"], name: "index_acs_user_level_script"
+  end
+
+  create_table "aichat_threads", charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.text "external_id", null: false
+    t.text "llm_version", null: false
+    t.text "title"
+    t.integer "unit_id"
+    t.integer "level_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_aichat_threads_on_user_id"
   end
 
   create_table "assessment_activities", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
@@ -154,6 +216,19 @@ ActiveRecord::Schema.define(version: 2024_04_03_074309) do
     t.text "qtip_config"
     t.string "on"
     t.string "callout_text"
+  end
+
+  create_table "cap_user_events", charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
+    t.string "name", limit: 64, null: false
+    t.integer "user_id", null: false
+    t.string "policy", limit: 16, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "state_before", limit: 1
+    t.string "state_after", limit: 1
+    t.index ["name", "policy"], name: "index_cap_user_events_on_name_and_policy"
+    t.index ["policy"], name: "index_cap_user_events_on_policy"
+    t.index ["user_id"], name: "index_cap_user_events_on_user_id"
   end
 
   create_table "census_state_course_codes", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
@@ -292,8 +367,8 @@ ActiveRecord::Schema.define(version: 2024_04_03_074309) do
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.virtual "active", type: :boolean, as: "if(isnull(`deleted_at`),TRUE,NULL)"
-    t.virtual "open", type: :boolean, as: "if(isnull(`closed_at`),TRUE,NULL)"
+    t.virtual "active", type: :boolean, as: "if((`deleted_at` is null),true,NULL)"
+    t.virtual "open", type: :boolean, as: "if((`closed_at` is null),true,NULL)"
     t.index ["project_id", "deleted_at"], name: "index_code_reviews_on_project_id_and_deleted_at"
     t.index ["user_id", "project_id", "open", "active"], name: "index_code_reviews_unique", unique: true
     t.index ["user_id", "script_id", "project_level_id", "closed_at", "deleted_at"], name: "index_code_reviews_for_peer_lookup"
@@ -383,7 +458,6 @@ ActiveRecord::Schema.define(version: 2024_04_03_074309) do
     t.string "display_name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "category", default: "other", null: false
     t.boolean "is_featured", default: false, null: false
     t.boolean "assignable", default: true, null: false
     t.string "curriculum_type"
@@ -399,7 +473,17 @@ ActiveRecord::Schema.define(version: 2024_04_03_074309) do
     t.string "video"
     t.datetime "published_date"
     t.integer "self_paced_pl_course_offering_id"
+    t.boolean "ai_teaching_assistant_available", default: false, null: false
     t.index ["key"], name: "index_course_offerings_on_key", unique: true
+  end
+
+  create_table "course_offerings_pd_workshops", id: false, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
+    t.bigint "pd_workshop_id", null: false
+    t.bigint "course_offering_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["course_offering_id"], name: "index_course_offerings_pd_workshops_on_course_offering_id"
+    t.index ["pd_workshop_id"], name: "index_course_offerings_pd_workshops_on_pd_workshop_id"
   end
 
   create_table "course_scripts", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
@@ -484,7 +568,7 @@ ActiveRecord::Schema.define(version: 2024_04_03_074309) do
     t.integer "priority", default: 0, null: false
     t.integer "attempts", default: 0, null: false
     t.text "handler", null: false
-    t.text "last_error"
+    t.text "last_error", size: :medium
     t.datetime "run_at"
     t.datetime "locked_at"
     t.datetime "failed_at"
@@ -872,8 +956,16 @@ ActiveRecord::Schema.define(version: 2024_04_03_074309) do
     t.bigint "lti_integration_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "name"
     t.index ["deployment_id"], name: "index_lti_deployments_on_deployment_id"
     t.index ["lti_integration_id"], name: "index_lti_deployments_on_lti_integration_id"
+  end
+
+  create_table "lti_deployments_user_identities", id: false, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
+    t.bigint "lti_deployment_id", null: false
+    t.bigint "lti_user_identity_id", null: false
+    t.index ["lti_deployment_id"], name: "index_lti_deployments_user_identities_on_lti_deployment_id"
+    t.index ["lti_user_identity_id"], name: "index_lti_deployments_user_identities_on_lti_user_identity_id"
   end
 
   create_table "lti_feedbacks", charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
@@ -939,6 +1031,17 @@ ActiveRecord::Schema.define(version: 2024_04_03_074309) do
     t.string "metric", null: false
     t.string "submetric", null: false
     t.float "value", null: false
+  end
+
+  create_table "new_feature_feedbacks", charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "form_key", null: false
+    t.boolean "satisfied", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["satisfied"], name: "index_new_feature_feedbacks_on_satisfied"
+    t.index ["user_id", "form_key"], name: "index_new_feature_feedbacks_on_user_id_and_form_key", unique: true
+    t.index ["user_id"], name: "index_new_feature_feedbacks_on_user_id"
   end
 
   create_table "objectives", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
@@ -1110,6 +1213,7 @@ ActiveRecord::Schema.define(version: 2024_04_03_074309) do
     t.index ["code"], name: "index_pd_enrollments_on_code", unique: true
     t.index ["email"], name: "index_pd_enrollments_on_email"
     t.index ["pd_workshop_id"], name: "index_pd_enrollments_on_pd_workshop_id"
+    t.index ["user_id"], name: "index_pd_enrollments_on_user_id"
   end
 
   create_table "pd_facilitator_program_registrations", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
@@ -1624,13 +1728,7 @@ ActiveRecord::Schema.define(version: 2024_04_03_074309) do
     t.index ["storage_app_id"], name: "index_project_commits_on_storage_app_id"
   end
 
-  create_table "project_use_datablock_storages", charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
-    t.integer "project_id", null: false
-    t.boolean "use_datablock_storage", default: false, null: false
-    t.index ["project_id"], name: "index_project_use_datablock_storages_on_project_id"
-  end
-
-  create_table "projects", id: :integer, charset: "utf8mb4", force: :cascade do |t|
+  create_table "projects", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.integer "storage_id"
     t.text "value", size: :medium
     t.datetime "updated_at", null: false
@@ -2160,6 +2258,21 @@ ActiveRecord::Schema.define(version: 2024_04_03_074309) do
     t.index ["user_id"], name: "index_user_geos_on_user_id"
   end
 
+  create_table "user_level_interactions", charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "level_id", null: false
+    t.integer "script_id", null: false
+    t.string "school_year", null: false
+    t.string "interaction", null: false
+    t.string "code_version"
+    t.json "metadata"
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["level_id"], name: "index_user_level_interactions_on_level_id"
+    t.index ["user_id"], name: "index_user_level_interactions_on_user_id"
+  end
+
   create_table "user_levels", id: { type: :bigint, unsigned: true }, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "level_id", null: false
@@ -2345,7 +2458,11 @@ ActiveRecord::Schema.define(version: 2024_04_03_074309) do
     t.boolean "urm"
     t.string "races"
     t.integer "primary_contact_info_id"
+    t.string "unlock_token"
+    t.string "cap_status", limit: 1
+    t.datetime "cap_status_date"
     t.index ["birthday"], name: "index_users_on_birthday"
+    t.index ["cap_status", "cap_status_date"], name: "index_users_on_cap_status_and_cap_status_date"
     t.index ["current_sign_in_at"], name: "index_users_on_current_sign_in_at"
     t.index ["deleted_at"], name: "index_users_on_deleted_at"
     t.index ["email", "deleted_at"], name: "index_users_on_email_and_deleted_at"
@@ -2359,6 +2476,7 @@ ActiveRecord::Schema.define(version: 2024_04_03_074309) do
     t.index ["reset_password_token", "deleted_at"], name: "index_users_on_reset_password_token_and_deleted_at", unique: true
     t.index ["school_info_id"], name: "index_users_on_school_info_id"
     t.index ["studio_person_id"], name: "index_users_on_studio_person_id"
+    t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true
     t.index ["username", "deleted_at"], name: "index_users_on_username_and_deleted_at", unique: true
   end
 
@@ -2386,6 +2504,7 @@ ActiveRecord::Schema.define(version: 2024_04_03_074309) do
 
   add_foreign_key "ai_tutor_interaction_feedbacks", "ai_tutor_interactions"
   add_foreign_key "ai_tutor_interaction_feedbacks", "users"
+  add_foreign_key "cap_user_events", "users"
   add_foreign_key "census_submission_form_maps", "census_submissions"
   add_foreign_key "census_summaries", "schools"
   add_foreign_key "hint_view_requests", "users"
@@ -2400,6 +2519,7 @@ ActiveRecord::Schema.define(version: 2024_04_03_074309) do
   add_foreign_key "lti_sections", "sections"
   add_foreign_key "lti_user_identities", "lti_integrations"
   add_foreign_key "lti_user_identities", "users"
+  add_foreign_key "new_feature_feedbacks", "users"
   add_foreign_key "parental_permission_requests", "users"
   add_foreign_key "pd_application_emails", "pd_applications"
   add_foreign_key "pd_application_tags_applications", "pd_application_tags"

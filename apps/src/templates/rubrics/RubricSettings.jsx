@@ -1,23 +1,32 @@
-import React, {useEffect, useState} from 'react';
-import PropTypes from 'prop-types';
-import style from './rubrics.module.scss';
 import classnames from 'classnames';
-import i18n from '@cdo/locale';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React, {useEffect, useState, useMemo, useCallback} from 'react';
+import {CSVLink} from 'react-csv';
+import {connect} from 'react-redux';
+
+import Link from '@cdo/apps/componentLibrary/link/Link';
+import Toggle from '@cdo/apps/componentLibrary/toggle/Toggle';
 import {
   BodyTwoText,
+  BodyThreeText,
   Heading3,
   Heading4,
   StrongText,
 } from '@cdo/apps/componentLibrary/typography';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
-import {EVENTS, PLATFORMS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import {reportingDataShape, rubricShape} from './rubricShapes';
-import Button from '@cdo/apps/templates/Button';
-import SectionSelector from './SectionSelector';
-import Link from '@cdo/apps/componentLibrary/link/Link';
+import Button from '@cdo/apps/legacySharedComponents/Button';
+import UserPreferences from '@cdo/apps/lib/util/UserPreferences';
+import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import {setAiRubricsDisabled} from '@cdo/apps/templates/currentUserRedux';
+import {setAiEvalStatusMap} from '@cdo/apps/templates/rubrics/teacherRubricRedux';
+import i18n from '@cdo/locale';
+
 import {UNDERSTANDING_LEVEL_STRINGS_V2, TAB_NAMES} from './rubricHelpers';
-import {CSVLink} from 'react-csv';
-import _ from 'lodash';
+import {reportingDataShape, rubricShape} from './rubricShapes';
+import SectionSelector from './SectionSelector';
+
+import style from './rubrics.module.scss';
 
 const STATUS_ALL = {
   // we are waiting for initial status from the server
@@ -34,13 +43,18 @@ const STATUS_ALL = {
   ERROR: 'error',
 };
 
-export default function RubricSettings({
+function RubricSettings({
   visible,
   refreshAiEvaluations,
   rubric,
   sectionId,
   tabSelectCallback,
   reportingData,
+  aiRubricsDisabled,
+  setAiRubricsDisabled,
+  allTeacherEvaluationData,
+  aiEvalStatusCounters,
+  setAiEvalStatusMap,
 }) {
   const rubricId = rubric.id;
   const {lesson} = rubric;
@@ -53,14 +67,23 @@ export default function RubricSettings({
   const [teacherEval, setTeacherEval] = useState(null);
   const [teacherEvalCount, setTeacherEvalCount] = useState(0);
   const polling = statusAll === STATUS_ALL.EVALUATION_PENDING;
-  const headers = [
-    {label: i18n.studentName(), key: 'user_name'},
-    {label: i18n.familyName(), key: 'user_family_name'},
-  ].concat(
-    ..._.sortBy(rubric.learningGoals, 'id').map(lg => {
-      return {label: String(lg.learningGoal), key: String(lg.id)};
-    })
+  const headers = useMemo(
+    () =>
+      [
+        {label: i18n.studentName(), key: 'user_name'},
+        {label: i18n.familyName(), key: 'user_family_name'},
+      ].concat(
+        ..._.sortBy(rubric.learningGoals, 'id').map(lg => {
+          return {label: String(lg.learningGoal), key: String(lg.id)};
+        })
+      ),
+    [rubric.learningGoals]
   );
+
+  const updateAiRubricsDisabled = () => {
+    new UserPreferences().setAiRubricsDisabled(!aiRubricsDisabled);
+    setAiRubricsDisabled(!aiRubricsDisabled);
+  };
 
   const fetchAiEvaluationStatusAll = (rubricId, sectionId) => {
     return fetch(
@@ -68,15 +91,9 @@ export default function RubricSettings({
     );
   };
 
-  const fetchTeacherEvaluationAll = (rubricId, sectionId) => {
-    return fetch(
-      `/rubrics/${rubricId}/get_teacher_evaluations_for_all?section_id=${sectionId}`
-    );
-  };
-
-  const getHeadersSlice = () => {
+  const getHeadersSlice = useCallback(() => {
     return headers.slice(2, headers.length);
-  };
+  }, [headers]);
 
   const statusAllText = () => {
     switch (statusAll) {
@@ -110,80 +127,71 @@ export default function RubricSettings({
     setDisplayDetails(!displayDetails);
   };
 
-  // load initial ai evaluation status
+  const parseAiEvalStatusCounters = useCallback(data => {
+    // we can't fetch the csrf token from the DOM because CSRF protection
+    // is disabled on script level pages.
+    setCsrfToken(data.csrfToken);
+    setUnevaluatedCount(data.attemptedUnevaluatedCount);
+    setTotalCount(data.attemptedCount + data.notAttemptedCount);
+    setEvaluatedCount(data.lastAttemptEvaluatedCount);
+    if (data.attemptedCount === 0) {
+      setStatusAll(STATUS_ALL.NOT_ATTEMPTED);
+    } else if (data.attemptedUnevaluatedCount === 0) {
+      setStatusAll(STATUS_ALL.ALREADY_EVALUATED);
+    } else {
+      setStatusAll(STATUS_ALL.READY);
+    }
+  }, []);
+
+  // parse initial ai evaluation status
   useEffect(() => {
-    const abort = new AbortController();
-    if (!!rubricId && !!sectionId) {
-      fetchAiEvaluationStatusAll(rubricId, sectionId).then(response => {
-        if (!response.ok) {
-          setStatusAll(STATUS_ALL.ERROR);
+    if (aiEvalStatusCounters) {
+      parseAiEvalStatusCounters(aiEvalStatusCounters);
+    }
+  }, [aiEvalStatusCounters, parseAiEvalStatusCounters]);
+
+  const parseTeacherEvaluationData = useCallback(
+    data => {
+      const teachEvalArr = [];
+      let count = 0;
+      data.forEach(student => {
+        var teachEvalRow = {
+          user_name: student.user_name,
+          user_family_name: !!student.user_family_name
+            ? student.user_family_name
+            : '',
+        };
+        if (student.eval.length > 0) {
+          count++;
+          student.eval.forEach(e => {
+            teachEvalRow[String(e.learning_goal_id)] =
+              e.understanding !== null
+                ? UNDERSTANDING_LEVEL_STRINGS_V2[e.understanding]
+                : '';
+          });
         } else {
-          response.json().then(data => {
-            // we can't fetch the csrf token from the DOM because CSRF protection
-            // is disabled on script level pages.
-            setCsrfToken(data.csrfToken);
-            setUnevaluatedCount(data.attemptedUnevaluatedCount);
-            setTotalCount(data.attemptedCount + data.notAttemptedCount);
-            setEvaluatedCount(data.lastAttemptEvaluatedCount);
-            if (data.attemptedCount === 0) {
-              setStatusAll(STATUS_ALL.NOT_ATTEMPTED);
-            } else if (data.attemptedUnevaluatedCount === 0) {
-              setStatusAll(STATUS_ALL.ALREADY_EVALUATED);
-            } else {
-              setStatusAll(STATUS_ALL.READY);
-            }
+          // add dummy values to keep the shape for students
+          // with no evaluations
+          getHeadersSlice().forEach(h => {
+            teachEvalRow[String(h.key)] = '';
           });
         }
+        teachEvalArr.push(teachEvalRow);
       });
-    }
-    return () => abort.abort();
-  }, [rubricId, sectionId]);
+      setTeacherEval(teachEvalArr);
+      setTeacherEvalCount(count);
+    },
+    [getHeadersSlice]
+  );
 
   useEffect(() => {
-    const abort = new AbortController();
-    if (!!rubricId && !!sectionId) {
-      fetchTeacherEvaluationAll(rubricId, sectionId).then(response => {
-        if (response.ok) {
-          response.json().then(data => {
-            var teachEvalArr = [];
-            var count = 0;
-            data.forEach(student => {
-              var teachEvalRow = {
-                user_name: student.user_name,
-                user_family_name: !!student.user_family_name
-                  ? student.user_family_name
-                  : '',
-              };
-              if (student.eval.length > 0) {
-                count++;
-                student.eval.forEach(e => {
-                  teachEvalRow[String(e.learning_goal_id)] =
-                    e.understanding !== null
-                      ? UNDERSTANDING_LEVEL_STRINGS_V2[e.understanding]
-                      : '';
-                });
-              } else {
-                // add dummy values to keep the shape for students
-                // with no evaluations
-                getHeadersSlice().forEach(h => {
-                  teachEvalRow[String(h.key)] = '';
-                });
-              }
-              teachEvalArr.push(teachEvalRow);
-            });
-            setTeacherEval(teachEvalArr);
-            setTeacherEvalCount(count);
-          });
-        }
-      });
+    if (allTeacherEvaluationData && allTeacherEvaluationData.length > 0) {
+      parseTeacherEvaluationData(allTeacherEvaluationData);
     }
-    return () => abort.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rubricId, sectionId]);
+  }, [allTeacherEvaluationData, parseTeacherEvaluationData]);
 
   // after ai eval is requested, poll for status changes
   useEffect(() => {
-    const abort = new AbortController();
     if (polling && !!rubricId && !!sectionId) {
       const intervalId = setInterval(() => {
         refreshAiEvaluations();
@@ -202,6 +210,7 @@ export default function RubricSettings({
                 setStatusAll(STATUS_ALL.EVALUATION_PENDING);
               } else {
                 setStatusAll(STATUS_ALL.SUCCESS);
+                setAiEvalStatusMap(data.aiEvalStatusMap);
               }
             });
           }
@@ -209,8 +218,14 @@ export default function RubricSettings({
       }, 5000);
       return () => clearInterval(intervalId);
     }
-    return () => abort.abort();
-  }, [rubricId, polling, sectionId, statusAll, refreshAiEvaluations]);
+  }, [
+    rubricId,
+    polling,
+    sectionId,
+    statusAll,
+    refreshAiEvaluations,
+    setAiEvalStatusMap,
+  ]);
 
   const handleRunAiAssessmentAll = () => {
     setStatusAll(STATUS_ALL.EVALUATION_PENDING);
@@ -352,6 +367,27 @@ export default function RubricSettings({
             )}
           </div>
         </div>
+
+        <div className={style.settingsGroup}>
+          <Heading4>{i18n.aiSettings()}</Heading4>
+          <div
+            className={classnames(
+              'uitest-rubric-ai-enable',
+              style.settingsContainers,
+              style.aiSettingsContainer
+            )}
+          >
+            <BodyThreeText>
+              <StrongText>{i18n.useAiFeaturesOnCodeOrg()}</StrongText>
+            </BodyThreeText>
+            <Toggle
+              label={i18n.useAiFeatures()}
+              checked={!aiRubricsDisabled}
+              onChange={updateAiRubricsDisabled}
+              size="s"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -366,4 +402,26 @@ RubricSettings.propTypes = {
   sectionId: PropTypes.number,
   tabSelectCallback: PropTypes.func,
   reportingData: reportingDataShape,
+  aiRubricsDisabled: PropTypes.bool,
+  setAiRubricsDisabled: PropTypes.func.isRequired,
+
+  // Redux provided
+  allTeacherEvaluationData: PropTypes.array,
+  aiEvalStatusCounters: PropTypes.object,
+  setAiEvalStatusMap: PropTypes.func,
 };
+
+export const UnconnectedRubricSettings = RubricSettings;
+
+export default connect(
+  state => ({
+    aiRubricsDisabled: state.currentUser.aiRubricsDisabled,
+    allTeacherEvaluationData: state.teacherRubric.allTeacherEvaluationData,
+    aiEvalStatusCounters: state.teacherRubric.aiEvalStatusCounters,
+  }),
+  dispatch => ({
+    setAiRubricsDisabled: aiRubricsDisabled =>
+      dispatch(setAiRubricsDisabled(aiRubricsDisabled)),
+    setAiEvalStatusMap: statusMap => dispatch(setAiEvalStatusMap(statusMap)),
+  })
+)(RubricSettings);

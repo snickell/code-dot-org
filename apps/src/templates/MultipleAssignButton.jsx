@@ -1,15 +1,16 @@
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {connect} from 'react-redux';
-import Button from './Button';
-import i18n from '@cdo/locale';
+
+import Button from '@cdo/apps/legacySharedComponents/Button';
+import MultipleSectionsAssigner from '@cdo/apps/templates/MultipleSectionsAssigner';
+import {sectionForDropdownShape} from '@cdo/apps/templates/teacherDashboard/shapes';
 import {
   assignToSection,
   unassignSection,
-  sectionsForDropdown,
 } from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
-import MultipleSectionsAssigner from '@cdo/apps/templates/MultipleSectionsAssigner';
-import {sectionForDropdownShape} from '@cdo/apps/templates/teacherDashboard/shapes';
+import {sectionsForDropdown} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
+import i18n from '@cdo/locale';
 
 class MultipleAssignButton extends React.Component {
   static propTypes = {
@@ -55,29 +56,21 @@ class MultipleAssignButton extends React.Component {
       scriptId,
       assignmentName,
       isStandAloneUnit,
-      isRtl,
       sectionsForDropdown,
       participantAudience,
       isAssigningCourse,
       reassignConfirm,
     } = this.props;
 
-    // Adjust styles if locale is RTL
-    const buttonMarginStyle = isRtl
-      ? styles.buttonMarginRTL
-      : styles.buttonMargin;
-
     return (
       <div>
-        <div style={buttonMarginStyle}>
-          <Button
-            color={Button.ButtonColor.brandSecondaryDefault}
-            text={i18n.assignToMultipleSections()}
-            icon="plus"
-            onClick={this.handleClick}
-            className={'uitest-assign-button'}
-          />
-        </div>
+        <Button
+          color={Button.ButtonColor.brandSecondaryDefault}
+          text={i18n.assignToMultipleSections()}
+          icon="plus"
+          onClick={this.handleClick}
+          className={'uitest-assign-button'}
+        />
         {assignmentChoiceDialogOpen && (
           <MultipleSectionsAssigner
             assignmentName={assignmentName}
@@ -97,19 +90,6 @@ class MultipleAssignButton extends React.Component {
     );
   }
 }
-
-const styles = {
-  buttonMargin: {
-    marginLeft: 10,
-    display: 'flex',
-    alignItems: 'center',
-  },
-  buttonMarginRTL: {
-    marginRight: 10,
-    display: 'flex',
-    alignItems: 'center',
-  },
-};
 
 export const UnconnectedMultipleAssignButton = MultipleAssignButton;
 

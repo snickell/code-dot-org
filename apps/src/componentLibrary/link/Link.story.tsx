@@ -12,7 +12,6 @@ export default {
 // TEMPLATE
 //
 // This is needed to fix children type error (passing string instead of React.ReactNode type)
-// eslint-disable-next-line
 const SingleTemplate: StoryFn<LinkProps> = args => <Link {...args} />;
 
 const MultipleTemplate: StoryFn<{
@@ -34,7 +33,7 @@ const MultipleTemplate: StoryFn<{
 
 export const DefaultLink = SingleTemplate.bind({});
 DefaultLink.args = {
-  children: 'Default Link',
+  text: 'Default Link',
   href: '#',
   onClick: e => {
     e.preventDefault();
@@ -45,7 +44,7 @@ DefaultLink.args = {
 
 export const DisabledLink = SingleTemplate.bind({});
 DisabledLink.args = {
-  children: 'Disabled Link',
+  text: 'Disabled Link',
   onClick: e => {
     e.preventDefault();
     alert('clicked');
@@ -54,11 +53,29 @@ DisabledLink.args = {
   size: 'm',
 };
 
+export const LinkWithTextPropVsLinkWithChildrenProp = MultipleTemplate.bind({});
+LinkWithTextPropVsLinkWithChildrenProp.args = {
+  components: [
+    {
+      text: 'Link Text Prop',
+      href: '#',
+    },
+    {
+      children: 'Link Children Prop',
+      href: '#',
+    },
+    {
+      children: <em>Link Children Prop (with em tag)</em>,
+      href: '#',
+    },
+  ],
+};
+
 export const GroupOfTypesOfLinks = MultipleTemplate.bind({});
 GroupOfTypesOfLinks.args = {
   components: [
     {
-      children: 'Link M Primary',
+      text: 'Link M Primary',
       href: '#',
       size: 'm',
     },

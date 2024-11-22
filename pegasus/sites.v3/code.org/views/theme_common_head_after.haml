@@ -1,5 +1,7 @@
-=::NewRelic::Agent.browser_timing_header rescue ''
-=view :old_ie
+- begin
+  =::NewRelic::Agent.browser_timing_header
+- rescue
+  = ''
 =view :jquery
 =view :theme_google_analytics
 

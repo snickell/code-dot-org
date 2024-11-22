@@ -26,8 +26,7 @@ class Projects
   #### rather than this middleware class (Projects, plural)
   #### such that we can make use of model associations managed by Rails.
   def get_rails_project(project_id)
-    return @rails_project if @rails_project
-    @rails_project = Project.find(project_id)
+    Project.find(project_id)
   end
 
   def create(value, ip:, type: nil, published_at: nil, remix_parent_id: nil, standalone: true, level: nil)
@@ -49,9 +48,6 @@ class Projects
       standalone: standalone,
     }
     row[:id] = @table.insert(row)
-
-    # TODO: post-firebase-cleanup, remove this once we switch 100% to datablock storage: #56994
-    set_use_datablock_storage row[:id], project_type
 
     storage_encrypt_channel_id(row[:storage_id], row[:id])
   end
@@ -140,10 +136,8 @@ class Projects
     raise NotFound, "channel `#{channel_id}` not found" if project_query_result.empty?
 
     rails_project = get_rails_project(project_id)
-    if rails_project.apply_project_age_publish_limits?
-      raise PublishError, "User too new to publish channel `#{channel_id}`" unless rails_project.owner_existed_long_enough_to_publish?
-      raise PublishError, "Project too new to publish channel `#{channel_id}`" unless rails_project.existed_long_enough_to_publish?
-    end
+    raise PublishError, "User too new to publish channel `#{channel_id}`" unless rails_project.owner_existed_long_enough_to_publish?
+    raise PublishError, "Project too new to publish channel `#{channel_id}`" unless rails_project.existed_long_enough_to_publish?
 
     project_query_result.update(row)
 
@@ -370,6 +364,7 @@ class Projects
         updatedAt: row[:updated_at],
         publishedAt: row[:published_at],
         projectType: row[:project_type],
+        frozen: JSON.parse(row[:value])['frozen'],
       }
     )
   end
@@ -447,26 +442,6 @@ class Projects
     source_body = source_data[:body].string
     project_src = ProjectSourceJson.new(source_body)
     return project_src.in_restricted_share_mode?
-  end
-
-  # TODO: post-firebase-cleanup, remove this once we switch 100% to datablock storage
-  private def set_use_datablock_storage(project_id, project_type)
-    # TODO: unfirebase, include 'gamelab' in this list, see #56995
-    if ['applab'].include? project_type
-      # While we transition, a fraction of new projects will be set at creation
-      # to use datablock storage. As we gain confidence, we can increase this
-      # DCDO flag to 1.0. At that point, we're ready to migrate all the old projects.
-      #
-      # Once 100% of the old projects are migrated, we're ready to remove code
-      # marked with: TODO: post-firebase-cleanup
-      use_datablock_table = DASHBOARD_DB[:project_use_datablock_storages]
-      existing_record = use_datablock_table.where(project_id: project_id).first
-      unless existing_record
-        fraction = DCDO.get('fraction_of_new_projects_use_datablock_storage', 0.0)
-        should_use_datablock = rand < fraction
-        use_datablock_table.insert(project_id: project_id, use_datablock_storage: should_use_datablock)
-      end
-    end
   end
 
   #

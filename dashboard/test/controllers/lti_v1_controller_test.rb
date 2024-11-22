@@ -4,6 +4,7 @@ require 'jwt'
 require 'policies/lti'
 require "services/lti"
 require "clients/lti_advantage_client"
+require 'clients/lti_dynamic_registration_client'
 
 class LtiV1ControllerTest < ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers
@@ -15,6 +16,7 @@ class LtiV1ControllerTest < ActionDispatch::IntegrationTest
     # create arbitary state and nonce values
     @state = 'state'
     @nonce = 'nonce'
+    @subject = SecureRandom.uuid
     @parsed_nrps_sections = {
       "1" =>
       {
@@ -300,7 +302,7 @@ class LtiV1ControllerTest < ActionDispatch::IntegrationTest
             @integration.client_id
           end
     roles_key = Policies::Lti::LTI_ROLES_KEY
-    custom_claims_key = Policies::Lti::LTI_CUSTOM_CLAIMS
+    custom_claims_key = Policies::Lti::LTI_CUSTOM_CLAIMS.to_sym
     teacher_roles = Policies::Lti::STAFF_ROLES
     nrps_url_key = Policies::Lti::LTI_NRPS_CLAIM
     resource_link_key = Policies::Lti::LTI_RESOURCE_LINK_CLAIM
@@ -312,10 +314,13 @@ class LtiV1ControllerTest < ActionDispatch::IntegrationTest
       exp: 7.days.from_now.to_i,
       iat: 1.day.ago.to_i,
       iss: @integration.issuer,
-      sub: 'LTI-AUTH',
+      sub: @subject,
       nonce: @nonce,
       'https://purl.imsglobal.org/spec/lti/claim/target_link_uri': target_link_uri,
       'https://purl.imsglobal.org/spec/lti/claim/message_type': 'LtiResourceLinkRequest',
+      'https://purl.imsglobal.org/spec/lti/claim/tool_platform' => {
+        name: 'test_platform'
+      },
       custom_claims_key => {
         display_name: 'hansolo',
         full_name: 'Han Solo',
@@ -456,6 +461,9 @@ class LtiV1ControllerTest < ActionDispatch::IntegrationTest
     jwt = create_jwt(payload)
     post '/lti/v1/authenticate', params: {id_token: jwt, state: @state}
     assert_response :not_acceptable
+    assert_match 'Unsupported LTI message type', @response.body
+    assert_match 'Sorry! It looks like you are trying to launch the Code.org Integration via a file.', @response.body
+    assert_match 'Please try launching Code.org again from a <a href="https://github.com/code-dot-org/code-dot-org/blob/staging/docs/lti-integration.md#option-2-manual-entry">supported method</a>.', @response.body
   end
 
   test 'auth - error raised in decoding jwt' do
@@ -474,14 +482,19 @@ class LtiV1ControllerTest < ActionDispatch::IntegrationTest
 
   test 'auth - given a valid jwt with the audience as an array, redirect to target_link_url' do
     aud_is_array = true
-    jwt = create_valid_jwt(aud_is_array)
+    payload = get_valid_payload(aud_is_array)
+    jwt = create_jwt_and_stub(payload)
+    create_preexisting_user(payload)
+
     post '/lti/v1/authenticate', params: {id_token: jwt, state: @state}
     assert_response :redirect
   end
 
   test 'auth - given a valid jwt, redirect to target_link_url' do
-    aud_is_array = false
-    jwt = create_valid_jwt(aud_is_array)
+    payload = get_valid_payload
+    jwt = create_jwt_and_stub(payload)
+    create_preexisting_user(payload)
+
     post '/lti/v1/authenticate', params: {id_token: jwt, state: @state}
     assert_response :redirect
     # could confirm more things here
@@ -493,31 +506,59 @@ class LtiV1ControllerTest < ActionDispatch::IntegrationTest
     post '/lti/v1/authenticate', params: {id_token: jwt, state: @state}
     deployment = LtiDeployment.find_by(deployment_id: @deployment_id)
     assert deployment
+    assert deployment.name
     assert_equal deployment, @integration.lti_deployments.first
   end
 
   test 'auth - given an existing deployment_id in our system, do not create a new LtiDeployment' do
     payload = get_valid_payload
     jwt = create_jwt_and_stub(payload)
-    deployment = LtiDeployment.create(deployment_id: @deployment_id, lti_integration_id: @integration.id)
+    deployment = create(:lti_deployment, deployment_id: @deployment_id, lti_integration: @integration)
     assert deployment
     post '/lti/v1/authenticate', params: {id_token: jwt, state: @state}
     assert_equal deployment, @integration.lti_deployments.first
     assert_equal @integration.lti_deployments.count, 1
   end
 
+  test 'auth - given an existing LTI deployment in our system, update deployment with name if empty' do
+    payload = get_valid_payload
+    jwt = create_jwt_and_stub(payload)
+    deployment = create(:lti_deployment, deployment_id: @deployment_id, lti_integration: @integration)
+    assert deployment
+    assert_nil deployment.name
+    post '/lti/v1/authenticate', params: {id_token: jwt, state: @state}
+    assert_equal deployment, @integration.lti_deployments.first
+    assert_equal @integration.lti_deployments.count, 1
+    deployment.reload
+    assert deployment.name
+  end
+
+  test 'auth - link lti_user_identity with lti_deployment' do
+    payload = get_valid_payload
+    jwt = create_jwt_and_stub(payload)
+    user = create_preexisting_user(payload)
+    deployment = create(:lti_deployment, deployment_id: @deployment_id, lti_integration: @integration)
+    assert_equal deployment.lti_user_identities.count, 0
+    post '/lti/v1/authenticate', params: {id_token: jwt, state: @state}
+    assert_equal deployment.lti_user_identities.count, 1
+    assert_equal deployment.lti_user_identities.first, user.lti_user_identities.first
+  end
+
+  test 'auth - do not link lti_user_identity with lti_deployment if already linked' do
+    payload = get_valid_payload
+    jwt = create_jwt_and_stub(payload)
+    user = create_preexisting_user(payload)
+    deployment = create(:lti_deployment, deployment_id: @deployment_id, lti_integration: @integration)
+    deployment.lti_user_identities << user.lti_user_identities.first
+    assert_equal deployment.lti_user_identities.count, 1
+    post '/lti/v1/authenticate', params: {id_token: jwt, state: @state}
+    assert_equal deployment.lti_user_identities.count, 1
+  end
+
   test 'auth - should render the upgrade account page if the LTI has the same user as an instructor' do
     payload = get_valid_payload
     jwt = create_jwt_and_stub(payload)
-
-    user = create :student
-    ao = AuthenticationOption.new(
-      user: user,
-      email: Services::Lti.get_claim(payload, :email),
-      credential_type: AuthenticationOption::LTI_V1,
-      authentication_id: Services::Lti::AuthIdGenerator.new(payload).call
-    )
-    ao.save!
+    create_preexisting_user(payload, User::TYPE_STUDENT)
 
     deployment = LtiDeployment.create(deployment_id: @deployment_id, lti_integration_id: @integration.id)
     assert deployment
@@ -530,15 +571,7 @@ class LtiV1ControllerTest < ActionDispatch::IntegrationTest
   test 'auth - should NOT upgrade if student and LTI informs that this is a learner' do
     payload = {**get_valid_payload, Policies::Lti::LTI_ROLES_KEY => [Policies::Lti::CONTEXT_LEARNER_ROLE]}
     jwt = create_jwt_and_stub(payload)
-
-    user = create :student
-    ao = AuthenticationOption.new(
-      user: user,
-      email: Services::Lti.get_claim(payload, :email),
-      credential_type: AuthenticationOption::LTI_V1,
-      authentication_id: Services::Lti::AuthIdGenerator.new(payload).call
-    )
-    ao.save!
+    create_preexisting_user(payload, User::TYPE_STUDENT)
 
     deployment = LtiDeployment.create(deployment_id: @deployment_id, lti_integration_id: @integration.id)
     assert deployment
@@ -555,20 +588,53 @@ class LtiV1ControllerTest < ActionDispatch::IntegrationTest
     payload = {**get_valid_payload, iss: issuer, aud: integration.client_id}
     jwt = create_jwt_and_stub(payload)
     post '/lti/v1/authenticate', params: {id_token: jwt, state: @state}
-    assert_response :redirect
-    assert_redirected_to '/lti/v1/iframe' + "?id_token=#{jwt}&state=#{@state}"
+    assert_template 'lti/v1/iframe'
   end
 
   test 'auth - should NOT redirect to iframe route if LMS caller is Schoology AND new_tab=true param is present' do
     issuer = Policies::Lti::LMS_PLATFORMS[:schoology][:issuer]
     integration = create :lti_integration, issuer: issuer
+    integration.update(platform_name: 'schoology')
     # Override read_cache stub with this integration
     LtiV1Controller.any_instance.stubs(:read_cache).with("#{integration.issuer}/#{integration.client_id}").returns(integration)
     payload = {**get_valid_payload, iss: issuer, aud: integration.client_id, azp: integration.client_id}
     jwt = create_jwt_and_stub(payload)
     post '/lti/v1/authenticate', params: {id_token: jwt, state: @state, new_tab: true}
-    assert_response :redirect
-    assert_redirected_to '/users/sign_up'
+    assert_response :ok
+    assert_template 'lti/v1/account_linking/landing'
+  end
+
+  test 'auth - should render the landing page and store session state' do
+    payload = {**get_valid_payload, Policies::Lti::LTI_ROLES_KEY => [Policies::Lti::CONTEXT_LEARNER_ROLE]}
+    jwt = create_jwt_and_stub(payload)
+
+    deployment = LtiDeployment.create(deployment_id: @deployment_id, lti_integration_id: @integration.id)
+    assert deployment
+    post '/lti/v1/authenticate', params: {id_token: jwt, state: @state}
+
+    expected = {
+      lti_provider_name: "canvas_cloud",
+      new_cta_type: "new",
+      user_type: "student",
+    }
+
+    assert_equal expected, session[:lms_landing]
+    assert_template 'lti/v1/account_linking/landing'
+  end
+
+  test 'auth - should create teacher account if user is both teacher and student' do
+    payload = {**get_valid_payload, Policies::Lti::LTI_ROLES_KEY => [Policies::Lti::CONTEXT_LEARNER_ROLE, Policies::Lti::TEACHER_ROLES.first]}
+    jwt = create_jwt_and_stub(payload)
+    post '/lti/v1/authenticate', params: {id_token: jwt, state: @state}
+
+    expected = {
+      lti_provider_name: "canvas_cloud",
+      new_cta_type: "new",
+      user_type: "teacher",
+    }
+
+    assert_equal expected, session[:lms_landing]
+    assert_template 'lti/v1/account_linking/landing'
   end
 
   test 'sync - should redirect students to homepage without syncing' do
@@ -611,6 +677,23 @@ class LtiV1ControllerTest < ActionDispatch::IntegrationTest
 
     get '/lti/v1/sync_course', params: {lti_integration_id: lti_integration.id, deployment_id: 'foo', context_id: lti_course.context_id, rlid: lti_course.resource_link_id, nrps_url: lti_course.nrps_url}
     assert_response :ok
+  end
+
+  test 'sync - should update the LtiCourse resource link id if the params rlid has changed' do
+    user = create :teacher, :with_lti_auth
+    sign_in user
+    lti_integration = create :lti_integration
+    lti_course = create :lti_course, lti_integration: lti_integration, context_id: SecureRandom.uuid, resource_link_id: SecureRandom.uuid, nrps_url: 'https://example.com/nrps'
+    new_resource_id = SecureRandom.uuid
+    LtiAdvantageClient.any_instance.expects(:get_context_membership).with(lti_course.nrps_url, new_resource_id).returns({})
+    Services::Lti.expects(:parse_nrps_response).returns(@parsed_nrps_sections)
+    Services::Lti.expects(:sync_course_roster).returns(@sync_course_result_with_changes)
+
+    get '/lti/v1/sync_course', params: {lti_integration_id: lti_integration.id, deployment_id: 'foo', context_id: lti_course.context_id, rlid: new_resource_id, nrps_url: lti_course.nrps_url}
+
+    lti_course.reload
+    assert_response :ok
+    assert_equal new_resource_id, lti_course.resource_link_id
   end
 
   test 'sync_course as json - syncs and returns course sections data' do
@@ -772,22 +855,6 @@ class LtiV1ControllerTest < ActionDispatch::IntegrationTest
     assert_response :internal_server_error
   end
 
-  test 'integration form - renders the integration template' do
-    Policies::Lti.stubs(:early_access?).returns(false)
-
-    get '/lti/v1/integrations'
-
-    assert_template 'lti/v1/integrations'
-  end
-
-  test 'integration form - renders the early access template when early access is enabled' do
-    Policies::Lti.stubs(:early_access?).returns(true)
-
-    get '/lti/v1/integrations'
-
-    assert_template 'lti/v1/integrations/early_access'
-  end
-
   test 'integration - given valid inputs, creates a new integration if one does not exist' do
     name = "Fake School"
     client_id = "1234canvas"
@@ -802,22 +869,6 @@ class LtiV1ControllerTest < ActionDispatch::IntegrationTest
 
     post '/lti/v1/integrations', params: {name: name, client_id: client_id, lms: lms, email: email}
     assert_response :ok
-  end
-
-  test 'integration - redirects to the form without integration creation when early access is closed' do
-    Policies::Lti.expects(:early_access_closed?).returns(true)
-
-    name = 'Fake School'
-    client_id = '1234canvas'
-    lms = 'canvas_cloud'
-    email = 'fake@email.com'
-
-    assert_no_difference 'LtiIntegration.count' do
-      post '/lti/v1/integrations', params: {name: name, client_id: client_id, lms: lms, email: email}
-    end
-
-    assert_redirected_to lti_v1_integrations_path
-    assert_match /Learning Management System Integrations have been claimed/, flash[:alert]
   end
 
   test 'integration - given missing inputs, does not create a new integration' do
@@ -890,13 +941,14 @@ class LtiV1ControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'upgrade_account - upgrades current user to teacher' do
-    user = create :student
+    user = create :student, :with_lti_auth
     sign_in user
     post '/lti/v1/upgrade_account', params: {email: 'test-teacher@code.org'}
 
     assert_response :ok
     user.reload
     assert_equal User::TYPE_TEACHER, user.user_type
+    assert_equal true, user.lti_roster_sync_enabled
   end
 
   test 'should not sync if the user has roster sync disabled' do
@@ -912,5 +964,27 @@ class LtiV1ControllerTest < ActionDispatch::IntegrationTest
 
     get '/lti/v1/sync_course', params: {lti_integration_id: lti_integration.id, deployment_id: 'foo', context_id: lti_course.context_id, rlid: lti_course.resource_link_id, nrps_url: lti_course.nrps_url}
     assert_response :redirect
+  end
+
+  # Create a user with an auth option matching the given JWT.
+  # Useful for bypassing the landing/linking flow.
+  private def create_preexisting_user(jwt_payload, user_type = User::TYPE_TEACHER)
+    user = user_type == User::TYPE_TEACHER ? create(:teacher) : create(:student)
+    user.update(lms_landing_opted_out: true)
+    ao = AuthenticationOption.new(
+      user: user,
+      email: Services::Lti.get_claim(jwt_payload, :email),
+      credential_type: AuthenticationOption::LTI_V1,
+      authentication_id: Services::Lti::AuthIdGenerator.new(jwt_payload).call
+    )
+    ao.save!
+    user_identity = LtiUserIdentity.new(
+      user_id: user.id,
+      lti_integration_id: @integration.id,
+      subject: @subject,
+    )
+    user_identity.save!
+
+    user
   end
 end

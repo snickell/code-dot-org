@@ -3,6 +3,8 @@
 // Most settings should be set in this config file.
 {
   "include": [
+    "./.storybook/**/*.js",
+    "./.storybook/**/*.ts",
     "./src/**/*.ts",
     "./src/**/*.tsx",
     "./test/**/*.ts",
@@ -26,9 +28,11 @@
     "baseUrl": "./",
     "paths": {
       "@cdo/apps/*": ["./src/*"],
+      "@cdo/storybook/*": ["./.storybook/*"],
       "@cdo/static/*": ["./static/*"],
       "@cdo/i18n/*": ["./i18n/*"],
-      "@cdoide/*": ["./src/weblab2/CDOIDE/*"]
+      "@codebridge/*": ["./src/codebridge/*"],
+      "@cdo/generated-scripts/*": ["./generated-scripts/*"]
     },
     "resolveJsonModule": true,
     "incremental": true,

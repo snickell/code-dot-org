@@ -5,28 +5,34 @@
  */
 import React from 'react';
 import {Provider} from 'react-redux';
-import {getStore} from '@cdo/apps/redux';
+
 import {getStandaloneProjectId} from '@cdo/apps/lab2/projects/utils';
-import Lab2Wrapper from './Lab2Wrapper';
+import {getStore} from '@cdo/apps/redux';
+import BrowserTextToSpeechWrapper from '@cdo/apps/sharedComponents/BrowserTextToSpeechWrapper';
+
 import ProjectContainer from '../projects/ProjectContainer';
-import MetricsAdapter from './MetricsAdapter';
-import LabViewsRenderer from './LabViewsRenderer';
+
 import DialogManager from './dialogs/DialogManager';
+import Lab2Wrapper from './Lab2Wrapper';
+import LabViewsRenderer from './LabViewsRenderer';
+import MetricsAdapter from './MetricsAdapter';
 import ThemeWrapper from './ThemeWrapper';
 
 const Lab2: React.FunctionComponent = () => {
   return (
     <Provider store={getStore()}>
-      <ThemeWrapper>
-        <Lab2Wrapper>
-          <DialogManager>
-            <MetricsAdapter />
-            <ProjectContainer channelId={getStandaloneProjectId()}>
-              <LabViewsRenderer />
-            </ProjectContainer>
-          </DialogManager>
-        </Lab2Wrapper>
-      </ThemeWrapper>
+      <BrowserTextToSpeechWrapper>
+        <ThemeWrapper>
+          <Lab2Wrapper>
+            <DialogManager>
+              <MetricsAdapter />
+              <ProjectContainer channelId={getStandaloneProjectId()}>
+                <LabViewsRenderer />
+              </ProjectContainer>
+            </DialogManager>
+          </Lab2Wrapper>
+        </ThemeWrapper>
+      </BrowserTextToSpeechWrapper>
     </Provider>
   );
 };

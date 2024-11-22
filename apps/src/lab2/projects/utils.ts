@@ -1,11 +1,18 @@
-import getScriptData from '@cdo/apps/util/getScriptData';
-import {ProjectFile, ProjectType} from '../types';
+import {START_SOURCES} from '@cdo/apps/lab2/constants';
+import currentLocale from '@cdo/apps/util/currentLocale';
+import getScriptData, {hasScriptData} from '@cdo/apps/util/getScriptData';
+
+import {MultiFileSource, ProjectFile, ProjectFileType} from '../types';
 
 // Partial definition of the App Options structure, only defining the
 // pieces we need in this component.
-interface PartialAppOptions {
+export interface PartialAppOptions {
   channel: string;
-  projectType: ProjectType;
+  editBlocks: string;
+  levelId: number;
+  share: boolean;
+  isEditingExemplar: boolean;
+  isViewingExemplar: boolean;
 }
 
 /**
@@ -17,13 +24,65 @@ interface PartialAppOptions {
  * Note: We are trying to use app options as little as possible.
  */
 export function getStandaloneProjectId(): string | undefined {
-  const appOptions = getScriptData('appoptions') as PartialAppOptions;
-  return appOptions.channel;
+  if (hasScriptData('script[data-appoptions]')) {
+    const appOptions = getScriptData('appoptions') as PartialAppOptions;
+    return appOptions.channel;
+  }
 }
 
-export function getProjectType(): string {
-  const appOptions = getScriptData('appoptions') as PartialAppOptions;
-  return appOptions.projectType;
+/**
+ * Returns the level ID provided by App Options, if available.
+ * This is specifically used in scenarios where the level ID is not provided
+ * by other means (for example via header.js)
+ */
+export function getAppOptionsLevelId(): number | undefined {
+  if (hasScriptData('script[data-appoptions]')) {
+    const appOptions = getScriptData('appoptions') as PartialAppOptions;
+    return appOptions.levelId;
+  }
+}
+
+/**
+ * Returns the edit mode provided by App Options, if available.
+ * This can be used to tell if we are a levelbuilder mode (e.g. start_sources)
+ */
+export function getAppOptionsEditBlocks(): string | undefined {
+  if (hasScriptData('script[data-appoptions]')) {
+    const appOptions = getScriptData('appoptions') as PartialAppOptions;
+    return appOptions.editBlocks;
+  }
+}
+
+/**
+ * Returns the value of isEditingExemplar provided by App Options, if available.
+ * This can be used to tell if we are currently editing exemplars.
+ */
+export function getAppOptionsEditingExemplar(): boolean | undefined {
+  if (hasScriptData('script[data-appoptions]')) {
+    const appOptions = getScriptData('appoptions') as PartialAppOptions;
+    return appOptions.isEditingExemplar;
+  }
+}
+
+/**
+ * Returns the value of isViewingExemplar provided by App Options, if available.
+ * This can be used to tell if we are currently viewing exemplars.
+ */
+export function getAppOptionsViewingExemplar(): boolean | undefined {
+  if (hasScriptData('script[data-appoptions]')) {
+    const appOptions = getScriptData('appoptions') as PartialAppOptions;
+    return appOptions.isViewingExemplar;
+  }
+}
+/**
+ * Returns if the lab should presented in a share/play-only view,
+ * if present in App Options. Only used in standalone project levels.
+ */
+export function getIsShareView(): boolean | undefined {
+  if (hasScriptData('script[data-appoptions]')) {
+    const appOptions = getScriptData('appoptions') as PartialAppOptions;
+    return appOptions.share;
+  }
 }
 
 /**
@@ -42,4 +101,35 @@ export function getFileByName(
     }
   }
   return null;
+}
+
+/**
+ * Given a map of {fileId: ProjectFile}, return the first non-hidden, active file.
+ * @param project - The folders and files for a given project.
+ * @returns The first non-hidden, active file, the first open file if no files are active,
+ * or undefined if no files are open.
+ */
+export function getActiveFileForProject(project: MultiFileSource) {
+  const files = Object.values(project.files);
+  const isStartMode = getAppOptionsEditBlocks() === START_SOURCES;
+  // No files are hidden in start mode. In non-start mode, only show starter files
+  // (or files without a type, which default to starter files).
+  const visibleFiles = files.filter(
+    f =>
+      isStartMode ||
+      !f.type ||
+      f.type === ProjectFileType.STARTER ||
+      f.type === ProjectFileType.LOCKED_STARTER
+  );
+
+  // Get the first active file, if no active file then the first open file,
+  // or undefined if no files are open.
+  return visibleFiles.find(f => f.active) || visibleFiles.find(f => f.open);
+}
+
+/**
+ * Returns the value of the language cookie (eg, en-US, which is also the default if the cookie is not set).
+ */
+export function getCurrentLocale(): string {
+  return currentLocale();
 }

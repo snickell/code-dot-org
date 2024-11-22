@@ -1,29 +1,30 @@
-import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import i18n from '@cdo/locale';
-import {BodyTwoText} from '@cdo/apps/componentLibrary/typography';
-import style from './school-association.module.scss';
+import React from 'react';
 
-export default function SchoolNameInput({fieldNames}) {
-  const [schoolName, setSchoolName] = useState('');
+import TextField from '@cdo/apps/componentLibrary/textField/TextField';
+import i18n from '@cdo/locale';
+
+export default function SchoolNameInput({
+  fieldNames,
+  schoolName,
+  setSchoolName,
+}) {
+  const handleSchoolNameChange = name => {
+    setSchoolName(name);
+  };
 
   return (
-    <label>
-      <BodyTwoText className={style.padding} visualAppearance={'heading-xs'}>
-        {i18n.schoolOrganizationQuestion()}
-      </BodyTwoText>
-      <input
-        type="text"
-        name={fieldNames.schoolName}
-        onChange={e => {
-          setSchoolName(e.target.value);
-        }}
-        value={schoolName}
-      />
-    </label>
+    <TextField
+      name={fieldNames.schoolName}
+      label={i18n.schoolOrganizationQuestion()}
+      onChange={e => handleSchoolNameChange(e.target.value)}
+      value={schoolName}
+    />
   );
 }
 
 SchoolNameInput.propTypes = {
   fieldNames: PropTypes.object,
+  schoolName: PropTypes.string,
+  setSchoolName: PropTypes.func,
 };

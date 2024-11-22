@@ -6,16 +6,16 @@
   height: 290px;
   display: flex;
   flex-direction: column;
-  gap: 5px;
 
   &Top {
     display: flex;
     justify-content: space-between;
-    margin: 5px 0;
+    margin-bottom: 5px;
+    gap: 8px;
 
     .segmentedButtons {
       span {
-        font-size: 12px !important;
+        user-select: none;
       }
     }
   }
@@ -61,9 +61,6 @@
     &:first-child {
       margin-top: 1px;
     }
-    &:not(:first-child) {
-      margin-top: 14px;
-    }
 
     &Left {
       width: 55px;
@@ -95,9 +92,9 @@
 
   .soundRow {
     overflow: hidden;
-    padding: 4px 0;
     font-size: 14px;
     margin: 1px;
+    padding: 6px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -118,13 +115,14 @@
     &Left {
       display: flex;
       align-items: center;
-      width: 200px;
+      width: calc(100% - 30px);
 
       .typeIcon {
         margin-right: 6px;
         margin-left: 4px;
         width: 24px;
         text-align: center;
+        flex-shrink: 0;
       }
 
       .name {
@@ -156,6 +154,10 @@
     margin-right: 10px;
     color: $neutral_dark50;
     text-align: right;
+
+    &NoMarginRight {
+      margin-right: 0;
+    }
   }
 
   .previewContainer {

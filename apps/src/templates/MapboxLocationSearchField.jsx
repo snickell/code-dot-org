@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import i18n from '@cdo/locale';
 import {connect} from 'react-redux';
+
+import i18n from '@cdo/locale';
 /**
  * A search box that loads a Mapbox location search control.
  *
@@ -41,7 +42,6 @@ export class MapboxLocationSearchField extends React.Component {
     if (!this.props.mapboxAccessToken || this.props.readOnly) {
       return;
     }
-    // eslint-disable-next-line no-undef
     const mapboxGeocoder = new MapboxGeocoder({
       accessToken: this.props.mapboxAccessToken,
       types: this.props.locationTypes.join(','),

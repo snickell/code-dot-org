@@ -1,10 +1,26 @@
-import React, {useState} from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {concat, intersection} from 'lodash';
-import FontAwesome from '@cdo/apps/templates/FontAwesome';
-import Button from '@cdo/apps/templates/Button';
-import i18n from '@cdo/locale';
+import PropTypes from 'prop-types';
+import React, {useEffect, useState} from 'react';
+import {createPortal} from 'react-dom';
+import {connect} from 'react-redux';
+
+import {
+  Button,
+  buttonColors,
+  LinkButton,
+} from '@cdo/apps/componentLibrary/button';
+import {BodyThreeText, Heading4} from '@cdo/apps/componentLibrary/typography';
+import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import CardLabels from '@cdo/apps/templates/curriculumCatalog/CardLabels';
+import {
+  CreateSectionsToAssignSectionsDialog,
+  SignInToAssignSectionsDialog,
+  UpgradeAccountToAssignSectionsDialog,
+} from '@cdo/apps/templates/curriculumCatalog/noSectionsToAssignDialogs';
+import MultipleSectionsAssigner from '@cdo/apps/templates/MultipleSectionsAssigner';
 import {
   translatedCourseOfferingCsTopics,
   translatedCourseOfferingSchoolSubjects,
@@ -12,25 +28,21 @@ import {
   subjectsAndTopicsOrder,
   translatedLabels,
 } from '@cdo/apps/templates/teacherDashboard/CourseOfferingHelpers';
-import style from './curriculum_catalog_card.module.scss';
-import CardLabels from '@cdo/apps/templates/curriculumCatalog/CardLabels';
-import MultipleSectionsAssigner from '@cdo/apps/templates/MultipleSectionsAssigner';
-import {connect} from 'react-redux';
-import {
-  assignToSection,
-  sectionsForDropdown,
-  unassignSection,
-} from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
 import {sectionForDropdownShape} from '@cdo/apps/templates/teacherDashboard/shapes';
 import {
-  CreateSectionsToAssignSectionsDialog,
-  SignInToAssignSectionsDialog,
-  UpgradeAccountToAssignSectionsDialog,
-} from '@cdo/apps/templates/curriculumCatalog/noSectionsToAssignDialogs';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
-import {EVENTS} from '@cdo/apps/lib/util/AnalyticsConstants';
+  assignToSection,
+  unassignSection,
+} from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
+import {sectionsForDropdown} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
+import i18n from '@cdo/locale';
+
+import {
+  curriculumCatalogCardIdPrefix,
+  defaultImageSrc,
+} from './curriculumCatalogConstants';
 import ExpandedCurriculumCatalogCard from './ExpandedCurriculumCatalogCard';
-import {defaultImageSrc} from './curriculumCatalogConstants';
+
+import style from './curriculum_catalog_card.module.scss';
 
 const CurriculumCatalogCard = ({
   courseKey,
@@ -187,10 +199,25 @@ const CustomizableCurriculumCatalogCard = ({
   availableResources,
   recommendedSimilarCurriculum,
   recommendedStretchCurriculum,
+  wide,
   ...props
 }) => {
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const isTeacherOrSignedOut = isSignedOut || isTeacher;
+
+  const disallowWideViewThreshold = 640;
+  const [disallowWideView, setDisallowWideView] = useState(
+    window.innerWidth <= disallowWideViewThreshold
+  );
+
+  useEffect(() => {
+    const onResize = () =>
+      setDisallowWideView(window.innerWidth <= disallowWideViewThreshold);
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
 
   const handleClickAssign = cardType => {
     setIsAssignDialogOpen(true);
@@ -242,33 +269,18 @@ const CustomizableCurriculumCatalogCard = ({
     }
   };
 
-  return (
-    <div className={style.cardsContainer}>
-      <div>
-        <div
-          className={classNames(
-            style.curriculumCatalogCardContainer,
-            isExpanded ? style.expandedCard : '',
-            isEnglish
-              ? style.curriculumCatalogCardContainer_english
-              : style.curriculumCatalogCardContainer_notEnglish
-          )}
-        >
-          <img src={imageSrc} alt={imageAltText} />
-          <div className={style.curriculumInfoContainer}>
-            <div className={style.labelsAndTranslatabilityContainer}>
-              <div className={style.labelsContainer}>
-                <CardLabels subjectsAndTopics={subjectsAndTopics} />
-              </div>
-              {!isEnglish && isTranslated && (
-                <FontAwesome
-                  icon="language"
-                  className="fa-solid"
-                  title={translationIconTitle}
-                />
-              )}
-            </div>
-            <h4>{courseDisplayName}</h4>
+  const isWide = wide && !disallowWideView;
+
+  const getCurriculumInfo = () => {
+    if (isWide) {
+      return (
+        <div className={style.wideCardContent}>
+          <CardLabels subjectsAndTopics={subjectsAndTopics} />
+          <Heading4>{courseDisplayName}</Heading4>
+          <BodyThreeText className={style.wideCardDescription}>
+            {description}
+          </BodyThreeText>
+          <div className={style.wideCardAspects}>
             <div className={style.iconWithDescription}>
               <FontAwesome icon="user" className="fa-solid" />
               <p>{gradeRange}</p>
@@ -277,6 +289,55 @@ const CustomizableCurriculumCatalogCard = ({
               <FontAwesome icon="clock" className="fa-solid" />
               <p>{duration}</p>
             </div>
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <div className={style.labelsAndTranslatabilityContainer}>
+            <CardLabels subjectsAndTopics={subjectsAndTopics} />
+            {!isEnglish && isTranslated && (
+              <FontAwesome
+                icon="language"
+                className="fa-solid"
+                title={translationIconTitle}
+              />
+            )}
+          </div>
+          <h4>{courseDisplayName}</h4>
+          <div className={style.iconWithDescription}>
+            <FontAwesome icon="user" className="fa-solid" />
+            <p>{gradeRange}</p>
+          </div>
+          <div className={style.iconWithDescription}>
+            <FontAwesome icon="clock" className="fa-solid" />
+            <p>{duration}</p>
+          </div>
+        </div>
+      );
+    }
+  };
+
+  return (
+    <div
+      id={`${curriculumCatalogCardIdPrefix}${courseKey}`}
+      className={style.cardsContainer}
+    >
+      <div>
+        <div
+          className={classNames(
+            style.curriculumCatalogCardContainer,
+            isExpanded ? style.expandedCard : '',
+            isEnglish
+              ? style.curriculumCatalogCardContainer_english
+              : style.curriculumCatalogCardContainer_notEnglish,
+            isWide ? style.wideCard : ''
+          )}
+        >
+          <img src={imageSrc} alt={imageAltText} />
+          <div className={style.curriculumInfoContainer}>
+            {getCurriculumInfo()}
             <div
               className={classNames(
                 style.buttonsContainer,
@@ -285,44 +346,44 @@ const CustomizableCurriculumCatalogCard = ({
                   : style.buttonsContainer_notEnglish
               )}
             >
-              <Button
-                color={Button.ButtonColor.neutralDark}
-                type="button"
-                onClick={onQuickViewClick}
-                aria-label={quickViewButtonDescription}
-                text={i18n.quickView()}
-                className={`${style.buttonFlex} ${style.quickViewButton}`}
-              />
+              {onQuickViewClick && (
+                <Button
+                  onClick={onQuickViewClick}
+                  ariaLabel={quickViewButtonDescription}
+                  text={i18n.quickView()}
+                  className={`${style.buttonFlex} ${style.quickViewButton}`}
+                  type="secondary"
+                  color={buttonColors.black}
+                />
+              )}
               {isTeacherOrSignedOut && (
                 <>
-                  <Button
-                    __useDeprecatedTag
-                    color={Button.ButtonColor.neutralDark}
-                    type="button"
+                  <LinkButton
+                    color={buttonColors.black}
+                    type="secondary"
                     href={pathToCourse}
-                    aria-label={i18n.learnMoreDescription({
+                    ariaLabel={i18n.learnMoreDescription({
                       course_name: courseDisplayName,
                     })}
                     text={i18n.learnMore()}
                     className={`${style.buttonFlex} ${style.teacherAndSignedOutLearnMoreButton}`}
                   />
                   <Button
-                    color={Button.ButtonColor.brandSecondaryDefault}
-                    type="button"
+                    color={buttonColors.purple}
+                    type="primary"
                     onClick={() => handleClickAssign('top-card')}
-                    aria-label={assignButtonDescription}
+                    ariaLabel={assignButtonDescription}
                     text={assignButtonText}
                     className={style.buttonFlex}
                   />
                 </>
               )}
               {!isTeacherOrSignedOut && (
-                <Button
-                  __useDeprecatedTag
-                  color={Button.ButtonColor.brandSecondaryDefault}
-                  type="button"
+                <LinkButton
+                  color={buttonColors.purple}
+                  type="primary"
                   href={pathToCourse}
-                  aria-label={i18n.tryCourseNow({
+                  ariaLabel={i18n.tryCourseNow({
                     course_name: courseDisplayName,
                   })}
                   text={i18n.tryNow()}
@@ -332,7 +393,8 @@ const CustomizableCurriculumCatalogCard = ({
             </div>
           </div>
         </div>
-        {isAssignDialogOpen && renderAssignDialog()}
+        {isAssignDialogOpen &&
+          createPortal(renderAssignDialog(), document.body)}
       </div>
       {isExpanded && (
         <ExpandedCurriculumCatalogCard
@@ -407,6 +469,8 @@ CustomizableCurriculumCatalogCard.propTypes = {
   availableResources: PropTypes.object,
   recommendedSimilarCurriculum: PropTypes.object,
   recommendedStretchCurriculum: PropTypes.object,
+
+  wide: PropTypes.bool,
 };
 
 export default connect(

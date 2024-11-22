@@ -4,14 +4,14 @@ import React from 'react';
 import ReactTooltip from 'react-tooltip';
 
 import {StrongText, BodyTwoText} from '@cdo/apps/componentLibrary/typography';
-import FontAwesome from '@cdo/apps/templates/FontAwesome';
+import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import i18n from '@cdo/locale';
 
 import styles from './coteacher-settings.module.scss';
 
 const getPendingPill = () => {
   return (
-    <span style={styles.toolTipBox}>
+    <span>
       <div
         className={classNames(styles.tablePending, styles.tablePill)}
         data-tip

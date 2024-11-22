@@ -87,6 +87,22 @@ class Api::V1::UsersControllerTest < ActionController::TestCase
     refute @user.show_progress_table_v2
   end
 
+  test 'a post request to show_progress_table_v2 updates appropriate timestamp' do
+    sign_in(@user)
+    assert_nil @user.progress_table_v2_timestamp
+    post :post_show_progress_table_v2, params: {user_id: 'me', show_progress_table_v2: true}
+    assert_response :success
+    @user.reload
+    assert @user.progress_table_v2_timestamp
+    assert_nil @user.progress_table_v1_timestamp
+
+    post :post_show_progress_table_v2, params: {user_id: 'me', show_progress_table_v2: false}
+    assert_response :success
+    @user.reload
+    assert @user.progress_table_v2_timestamp
+    assert @user.progress_table_v1_timestamp
+  end
+
   test 'a post request to disable_lti_roster_sync updates lti_roster_sync_enabled' do
     teacher = create :teacher, lti_roster_sync_enabled: true
     sign_in(teacher)
@@ -352,5 +368,35 @@ class Api::V1::UsersControllerTest < ActionController::TestCase
     post :update_ai_tutor_access, params: {user_id: -1, ai_tutor_access: false}
 
     assert_response :unauthorized
+  end
+
+  test 'set_seen_ta_scores updates seen_ta_scores_map' do
+    teacher = create :teacher
+    assert_nil teacher.seen_ta_scores_map
+    sign_in(teacher)
+
+    unit = create :unit, :with_lessons
+    lesson = unit.lessons.first
+    params = {lesson_id: lesson.id}
+
+    post :set_seen_ta_scores, params: params
+    assert_response :success
+    assert_equal({lesson.id.to_s => true}, teacher.reload.seen_ta_scores_map)
+  end
+
+  test 'set_seen_ta_scores returns 400 if lesson id is missing' do
+    teacher = create :teacher
+    sign_in(teacher)
+
+    post :set_seen_ta_scores
+    assert_response :bad_request
+  end
+
+  test 'set_seen_ta_scores returns 400 if lesson id is not a number' do
+    teacher = create :teacher
+    sign_in(teacher)
+
+    post :set_seen_ta_scores, params: {lesson_id: 'not_a_number'}
+    assert_response :bad_request
   end
 end

@@ -1,74 +1,67 @@
-import React from 'react';
+import React, {AriaAttributes, memo, MouseEvent} from 'react';
 
+import Button, {buttonColors} from '@cdo/apps/componentLibrary/button';
 import Checkbox from '@cdo/apps/componentLibrary/checkbox';
 import {dropdownColors} from '@cdo/apps/componentLibrary/common/constants';
 import {DropdownProviderWrapper} from '@cdo/apps/componentLibrary/common/contexts/DropdownContext';
 import {
   ComponentSizeXSToL,
   DropdownColor,
+  DropdownFormFieldRelatedProps,
 } from '@cdo/apps/componentLibrary/common/types';
-import CustomDropdown from '@cdo/apps/componentLibrary/dropdown/_CustomDropdown';
-import Button from '@cdo/apps/templates/Button';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
+import CustomDropdown, {
+  _CustomDropdownOption,
+} from '@cdo/apps/componentLibrary/dropdown/_CustomDropdown';
 import i18n from '@cdo/locale';
 
 import moduleStyles from '@cdo/apps/componentLibrary/dropdown/customDropdown.module.scss';
 
-export interface CheckboxOption {
-  value: string;
-  label: string;
-  isOptionDisabled?: boolean;
-}
+export interface CheckboxDropdownOption extends _CustomDropdownOption {}
 
-export interface CheckboxOption {
-  value: string;
-  label: string;
-  isOptionDisabled?: boolean;
-}
-
-export interface CheckboxDropdownProps {
+export interface CheckboxDropdownProps
+  extends DropdownFormFieldRelatedProps,
+    AriaAttributes {
   /** CheckboxDropdown name.
    * Name of the dropdown, used as unique identifier of the dropdown's HTML element */
   name: string;
+  /** CheckboxDropdown custom class name */
+  className?: string;
   /** CheckboxDropdown color */
   color?: DropdownColor;
   /** CheckboxDropdown size */
   size: ComponentSizeXSToL;
   /** CheckboxDropdown disabled state */
   disabled?: boolean;
+  /** CheckboxDropdown readOnly state */
+  readOnly?: boolean;
   /** CheckboxDropdown label
    * The user-facing label of the dropdown */
   labelText: string;
   /** CheckboxDropdown label style type*/
   labelType?: 'thick' | 'thin';
   /** CheckboxDropdown options */
-  allOptions: CheckboxOption[];
+  allOptions: CheckboxDropdownOption[];
   /** CheckboxDropdown checked options */
   checkedOptions: string[];
   /** CheckboxDropdown onChange handler */
   onChange: (args: React.ChangeEvent<HTMLInputElement>) => void;
   /** CheckboxDropdown onSelectAll handler */
-  onSelectAll: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onSelectAll: (
+    event:
+      | React.MouseEvent<HTMLButtonElement>
+      | React.MouseEvent<HTMLAnchorElement>
+  ) => void;
   /** CheckboxDropdown onClearAll handler */
-  onClearAll: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onClearAll: (
+    event:
+      | React.MouseEvent<HTMLButtonElement>
+      | React.MouseEvent<HTMLAnchorElement>
+  ) => void;
 }
 
-/**
- * ### Production-ready Checklist:
- * * (✔) implementation of component approved by design team;
- * * (✔) has storybook, covered with stories and documentation;
- * * (✔) has tests: test every prop, every state and every interaction that's js related;
- * * (see apps/test/unit/componentLibrary/DropdownMenuTest.jsx)
- * * (?) passes accessibility checks;
- *
- * ###  Status: ```Ready for dev```
- *
- * Design System: Checkbox Dropdown Component.
- * Used to render checkbox (multiple choice) dropdowns.
- */
 const CheckboxDropdown: React.FunctionComponent<CheckboxDropdownProps> = ({
   name,
+  className,
   labelText,
   labelType = 'thick',
   allOptions,
@@ -77,20 +70,36 @@ const CheckboxDropdown: React.FunctionComponent<CheckboxDropdownProps> = ({
   onSelectAll,
   onClearAll,
   disabled = false,
+  readOnly = false,
   color = dropdownColors.black,
   size = 'm',
+  helperMessage,
+  helperIcon,
+  errorMessage,
+  styleAsFormField = false,
+  ...rest
 }) => {
   return (
     <CustomDropdown
       name={name}
+      className={className}
       labelText={labelText}
       labelType={labelType}
       color={color}
       disabled={disabled}
+      readOnly={readOnly}
       size={size}
       isSomeValueSelected={checkedOptions.length > 0}
+      helperMessage={helperMessage}
+      helperIcon={helperIcon}
+      errorMessage={errorMessage}
+      styleAsFormField={styleAsFormField}
+      selectedValueText={checkedOptions
+        ?.map(str => allOptions.find(opt => opt.value === str)?.label)
+        .join(', ')}
+      {...rest}
     >
-      <form className={moduleStyles.dropdownMenuContainer}>
+      <div className={moduleStyles.dropdownMenuContainer}>
         <ul>
           {allOptions.map(({value, label, isOptionDisabled}) => (
             <li key={value}>
@@ -108,29 +117,42 @@ const CheckboxDropdown: React.FunctionComponent<CheckboxDropdownProps> = ({
         </ul>
         <div className={moduleStyles.bottomButtonsContainer}>
           <Button
-            type="button"
+            type="tertiary"
+            color={buttonColors.purple}
             text={i18n.selectAll()}
             onClick={onSelectAll}
-            styleAsText
-            color={Button.ButtonColor.brandSecondaryDefault}
+            size={size}
           />
           <Button
-            type="button"
+            type="tertiary"
+            color={buttonColors.purple}
             text={i18n.clearAll()}
             onClick={onClearAll}
-            styleAsText
-            color={Button.ButtonColor.brandSecondaryDefault}
+            size={size}
           />
         </div>
-      </form>
+      </div>
     </CustomDropdown>
   );
 };
 
+/**
+ * ### Production-ready Checklist:
+ * * (✔) implementation of component approved by design team;
+ * * (✔) has storybook, covered with stories and documentation;
+ * * (✔) has tests: test every prop, every state and every interaction that's js related;
+ * * (see apps/test/unit/componentLibrary/CheckboxDropdownTest.jsx)
+ * * (?) passes accessibility checks;
+ *
+ * ###  Status: ```Ready for dev```
+ *
+ * Design System: Checkbox Dropdown Component.
+ * Used to render checkbox (multiple choice) dropdowns.
+ */
 const WrappedCheckboxDropdown = (props: CheckboxDropdownProps) => (
   <DropdownProviderWrapper>
     <CheckboxDropdown {...props} />
   </DropdownProviderWrapper>
 );
 
-export default WrappedCheckboxDropdown;
+export default memo(WrappedCheckboxDropdown);

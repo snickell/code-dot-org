@@ -1,134 +1,204 @@
-import React, {useState, useEffect} from 'react';
+import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import i18n from '@cdo/locale';
-import {
-  Heading2,
-  BodyTwoText,
-  BodyThreeText,
-} from '@cdo/apps/componentLibrary/typography';
-import style from './school-association.module.scss';
+import React, {useMemo} from 'react';
+
+import {Button} from '@cdo/apps/componentLibrary/button';
 import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
-import {COUNTRIES} from '@cdo/apps/geographyConstants';
-import SchoolZipSearch from '@cdo/apps/templates/SchoolZipSearch';
+import {BodyTwoText, Heading2} from '@cdo/apps/componentLibrary/typography';
+import {
+  SELECT_COUNTRY,
+  US_COUNTRY_CODE,
+  ZIP_REGEX,
+} from '@cdo/apps/signUpFlow/signUpFlowConstants';
 import SchoolNameInput from '@cdo/apps/templates/SchoolNameInput';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
-import {EVENTS, PLATFORMS} from '@cdo/apps/lib/util/AnalyticsConstants';
+import SchoolZipSearch from '@cdo/apps/templates/SchoolZipSearch';
+import {NonSchoolOptions} from '@cdo/generated-scripts/sharedConstants';
+import i18n from '@cdo/locale';
+
+import {getCountriesUsFirst} from '../schoolInfo/utils/getCountriesUsFirst';
+
+import style from './school-association.module.scss';
+
+const SEARCH_DEFAULTS = [
+  {value: NonSchoolOptions.CLICK_TO_ADD, text: i18n.schoolClickToAdd()},
+  {value: NonSchoolOptions.NO_SCHOOL_SETTING, text: i18n.noSchoolSetting()},
+];
+
+const COUNTRIES_US_FIRST = getCountriesUsFirst();
 
 export default function SchoolDataInputs({
+  schoolId,
+  country,
+  schoolName,
+  schoolZip,
+  schoolsList,
+  setSchoolId,
+  setCountry,
+  setSchoolName,
+  setSchoolZip,
+  usIp,
   includeHeaders = true,
   fieldNames = {
     country: 'user[school_info_attributes][country]',
     ncesSchoolId: 'user[school_info_attributes][school_id]',
     schoolName: 'user[school_info_attributes][school_name]',
     schoolZip: 'user[school_info_attributes][school_zip]',
+    schoolType: 'user[school_info_attributes][school_type]',
   },
 }) {
-  const [askForZip, setAskForZip] = useState(false);
-  const [isOutsideUS, setIsOutsideUS] = useState(false);
-  const [zip, setZip] = useState('');
-  const [country, setCountry] = useState('');
-  const [zipSearchReady, setZipSearchReady] = useState(false);
+  // We don't want to display any fields to start that won't eventually be
+  // necessary, so updating any time country changes
+  const countryIsUS = useMemo(() => country === US_COUNTRY_CODE, [country]);
 
-  let COUNTRY_ITEMS = [{value: 'selectCountry', text: i18n.selectCountry()}];
-  for (const item of Object.values(COUNTRIES)) {
-    COUNTRY_ITEMS.push({value: item.label, text: item.value});
-  }
+  const countryIsSelectedOrUsIpFalse = useMemo(
+    () => (country && country !== SELECT_COUNTRY) || usIp === false,
+    [country, usIp]
+  );
 
-  useEffect(() => {
-    if (zip.length === 5) {
-      setZipSearchReady(true);
-      analyticsReporter.sendEvent(
-        EVENTS.ZIP_CODE_ENTERED,
-        {zip: zip},
-        PLATFORMS.BOTH
-      );
-    } else {
-      // Removes the school dropdown if you delete part of the zip
-      setZipSearchReady(false);
-    }
-  }, [zip]);
+  const inputManually = useMemo(
+    () => schoolId === NonSchoolOptions.CLICK_TO_ADD,
+    [schoolId]
+  );
 
-  const onCountryChange = e => {
-    const country = e.target.value;
-    setCountry(country);
-    analyticsReporter.sendEvent(
-      EVENTS.COUNTRY_SELECTED,
-      {country: country},
-      PLATFORMS.BOTH
-    );
-    // We don't want to display any fields to start that won't eventually be
-    // necessary, so updating both of these any time country changes
-    if (country === 'US') {
-      setAskForZip(true);
-      setIsOutsideUS(false);
-    } else {
-      setAskForZip(false);
-      setIsOutsideUS(true);
-    }
+  const showNoSchoolSettingButton = useMemo(
+    () => schoolId !== NonSchoolOptions.NO_SCHOOL_SETTING,
+    [schoolId]
+  );
+
+  const schoolZipIsValid = useMemo(
+    () => ZIP_REGEX.test(schoolZip),
+    [schoolZip]
+  );
+
+  const schoolSelectOptions = useMemo(
+    () => [
+      {value: NonSchoolOptions.SELECT_A_SCHOOL, text: i18n.selectASchool()},
+      ...schoolsList,
+    ],
+    [schoolsList]
+  );
+
+  const handleCountryChange = c => {
+    setCountry(c);
   };
 
+  const handleSchoolChange = id => {
+    setSchoolId(id);
+  };
+
+  const labelClassName = schoolZipIsValid ? '' : style.disabledLabel;
+
   return (
-    <div className={style.outerContainer}>
+    <div className={style.schoolAssociationWrapper}>
       {includeHeaders && (
-        <div>
-          <Heading2 className={style.topPadding}>
-            {i18n.censusHeading()}
-          </Heading2>
+        <div className={style.headerContainer}>
+          <Heading2>{i18n.censusHeading()}</Heading2>
           <BodyTwoText>{i18n.schoolInfoInterstitialTitle()}</BodyTwoText>
         </div>
       )}
       <div className={style.inputContainer}>
-        <BodyTwoText className={style.padding} visualAppearance={'heading-xs'}>
-          {i18n.whatCountry()}
-        </BodyTwoText>
         <SimpleDropdown
           id="uitest-country-dropdown"
           className={style.dropdown}
           name={fieldNames.country}
-          items={COUNTRY_ITEMS}
+          labelText={i18n.whatCountry()}
+          items={COUNTRIES_US_FIRST}
           selectedValue={country}
-          onChange={onCountryChange}
-          size="m"
+          onChange={e => handleCountryChange(e.target.value)}
+          dropdownTextThickness="thin"
         />
-        {askForZip && (
-          <label>
-            <BodyTwoText
-              className={style.padding}
-              visualAppearance={'heading-xs'}
-            >
-              {i18n.enterYourSchoolZip()}
-            </BodyTwoText>
-            <input
-              id="uitest-school-zip"
-              type="text"
-              name={fieldNames.schoolZip}
-              onChange={e => {
-                setZip(e.target.value);
+        {countryIsUS && (
+          <div>
+            <SchoolZipSearch
+              fieldNames={{
+                schoolZip: fieldNames.schoolZip,
+                ncesSchoolId: fieldNames.ncesSchoolId,
+                schoolName: fieldNames.schoolName,
               }}
-              value={zip}
+              schoolId={schoolId}
+              setSchoolId={setSchoolId}
+              schoolZip={schoolZip}
+              setSchoolZip={setSchoolZip}
+              schoolsList={schoolsList}
             />
-            {zip && !zipSearchReady && (
-              <BodyThreeText>{i18n.zipInvalidMessage()}</BodyThreeText>
-            )}
-          </label>
+          </div>
         )}
-        {isOutsideUS && (
+        {!countryIsUS && countryIsSelectedOrUsIpFalse && (
           <SchoolNameInput
             fieldNames={{
               schoolName: fieldNames.schoolName,
             }}
+            schoolName={schoolName}
+            setSchoolName={setSchoolName}
           />
         )}
-        {askForZip && zipSearchReady && (
-          <SchoolZipSearch
-            fieldNames={{
-              ncesSchoolId: fieldNames.ncesSchoolId,
-              schoolName: fieldNames.schoolName,
-            }}
-            zip={zip}
-          />
+        {countryIsUS && !inputManually && (
+          <div>
+            <SimpleDropdown
+              id="uitest-school-dropdown"
+              disabled={!schoolZipIsValid}
+              name={fieldNames.ncesSchoolId}
+              className={classNames(labelClassName, style.dropdown)}
+              labelText={i18n.selectYourSchool()}
+              itemGroups={[
+                {
+                  label: i18n.schools(),
+                  groupItems: schoolSelectOptions,
+                },
+                {
+                  label: i18n.additionalOptions(),
+                  groupItems: SEARCH_DEFAULTS,
+                },
+              ]}
+              selectedValue={schoolId}
+              onChange={e => handleSchoolChange(e.target.value)}
+              dropdownTextThickness="thin"
+            />
+            {showNoSchoolSettingButton && (
+              <Button
+                text={i18n.noSchoolSetting()}
+                disabled={!schoolZipIsValid}
+                color={'purple'}
+                type={'tertiary'}
+                size={'s'}
+                onClick={e => {
+                  e.preventDefault();
+                  handleSchoolChange(NonSchoolOptions.NO_SCHOOL_SETTING);
+                }}
+              />
+            )}
+          </div>
+        )}
+        {countryIsUS && inputManually && (
+          <div>
+            <SchoolNameInput
+              fieldNames={{schoolName: fieldNames.schoolName}}
+              schoolName={schoolName}
+              setSchoolName={setSchoolName}
+            />
+            <Button
+              text={i18n.returnToResults()}
+              color={'purple'}
+              type={'tertiary'}
+              size={'s'}
+              onClick={() => {
+                handleSchoolChange(NonSchoolOptions.SELECT_A_SCHOOL);
+              }}
+            />
+          </div>
         )}
       </div>
+      {/* hidden fields are needed when form is submitted in _finish_sign_up.js 
+      in order to pass the default schoolType when the user does 
+      not teach in a school setting */}
+      {schoolId === NonSchoolOptions.NO_SCHOOL_SETTING && (
+        <input
+          hidden
+          readOnly
+          name={fieldNames.schoolType}
+          value={NonSchoolOptions.NO_SCHOOL_SETTING}
+        />
+      )}
     </div>
   );
 }
@@ -136,4 +206,16 @@ export default function SchoolDataInputs({
 SchoolDataInputs.propTypes = {
   includeHeaders: PropTypes.bool,
   fieldNames: PropTypes.object,
+  schoolId: PropTypes.string.isRequired,
+  country: PropTypes.string.isRequired,
+  schoolName: PropTypes.string.isRequired,
+  schoolZip: PropTypes.string.isRequired,
+  schoolsList: PropTypes.arrayOf(
+    PropTypes.shape({value: PropTypes.string, text: PropTypes.string})
+  ).isRequired,
+  usIp: PropTypes.bool,
+  setSchoolId: PropTypes.func.isRequired,
+  setCountry: PropTypes.func.isRequired,
+  setSchoolName: PropTypes.func.isRequired,
+  setSchoolZip: PropTypes.func.isRequired,
 };

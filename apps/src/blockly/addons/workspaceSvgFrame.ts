@@ -1,9 +1,11 @@
+import * as GoogleBlockly from 'blockly/core';
+
 import {commonI18n} from '@cdo/apps/types/locale';
+
+import {EditorWorkspaceSvg} from '../types.js';
+
 import {frameSizes} from './cdoConstants';
 import SvgFrame from './svgFrame';
-import {WorkspaceSvg} from 'blockly';
-import {Abstract} from 'blockly/core/events/events_abstract.js';
-import {EditorWorkspaceSvg} from '../types.js';
 
 /**
  * Represents an SVG frame specifically designed for workspaces.
@@ -19,7 +21,7 @@ export default class WorkspaceSvgFrame extends SvgFrame {
    * @param {Function} getColor - Returns the color for the frame's header.
    */
   constructor(
-    workspace: WorkspaceSvg,
+    workspace: GoogleBlockly.WorkspaceSvg,
     text: string,
     className: string,
     getColor: () => string
@@ -77,7 +79,7 @@ export default class WorkspaceSvgFrame extends SvgFrame {
       return;
     }
     // this.element_ is always a workspace in this class.
-    const workspace = this.element_ as WorkspaceSvg;
+    const workspace = this.element_ as GoogleBlockly.WorkspaceSvg;
     const minWidth = this.frameText_.getBoundingClientRect().width;
     let width =
       Math.max(
@@ -126,7 +128,9 @@ export default class WorkspaceSvgFrame extends SvgFrame {
 
   getFrameX() {
     // In LTR the svg should be to the right of the toolbox, plus a margin.
-    const metricsManager = (this.element_ as WorkspaceSvg).getMetricsManager();
+    const metricsManager = (
+      this.element_ as GoogleBlockly.WorkspaceSvg
+    ).getMetricsManager();
     let frameX = frameSizes.MARGIN_SIDE / 2;
     // Toolbox width > 0 if we have a categorized toolbox.
     const toolboxWidth = metricsManager.getToolboxMetrics().width;
@@ -161,7 +165,7 @@ export default class WorkspaceSvgFrame extends SvgFrame {
 
   getRtlFrameTextX() {
     // Width of the visible portion of the workspace.
-    const viewWidth = (this.element_ as WorkspaceSvg)
+    const viewWidth = (this.element_ as GoogleBlockly.WorkspaceSvg)
       .getMetricsManager()
       .getViewMetrics().width;
     // In RTL, frame text should be on the right side of the visible portion
@@ -183,7 +187,7 @@ export default class WorkspaceSvgFrame extends SvgFrame {
  *
  * @param {Blockly.Events.Abstract} event - The Blockly event object.
  */
-function onWorkspaceChange(event: Abstract) {
+function onWorkspaceChange(event: GoogleBlockly.Events.Abstract) {
   if (
     [
       Blockly.Events.DELETE,

@@ -1,21 +1,25 @@
-import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
-import style from './rubrics.module.scss';
-import i18n from '@cdo/locale';
+import React, {useEffect, useState} from 'react';
 import {connect} from 'react-redux';
+
+import Checkbox from '@cdo/apps/componentLibrary/checkbox/Checkbox';
 import {BodyFourText} from '@cdo/apps/componentLibrary/typography';
+import Button from '@cdo/apps/legacySharedComponents/Button';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import {updateTeacherFeedback} from '@cdo/apps/templates/instructions/teacherFeedback/teacherFeedbackDataApi';
+import {getTeacherFeedbackForStudent} from '@cdo/apps/templates/instructions/topInstructionsDataApi';
+import {setUserHasTeacherFeedback} from '@cdo/apps/templates/rubrics/teacherRubricRedux';
+import HttpClient from '@cdo/apps/util/HttpClient';
+import i18n from '@cdo/locale';
+
 import {
   reportingDataShape,
   rubricShape,
   studentLevelInfoShape,
 } from './rubricShapes';
-import HttpClient from '@cdo/apps/util/HttpClient';
-import {getTeacherFeedbackForStudent} from '@cdo/apps/templates/instructions/topInstructionsDataApi';
-import {updateTeacherFeedback} from '@cdo/apps/templates/instructions/teacherFeedback/teacherFeedbackDataApi';
-import {EVENTS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import Button from '@cdo/apps/templates/Button';
-import Checkbox from '@cdo/apps/componentLibrary/checkbox/Checkbox';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+
+import style from './rubrics.module.scss';
 
 function RubricSubmitFooter({
   rubric,
@@ -27,6 +31,7 @@ function RubricSubmitFooter({
 
   // redux
   teacherId,
+  setUserHasTeacherFeedback,
 }) {
   const [feedbackLoaded, setFeedbackLoaded] = useState(false);
   const [isSubmittingToStudent, setIsSubmittingToStudent] = useState(false);
@@ -118,6 +123,7 @@ function RubricSubmitFooter({
         }
         const lastSubmittedDateObj = new Date(json.submittedAt);
         setLastSubmittedTimestamp(lastSubmittedDateObj.toLocaleString());
+        setUserHasTeacherFeedback(studentLevelInfo.user_id);
 
         if (feedbackAdded) {
           analyticsReporter.sendEvent(
@@ -191,8 +197,16 @@ RubricSubmitFooter.propTypes = {
   feedbackAdded: PropTypes.bool,
   setFeedbackAdded: PropTypes.func,
   teacherId: PropTypes.number,
+  setUserHasTeacherFeedback: PropTypes.func,
 };
 
-export default connect(state => ({
-  teacherId: state.currentUser.userId,
-}))(RubricSubmitFooter);
+export default connect(
+  state => ({
+    teacherId: state.currentUser.userId,
+  }),
+  dispatch => ({
+    setUserHasTeacherFeedback(userId) {
+      dispatch(setUserHasTeacherFeedback(userId));
+    },
+  })
+)(RubricSubmitFooter);

@@ -1,20 +1,20 @@
-import {
-  DialogContext,
-  DialogType,
-} from '@cdo/apps/lab2/views/dialogs/DialogManager';
-import FontAwesome from '@cdo/apps/templates/FontAwesome';
 import classNames from 'classnames';
 import React, {useCallback, useContext} from 'react';
 import {useSelector} from 'react-redux';
-import {AnalyticsContext} from '../context';
-import {useAppSelector} from '@cdo/apps/util/reduxHooks';
-import {MusicState} from '../redux/musicRedux';
-import moduleStyles from './HeaderButtons.module.scss';
-import musicI18n from '../locale';
-import {commonI18n} from '@cdo/apps/types/locale';
+
 import {isReadOnlyWorkspace} from '@cdo/apps/lab2/lab2Redux';
-import MusicLibrary, {SoundFolder} from '../player/MusicLibrary';
+import {useDialogControl, DialogType} from '@cdo/apps/lab2/views/dialogs';
+import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
+import {commonI18n} from '@cdo/apps/types/locale';
+import {useAppSelector} from '@cdo/apps/util/reduxHooks';
+
 import {getBaseAssetUrl} from '../appConfig';
+import {AnalyticsContext} from '../context';
+import musicI18n from '../locale';
+import MusicLibrary, {SoundFolder} from '../player/MusicLibrary';
+import {MusicState} from '../redux/musicRedux';
+
+import moduleStyles from './HeaderButtons.module.scss';
 
 interface CurrentPackProps {
   packFolder: SoundFolder;
@@ -30,7 +30,7 @@ const CurrentPack: React.FunctionComponent<CurrentPackProps> = ({
   let packImageSrc = null;
 
   if (library && packFolder) {
-    const libraryGroupPath = library.libraryJson.path;
+    const libraryGroupPath = library.getPath();
     packImageSrc =
       packFolder.imageSrc &&
       `${getBaseAssetUrl()}${libraryGroupPath}/${packFolder.path}/${
@@ -39,7 +39,7 @@ const CurrentPack: React.FunctionComponent<CurrentPackProps> = ({
   }
 
   return (
-    <span>
+    <span className={moduleStyles.currentPack}>
       {packImageSrc && (
         <img
           src={packImageSrc}
@@ -65,6 +65,7 @@ interface HeaderButtonsProps {
   clearCode: () => void;
   allowPackSelection: boolean;
   skipUrl: string | undefined;
+  hideChaff: () => void;
 }
 
 /**
@@ -76,6 +77,7 @@ const HeaderButtons: React.FunctionComponent<HeaderButtonsProps> = ({
   clearCode,
   allowPackSelection,
   skipUrl,
+  hideChaff,
 }) => {
   const readOnlyWorkspace: boolean = useSelector(isReadOnlyWorkspace);
   const {canUndo, canRedo} = useSelector(
@@ -83,14 +85,14 @@ const HeaderButtons: React.FunctionComponent<HeaderButtonsProps> = ({
   );
   const currentPackId = useAppSelector(state => state.music.packId);
   const analyticsReporter = useContext(AnalyticsContext);
-  const dialogControl = useContext(DialogContext);
+  const dialogControl = useDialogControl();
 
   const library = MusicLibrary.getInstance();
 
   let packFolder = null;
 
   if (library && currentPackId) {
-    packFolder = library.getAllowedFolderForFolderId(undefined, currentPackId);
+    packFolder = library.getAllowedFolderForFolderId(currentPackId);
   }
 
   const onClickUndoRedo = useCallback(
@@ -111,14 +113,20 @@ const HeaderButtons: React.FunctionComponent<HeaderButtonsProps> = ({
   );
 
   const onClickStartOver = useCallback(() => {
+    // Hide any custom fields that are showing.
+    hideChaff();
+
     if (dialogControl) {
-      dialogControl.showDialog(DialogType.StartOver, clearCode);
+      dialogControl.showDialog({
+        type: DialogType.StartOver,
+        handleConfirm: clearCode,
+      });
     }
 
     if (analyticsReporter) {
       analyticsReporter.onButtonClicked('startOver');
     }
-  }, [dialogControl, analyticsReporter, clearCode]);
+  }, [hideChaff, dialogControl, analyticsReporter, clearCode]);
 
   const onFeedbackClicked = () => {
     if (analyticsReporter) {
@@ -132,10 +140,13 @@ const HeaderButtons: React.FunctionComponent<HeaderButtonsProps> = ({
 
   const onClickSkip = useCallback(() => {
     if (dialogControl) {
-      dialogControl.showDialog(DialogType.Skip, () => {
-        if (skipUrl) {
-          window.location.href = skipUrl;
-        }
+      dialogControl.showDialog({
+        type: DialogType.Skip,
+        handleConfirm: () => {
+          if (skipUrl) {
+            window.location.href = skipUrl;
+          }
+        },
       });
     }
   }, [dialogControl, skipUrl]);
@@ -223,9 +234,7 @@ const HeaderButtons: React.FunctionComponent<HeaderButtonsProps> = ({
           type="button"
           className={classNames(moduleStyles.button, moduleStyles.buttonSkip)}
         >
-          <span className={moduleStyles.buttonSkipContent}>
-            {commonI18n.skipToProject()}
-          </span>
+          {commonI18n.skipToProject()}
           <FontAwesome
             title={commonI18n.skipToProject()}
             icon="arrow-right"

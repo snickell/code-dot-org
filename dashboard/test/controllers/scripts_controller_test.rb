@@ -111,19 +111,9 @@ class ScriptsControllerTest < ActionController::TestCase
     assert_select 'a', text: 'Overview of Courses 1, 2, and 3'
   end
 
-  test "should redirect to /s/course1" do
-    get :show, params: {id: Unit.find_by_name("course1").id}
-    assert_redirected_to "/s/course1"
-  end
-
   test "show of hourofcode redirects to hoc" do
     get :show, params: {id: 'hourofcode'}
     assert_response :success
-  end
-
-  test "show of hourofcode by id should redirect to hoc" do
-    get :show, params: {id: Unit.find_by_name('hourofcode').id}
-    assert_redirected_to '/s/hourofcode'
   end
 
   test "should get show if not signed in" do
@@ -376,14 +366,14 @@ class ScriptsControllerTest < ActionController::TestCase
   test "platformization partner cannot edit our units" do
     Rails.application.config.stubs(:levelbuilder_mode).returns true
     sign_in create(:platformization_partner)
-    get :edit, params: {id: @coursez_2019.id}
+    get :edit, params: {id: @coursez_2019.name}
     assert_response :forbidden
   end
 
   test "platformization partner can edit their units" do
     Rails.application.config.stubs(:levelbuilder_mode).returns true
     sign_in create(:platformization_partner)
-    get :edit, params: {id: @partner_unit.id}
+    get :edit, params: {id: @partner_unit.name}
     assert_response :success
   end
 
@@ -411,19 +401,6 @@ class ScriptsControllerTest < ActionController::TestCase
       lesson_groups: '[]',
     }
     assert_response :success
-  end
-
-  # These two tests are the only remaining dependency on script seed order.  Check that /s/1 redirects to /s/20-hour in
-  # production. On a fresh db the only guarantee that '20-hour.script' has id:1 is by manually specifying ID in the DSL.
-
-  test "should redirect old k-8" do
-    get :show, params: {id: 1}
-    assert_redirected_to script_path(Unit.twenty_hour_unit)
-  end
-
-  test "show should redirect to flappy" do
-    get :show, params: {id: 6}
-    assert_redirected_to "/s/flappy"
   end
 
   test 'create' do
@@ -507,9 +484,20 @@ class ScriptsControllerTest < ActionController::TestCase
       evil_unit = Unit.new(name: name)
       evil_unit.save(validate: false)
       assert_raise ArgumentError do
-        delete :destroy, params: {id: evil_unit.id}
+        delete :destroy, params: {id: evil_unit.name}
       end
     end
+  end
+
+  test 'destroy successfully deletes the unit' do
+    Rails.application.config.stubs(:levelbuilder_mode).returns true
+    sign_in create(:levelbuilder)
+
+    unit_to_delete = create :script
+    delete :destroy, params: {id: unit_to_delete.name}
+
+    assert_response :found
+    assert_nil Unit.find_by(name: unit_to_delete.name)
   end
 
   test "cannot update on production" do
@@ -864,7 +852,7 @@ class ScriptsControllerTest < ActionController::TestCase
       is_migrated: true,
       last_updated_at: unit.updated_at.to_s,
     }
-    assert_equal(teacher_resources.map(&:key), Unit.find_by_name(unit.name).resources.map {|r| r[:key]})
+    assert_equal(teacher_resources.map(&:key), Unit.find_by_name(unit.name).resources.pluck(:key))
   end
 
   test 'updates migrated student resources' do
@@ -889,7 +877,7 @@ class ScriptsControllerTest < ActionController::TestCase
       is_migrated: true,
       last_updated_at: unit.updated_at.to_s,
     }
-    assert_equal(student_resources.map(&:key), Unit.find_by_name(unit.name).student_resources.map {|r| r[:key]})
+    assert_equal(student_resources.map(&:key), Unit.find_by_name(unit.name).student_resources.pluck(:key))
   end
 
   test 'updates pilot_experiment' do
@@ -947,6 +935,8 @@ class ScriptsControllerTest < ActionController::TestCase
 
     assert_nil unit.project_sharing
     assert_nil unit.curriculum_umbrella
+    assert_nil unit.content_area
+    assert_nil unit.topic_tags
     assert_nil unit.family_name
     assert_nil unit.version_year
 
@@ -957,15 +947,19 @@ class ScriptsControllerTest < ActionController::TestCase
       lesson_groups: '[]',
       project_sharing: 'on',
       curriculum_umbrella: 'CSF',
+      content_area: '6-12',
       family_name: 'my-fam',
-      version_year: '2017'
+      version_year: '2017',
+      topic_tags: ['ai', 'maker']
     }
     unit.reload
 
     assert unit.project_sharing
     assert_equal 'CSF', unit.curriculum_umbrella
+    assert_equal '6-12', unit.content_area
     assert_equal 'my-fam', unit.family_name
     assert_equal '2017', unit.version_year
+    assert_equal ['ai', 'maker'], unit.topic_tags
   end
 
   test 'set and unset all general_params' do
@@ -998,8 +992,10 @@ class ScriptsControllerTest < ActionController::TestCase
       pilot_experiment: 'fake-pilot-experiment',
       editor_experiment: 'fake-editor-experiment',
       curriculum_umbrella: 'CSF',
+      content_area: 'k-5',
       supported_locales: ['fake-locale'],
       project_widget_types: ['gamelab', 'weblab'],
+      topic_tags: ['ai', 'maker', 'virutal-pl'],
     }
 
     post :update, params: {
@@ -1031,8 +1027,10 @@ class ScriptsControllerTest < ActionController::TestCase
       pilot_experiment: '',
       editor_experiment: '',
       curriculum_umbrella: '',
+      content_area: '',
       supported_locales: [],
       project_widget_types: [],
+      topic_tags: [],
     }
     assert_response :success
     unit.reload
@@ -1793,6 +1791,40 @@ class ScriptsControllerTest < ActionController::TestCase
     Unit.expects(:get_from_cache).with(@migrated_unit.name, raise_exceptions: false).returns(@migrated_unit).once
     Unit.expects(:get_without_cache).never
     get :show, params: {id: @migrated_unit.name}
+  end
+
+  test "legacy path look up by id fails with not found" do
+    Rails.application.config.stubs(:levelbuilder_mode).returns true
+    sign_in(create(:levelbuilder))
+    legacy_path_validation_unit = create :script
+
+    assert_raises ActiveRecord::RecordNotFound do
+      get :edit, params: {id: legacy_path_validation_unit.id}
+    end
+
+    assert_raises ActiveRecord::RecordNotFound do
+      get :show, params: {id: legacy_path_validation_unit.id}
+    end
+
+    assert_raises ActiveRecord::RecordNotFound do
+      get :standards, params: {id: legacy_path_validation_unit.id}
+    end
+
+    assert_raises ActiveRecord::RecordNotFound do
+      get :code, params: {id: legacy_path_validation_unit.id}
+    end
+
+    assert_raises ActiveRecord::RecordNotFound do
+      get :vocab, params: {id: legacy_path_validation_unit.id}
+    end
+
+    assert_raises ActiveRecord::RecordNotFound do
+      get :resources, params: {id: legacy_path_validation_unit.id}
+    end
+
+    assert_raises ActiveRecord::RecordNotFound do
+      delete :destroy, params: {id: legacy_path_validation_unit.id}
+    end
   end
 
   def stub_file_writes(unit_name, family_name: nil)

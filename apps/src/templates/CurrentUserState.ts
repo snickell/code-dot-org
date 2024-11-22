@@ -23,6 +23,10 @@ export interface CurrentUserState {
   isSortedByFamilyName: boolean;
   under13: boolean;
   over21: boolean;
+  isTeacher: boolean | undefined;
   showProgressTableV2: boolean;
   progressTableV2ClosedBeta: boolean;
+  childAccountComplianceState: string | null;
+  inSection: boolean | null;
+  usStateCode: string | null;
 }

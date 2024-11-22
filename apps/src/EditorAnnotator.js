@@ -1,9 +1,10 @@
-import {singleton as studioApp} from '@cdo/apps/StudioApp';
-import annotationList from '@cdo/apps/acemode/annotationList';
-import {interpolateColors} from '@cdo/apps/utils';
-import {border_gray} from '@cdo/apps/util/color';
-import RGBColor from 'rgbcolor';
 import md5 from 'md5';
+import RGBColor from 'rgbcolor';
+
+import annotationList from '@cdo/apps/acemode/annotationList';
+import {singleton as studioApp} from '@cdo/apps/StudioApp';
+import {border_gray} from '@cdo/apps/util/color';
+import {interpolateColors} from '@cdo/apps/utils';
 
 /**
  * Represents an implementation of an editing environment and wraps functionality
@@ -184,7 +185,8 @@ export class Annotator {
     logLevel = 'INFO',
     color = null,
     icon = null,
-    tipStyle = {}
+    tipStyle = {},
+    hoverCallback = null
   ) {}
 
   /**
@@ -551,7 +553,8 @@ export class DropletAnnotator extends Annotator {
     logLevel = 'INFO',
     color = null,
     icon = null,
-    tipStyle = {}
+    tipStyle = {},
+    hoverCallback = null
   ) {
     const hash = md5((color || '') + (icon || ''));
     if (color || icon) {
@@ -609,6 +612,7 @@ export class DropletAnnotator extends Annotator {
       message: message,
       hash: hash,
       tipStyle: tipStyle,
+      hoverCallback: hoverCallback,
     });
     this.annotationList_().addRuntimeAnnotation(logLevel, lineNumber, message);
 
@@ -639,9 +643,11 @@ export class DropletAnnotator extends Annotator {
               // See if it is one of our known annotations
               for (const annotation of this.knownAnnotations_) {
                 if (el.textContent.trim() === annotation.message.trim()) {
-                  el.classList.add(
-                    `editor-annotator-tooltip-${annotation.hash}`
-                  );
+                  const annotationClass = `editor-annotator-tooltip-${annotation.hash}`;
+                  el.classList.add(annotationClass);
+                  if (annotation.hoverCallback) {
+                    annotation.hoverCallback(annotation);
+                  }
                   Object.keys(annotation.tipStyle || {}).forEach(k => {
                     el.style[k] = annotation.tipStyle[k];
                   });
@@ -824,10 +830,10 @@ export default class EditorAnnotator {
       return EditorAnnotator.code_;
     }
 
-    let code = EditorAnnotator.annotator().getCode();
+    let code = EditorAnnotator.annotator()?.getCode();
     EditorAnnotator.code_ = code;
 
-    if (options.stripComments) {
+    if (options.stripComments && code) {
       code = EditorAnnotator.anonymizeCode_(code);
       EditorAnnotator.strippedCode_ = code;
     }
@@ -846,12 +852,12 @@ export default class EditorAnnotator {
       }
 
       EditorAnnotator.strippedLines_ =
-        EditorAnnotator.getCode(options).split('\n');
+        EditorAnnotator.getCode(options)?.split('\n');
     } else if (EditorAnnotator.lines_) {
       return EditorAnnotator.lines_;
     }
 
-    EditorAnnotator.lines_ = EditorAnnotator.getCode(options).split('\n');
+    EditorAnnotator.lines_ = EditorAnnotator.getCode(options)?.split('\n');
     return EditorAnnotator.lines_;
   }
 
@@ -884,6 +890,10 @@ export default class EditorAnnotator {
     // Get the code
     let code = EditorAnnotator.getCode(options);
     let lines = EditorAnnotator.getLines(options);
+    if (!code && !lines) {
+      // In case there are no lines (the editor is not loaded)
+      return ret;
+    }
 
     // Attempt to just find the code in the full code listing
     let index = code.indexOf(snippet);
@@ -1110,7 +1120,8 @@ export default class EditorAnnotator {
     logLevel = 'INFO',
     color = null,
     icon = null,
-    tipStyle = {}
+    tipStyle = {},
+    hoverCallback = null
   ) {
     EditorAnnotator.annotator()?.annotateLine(
       lineNumber,

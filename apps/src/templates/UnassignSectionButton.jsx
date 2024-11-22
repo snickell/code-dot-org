@@ -1,14 +1,13 @@
-import React, {useState} from 'react';
 import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {connect} from 'react-redux';
-import Button from './Button';
-import i18n from '@cdo/locale';
-import {
-  unassignSection,
-  sectionName,
-} from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
+
+import Button from '@cdo/apps/legacySharedComponents/Button';
+import firehoseClient from '@cdo/apps/metrics/firehose';
+import {unassignSection} from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
+import {sectionName} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
 import UnassignSectionDialog from '@cdo/apps/templates/UnassignSectionDialog';
-import firehoseClient from '@cdo/apps/lib/util/firehose';
+import i18n from '@cdo/locale';
 
 const FIREHOSE_START_EVENT = 'start-course-unassigned-from-section';
 const FIREHOSE_CANCEL_EVENT = 'cancel-course-unassigned-from-section';

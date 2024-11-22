@@ -17,8 +17,11 @@ class HomeController < ApplicationController
   # The terms_and_privacy page gets loaded in an iframe on the signup page, so skip
   # clearing the sign up tracking variables
   skip_before_action :clear_sign_up_session_vars, only: [:terms_and_privacy]
+  skip_before_action :initialize_statsig_stable_id, only: [:health_check]
 
   def set_locale
+    params[:locale], ge_region = params[:locale]&.split('|')
+
     set_locale_cookie(params[:locale]) if params[:locale]
     redirect_path = if params[:i18npath]
                       "/#{params[:i18npath]}"
@@ -29,6 +32,26 @@ class HomeController < ApplicationController
                     end
     # Query parameter for browser cache to be avoided and load new locale
     redirect_path = "#{redirect_path}?lang=#{params[:locale]}" if params[:locale]
+
+    unless ge_region == request.ge_region
+      redirect_uri = URI(redirect_path)
+      redirect_params = URI.decode_www_form(redirect_uri.query.to_s).to_h
+      redirect_params[Rack::GlobalEdition::REGION_KEY] = ge_region
+      redirect_uri.query = URI.encode_www_form(redirect_params).presence
+      redirect_path = redirect_uri.to_s
+
+      Metrics::Events.log_event(
+        request: request,
+        user: current_user,
+        event_name: 'Global Edition Region Selected',
+        metadata: {
+          country: request.country_code,
+          region: ge_region,
+          locale: params[:locale],
+        }
+      )
+    end
+
     redirect_to redirect_path
   rescue URI::InvalidURIError
     redirect_to '/'
@@ -56,7 +79,7 @@ class HomeController < ApplicationController
       if should_redirect_to_script_overview?
         redirect_to script_path(current_user.most_recently_assigned_script)
       else
-        redirect_to '/home'
+        redirect_to home_path
       end
     else
       redirect_to '/users/sign_in'
@@ -68,7 +91,6 @@ class HomeController < ApplicationController
   def home
     authenticate_user!
     init_homepage
-    @is_teacher_homepage = true
     render 'home/index'
   end
 
@@ -113,9 +135,6 @@ class HomeController < ApplicationController
 
     current_user_permissions = UserPermission.where(user_id: current_user.id).pluck(:permission)
     @homepage_data[:showStudentAsVerifiedTeacherWarning] = current_user.student? && current_user_permissions.include?(UserPermission::AUTHORIZED_TEACHER)
-
-    # DCDO Flag - show/hide Lock Section field - Can/Will be overwritten by DCDO.
-    @homepage_data[:showLockSectionField] = DCDO.get('show_lock_section_field', true)
 
     @force_race_interstitial = params[:forceRaceInterstitial]
     @force_school_info_confirmation_dialog = params[:forceSchoolInfoConfirmationDialog]
@@ -196,12 +215,19 @@ class HomeController < ApplicationController
       @homepage_data[:showIncubatorBanner] = show_incubator_banner?
 
       if show_census_banner
-        teachers_school = current_user.school_info.school
-        school_stats = SchoolStatsByYear.where(school_id: teachers_school.id).order(school_year: :desc).first
+        teachers_school = Queries::SchoolInfo.current_school(current_user)
+        school_stats = SchoolStatsByYear.where(school_id: teachers_school[:school_id]).order(school_year: :desc).first
 
         @homepage_data[:censusQuestion] = school_stats.try(:has_high_school_grades?) ? "how_many_20_hours" : "how_many_10_hours"
         @homepage_data[:currentSchoolYear] = current_census_year
-        @homepage_data[:ncesSchoolId] = teachers_school.id
+        @homepage_data[:existingSchoolInfo] = {
+          id: teachers_school[:school_id],
+          name: teachers_school[:school_name],
+          country: 'US',
+          zip: teachers_school[:school_zip],
+          type: teachers_school[:school_type],
+        }
+        @homepage_data[:ncesSchoolId] = teachers_school[:school_id]
         @homepage_data[:teacherName] = current_user.name
         @homepage_data[:teacherId] = current_user.id
         @homepage_data[:teacherEmail] = current_user.email
@@ -211,6 +237,7 @@ class HomeController < ApplicationController
       @homepage_data[:sections] = student_sections
       @homepage_data[:studentId] = current_user.id
       @homepage_data[:studentSpecialAnnouncement] = Announcements.get_localized_announcement_for_page("/student-home")
+      @homepage_data[:parentalPermissionBanner] = helpers.parental_permission_banner_data(current_user, request)
     end
 
     if current_user.school_donor_name

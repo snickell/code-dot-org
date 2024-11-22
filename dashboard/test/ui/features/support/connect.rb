@@ -20,19 +20,19 @@ def saucelabs_browser(test_run_name)
   raise "Please define CDO.saucelabs_username" if CDO.saucelabs_username.blank?
   raise "Please define CDO.saucelabs_authkey"  if CDO.saucelabs_authkey.blank?
 
-  is_tunnel = ENV['CIRCLE_BUILD_NUM']
-  url = "http://#{CDO.saucelabs_username}:#{CDO.saucelabs_authkey}@#{is_tunnel ? 'localhost:4445' : 'ondemand.saucelabs.com:80'}/wd/hub"
-
   capabilities = Selenium::WebDriver::Remote::Capabilities.new($browser_config.except('name'))
 
   sauce_options = {
     name: test_run_name,
-    tags: [ENV['GIT_BRANCH']],
-    build: CDO.circle_run_identifier || ENV['BUILD'],
-    idleTimeout: 60,
-    seleniumVersion: Selenium::WebDriver::VERSION
+    tags: [ENV.fetch('GIT_BRANCH', nil)],
+    build: ENV.fetch('CIRCLE_BUILD_NUM', nil) || ENV.fetch('BUILD', nil),
+    idleTimeout: 90,
+    seleniumVersion: Selenium::WebDriver::VERSION,
+    username: CDO.saucelabs_username,
+    access_key: CDO.saucelabs_authkey,
+    tunnelIdentifier: CDO.saucelabs_tunnel_name,
   }
-  sauce_options[:tunnelIdentifier] = CDO.circle_run_identifier if CDO.circle_run_identifier
+
   sauce_options[:priority] = ENV['PRIORITY'].to_i if ENV['PRIORITY']
   capabilities["sauce:options"] ||= {}
   capabilities["sauce:options"].merge!(sauce_options)
@@ -42,7 +42,7 @@ def saucelabs_browser(test_run_name)
   $http_client = SeleniumBrowser::Client.new(read_timeout: 2.minutes)
   with_read_timeout(5.minutes) do
     Selenium::WebDriver.for(:remote,
-      url: url,
+      url: "https://ondemand.us-west-1.saucelabs.com/wd/hub",
       capabilities: capabilities,
       http_client: $http_client
     )
@@ -60,7 +60,7 @@ def get_browser(test_run_name)
   browser = nil
   if ENV['TEST_LOCAL'] == 'true'
     headless = ENV['TEST_LOCAL_HEADLESS'] == 'true'
-    browser = SeleniumBrowser.local(browser: ENV['BROWSER_CONFIG'], headless: headless)
+    browser = SeleniumBrowser.local(browser: ENV.fetch('BROWSER_CONFIG', nil), headless: headless)
   else
     browser = Retryable.retryable(tries: MAX_CONNECT_RETRIES) do
       saucelabs_browser(test_run_name)
@@ -99,10 +99,10 @@ Before do |scenario|
 
   if single_session?
     very_verbose('Single session, using existing browser') if $browser
-    $browser ||= get_browser ENV['TEST_RUN_NAME']
+    $browser ||= get_browser ENV.fetch('TEST_RUN_NAME', nil)
     @browser ||= $browser
   else
-    $browser = @browser = get_browser "#{ENV['TEST_RUN_NAME']}_#{scenario.name}"
+    $browser = @browser = get_browser "#{ENV.fetch('TEST_RUN_NAME', nil)}_#{scenario.name}"
   end
 
   debug_cookies(@browser.manage.all_cookies) if @browser && ENV['VERY_VERBOSE']

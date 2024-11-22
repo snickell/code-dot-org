@@ -11,6 +11,11 @@ class ScriptLevelsController < ApplicationController
   before_action :disable_session_for_cached_pages
   before_action :redirect_admin_from_labs, only: [:reset, :next, :show, :lesson_extras]
   before_action :set_redirect_override, only: [:show]
+  before_action :check_script_id_is_name, only: [:show, :lesson_extras]
+
+  # The TA scores alert will be shown at most once for each lesson. This
+  # is the maximum number of times it will be shown across all lessons.
+  MAX_SHOW_TA_SCORES_ALERT = 3
 
   # Return true if request is one that can be publicly cached.
   def cachable_request?(request)
@@ -64,8 +69,11 @@ class ScriptLevelsController < ApplicationController
     @current_user = current_user && User.includes(:teachers).where(id: current_user.id).first
     authorize! :read, ScriptLevel
     @script = ScriptLevelsController.get_script(request)
+    @script_level = ScriptLevelsController.get_script_level(@script, params)
 
-    if @script.is_deprecated
+    # Check if the script or current level is deprecated
+    level_is_deprecated = @script_level&.level_deprecated?
+    if @script.is_deprecated || level_is_deprecated
       return render 'errors/deprecated_course'
     end
 
@@ -81,7 +89,6 @@ class ScriptLevelsController < ApplicationController
       new_path = request.fullpath.sub(%r{^/s/#{params[:script_id]}/}, "/s/#{new_script.name}/")
 
       if Unit.family_names.include?(params[:script_id])
-        session[:show_unversioned_redirect_warning] = true unless new_script.is_course
         Unit.log_redirect(params[:script_id], new_script.name, request, 'unversioned-script-level-redirect', current_user&.user_type)
       end
 
@@ -95,18 +102,27 @@ class ScriptLevelsController < ApplicationController
       return
     end
 
-    @show_unversioned_redirect_warning = !!session[:show_unversioned_redirect_warning]
-    session[:show_unversioned_redirect_warning] = false
-
     # will be true if the user is in any unarchived section where tts autoplay is enabled
     @tts_autoplay_enabled = current_user&.sections_as_student&.where({hidden: false})&.map(&:tts_autoplay_enabled)&.reduce(false, :|)
 
     @public_caching = configure_caching(@script)
 
-    @script_level = ScriptLevelsController.get_script_level(@script, params)
     raise ActiveRecord::RecordNotFound unless @script_level
-    # If we have a signed out user for any of these cases we will want to redirect them to sign in
-    authenticate_user! if !can?(:read, @script) || @script.login_required? || (!params.nil? && params[:login_required] == "true")
+
+    if @script.login_required? || (!params.nil? && params[:login_required] == "true")
+      if cachable_request?(request)
+        # if login_required on a cached level, redirect to cached_page_auth_redirect
+        # See https://codedotorg.atlassian.net/browse/TEACH-758 for more details.
+        uri = Addressable::URI.parse request.fullpath
+        uri.query_values = uri&.query_values&.except('login_required')
+        uri.query_values = nil if uri.query_values && uri.query_values.empty?
+        return redirect_to api_v1_users_cached_page_auth_redirect_path({user_return_to: uri.to_s})
+      else
+        authenticate_user!
+      end
+    end
+    authenticate_user! unless can?(:read, @script)
+
     return render 'levels/no_access' unless can?(:read, @script_level)
 
     if current_user&.script_level_hidden?(@script_level)
@@ -154,19 +170,29 @@ class ScriptLevelsController < ApplicationController
       @responses = []
       # We use this for the level summary entry point, so on contained levels
       # what we actually care about are responses to the contained level.
-      level = @level.contained_levels.any? ? @level.contained_levels.first : @level
+
+      levels =
+        if @level.is_a?(LevelGroup)
+          @level.levels
+        else
+          [@level.contained_levels.any? ? @level.contained_levels.first : @level]
+        end
 
       # TODO: Change/remove this check as we add support for more level types.
-      if level.is_a?(FreeResponse) || level.is_a?(Multi)
-        @responses = UserLevel.where(level: level, user: @section&.students)
+      if levels[0].is_a?(FreeResponse) || levels[0].is_a?(Multi) || levels[0].predict_level? || levels[0].is_a?(LevelGroup)
+        @responses = levels.map do |sublevel|
+          UserLevel.where(level: sublevel, user: @section&.students)
+        end
       end
     end
 
     @body_classes = @level.properties['background']
 
     @rubric = @script_level.lesson.rubric
-    if @rubric
+    ai_rubrics_enabled_for_user = @view_as_user&.verified_teacher? || @view_as_user&.teachers&.any?(&:verified_teacher?)
+    if @rubric && ai_rubrics_enabled_for_user
       @rubric_data = {rubric: @rubric.summarize}
+      @rubric_data[:canShowTaScoresAlert] = can_show_ta_scores_alert?
       if @script_level.lesson.rubric && view_as_other
         viewing_user_level = @view_as_user.user_levels.find_by(script: @script_level.script, level: @level)
         @rubric_data[:studentLevelInfo] = {
@@ -204,9 +230,9 @@ class ScriptLevelsController < ApplicationController
     @script_level = ScriptLevelsController.get_script_level(@script, params)
     raise ActiveRecord::RecordNotFound unless @script_level
 
-    @level = @script_level.level
+    @level = select_level
 
-    render json: @level.summarize_for_lab2_properties(@script)
+    render json: @level.summarize_for_lab2_properties(@script, @script_level, @current_user)
   end
 
   # Get a list of hidden lessons for the current users section
@@ -524,13 +550,16 @@ class ScriptLevelsController < ApplicationController
       current_user.present? &&
       (current_user.teacher? || (current_user&.sections_as_student&.any?(&:code_review_enabled?) && !current_user.code_review_groups.empty?))
 
-    # Javalab exemplar URLs include ?exemplar=true as a URL param
+    # Javalab and Code Bridge exemplar URLs include ?exemplar=true as a URL param
     if params[:exemplar]
       return render 'levels/no_access_exemplar' unless current_user&.verified_instructor?
 
       @is_viewing_exemplar = true
       exemplar_sources = @level.try(:exemplar_sources)
-      return render 'levels/no_exemplar' unless exemplar_sources
+      # Java Lab shows the no exemplar page for levels that don't have exemplar sources.
+      # Lab2 handles this on the client side to enable switching between exemplar levels
+      # without a page reload.
+      return render 'levels/no_exemplar' unless exemplar_sources || @level.uses_lab2?
 
       level_view_options(@level.id, {is_viewing_exemplar: true, exemplar_sources: exemplar_sources})
       readonly_view_options
@@ -578,6 +607,18 @@ class ScriptLevelsController < ApplicationController
     end
   end
 
+  # showing script levels by script id is no longer supported. Other codepaths
+  # still need underlying helper methods to support lookup by id, so we filter
+  # out numerical ids on a per-action basis rather than removing support for
+  # ids from those methods.
+  private def check_script_id_is_name
+    # Unfortunately, scripts routes sometimes pass the name and sometimes pass
+    # the id, making params[:script_id] a misnomer when passing the name.
+    script_id = request.params[:script_id]
+    is_id = script_id.to_i.to_s == script_id.to_s
+    raise ActiveRecord::RecordNotFound if is_id
+  end
+
   private def redirect_script(script, locale)
     return nil unless script
 
@@ -590,5 +631,11 @@ class ScriptLevelsController < ApplicationController
     return nil if redirect_script == script
 
     redirect_script
+  end
+
+  private def can_show_ta_scores_alert?
+    seen_ta_scores_map = current_user&.seen_ta_scores_map || {}
+    return false if seen_ta_scores_map.keys.length >= MAX_SHOW_TA_SCORES_ALERT
+    !seen_ta_scores_map[@script_level.lesson.id.to_s]
   end
 end

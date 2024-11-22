@@ -5,25 +5,26 @@ import {connect} from 'react-redux';
 import * as Table from 'reactabular-table';
 import * as sort from 'sortabular';
 
-import {OAuthSectionTypes} from '@cdo/apps/lib/ui/accounts/constants';
-import Button from '@cdo/apps/templates/Button';
+import {OAuthSectionTypes} from '@cdo/apps/accounts/constants';
+import Button from '@cdo/apps/legacySharedComponents/Button';
 import {teacherDashboardUrl} from '@cdo/apps/templates/teacherDashboard/urlHelpers';
 import color from '@cdo/apps/util/color';
 import {
   StudentGradeLevels,
   SectionLoginType,
-} from '@cdo/apps/util/sharedConstants';
+} from '@cdo/generated-scripts/sharedConstants';
 import i18n from '@cdo/locale';
 
 import {stringifyQueryParams} from '../../utils';
 import {tableLayoutStyles, sortableOptions} from '../tables/tableConstants';
 import wrappedSortable from '../tables/wrapped_sortable';
+import {showV2TeacherDashboard} from '../teacherNavigation/TeacherNavFlagUtils';
 
 import SectionActionDropdown from './SectionActionDropdown';
 import {sortableSectionShape} from './shapes';
-import {getSectionRows} from './teacherSectionsRedux';
+import {getSectionRows} from './teacherSectionsReduxSelectors';
 
-import skeletonizeContent from '@cdo/apps/componentLibrary/skeletonize-content.module.scss';
+import skeletonizeContent from '@cdo/apps/sharedComponents/skeletonize-content.module.scss';
 
 /** @enum {number} */
 export const COLUMNS = {
@@ -34,11 +35,6 @@ export const COLUMNS = {
   STUDENTS: 4,
   LOGIN_INFO: 5,
   EDIT_DELETE: 6,
-};
-
-const participantNames = {
-  facilitator: i18n.participantTypeFacilitatorTitle(),
-  teacher: i18n.participantTypeTeacherTitle(),
 };
 
 // Cell formatters for sortable OwnedSectionsTable.
@@ -57,9 +53,13 @@ export const courseLinkFormatter = function (course, {rowData}) {
       {courseOfferingsAreLoaded ? (
         <>
           <a
-            href={`${assignmentPaths[0]}${stringifyQueryParams({
-              section_id: rowData.id,
-            })}`}
+            href={
+              showV2TeacherDashboard()
+                ? teacherDashboardUrl(rowData.id, assignmentPaths[0])
+                : `${assignmentPaths[0]}${stringifyQueryParams({
+                    section_id: rowData.id,
+                  })}`
+            }
             style={tableLayoutStyles.link}
           >
             {assignmentNames[0]}
@@ -68,9 +68,16 @@ export const courseLinkFormatter = function (course, {rowData}) {
             <div style={styles.currentUnit}>
               <div>{i18n.currentUnit()}</div>
               <a
-                href={`${assignmentPaths[1]}${stringifyQueryParams({
-                  section_id: rowData.id,
-                })}`}
+                href={
+                  showV2TeacherDashboard()
+                    ? teacherDashboardUrl(
+                        rowData.id,
+                        assignmentPaths[1].replace('/s/', '/unit/')
+                      )
+                    : `${assignmentPaths[1]}${stringifyQueryParams({
+                        section_id: rowData.id,
+                      })}`
+                }
                 style={tableLayoutStyles.link}
               >
                 {assignmentNames[1]}
@@ -89,6 +96,8 @@ export const courseLinkFormatter = function (course, {rowData}) {
       ) : (
         <span
           className={skeletonizeContent.skeletonizeContent}
+          // eslint-disable-next-line react/forbid-dom-props
+          data-testid={'skeletonize-content'}
           style={{width: random(30, 90) + '%'}}
         />
       )}
@@ -120,7 +129,9 @@ export const loginInfoFormatter = function (loginType, {rowData}) {
 };
 
 export const studentsFormatter = function (studentCount, {rowData}) {
-  const manageStudentsUrl = teacherDashboardUrl(rowData.id, '/manage_students');
+  const manageStudentsUrl = showV2TeacherDashboard()
+    ? teacherDashboardUrl(rowData.id, '/roster')
+    : teacherDashboardUrl(rowData.id, '/manage_students');
   const studentHtml =
     rowData.studentCount <= 0 ? (
       <Button
@@ -164,7 +175,6 @@ class OwnedSectionsTable extends Component {
   static propTypes = {
     sectionIds: PropTypes.arrayOf(PropTypes.number).isRequired,
     onEdit: PropTypes.func.isRequired,
-    isPlSections: PropTypes.bool,
 
     //Provided by redux
     sectionRows: PropTypes.arrayOf(sortableSectionShape).isRequired,
@@ -183,7 +193,7 @@ class OwnedSectionsTable extends Component {
   determineSorter = (data, activeColumn, directionArray) => {
     // If we are sorting on grade
     const gradeCol = COLUMNS.GRADE.toString();
-    if (this.state.sortingColumns[gradeCol] && !this.props.isPlSections) {
+    if (this.state.sortingColumns[gradeCol]) {
       const mult = directionArray[0] === 'asc' ? 1 : -1;
       return sortBy(data, function (obj) {
         return (
@@ -200,13 +210,7 @@ class OwnedSectionsTable extends Component {
 
   gradeFormatter = (grades, {rowData}) => {
     const formattedGrades = rowData.grades ? rowData.grades.join(', ') : null;
-    return (
-      <div>
-        {this.props.isPlSections
-          ? participantNames[rowData.participantType]
-          : formattedGrades}
-      </div>
-    );
+    return <div>{formattedGrades}</div>;
   };
 
   actionCellFormatter = (temp, {rowData}) => {
@@ -268,13 +272,11 @@ class OwnedSectionsTable extends Component {
         },
       },
       {
-        property: this.props.isPlSections ? 'participantType' : 'grades',
+        property: 'grades',
         header: {
-          label: this.props.isPlSections ? i18n.participants() : i18n.grade(),
+          label: i18n.grade(),
           props: {
-            className: this.props.isPlSections
-              ? 'uitest-participant-type-header'
-              : 'uitest-grade-header',
+            className: 'uitest-grade-header',
             style: tableLayoutStyles.headerCell,
           },
           transforms: [sortable],
@@ -353,7 +355,11 @@ class OwnedSectionsTable extends Component {
     })(this.props.sectionRows);
 
     return (
-      <Table.Provider columns={columns} style={tableLayoutStyles.table}>
+      <Table.Provider
+        className="uitest-owned-sections"
+        columns={columns}
+        style={tableLayoutStyles.table}
+      >
         <Table.Header />
         <Table.Body
           className="uitest-sorted-rows"

@@ -1,4 +1,3 @@
-import {assert} from 'chai';
 import {lintFoormKeys} from '@cdo/apps/sites/studio/pages/foorm/forms/editorHelpers';
 
 const fakeCodeMirror = {
@@ -23,20 +22,20 @@ const testErrorJson = `{
 describe('foorm linting', () => {
   it("doesn't find errors in valid json", () => {
     const annotations = lintFoormKeys(testValidJson, {}, fakeCodeMirror);
-    assert(annotations.length === 0);
+    expect(annotations.length === 0).toBeTruthy();
   });
   it('finds errors in bad json', () => {
     const annotations = lintFoormKeys(testErrorJson, {}, fakeCodeMirror);
-    assert(annotations.length === 2);
-    assert(
+    expect(annotations.length === 2).toBeTruthy();
+    expect(
       annotations[1].message ===
         'Question names should only contain letters and underscores.'
-    );
-    assert(annotations[0].severity === 'error');
-    assert(
+    ).toBeTruthy();
+    expect(annotations[0].severity === 'error').toBeTruthy();
+    expect(
       annotations[1].message ===
         'Question names should only contain letters and underscores.'
-    );
-    assert(annotations[1].severity === 'error');
+    ).toBeTruthy();
+    expect(annotations[1].severity === 'error').toBeTruthy();
   });
 });

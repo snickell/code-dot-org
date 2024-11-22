@@ -2,12 +2,15 @@ import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {getSelectedScriptFriendlyName} from '@cdo/apps/redux/unitSelectionRedux';
 import i18n from '@cdo/locale';
 
-import {h3Style} from '../../lib/ui/Headings';
-import firehoseClient from '../../lib/util/firehose';
+import {h3Style} from '../../legacySharedComponents/Headings';
+import firehoseClient from '../../metrics/firehose';
 import color from '../../util/color';
+import {getUnitUrl} from '../teacherDashboard/urlHelpers';
 
 import {ViewType, unitDataPropType} from './sectionProgressConstants';
 import {getCurrentUnitData} from './sectionProgressRedux';
@@ -19,13 +22,19 @@ class ProgressViewHeader extends Component {
     //redux
     currentView: PropTypes.oneOf(Object.values(ViewType)),
     sectionId: PropTypes.number.isRequired,
-    scriptFriendlyName: PropTypes.string.isRequired,
+    scriptFriendlyName: PropTypes.string,
     scriptData: unitDataPropType,
   };
 
   getLinkToOverview() {
     const {scriptData, sectionId} = this.props;
-    return scriptData ? `${scriptData.path}?section_id=${sectionId}` : null;
+    return scriptData
+      ? getUnitUrl(
+          sectionId,
+          scriptData.name,
+          `${scriptData.path}?section_id=${sectionId}`
+        )
+      : null;
   }
 
   navigateToScript = () => {
@@ -41,6 +50,13 @@ class ProgressViewHeader extends Component {
       },
       {includeUserId: true}
     );
+
+    analyticsReporter.sendEvent(EVENTS.PROGRESS_VIEWED, {
+      sectionId: this.props.sectionId,
+      unitId: this.props.scriptId,
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight,
+    });
   };
 
   render() {
@@ -54,14 +70,16 @@ class ProgressViewHeader extends Component {
     return (
       <div style={{...h3Style, ...styles.heading, ...styles.tableHeader}}>
         <span>
-          {headingText[currentView] + ' '}
-          <a
-            href={linkToOverview}
-            style={styles.scriptLink}
-            onClick={this.navigateToScript}
-          >
-            {scriptFriendlyName}
-          </a>
+          {headingText[currentView] + ' '}{' '}
+          {scriptFriendlyName && (
+            <a
+              href={linkToOverview}
+              style={styles.scriptLink}
+              onClick={this.navigateToScript}
+            >
+              {scriptFriendlyName}
+            </a>
+          )}
         </span>
         {currentView === ViewType.STANDARDS && (
           <StandardsViewHeaderButtons sectionId={this.props.sectionId} />
