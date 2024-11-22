@@ -9,8 +9,10 @@ import {Provider} from 'react-redux';
 
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import {logUserLevelInteraction} from '@cdo/apps/userLevelInteractionsLogger/userLevelInteractionsApi';
 import color from '@cdo/apps/util/color';
 import copyToClipboard from '@cdo/apps/util/copyToClipboard';
+import {UserLevelInteractions} from '@cdo/generated-scripts/sharedConstants';
 import msg from '@cdo/locale';
 
 import {getAllBlocks} from './blockly/utils';
@@ -305,9 +307,16 @@ FeedbackUtils.prototype.displayFeedback = function (
     showXButton: !options.hideXButton,
   });
 
+  const levelId = this.studioApp_.config.serverLevelId;
+  const scriptId = this.studioApp_.config.serverScriptId;
   if (againButton) {
     dom.addClickTouchEvent(againButton, function () {
       feedbackDialog.hide();
+      logUserLevelInteraction({
+        levelId: levelId,
+        scriptId: scriptId,
+        interaction: UserLevelInteractions.click_keep_working,
+      });
     });
   }
 
@@ -401,6 +410,11 @@ FeedbackUtils.prototype.displayFeedback = function (
           level_id: options.response.level_id,
         });
       }
+      logUserLevelInteraction({
+        levelId: levelId,
+        scriptId: scriptId,
+        interaction: UserLevelInteractions.click_continue,
+      });
       options.onContinue();
     });
   }
