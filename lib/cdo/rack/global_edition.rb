@@ -97,7 +97,7 @@ module Rack
 
       private def setup_region(region)
         # Resets the region if it's `nil` or sets it only if it's available.
-        return unless region.nil? || Cdo::GlobalEdition.region_available?(region)
+        return unless region.nil? || region.empty? || Cdo::GlobalEdition.region_available?(region)
 
         # Sets the request cookies to apply changes immediately without needing to reload the page.
         request.cookies[REGION_KEY] = region
@@ -144,9 +144,6 @@ module Rack
         site_locale = request.cookies[LOCALE_KEY]
 
         if Cdo::GlobalEdition.region_available?(region)
-          # Only Pegasus pages are available in all regional languages.
-          site_locale = Cdo::GlobalEdition.region_locked_locales.key(region) unless pegasus?
-
           region_locales = Cdo::GlobalEdition.region_locales(region)
           site_locale = Cdo::GlobalEdition.main_region_locale(region) unless region_locales.include?(site_locale)
         else

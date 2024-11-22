@@ -32,9 +32,11 @@ class HomeController < ApplicationController
     if params[:locale]
       redirect_uri = URI(redirect_path)
       redirect_params = URI.decode_www_form(redirect_uri.query.to_s).to_h
-      redirect_params[VarnishEnvironment::LOCALE_PARAM_KEY] = params[:locale]
+      lang, ge_region = params[:locale].split('|')
+      redirect_params[VarnishEnvironment::LOCALE_PARAM_KEY] = lang
       # Query parameter for browser cache to be avoided and load new locale
-      redirect_params['lang'] = params[:locale].split('|').first
+      redirect_params['lang'] = lang
+      redirect_params['ge_region'] = ge_region
       redirect_uri.query = URI.encode_www_form(redirect_params)
       redirect_path = redirect_uri.to_s
     end

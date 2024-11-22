@@ -1522,5 +1522,6 @@ en:
         resend_limit_reached: The limit for resend requests has been reached
   not_applicable_abbreviation: "N/A"
   global_edition:
+    region_reset: "Return to Full Site"
     regions:
       fa: Farsi
