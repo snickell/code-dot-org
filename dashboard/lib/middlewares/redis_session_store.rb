@@ -14,6 +14,7 @@ module Middlewares
     end
 
     def initialize(...)
+      File.write('/tmp/session_store.log', "Process ##{Process.pid} (in thread #{Thread.current}) initializing instance of RedisSessionStore at #{Time.now}", mode: 'a+')
       ActionDispatch::Request::Session.prepend(SessionExtension)
       super
     end
