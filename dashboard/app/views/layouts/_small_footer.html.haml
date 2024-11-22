@@ -4,8 +4,8 @@
   reactProps = {
     i18nDropdownInBase: view_options[:has_i18n],
     localeUrl: locale_url,
-    currentLocale: locale,
-    localeOptions: Cdo::I18n.locale_options.map {|(text, value)| {text: text, value: value}},
+    currentLocale: Cdo::I18n.current_locale_option(locale, request.ge_region),
+    localeOptions: Cdo::GlobalEdition.locale_options(request.ge_region).map {|(text, value)| {text: text, value: value}},
     privacyPolicyInBase: true,
     copyrightInBase: true,
     baseMoreMenuString: I18n.t('footer.more'),

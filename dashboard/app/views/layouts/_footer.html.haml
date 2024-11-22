@@ -40,12 +40,9 @@
         -# user input or to persist data without also updating it to enforce UTF-8
         = form_tag(locale_url, method: :post, id: 'localeForm', style: 'margin-bottom: 0px;', enforce_utf8: false) do
           = hidden_field_tag :user_return_to, request.url
-          - options = Cdo::I18n.locale_options
-          - selected = locale
+          - options = Cdo::GlobalEdition.locale_options(request.ge_region)
+          - selected = Cdo::I18n.current_locale_option(request.ge_region)
           - if request.ge_region
-            - region_locales = Cdo::GlobalEdition.region_locales(request.ge_region)
-            - options = options.select {|_name, value| region_locales.include?(value)}
-            - options = options.map {|name, value| [name, value + "|#{request.ge_region}"]}
             -# Add the "escape" option to go out of the global edition
             - options << [I18n.t(:region_reset, scope: %i[global_edition]), "en-US"]
             - selected = "#{locale}|#{request.ge_region}"

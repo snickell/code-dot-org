@@ -59,6 +59,10 @@ module Cdo
         end.sort_by(&:second).freeze
       end
 
+      def current_locale_option(locale, ge_region = nil)
+        ge_region.nil? || ge_region.empty? ? locale.to_s : "#{locale}|#{ge_region}"
+      end
+
       def locale_direction(locale)
         LOCALE_CONFIGS.dig(locale.to_s, :dir) || TEXT_DIRECTION_LTR
       end

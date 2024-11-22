@@ -4,6 +4,8 @@ require 'request_store'
 require 'uri'
 require 'yaml'
 
+require 'cdo/i18n'
+
 module Cdo
   # Lazily loads global configurations for regional pages
   module GlobalEdition
@@ -76,6 +78,16 @@ module Cdo
         end
         region_locked_locales
       end.freeze
+    end
+
+    def self.locale_options(region = nil)
+      options = Cdo::I18n.locale_options
+      if region
+        region_locales = region_locales(region)
+        options = options.select {|_name, value| region_locales.include?(value)}
+        options = options.map {|name, value| [name, value + "|#{region}"]}
+      end
+      options
     end
 
     def self.region_change_url(url, region = nil)
