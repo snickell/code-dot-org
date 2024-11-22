@@ -51,6 +51,7 @@ class Pd::WorkshopEnrollmentController < ApplicationController
       @enrollment.email_confirmation = current_user.email_for_enrollments
 
       session_dates = @workshop.sessions.map(&:formatted_date_with_start_and_end_times)
+      session_dates_for_calendar = @workshop.sessions.map(&:formatted_date_and_time_for_calendar)
 
       facilitators = @workshop.facilitators.map do |facilitator|
         # TODO: Come up with more permanent solution that doesn't require cross-project file dependency.
@@ -92,6 +93,7 @@ class Pd::WorkshopEnrollmentController < ApplicationController
             }
           ),
           session_dates: session_dates,
+          session_dates_for_calendar: session_dates_for_calendar,
           enrollment: @enrollment,
           facilitators: facilitators,
           workshop_enrollment_status: "unsubmitted",

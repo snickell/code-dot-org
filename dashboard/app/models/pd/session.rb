@@ -54,6 +54,20 @@ class Pd::Session < ApplicationRecord
     "#{formatted_date}, #{start_time}-#{end_time}"
   end
 
+  def formatted_date_and_time_for_calendar
+    start_utc = start.utc
+    start_date = start_utc.strftime('%Y%m%d').strip
+    start_time = start_utc.strftime('%H%M%S').strip
+    start_datetime = "#{start_date}T#{start_time}Z"
+
+    end_utc = self.end.utc
+    end_date = end_utc.strftime('%Y%m%d').strip
+    end_time = end_utc.strftime('%H%M%S').strip
+    end_datetime = "#{end_date}T#{end_time}Z"
+
+    "#{start_datetime}TO#{end_datetime}"
+  end
+
   def start_date_us_format
     start.strftime('%b %d %Y').strip
   end

@@ -9,8 +9,6 @@ import Tabs from '@cdo/apps/componentLibrary/tabs';
 import {Heading2} from '@cdo/apps/componentLibrary/typography';
 import DCDO from '@cdo/apps/dcdo';
 import {pegasus} from '@cdo/apps/lib/util/urlHelpers';
-import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import HeaderBannerNoImage from '@cdo/apps/templates/HeaderBannerNoImage';
 import ActionBlocksWrapper from '@cdo/apps/templates/studioHomepages/ActionBlocksWrapper';
 import BorderedCallToAction from '@cdo/apps/templates/studioHomepages/BorderedCallToAction';
@@ -28,7 +26,6 @@ import {
 import {hiddenPlSectionIds} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
 import i18n from '@cdo/locale';
 
-import {queryParams, updateQueryParam} from '../../utils';
 import {
   COURSE_CSF,
   COURSE_CSD,
@@ -85,26 +82,6 @@ const getAvailableTabs = permissions => {
   return tabs;
 };
 
-const getEnrollSucessWorkshopName = () => {
-  // If sent here from successfully enrolling in a workshop, log WORKSHOP_ENROLLMENT_COMPLETED_EVENT.
-  const urlParams = queryParams();
-  if (urlParams && Object.keys(urlParams).includes('wsCourse')) {
-    const workshopCourseName = urlParams['wsCourse'];
-
-    analyticsReporter.sendEvent(EVENTS.WORKSHOP_ENROLLMENT_COMPLETED_EVENT, {
-      'regional partner': urlParams['rpName'],
-      'workshop course': workshopCourseName,
-      'workshop subject': urlParams['wsSubject'],
-    });
-
-    updateQueryParam('rpName', undefined, false);
-    updateQueryParam('wsCourse', undefined, false);
-    updateQueryParam('wsSubject', undefined, false);
-
-    return workshopCourseName;
-  }
-};
-
 function LandingPage({
   lastWorkshopSurveyUrl,
   lastWorkshopSurveyCourse,
@@ -123,8 +100,8 @@ function LandingPage({
   hiddenPlSectionIds,
 }) {
   const availableTabs = getAvailableTabs(userPermissions);
-  const [enrollSuccessWorkshopName, setEnrollSuccessWorkshopName] = useState(
-    getEnrollSucessWorkshopName()
+  const [showEnrollSuccessDialog, setShowEnrollSuccessDialog] = useState(
+    sessionStorage.getItem('workshopCourse', null)
   );
   const [currentTab, setCurrentTab] = useState(availableTabs[0].value);
   const headerContainerStyles =
@@ -373,10 +350,9 @@ function LandingPage({
   const RenderMyPlTab = () => {
     return (
       <>
-        {enrollSuccessWorkshopName && (
+        {showEnrollSuccessDialog && (
           <WorkshopEnrollmentCelebrationDialog
-            workshopName={enrollSuccessWorkshopName}
-            onClose={() => setEnrollSuccessWorkshopName(null)}
+            onClose={() => setShowEnrollSuccessDialog(null)}
           />
         )}
         {RenderBanner()}

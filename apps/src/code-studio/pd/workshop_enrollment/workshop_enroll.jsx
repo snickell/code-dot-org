@@ -4,6 +4,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import {navigateToHref} from '@cdo/apps/utils';
+
 import EnrollForm from './enroll_form';
 import {WorkshopPropType, FacilitatorPropType} from './enrollmentConstants';
 import FacilitatorBio from './facilitator_bio';
@@ -25,6 +27,7 @@ export default class WorkshopEnroll extends React.Component {
     user_id: PropTypes.number.isRequired,
     workshop: WorkshopPropType,
     session_dates: PropTypes.arrayOf(PropTypes.string),
+    session_dates_for_calendar: PropTypes.arrayOf(PropTypes.string),
     enrollment: PropTypes.shape({
       email: PropTypes.string,
       first_name: PropTypes.string,
@@ -126,12 +129,24 @@ export default class WorkshopEnroll extends React.Component {
   }
 
   renderSuccess() {
-    // Redirect to My PL landing page. The WORKSHOP_ENROLLMENT_COMPLETED_EVENT event will be logged
-    // on that page since event logs immediately followed by redirects sometimes do not fire.
-    const rpName = this.props.workshop.regional_partner?.name;
-    const wsCourse = this.props.workshop.course;
-    const wsSubject = this.props.workshop.subject;
-    window.location.href = `/my-professional-learning?rpName=${rpName}&wsCourse=${wsCourse}&wsSubject=${wsSubject}`;
+    // Set workshop information in sessionStorage then redirect to My PL landing page. The WORKSHOP_ENROLLMENT_COMPLETED_EVENT
+    // event will be logged on that page instead since event logs immediately followed by redirects sometimes do not fire.
+    sessionStorage.setItem('workshopCourse', this.props.workshop.course);
+    sessionStorage.setItem('workshopSubject', this.props.workshop.subject);
+    sessionStorage.setItem(
+      'rpName',
+      this.props.workshop.regional_partner?.name
+    );
+    sessionStorage.setItem(
+      'workshopLocation',
+      this.props.workshop.location_name
+    );
+    sessionStorage.setItem(
+      'workshopTime',
+      this.props.session_dates_for_calendar
+    );
+
+    navigateToHref('/my-professional-learning');
   }
 
   render() {
