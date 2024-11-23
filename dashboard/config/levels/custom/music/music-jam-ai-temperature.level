@@ -9,7 +9,7 @@
     "encrypted": "false",
     "background": "music-black",
     "instructions_important": "false",
-    "long_instructions": "#### A.I. Gets Interesting\r\n\r\nYou can move the temperature slider to generate different results.\r\n\r\n- Click the [play AI drums](#clickable=id-left:play_pattern_ai_at_current_location_simple2) block to generate your own beat. \r\n- Use the slider to change the temperature.\r\n- Press [Run](#clickable=run-button). ",
+    "long_instructions": "#### A.I. Gets Interesting\r\n\r\nYou can move the temperature slider to generate different results.\r\n\r\n- Click the [play AI drums](#clickable=id-left:play_pattern_ai_at_current_location_simple2) block to generate your own beat. \r\n- Use the slider to change the temperature.\r\n- Press [Run](#clickable=run-button).",
     "hide_share_and_remix": "true",
     "validations": [
       {
@@ -49,7 +49,7 @@
       },
       {
         "key": "music-ai-skill-aibeats_2ec51257-daa4-40af-b5d4-4b42a2cfaf11",
-        "message": "No sounds have played yet. ",
+        "message": "No sounds have played yet.",
         "next": false,
         "conditions": [
 
