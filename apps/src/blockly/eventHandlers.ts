@@ -39,6 +39,7 @@ export function disableOrphans(event: GoogleBlockly.Events.Abstract) {
   if (
     event.type !== Blockly.Events.BLOCK_CHANGE &&
     event.type !== Blockly.Events.BLOCK_MOVE &&
+    event.type !== Blockly.Events.BLOCK_DRAG &&
     event.type !== Blockly.Events.BLOCK_CREATE
   ) {
     return;
@@ -67,11 +68,8 @@ export function disableOrphans(event: GoogleBlockly.Events.Abstract) {
     if (block) {
       updateBlockEnabled(block);
     }
-  }
-
-  if (
-    (blockEvent.type === Blockly.Events.BLOCK_DRAG ||
-      blockEvent.type === Blockly.Events.BLOCK_MOVE) &&
+  } else if (
+    blockEvent.type === Blockly.Events.BLOCK_DRAG &&
     block &&
     block.type === BLOCK_TYPES.procedureDefinition &&
     eventWorkspace
