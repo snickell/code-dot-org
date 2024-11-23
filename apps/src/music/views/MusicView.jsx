@@ -53,6 +53,7 @@ import {
   getCurrentlyPlayingBlockIds,
   setSoundLoadingProgress,
   setUndoStatus,
+  updateUniqueExecuteId,
   clearCallout,
   setSelectedTriggerId,
   clearSelectedTriggerId,
@@ -113,6 +114,7 @@ class UnconnectedMusicView extends React.Component {
     isReadOnlyWorkspace: PropTypes.bool,
     updateLoadProgress: PropTypes.func,
     setUndoStatus: PropTypes.func,
+    updateUniqueExecuteId: PropTypes.func,
     clearCallout: PropTypes.func,
     isPlayView: PropTypes.bool,
     blockMode: PropTypes.string,
@@ -325,6 +327,7 @@ class UnconnectedMusicView extends React.Component {
     // Go ahead and compile and execute the initial song, and report initial block stats once code is loaded.
     this.compileSong();
     this.executeCompiledSong();
+    this.props.updateUniqueExecuteId();
     this.analyticsReporter.onBlocksUpdated(
       this.musicBlocklyWorkspace.getAllBlocks()
     );
@@ -511,6 +514,7 @@ class UnconnectedMusicView extends React.Component {
           this.player.playEvents(this.sequencer.getPlaybackEvents(), true);
         }
       });
+      this.props.updateUniqueExecuteId();
 
       this.analyticsReporter.onBlocksUpdated(
         this.musicBlocklyWorkspace.getAllBlocks()
@@ -568,6 +572,8 @@ class UnconnectedMusicView extends React.Component {
     this.props.addOrderedFunctions({
       orderedFunctions: this.sequencer.getOrderedFunctions?.() || [],
     });
+    this.props.updateUniqueExecuteId();
+
     this.player.playEvents(playbackEvents);
 
     this.playingTriggers.push({
@@ -605,6 +611,7 @@ class UnconnectedMusicView extends React.Component {
     this.props.addOrderedFunctions({
       orderedFunctions: this.sequencer.getOrderedFunctions?.() || [],
     });
+    this.props.updateUniqueExecuteId();
 
     return this.player.preloadSounds(
       [...this.sequencer.getPlaybackEvents(), ...allTriggerEvents],
@@ -683,6 +690,7 @@ class UnconnectedMusicView extends React.Component {
     this.compileSong();
 
     this.executeCompiledSong();
+    this.props.updateUniqueExecuteId();
     this.saveCode(true);
 
     this.player.playSong(
@@ -716,6 +724,7 @@ class UnconnectedMusicView extends React.Component {
 
     // Clear the timeline of triggered events when song is stopped.
     this.executeCompiledSong();
+    this.props.updateUniqueExecuteId();
 
     this.props.setIsPlaying(false);
     this.props.setCurrentPlayheadPosition(this.props.startingPlayheadPosition);
@@ -821,6 +830,7 @@ const MusicView = connect(
     updateLoadProgress: value => dispatch(setSoundLoadingProgress(value)),
     setUndoStatus: value => dispatch(setUndoStatus(value)),
     clearCallout: id => dispatch(clearCallout()),
+    updateUniqueExecuteId: () => dispatch(updateUniqueExecuteId()),
   })
 )(UnconnectedMusicView);
 

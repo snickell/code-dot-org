@@ -154,6 +154,9 @@ const TimelineSimple2Events: React.FunctionComponent<
   const soundEventsOriginal = useMusicSelector(
     state => state.music.playbackEvents
   );
+  const uniqueExecuteId = useMusicSelector(
+    state => state.music.uniqueExecuteId
+  );
 
   // soundEventsOriginal has sounds sorted primarily by the immediate function
   // that generates them, and next by when they are played.  Unless useOriginalTimelineLayout
@@ -213,8 +216,8 @@ const TimelineSimple2Events: React.FunctionComponent<
     [currentUniqueSounds, getEventHeight]
   );
 
-  return (
-    <div id="timeline-events">
+  const timelineFunctionExtents = useMemo(
+    () => (
       <div id="timeline-events-function-extents">
         {uniqueFunctionExtentsArray.map((functionExtents, index) => (
           <FunctionExtentsSimple2
@@ -227,6 +230,13 @@ const TimelineSimple2Events: React.FunctionComponent<
           />
         ))}
       </div>
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [uniqueExecuteId]
+  );
+
+  const timelineSoundEvents = useMemo(
+    () => (
       <div id="timeline-events-sound-events">
         {soundEvents.map((eventData, index) => (
           <TimelineElement
@@ -244,6 +254,15 @@ const TimelineSimple2Events: React.FunctionComponent<
           />
         ))}
       </div>
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [uniqueExecuteId]
+  );
+
+  return (
+    <div id="timeline-events">
+      {timelineFunctionExtents}
+      {timelineSoundEvents}
     </div>
   );
 };

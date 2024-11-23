@@ -70,6 +70,10 @@ export interface MusicState {
     id?: string;
     index: number;
   };
+  /** A unique value for each execution.  We only need to re-render timeline
+   * elements when this value changes.
+   */
+  uniqueExecuteId: number;
 
   // State used by advanced controls (currently internal-only) with the ToneJS player
   loopEnabled: boolean;
@@ -104,6 +108,7 @@ const initialState: MusicState = {
     id: undefined,
     index: 0,
   },
+  uniqueExecuteId: 0,
   loopEnabled: false,
   loopStart: 1,
   loopEnd: 5,
@@ -238,6 +243,9 @@ const musicSlice = createSlice({
     clearCallout: state => {
       state.currentCallout.id = undefined;
     },
+    updateUniqueExecuteId: state => {
+      state.uniqueExecuteId++;
+    },
     setLoopEnabled: (state, action: PayloadAction<boolean>) => {
       state.loopEnabled = action.payload;
     },
@@ -338,6 +346,7 @@ export const {
   setUndoStatus,
   showCallout,
   clearCallout,
+  updateUniqueExecuteId,
   setLoopEnabled,
   setLoopStart,
   setLoopEnd,
