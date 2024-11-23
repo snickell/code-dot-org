@@ -67,8 +67,11 @@ export function disableOrphans(event: GoogleBlockly.Events.Abstract) {
     if (block) {
       updateBlockEnabled(block);
     }
-  } else if (
-    blockEvent.type === Blockly.Events.BLOCK_DRAG &&
+  }
+
+  if (
+    (blockEvent.type === Blockly.Events.BLOCK_DRAG ||
+      blockEvent.type === Blockly.Events.BLOCK_MOVE) &&
     block &&
     block.type === BLOCK_TYPES.procedureDefinition &&
     eventWorkspace
