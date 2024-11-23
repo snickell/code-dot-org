@@ -95,7 +95,7 @@ for (let i = 0; i < 5; i++) {
 }
 export const ALL_LEDS = allLeds;
 
-export const MICROBIT_FIRMATA_V1_URL = `${DOWNLOAD_PREFIX}microbit-firmata-v1-ver1.hex`;
+export const MICROBIT_FIRMATA_V1_URL = `${DOWNLOAD_PREFIX}microbit-firmata-v1-ver1.2.hex`;
 export const MICROBIT_FIRMATA_V2_URL = `${DOWNLOAD_PREFIX}microbit-firmata-v2-ver1.2.hex`;
 export const MICROBIT_MICROPYTHON_V1_URL = `${DOWNLOAD_PREFIX}microbit-micropython-v1-ver1.hex`;
 export const MICROBIT_MICROPYTHON_V2_URL = `${DOWNLOAD_PREFIX}microbit-micropython-v2-ver1.hex`;
