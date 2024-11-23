@@ -6,6 +6,7 @@ import {
   DEFAULT_CHORD_LENGTH,
   DEFAULT_PATTERN_LENGTH,
   DEFAULT_TUNE_LENGTH,
+  MAX_NUMBER_EVENTS,
 } from '../../constants';
 import {ChordEvent, ChordEventValue} from '../interfaces/ChordEvent';
 import {Effects, EffectValue} from '../interfaces/Effects';
@@ -32,8 +33,6 @@ interface SkipFrame {
   currentIndex: number;
   randomIndex: number;
 }
-
-const MaxNumberEvents = 1000;
 
 /**
  * A {@link Sequencer} used in the Simple2 (functions) block mode.
@@ -70,11 +69,13 @@ export default class Simple2Sequencer extends Sequencer {
 
   /**
    * Resets to the default new sequence and clears all sequenced events
+   * @param existingEventCount existing event count
    */
-  clear() {
+  clear(existingEventCount: number = 0) {
     this.newSequence();
     this.functionMap = {};
-    this.currentEventCount = 0;
+
+    this.currentEventCount = existingEventCount;
   }
 
   getLastMeasure(): number {
@@ -327,8 +328,7 @@ export default class Simple2Sequencer extends Sequencer {
   }
 
   private addNewEvent<T extends PlaybackEvent>(event: T) {
-    if (this.currentEventCount >= MaxNumberEvents) {
-      console.log(`Exceeded ${MaxNumberEvents} events`);
+    if (this.currentEventCount >= MAX_NUMBER_EVENTS) {
       return;
     } else {
       this.currentEventCount++;
