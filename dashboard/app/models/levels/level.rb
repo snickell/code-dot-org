@@ -22,6 +22,7 @@
 #  index_levels_on_game_id    (game_id)
 #  index_levels_on_level_num  (level_num)
 #  index_levels_on_name       (name)
+#  index_levels_on_type       (type)
 #
 
 require 'cdo/shared_constants'
@@ -29,8 +30,6 @@ require 'cdo/shared_constants'
 class Level < ApplicationRecord
   include SharedConstants
   include Levels::LevelsWithinLevels
-  include ScriptLevelsHelper
-  include Rails.application.routes.url_helpers
 
   belongs_to :game, optional: true
   has_and_belongs_to_many :concepts
@@ -96,6 +95,8 @@ class Level < ApplicationRecord
     thumbnail_url
     start_libraries
     ai_tutor_available
+    offer_browser_tts
+    use_secondary_finish_button
   )
 
   # Fix STI routing http://stackoverflow.com/a/9463495
@@ -847,7 +848,7 @@ class Level < ApplicationRecord
     properties_camelized[:appName] = game&.app
     properties_camelized[:useRestrictedSongs] = game.use_restricted_songs?
     properties_camelized[:usesProjects] = try(:is_project_level) || channel_backed?
-    properties_camelized[:finishUrl] = script_completion_redirect(current_user, script) if script
+    properties_camelized[:finishUrl] = script_level.next_level_or_redirect_path_for_user(current_user) if script_level
 
     if try(:project_template_level).try(:start_sources)
       properties_camelized['templateSources'] = try(:project_template_level).try(:start_sources)
@@ -897,10 +898,6 @@ class Level < ApplicationRecord
   # represent a version year.
   private def base_name
     base_name = name
-    if name_suffix
-      strip_suffix_regex = /^(.*)#{Regexp.escape(name_suffix)}$/
-      base_name = name[strip_suffix_regex, 1] || name
-    end
     base_name = strip_version_year_suffixes(base_name)
     base_name
   end

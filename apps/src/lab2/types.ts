@@ -127,6 +127,7 @@ export enum ProjectFileType {
   STARTER = 'starter',
   SUPPORT = 'support',
   VALIDATION = 'validation',
+  LOCKED_STARTER = 'locked_starter',
 }
 
 export interface ProjectFolder {
@@ -176,6 +177,9 @@ export interface LevelProperties {
   submittable?: boolean;
   finishUrl?: string;
   finishDialog?: string;
+  offerBrowserTts?: boolean;
+  validationFile?: ProjectFile;
+  useSecondaryFinishButton?: boolean;
 }
 
 // Level configuration data used by project-backed labs that don't require
@@ -294,12 +298,14 @@ export interface Condition {
 export interface ConditionType {
   name: string;
   valueType?: 'string' | 'number';
+  description: string;
 }
 
 // Validation in the level.
 export interface Validation {
   conditions: Condition[];
   message: string;
+  callout?: string;
   next: boolean;
   key: string;
 }

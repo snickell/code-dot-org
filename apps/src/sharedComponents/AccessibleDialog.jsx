@@ -10,6 +10,7 @@ import i18n from '@cdo/locale';
 import defaultStyle from './accessible-dialogue.module.scss';
 
 function AccessibleDialog({
+  id,
   styles,
   onClose,
   onDismiss,
@@ -18,11 +19,14 @@ function AccessibleDialog({
   fallbackFocus,
   initialFocus = true,
   closeOnClickBackdrop = false,
+  onDeactivate = onClose,
+  noMC = false, // exclude MineCraft button styles
 }) {
   // If these styles are provided by the given stylesheet, use them
   const modalStyle = styles?.modal || defaultStyle.modal;
   const backdropStyle = styles?.modalBackdrop || defaultStyle.modalBackdrop;
-  const closeIconStyle = styles?.xCloseButton || defaultStyle.xCloseButton;
+  let closeIconStyle = styles?.xCloseButton || defaultStyle.xCloseButton;
+  closeIconStyle = noMC ? [closeIconStyle, 'no-mc'] : closeIconStyle;
 
   // This provides the option for there to be different behaviors between closing the dialog
   // and explicitly dismissing it, for example when the user has selected "remind me later".
@@ -35,17 +39,20 @@ function AccessibleDialog({
         <FocusTrap
           focusTrapOptions={{
             initialFocus: initialFocus,
-            onDeactivate: onClose,
+            onDeactivate: onDeactivate,
             clickOutsideDeactivates: closeOnClickBackdrop,
             fallbackFocus: fallbackFocus,
           }}
         >
           <div
+            id={id}
             aria-modal
+            aria-labelledby={`${id}-title`}
             className={classnames(modalStyle, className)}
             role="dialog"
           >
             <CloseButton
+              id="ui-close-dialog"
               className={closeIconStyle}
               aria-label={i18n.closeDialog()}
               onClick={xIconOnClick}
@@ -59,6 +66,7 @@ function AccessibleDialog({
 }
 
 AccessibleDialog.propTypes = {
+  id: PropTypes.string,
   styles: PropTypes.object,
   onClose: PropTypes.func.isRequired,
   onDismiss: PropTypes.func,
@@ -67,6 +75,8 @@ AccessibleDialog.propTypes = {
   fallbackFocus: PropTypes.string,
   initialFocus: PropTypes.bool,
   closeOnClickBackdrop: PropTypes.bool,
+  onDeactivate: PropTypes.func,
+  noMC: PropTypes.bool,
 };
 
 export default AccessibleDialog;
