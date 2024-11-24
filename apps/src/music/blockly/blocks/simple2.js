@@ -42,7 +42,6 @@ export const whenRunSimple2 = {
   generator: ctx => {
     const nextBlock = ctx.nextConnection && ctx.nextConnection.targetBlock();
     let handlerCode = Blockly.JavaScript.blockToCode(nextBlock, false);
-    ctx.skipNextBlockGeneration = true;
     return `
       if (__context == 'when_run') {
         Sequencer.newSequence();
@@ -88,7 +87,6 @@ export const triggeredAtSimple2 = {
     const id = ctx.getFieldValue(TRIGGER_FIELD);
     const nextBlock = ctx.nextConnection && ctx.nextConnection.targetBlock();
     let handlerCode = Blockly.JavaScript.blockToCode(nextBlock, false);
-    ctx.skipNextBlockGeneration = true;
     return `
       if (__context == "${id}") {
         Sequencer.newSequence(startPosition, true);
