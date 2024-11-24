@@ -49,6 +49,9 @@ export default class CourseUnitsEditor extends Component {
                 {name}
               </option>
             ))}
+            <option key={unitNames.length} value={selectedUnit}>
+              {selectedUnit}
+            </option>
           </select>
         ))}
       </div>

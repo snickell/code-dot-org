@@ -97,8 +97,8 @@ describe('CourseEditor', () => {
       expect(screen.queryAllByDisplayValue('Unit Not Part of Course').length).to.equal(0);
 
       expect(screen.getAllByRole('option', {name: 'Select a unit to add to course'}).length).to.equal(3);
-      expect(screen.getAllByRole('option', {name: 'CSP Unit 1'}).length).to.equal(3);
-      expect(screen.getAllByRole('option', {name: 'CSP Unit 2'}).length).to.equal(3);
+      expect(screen.getAllByRole('option', {name: 'CSP Unit 1'}).length).to.equal(1);
+      expect(screen.getAllByRole('option', {name: 'CSP Unit 2'}).length).to.equal(1);
       expect(screen.getAllByRole('option', {name: 'Unit Not Part of Course'}).length).to.equal(3);
     });
   });
