@@ -12,7 +12,7 @@ import {
   ExtendedWorkspace,
   ExtendedWorkspaceSvg,
 } from './types';
-import {updateBlockEnabled, disableOrphanFunctionCalls} from './utils';
+import {updateBlockEnabled, disableOrphanBlocks} from './utils';
 
 // A custom version of Blockly's Events.disableOrphans. This makes a couple
 // changes to the original function.
@@ -75,7 +75,7 @@ export function disableOrphans(event: GoogleBlockly.Events.Abstract) {
     block.type === BLOCK_TYPES.procedureDefinition &&
     eventWorkspace
   ) {
-    disableOrphanFunctionCalls(eventWorkspace);
+    disableOrphanBlocks(eventWorkspace);
   }
 }
 

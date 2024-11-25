@@ -313,9 +313,7 @@ export function getAllBlocks(): BlockList {
   ];
 }
 
-export function disableOrphanFunctionCalls(
-  eventWorkspace: GoogleBlockly.Workspace
-) {
+export function disableOrphanBlocks(eventWorkspace: GoogleBlockly.Workspace) {
   // When a function definition is moved, we should not suddenly enable
   // its call blocks.
   eventWorkspace.getTopBlocks().forEach(block => {
