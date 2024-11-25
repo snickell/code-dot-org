@@ -33,10 +33,6 @@ const getFunctionExtents = (
     right = 0,
     bottom = 0;
 
-  if (depth > MAX_FUNCTION_BOUNDS_RENDER_DEPTH) {
-    return null;
-  }
-
   if (
     orderedFunction.playbackEvents.length === 0 &&
     orderedFunction.calledFunctionIds.length === 0
@@ -57,24 +53,30 @@ const getFunctionExtents = (
     );
   }
 
-  for (const calledFunctionId of orderedFunction.calledFunctionIds) {
-    const calledFunction = orderedFunctions.find(
-      orderedF => orderedF.uniqueInvocationId === calledFunctionId
-    );
-    if (calledFunction) {
-      const extents = getFunctionExtents(
-        calledFunction,
-        uniqueSounds,
-        orderedFunctions,
-        depth + 1
+  if (depth < MAX_FUNCTION_BOUNDS_RENDER_DEPTH) {
+    for (const calledFunctionId of orderedFunction.calledFunctionIds) {
+      const calledFunction = orderedFunctions.find(
+        orderedF => orderedF.uniqueInvocationId === calledFunctionId
       );
-      if (extents) {
-        left = Math.min(left, extents.left);
-        right = Math.max(right, extents.right);
-        top = Math.min(top, extents.top);
-        bottom = Math.max(bottom, extents.bottom);
+      if (calledFunction) {
+        const extents = getFunctionExtents(
+          calledFunction,
+          uniqueSounds,
+          orderedFunctions,
+          depth + 1
+        );
+        if (extents) {
+          left = Math.min(left, extents.left);
+          right = Math.max(right, extents.right);
+          top = Math.min(top, extents.top);
+          bottom = Math.max(bottom, extents.bottom);
+        }
       }
     }
+  }
+
+  if (left === Number.MAX_SAFE_INTEGER) {
+    return null;
   }
 
   return {left, right, top, bottom};
@@ -225,16 +227,18 @@ const TimelineSimple2Events: React.FunctionComponent<
 
       return (
         <div id="timeline-events-function-extents">
-          {uniqueFunctionExtentsArray.map((functionExtents, index) => (
-            <FunctionExtentsSimple2
-              key={index}
-              index={index}
-              paddingOffset={paddingOffset}
-              barWidth={barWidth}
-              eventHeight={eventHeight}
-              functionExtents={functionExtents}
-            />
-          ))}
+          {uniqueFunctionExtentsArray
+            .filter(functionExtents => functionExtents)
+            .map((functionExtents, index) => (
+              <FunctionExtentsSimple2
+                key={index}
+                index={index}
+                paddingOffset={paddingOffset}
+                barWidth={barWidth}
+                eventHeight={eventHeight}
+                functionExtents={functionExtents}
+              />
+            ))}
         </div>
       );
     },

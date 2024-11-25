@@ -279,9 +279,7 @@ export default class Simple2Sequencer extends Sequencer {
 
   // Can be used to render timeline
   getOrderedFunctions(): FunctionEvents[] {
-    return Object.keys(this.functionMap)
-      .sort()
-      .map(id => this.functionMap[id]);
+    return Object.keys(this.functionMap).map(id => this.functionMap[id]);
   }
 
   getPlaybackEvents(): PlaybackEvent[] {

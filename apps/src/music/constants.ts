@@ -48,6 +48,7 @@ export const DEFAULT_PATTERN_LENGTH = 1;
 export const DEFAULT_PATTERN_AI_LENGTH = 2;
 export const DEFAULT_CHORD_LENGTH = 1;
 export const DEFAULT_TUNE_LENGTH = 1;
+
 export const MAX_FUNCTION_BOUNDS_RENDER_DEPTH = 10;
 
 export const DEFAULT_PATTERN: InstrumentEventValue = {
