@@ -1,3 +1,4 @@
+import {MAX_LOOP_ITERATIONS_COUNT} from '../../constants';
 import musicI18n from '../../locale';
 import {BlockTypes} from '../blockTypes';
 import {getCodeForSingleBlock} from '../blockUtils';
@@ -397,19 +398,12 @@ export const repeatSimple2 = {
       'repeat_end',
       Blockly.Names.NameType.VARIABLE
     );
-    code += 'var ' + endVar + ' = ' + repeats + ';\n';
-    code +=
-      'for (var ' +
-      loopVar +
-      ' = 0; ' +
-      loopVar +
-      ' < ' +
-      endVar +
-      '; ' +
-      loopVar +
-      '++) {\n' +
-      branch +
-      '}\n';
+    code += `
+      var ${endVar} = ${repeats};
+      for (var ${loopVar} = 0; ${loopVar} < ${endVar} && __loopIterationsCount < ${MAX_LOOP_ITERATIONS_COUNT}; ${loopVar}++, __loopIterationsCount++) {
+        ${branch}
+      }
+    `;
 
     return `
       Sequencer.playSequential();
