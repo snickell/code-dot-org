@@ -1,12 +1,22 @@
 require_relative '../../deployment'
 require 'cdo/slack'
 require 'tzinfo'
+require 'cdo/github'
 
 module InfraTestTopic
   # Updates the Slack#infra-test topic to indicate the given commit is green (passes tests).
   # @param [String] commit The (abbreviated) sha of the commit being marked as green.
   def self.set_green_commit(commit)
-    msg = "#{commit} is :greenbeer: @ #{current_time_pacific}"
+    test_green_commit = InfraTestTopic.green_commit
+    unless GitHub.branch_exists?(branch_name, at_commit: test_green_commit)
+      create_branch_from_commit(branch_name, test_green_commit)
+    end
+    pr_number = GitHub.find_or_create_pull_request(
+      base: 'production',
+      head: branch_name,
+      title: "DTP (Test > Production: #{test_green_commit})"
+    )
+    msg = "#{commit} is :greenbeer: @ #{current_time_pacific} with <a href=\"#{GitHub.url(pr_number)}\">PR#{pr_number}</a>"
     Slack.update_topic 'infra-test', msg
   end
 
