@@ -1,6 +1,7 @@
 import React, {useCallback, useMemo} from 'react';
 
 import AppConfig from '../appConfig';
+import {MAX_FUNCTION_BOUNDS_RENDER_DEPTH} from '../constants';
 import {FunctionEvents} from '../player/interfaces/FunctionEvents';
 import {PlaybackEvent} from '../player/interfaces/PlaybackEvent';
 
@@ -24,12 +25,17 @@ interface FunctionExtents {
 const getFunctionExtents = (
   orderedFunction: FunctionEvents,
   uniqueSounds: string[],
-  orderedFunctions: FunctionEvents[]
+  orderedFunctions: FunctionEvents[],
+  depth: number = 0
 ): FunctionExtents | null => {
   let left = Number.MAX_SAFE_INTEGER,
     top = Number.MAX_SAFE_INTEGER,
     right = 0,
     bottom = 0;
+
+  if (depth > MAX_FUNCTION_BOUNDS_RENDER_DEPTH) {
+    return null;
+  }
 
   if (
     orderedFunction.playbackEvents.length === 0 &&
@@ -59,7 +65,8 @@ const getFunctionExtents = (
       const extents = getFunctionExtents(
         calledFunction,
         uniqueSounds,
-        orderedFunctions
+        orderedFunctions,
+        depth + 1
       );
       if (extents) {
         left = Math.min(left, extents.left);
@@ -187,23 +194,6 @@ const TimelineSimple2Events: React.FunctionComponent<
     return uniqueSounds;
   }, [soundEvents]);
 
-  // Next, for each function, determine the pixel extents of the sound events
-  // generated, including by functions it calls.
-  // The outcome is an object with each function's extents.
-  // Each timeline extent has left/right position in measures, and
-  // top/bottom position in rows.
-  const uniqueFunctionExtentsArray = useMemo(() => {
-    return orderedFunctions
-      .map(orderedFunction =>
-        getFunctionExtents(
-          orderedFunction,
-          currentUniqueSounds,
-          orderedFunctions
-        )
-      )
-      .filter(orderedFunction => orderedFunction);
-  }, [orderedFunctions, currentUniqueSounds]);
-
   const eventHeight = useMemo(
     () => getEventHeight(currentUniqueSounds.length),
     [currentUniqueSounds.length, getEventHeight]
@@ -217,20 +207,37 @@ const TimelineSimple2Events: React.FunctionComponent<
   );
 
   const timelineFunctionExtents = useMemo(
-    () => (
-      <div id="timeline-events-function-extents">
-        {uniqueFunctionExtentsArray.map((functionExtents, index) => (
-          <FunctionExtentsSimple2
-            key={index}
-            index={index}
-            paddingOffset={paddingOffset}
-            barWidth={barWidth}
-            eventHeight={eventHeight}
-            functionExtents={functionExtents}
-          />
-        ))}
-      </div>
-    ),
+    () => {
+      // For each function, determine the pixel extents of the sound events
+      // generated, including by functions it calls.
+      // The outcome is an object with each function's extents.
+      // Each timeline extent has left/right position in measures, and
+      // top/bottom position in rows.
+      const uniqueFunctionExtentsArray = orderedFunctions
+        .map(orderedFunction =>
+          getFunctionExtents(
+            orderedFunction,
+            currentUniqueSounds,
+            orderedFunctions
+          )
+        )
+        .filter(orderedFunction => orderedFunction);
+
+      return (
+        <div id="timeline-events-function-extents">
+          {uniqueFunctionExtentsArray.map((functionExtents, index) => (
+            <FunctionExtentsSimple2
+              key={index}
+              index={index}
+              paddingOffset={paddingOffset}
+              barWidth={barWidth}
+              eventHeight={eventHeight}
+              functionExtents={functionExtents}
+            />
+          ))}
+        </div>
+      );
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [uniqueExecuteId]
   );
