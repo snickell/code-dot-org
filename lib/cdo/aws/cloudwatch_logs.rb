@@ -17,7 +17,7 @@ module Cdo
     MAXIMUM_BATCH_COUNT = 10000
     MAXIMUM_EVENT_SIZE = 256 * 1024
     # Service Quota: https://us-east-1.console.aws.amazon.com/servicequotas/home/services/logs/quotas/L-7E1FAE88
-    MAX_TRANSACTIONS_PER_SECOND = 5000
+    MAX_TRANSACTIONS_PER_SECOND = 5000 / 25 / 48 # 25 instances with 48 vCPUs each
 
     class Buffer < Cdo::Buffer
       def initialize(log_group_name, log_stream_name)
