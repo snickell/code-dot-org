@@ -13,7 +13,7 @@ module Cdo
     BUFFERS = Hash.new {|h, key| h[key] = Buffer.new(key.split("/").first, key.split("/").last)}
 
     # Ref: http://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutLogEvents.html
-    MAXIUMUM_BATCH_SIZE = 1024 * 1024
+    MAXIMUM_BATCH_SIZE = 1024 * 1024
     MAXIMUM_BATCH_COUNT = 10000
     MAXIMUM_EVENT_SIZE = 256 * 1024
     # Service Quota: https://us-east-1.console.aws.amazon.com/servicequotas/home/services/logs/quotas/L-7E1FAE88
@@ -23,7 +23,7 @@ module Cdo
       def initialize(log_group_name, log_stream_name)
         super(
           batch_count: MAXIMUM_BATCH_COUNT,
-          batch_size: MAXIUMUM_BATCH_SIZE,
+          batch_size: MAXIMUM_BATCH_SIZE,
           max_interval: 60, # try to flush at least every minute
           min_interval: 1.0 / MAX_TRANSACTIONS_PER_SECOND,
           wait_at_exit: 10.0
