@@ -1072,6 +1072,16 @@ class Unit < ApplicationRecord
     get_course_version&.course_offering&.course_versions&.many?
   end
 
+  # version_year for a given unit should be the same whether you're looking at it on the unit itself,
+  # the associated unit_group (if there is one), or the associated course_version (if there is one).
+  # However, there is at least one instance of unit.version_year being mysteriously inconsistent
+  # with unit.unit_group.version_year and unit.course_version.key for "csp4-2024".
+  # This method is a cautious workaround to reconcile these inconsistencies while we investigate the mismatch.
+  # See https://codedotorg.atlassian.net/browse/TEACH-1492
+  def get_most_recent_version_year
+    [get_course_version&.key.to_i, version_year.to_i, unit_group&.version_year.to_i].max.to_s
+  end
+
   def self.add_unit(options, raw_lesson_groups)
     transaction do
       unit = fetch_unit(options)
