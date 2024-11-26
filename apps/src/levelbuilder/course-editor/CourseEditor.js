@@ -416,8 +416,7 @@ class CourseEditor extends Component {
             <div>
               The dropdown(s) below represent the ordered set of units in this
               course. To remove a unit, just set the dropdown to the default
-              (first) value. Please referesh the page after every edit to get
-              the most uptodate list of units.
+              (first) value.
             </div>
             <CourseUnitsEditor
               inputStyle={styles.input}

@@ -26,7 +26,32 @@ import {assert, expect} from '../../../util/reconfiguredChai'; // eslint-disable
 import {allowConsoleWarnings} from '../../../util/throwOnConsole';
 
 describe('CourseEditor', () => {
-  let defaultProps, store;
+  let store;
+  const defaultProps = {
+    name: 'test-course',
+    initialTitle: 'Computer Science Principles 2017',
+    initialFamilyName: 'CSP',
+    initialVersionYear: '2017',
+    initialPublishedState: 'beta',
+    initialDescriptionShort: 'Desc here',
+    initialDescriptionStudent:
+      '# Student description \n This is the course description with [link](https://studio.code.org/home) **Bold** *italics* ',
+    initialDescriptionTeacher:
+      '# Teacher description \n This is the course description with [link](https://studio.code.org/home) **Bold** *italics* ',
+    initialUnitsInCourse: ['CSP Unit 1', 'CSP Unit 2'],
+    unitNames: ['Unit Not Part of Course'],
+    initialHasVerifiedResources: false,
+    initialHasNumberedUnits: false,
+    courseFamilies: ['CSP', 'CSD', 'CSF'],
+    versionYearOptions: ['2017', '2018', '2019'],
+    initialAnnouncements: [],
+    coursePath: '/courses/test-course',
+    initialInstructionType: InstructionType.teacher_led,
+    initialInstructorAudience: InstructorAudience.teacher,
+    initialParticipantAudience: ParticipantAudience.student,
+    teacherResources: [],
+    studentResources: [],
+  };
 
   beforeEach(() => {
     sinon.stub(utils, 'navigateToHref');
@@ -37,32 +62,6 @@ describe('CourseEditor', () => {
       studentResources: createResourcesReducer('studentResource'),
     });
     store = getStore();
-
-    defaultProps = {
-      name: 'test-course',
-      initialTitle: 'Computer Science Principles 2017',
-      initialFamilyName: 'CSP',
-      initialVersionYear: '2017',
-      initialPublishedState: 'beta',
-      initialDescriptionShort: 'Desc here',
-      initialDescriptionStudent:
-        '# Student description \n This is the course description with [link](https://studio.code.org/home) **Bold** *italics* ',
-      initialDescriptionTeacher:
-        '# Teacher description \n This is the course description with [link](https://studio.code.org/home) **Bold** *italics* ',
-      initialUnitsInCourse: ['CSP Unit 1', 'CSP Unit 2'],
-      unitNames: ['Unit Not Part of Course'],
-      initialHasVerifiedResources: false,
-      initialHasNumberedUnits: false,
-      courseFamilies: ['CSP', 'CSD', 'CSF'],
-      versionYearOptions: ['2017', '2018', '2019'],
-      initialAnnouncements: [],
-      coursePath: '/courses/test-course',
-      initialInstructionType: InstructionType.teacher_led,
-      initialInstructorAudience: InstructorAudience.teacher,
-      initialParticipantAudience: ParticipantAudience.student,
-      teacherResources: [],
-      studentResources: [],
-    };
   });
 
   afterEach(() => {
@@ -106,10 +105,10 @@ describe('CourseEditor', () => {
       ).to.equal(3);
       expect(
         screen.getAllByRole('option', {name: 'CSP Unit 1'}).length
-      ).to.equal(1);
+      ).to.equal(3);
       expect(
         screen.getAllByRole('option', {name: 'CSP Unit 2'}).length
-      ).to.equal(1);
+      ).to.equal(3);
       expect(
         screen.getAllByRole('option', {name: 'Unit Not Part of Course'}).length
       ).to.equal(3);
