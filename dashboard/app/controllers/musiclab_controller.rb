@@ -6,7 +6,7 @@ class MusiclabController < ApplicationController
     RSDgNPmToACl-JRTVYAcTCbF46lyXXPRWOsHISyu3kc
     q0wDQmka3QRjS0EIH46XtSIQ_zJfhayM71YEqOAahao
     RSDgNPmToACl-JRTVYAcTCkE2DNnP529dBPfRByevCY
-    pYNY-IR4sQxUR4CDNGxoNsTpYDympRPq9f0j6R06me
+    pYNY-IR4sQxUR4CDNGxoNsTpYDympRPq9f0j6R06mec
     pYNY-IR4sQxUR4CDNGxoNrN_O4luFYm_Sxg6DnQUxyw
   )
 
