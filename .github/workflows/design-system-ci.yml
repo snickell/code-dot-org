@@ -1,0 +1,53 @@
+name: Design System CI and QA
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - staging
+            - cms # Temporary until merged to staging
+        paths:
+            - 'frontend/**'
+    pull_request:
+        branches:
+            - staging
+            - cms # Temporary until merged to staging
+        paths:
+            - 'frontend/**'
+
+jobs:
+    build:
+        runs-on: ubuntu-24.04
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                sparse-checkout: 'frontend'
+
+            - uses: actions/setup-node@v4
+              with:
+                node-version-file: "frontend/.nvmrc"
+                cache: "yarn"
+                cache-dependency-path: 'frontend/yarn.lock'
+
+            - name: Install dependencies
+              run: yarn install
+              working-directory: ./frontend
+
+            - name: Lint
+              run: yarn lint --filter @code-dot-org/dsco --filter @code-dot-org/design-system-storybook
+              working-directory: ./frontend
+
+            - name: Build
+              run: yarn build --filter @code-dot-org/dsco --filter @code-dot-org/design-system-storybook
+              working-directory: ./frontend
+
+            - name: Unit Tests
+              run: yarn test --filter @code-dot-org/dsco --filter @code-dot-org/design-system-storybook
+              working-directory: ./frontend
+
+            - name: UI Tests
+              run: yarn test:ui --filter @code-dot-org/dsco --filter @code-dot-org/design-system-storybook
+              working-directory: ./frontend
+
+            

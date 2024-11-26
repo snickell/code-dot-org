@@ -1,0 +1,20 @@
+name: "Node & Yarn Install"
+description: "Sets up Node.js and runs install"
+
+runs:
+  using: composite
+  steps:
+    - name: Enable Corepack
+      shell: bash
+      run: corepack enable yarn && yarn set version berry
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version-file: "frontend/.nvmrc"
+        cache: "yarn"
+        cache-dependency-path: 'frontend/yarn.lock'
+
+    - name: Install dependencies
+      shell: bash
+      run: yarn install
+      working-directory: ./frontend
