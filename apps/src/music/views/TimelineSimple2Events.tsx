@@ -6,6 +6,12 @@ import {FunctionEvents} from '../player/interfaces/FunctionEvents';
 import {PlaybackEvent} from '../player/interfaces/PlaybackEvent';
 
 import TimelineElement from './TimelineElement';
+import {
+  barWidth,
+  paddingOffset,
+  eventVerticalSpace,
+  getEventHeight,
+} from './TimelineUtil';
 import {useMusicSelector} from './types';
 
 const useOriginalTimelineLayout =
@@ -95,7 +101,7 @@ interface FunctionExtents2EventsProps {
 
 const FunctionExtentsSimple2: React.FunctionComponent<
   FunctionExtents2EventsProps
-> = ({index, paddingOffset, barWidth, eventHeight, functionExtents}) => {
+> = ({index, barWidth, eventHeight, functionExtents}) => {
   if (!functionExtents) {
     return null;
   }
@@ -151,21 +157,21 @@ const getOrderedByWhenSoundEvents = (soundEvents: PlaybackEvent[]) => {
  * Renders timeline events in the simple2 model.
  */
 interface TimelineSimple2EventsProps {
-  paddingOffset: number;
-  barWidth: number;
-  eventVerticalSpace: number;
-  getEventHeight: (numUniqueRows: number, availableHeight?: number) => number;
+  //paddingOffset: number;
+  //barWidth: number;
+  //eventVerticalSpace: number;
+  //getEventHeight: (numUniqueRows: number, availableHeight?: number) => number;
 }
 
 const TimelineSimple2Events: React.FunctionComponent<
   TimelineSimple2EventsProps
-> = ({paddingOffset, barWidth, eventVerticalSpace, getEventHeight}) => {
+> = (/*addingOffset, barWidth, eventVerticalSpace, getEventHeight*/) => {
   const soundEventsOriginal = useMusicSelector(
     state => state.music.playbackEvents
   );
-  const uniqueExecuteId = useMusicSelector(
-    state => state.music.uniqueExecuteId
-  );
+  //const uniqueExecuteId = useMusicSelector(
+  //  state => state.music.uniqueExecuteId
+  //);
 
   // soundEventsOriginal has sounds sorted primarily by the immediate function
   // that generates them, and next by when they are played.  Unless useOriginalTimelineLayout
@@ -198,77 +204,75 @@ const TimelineSimple2Events: React.FunctionComponent<
 
   const eventHeight = useMemo(
     () => getEventHeight(currentUniqueSounds.length),
-    [currentUniqueSounds.length, getEventHeight]
+    [currentUniqueSounds.length]
   );
 
   const getVerticalOffsetForEventId = useCallback(
     (id: string) =>
       currentUniqueSounds.indexOf(id) *
       getEventHeight(currentUniqueSounds.length),
-    [currentUniqueSounds, getEventHeight]
+    [currentUniqueSounds]
   );
 
-  const timelineFunctionExtents = useMemo(
-    () => {
-      // For each function, determine the pixel extents of the sound events
-      // generated, including by functions it calls.
-      // The outcome is an object with each function's extents.
-      // Each timeline extent has left/right position in measures, and
-      // top/bottom position in rows.
-      const uniqueFunctionExtentsArray = orderedFunctions
-        .map(orderedFunction =>
-          getFunctionExtents(
-            orderedFunction,
-            currentUniqueSounds,
-            orderedFunctions
-          )
-        )
-        .filter(orderedFunction => orderedFunction);
+  //const timelineFunctionExtents = useMemo(
+  //  () => {
+  // For each function, determine the pixel extents of the sound events
+  // generated, including by functions it calls.
+  // The outcome is an object with each function's extents.
+  // Each timeline extent has left/right position in measures, and
+  // top/bottom position in rows.
+  const uniqueFunctionExtentsArray = orderedFunctions
+    .map(orderedFunction =>
+      getFunctionExtents(orderedFunction, currentUniqueSounds, orderedFunctions)
+    )
+    .filter(orderedFunction => orderedFunction);
 
-      return (
-        <div id="timeline-events-function-extents">
-          {uniqueFunctionExtentsArray
-            .filter(functionExtents => functionExtents)
-            .map((functionExtents, index) => (
-              <FunctionExtentsSimple2
-                key={index}
-                index={index}
-                paddingOffset={paddingOffset}
-                barWidth={barWidth}
-                eventHeight={eventHeight}
-                functionExtents={functionExtents}
-              />
-            ))}
-        </div>
-      );
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [uniqueExecuteId]
-  );
-
-  const timelineSoundEvents = useMemo(
-    () => (
-      <div id="timeline-events-sound-events">
-        {soundEvents.map((eventData, index) => (
-          <TimelineElement
+  const timelineFunctionExtents = (
+    <div id="timeline-events-function-extents">
+      {uniqueFunctionExtentsArray
+        .filter(functionExtents => functionExtents)
+        .map((functionExtents, index) => (
+          <FunctionExtentsSimple2
             key={index}
-            eventData={eventData}
+            index={index}
+            paddingOffset={paddingOffset}
             barWidth={barWidth}
-            height={eventHeight - eventVerticalSpace - 1}
-            top={
-              32 +
-              getVerticalOffsetForEventId(
-                eventData.functionContext?.name + ' ' + eventData.id
-              )
-            }
-            left={paddingOffset + barWidth * (eventData.when - 1)}
+            eventHeight={eventHeight}
+            functionExtents={functionExtents}
           />
         ))}
-      </div>
-    ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [uniqueExecuteId]
+    </div>
   );
+  //},
+
+  //[uniqueExecuteId]
+  //);
+
+  //const timelineSoundEvents = useMemo(
+  //  () => (
+  const timelineSoundEvents = (
+    <div id="timeline-events-sound-events">
+      {soundEvents.map((eventData, index) => (
+        <TimelineElement
+          key={index}
+          eventData={eventData}
+          barWidth={barWidth}
+          height={eventHeight - eventVerticalSpace - 1}
+          top={
+            32 +
+            getVerticalOffsetForEventId(
+              eventData.functionContext?.name + ' ' + eventData.id
+            )
+          }
+          left={paddingOffset + barWidth * (eventData.when - 1)}
+        />
+      ))}
+    </div>
+  );
+  //),
+
+  //[uniqueExecuteId]
+  //);
 
   return (
     <div id="timeline-events">

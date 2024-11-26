@@ -16,44 +16,20 @@ import {MusicLevelData} from '../types';
 import usePlaybackUpdate from './hooks/usePlaybackUpdate';
 import TimelineSampleEvents from './TimelineSampleEvents';
 import TimelineSimple2Events from './TimelineSimple2Events';
+import {
+  barWidth,
+  paddingOffset,
+  eventVerticalSpace,
+  getEventHeight,
+} from './TimelineUtil';
 import {useMusicSelector} from './types';
 
 import moduleStyles from './timeline.module.scss';
 
-// The height of the primary timeline area for drawing events.  This is the height of each measure's
-// vertical bar.
-const timelineHeight = 130;
-// The width of one measure.
-const barWidth = 60;
-// Leave some vertical space between each event block.
-const eventVerticalSpace = 2;
-// A little room on the left.
-const paddingOffset = 10;
 // Start scrolling the playhead when it's more than this percentage of the way across the timeline area.
 const playheadScrollThreshold = 0.75;
 // How many extra measures to show at the end.
 const extraMeasures = 8;
-
-const getEventHeight = (
-  numUniqueRows: number,
-  availableHeight = timelineHeight
-) => {
-  // While we might not actually have this many rows to show,
-  // we will limit each row's height to the size that would allow
-  // this many to be shown at once.
-  const minVisible = 5;
-
-  const maxVisible = 26;
-
-  // We might not actually have this many rows to show, but
-  // we will size the bars so that this many rows would show.
-  const numSoundsToShow = Math.max(
-    Math.min(numUniqueRows, maxVisible),
-    minVisible
-  );
-
-  return Math.floor(availableHeight / numSoundsToShow);
-};
 
 /**
  * Renders the music playback timeline.
@@ -222,7 +198,7 @@ const Timeline: React.FunctionComponent = () => {
 
       <div id="timeline-soundsarea" className={moduleStyles.soundsArea}>
         {blockMode === BlockMode.SIMPLE2 ? (
-          <TimelineSimple2Events {...timelineElementProps} />
+          <TimelineSimple2Events />
         ) : (
           <TimelineSampleEvents {...timelineElementProps} />
         )}
