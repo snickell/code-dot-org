@@ -41,7 +41,7 @@ class AichatRequestChatCompletionJob < ApplicationJob
     # Report metrics for the failed job (after_perform doesn't run on failure)
     report_job_finish(request)
 
-    # Raise an exception to notify our system of the failed job.
+    # Raise an exception to notify our system of the failed job. Make sure not to exceed the delayed_jobs.last_error column size.
     raise "AichatRequestChatCompletionJob failed with unexpected error: #{exception.message}. Context: #{request.to_json[0..MAX_REQUEST_LOG_LENGTH]}"
   end
 
