@@ -2,7 +2,7 @@ import * as GoogleBlockly from 'blockly/core';
 
 import {BLOCK_TYPES, Renderers} from '@cdo/apps/blockly/constants';
 import CdoDarkTheme from '@cdo/apps/blockly/themes/cdoDark';
-import {ProcedureBlock} from '@cdo/apps/blockly/types';
+import {ProcedureBlock, ExtendedBlock} from '@cdo/apps/blockly/types';
 import {disableOrphanBlocks} from '@cdo/apps/blockly/utils';
 import LabMetricsReporter from '@cdo/apps/lab2/Lab2MetricsReporter';
 import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
@@ -206,6 +206,18 @@ export default class MusicBlocklyWorkspace {
     this.triggerIdToStartType = {};
 
     const topBlocks = workspace.getTopBlocks();
+
+    // Make sure that simple2 top-level blocks only generate their code once.
+    if (blockMode === BlockMode.SIMPLE2) {
+      topBlocks.forEach(block => {
+        if (
+          block.type === BlockTypes.WHEN_RUN_SIMPLE2 ||
+          block.type === BlockTypes.TRIGGERED_AT_SIMPLE2
+        ) {
+          (block as ExtendedBlock).skipNextBlockGeneration = true;
+        }
+      });
+    }
 
     topBlocks.forEach(block => {
       if (blockMode !== BlockMode.SIMPLE2) {
