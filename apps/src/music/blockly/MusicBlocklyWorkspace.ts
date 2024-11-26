@@ -45,6 +45,11 @@ export default class MusicBlocklyWorkspace {
       return;
     }
     setUpBlocklyForMusicLab();
+
+    if (blockMode !== BlockMode.SIMPLE2) {
+      Blockly.setInfiniteLoopTrap();
+    }
+
     this.isBlocklyEnvironmentSetup = true;
   }
 
@@ -234,6 +239,8 @@ export default class MusicBlocklyWorkspace {
           this.compiledEvents.whenRunButton = {
             code:
               'var __context = "when_run";\n' +
+              'var __functionCallsCount = 0;\n' +
+              'var __loopIterationsCount = 0;\n' +
               Blockly.JavaScript.workspaceToCode(workspace),
           };
         }
@@ -265,10 +272,14 @@ export default class MusicBlocklyWorkspace {
         ).includes(block.type)
       ) {
         const id = block.getFieldValue(TRIGGER_FIELD);
+        let code = `var __context = "${id}";\n`;
+        if (block.type === BlockTypes.TRIGGERED_AT_SIMPLE2) {
+          code +=
+            'var __functionCallsCount = 0;\n' +
+            'var __loopIterationsCount = 0;\n';
+        }
         this.compiledEvents[triggerIdToEvent(id)] = {
-          code:
-            `var __context = "${id}";\n` +
-            Blockly.JavaScript.workspaceToCode(workspace),
+          code: code + Blockly.JavaScript.workspaceToCode(workspace),
           args: ['startPosition'],
         };
         // Also save the value of the trigger start field at compile time so we can
@@ -322,6 +333,7 @@ export default class MusicBlocklyWorkspace {
       return;
     }
 
+    const startTime = Date.now();
     console.log('Executing compiled song.');
 
     if (this.codeHooks.whenRunButton) {
@@ -337,6 +349,8 @@ export default class MusicBlocklyWorkspace {
     });
 
     this.lastExecutedEvents = this.compiledEvents;
+
+    console.log('Execution time: ', Date.now() - startTime);
   }
 
   /**
