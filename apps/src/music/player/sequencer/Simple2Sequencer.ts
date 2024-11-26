@@ -328,11 +328,14 @@ export default class Simple2Sequencer extends Sequencer {
   }
 
   private addNewEvent<T extends PlaybackEvent>(event: T) {
+    this.currentEventCount++;
+    if (this.currentEventCount === MAX_NUMBER_EVENTS) {
+      console.log(`Reached MAX_NUMBER_EVENTS (${MAX_NUMBER_EVENTS}) events.`);
+    }
     if (this.currentEventCount >= MAX_NUMBER_EVENTS) {
       return;
-    } else {
-      this.currentEventCount++;
     }
+
     const currentFunctionId = this.getCurrentFunctionId();
     if (currentFunctionId === null) {
       this.metricsReporter.logWarning('Invalid state: no current function ID');
