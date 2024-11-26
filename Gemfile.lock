@@ -653,7 +653,7 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-    pg (1.0.0)
+    pg (1.5.9)
     phantomjs (1.9.7.1)
     progress (3.3.1)
     pry (0.14.2)
@@ -1066,7 +1066,7 @@ DEPENDENCIES
   parallel_tests
   paranoia (~> 2.5.0)
   pdf-reader
-  pg
+  pg (~> 1.4)
   phantomjs (~> 1.9.7.1)
   pry (~> 0.14.0)
   puma (~> 5.6)
