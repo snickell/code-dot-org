@@ -5,6 +5,7 @@ class AichatRequestChatCompletionJob < ApplicationJob
 
   DEFAULT_TOXICITY_THRESHOLD_USER_INPUT = 0.2
   DEFAULT_TOXICITY_THRESHOLD_MODEL_OUTPUT = 0.6
+  MAX_ERROR_MESSAGE_LENGTH = 4 * 1024 * 1024
 
   before_enqueue do |job|
     request = job.arguments.first[:request]
@@ -41,7 +42,8 @@ class AichatRequestChatCompletionJob < ApplicationJob
     report_job_finish(request)
 
     # Raise an exception to notify our system of the failed job.
-    raise "AichatRequestChatCompletionJob failed with unexpected error: #{exception.message}. Context: #{request.to_json}"
+    message = exception.message && exception.message[0..MAX_ERROR_MESSAGE_LENGTH]
+    raise "AichatRequestChatCompletionJob failed with unexpected error: #{message}. Context: #{request.to_json}"
   end
 
   def perform(request:, locale:)
