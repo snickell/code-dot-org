@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, {MouseEvent, useCallback, useRef} from 'react';
+import React, {MouseEvent, useCallback, useMemo, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
@@ -68,6 +68,9 @@ const Timeline: React.FunctionComponent = () => {
   );
   const startingPlayheadPosition = useMusicSelector(
     state => state.music.startingPlayheadPosition
+  );
+  const uniqueExecuteId = useMusicSelector(
+    state => state.music.uniqueExecuteId
   );
 
   const allowChangeStartingPlayheadPosition =
@@ -165,6 +168,17 @@ const Timeline: React.FunctionComponent = () => {
 
   usePlaybackUpdate(scrollPlayheadForward, scrollToPlayhead, scrollToPlayhead);
 
+  const timelineEvents = useMemo(
+    () =>
+      blockMode === BlockMode.SIMPLE2 ? (
+        <TimelineSimple2Events {...timelineElementProps} />
+      ) : (
+        <TimelineSampleEvents {...timelineElementProps} />
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [blockMode, uniqueExecuteId]
+  );
+
   return (
     <div
       id="timeline"
@@ -221,11 +235,7 @@ const Timeline: React.FunctionComponent = () => {
       </div>
 
       <div id="timeline-soundsarea" className={moduleStyles.soundsArea}>
-        {blockMode === BlockMode.SIMPLE2 ? (
-          <TimelineSimple2Events {...timelineElementProps} />
-        ) : (
-          <TimelineSampleEvents {...timelineElementProps} />
-        )}
+        {timelineEvents}
       </div>
 
       <div id="timeline-playhead" className={moduleStyles.fullWidthOverlay}>

@@ -330,7 +330,7 @@ export default class Simple2Sequencer extends Sequencer {
     if (this.currentEventCount === MAX_NUMBER_EVENTS) {
       console.log(`Reached MAX_NUMBER_EVENTS (${MAX_NUMBER_EVENTS}) events.`);
     }
-    if (this.currentEventCount >= MAX_NUMBER_EVENTS) {
+    if (this.currentEventCount > MAX_NUMBER_EVENTS) {
       return;
     }
 
