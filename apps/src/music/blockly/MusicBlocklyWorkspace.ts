@@ -3,6 +3,7 @@ import * as GoogleBlockly from 'blockly/core';
 import {BLOCK_TYPES, Renderers} from '@cdo/apps/blockly/constants';
 import CdoDarkTheme from '@cdo/apps/blockly/themes/cdoDark';
 import {ProcedureBlock, ExtendedBlock} from '@cdo/apps/blockly/types';
+import {disableOrphanBlocks} from '@cdo/apps/blockly/utils';
 import LabMetricsReporter from '@cdo/apps/lab2/Lab2MetricsReporter';
 import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
 import {getAppOptionsEditBlocks} from '@cdo/apps/lab2/projects/utils';
@@ -492,6 +493,8 @@ export default class MusicBlocklyWorkspace {
     const codeCopy = JSON.parse(JSON.stringify(code));
 
     Blockly.serialization.workspaces.load(codeCopy, this.workspace);
+
+    disableOrphanBlocks(this.workspace);
   }
 
   // For each function body in the current workspace, add a function call
