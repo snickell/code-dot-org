@@ -75,6 +75,8 @@ const getFunctionExtents = (
     }
   }
 
+  // It's possible to have a function that calls another functions but no
+  // events are emitted.  In that case, there's no bound to render.
   if (left === Number.MAX_SAFE_INTEGER) {
     return null;
   }
