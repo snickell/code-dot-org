@@ -27,7 +27,7 @@ import {allowConsoleWarnings} from '../../../util/throwOnConsole';
 
 describe('CourseEditor', () => {
   let defaultProps, store;
-  
+
   beforeEach(() => {
     sinon.stub(utils, 'navigateToHref');
     stubRedux();
@@ -37,7 +37,7 @@ describe('CourseEditor', () => {
       studentResources: createResourcesReducer('studentResource'),
     });
     store = getStore();
-  
+
     defaultProps = {
       name: 'test-course',
       initialTitle: 'Computer Science Principles 2017',
@@ -91,15 +91,28 @@ describe('CourseEditor', () => {
   describe('Course Editor - RTL', () => {
     it('All units within the course are listed under Units header', () => {
       renderDefault();
-      expect(screen.getAllByDisplayValue('Select a unit to add to course').length).to.equal(1);
+      expect(
+        screen.getAllByDisplayValue('Select a unit to add to course').length
+      ).to.equal(1);
       expect(screen.getAllByDisplayValue('CSP Unit 1').length).to.equal(1);
       expect(screen.getAllByDisplayValue('CSP Unit 2').length).to.equal(1);
-      expect(screen.queryAllByDisplayValue('Unit Not Part of Course').length).to.equal(0);
+      expect(
+        screen.queryAllByDisplayValue('Unit Not Part of Course').length
+      ).to.equal(0);
 
-      expect(screen.getAllByRole('option', {name: 'Select a unit to add to course'}).length).to.equal(3);
-      expect(screen.getAllByRole('option', {name: 'CSP Unit 1'}).length).to.equal(1);
-      expect(screen.getAllByRole('option', {name: 'CSP Unit 2'}).length).to.equal(1);
-      expect(screen.getAllByRole('option', {name: 'Unit Not Part of Course'}).length).to.equal(3);
+      expect(
+        screen.getAllByRole('option', {name: 'Select a unit to add to course'})
+          .length
+      ).to.equal(3);
+      expect(
+        screen.getAllByRole('option', {name: 'CSP Unit 1'}).length
+      ).to.equal(1);
+      expect(
+        screen.getAllByRole('option', {name: 'CSP Unit 2'}).length
+      ).to.equal(1);
+      expect(
+        screen.getAllByRole('option', {name: 'Unit Not Part of Course'}).length
+      ).to.equal(3);
     });
   });
 
@@ -368,7 +381,9 @@ describe('CourseEditor', () => {
       expect(
         wrapper
           .find('.saveBar')
-          .contains('Error Saving: Please set both version year and family name.')
+          .contains(
+            'Error Saving: Please set both version year and family name.'
+          )
       ).to.be.true;
 
       $.ajax.restore();
@@ -401,7 +416,9 @@ describe('CourseEditor', () => {
       expect(
         wrapper
           .find('.saveBar')
-          .contains('Error Saving: Please set both version year and family name.')
+          .contains(
+            'Error Saving: Please set both version year and family name.'
+          )
       ).to.be.true;
 
       $.ajax.restore();
@@ -483,4 +500,3 @@ describe('CourseEditor', () => {
     });
   });
 });
-
