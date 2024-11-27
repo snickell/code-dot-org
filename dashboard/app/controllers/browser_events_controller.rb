@@ -4,9 +4,7 @@ require 'cdo/aws/cloudwatch_logs'
 # A controller for reporting browser logs and metrics to Cloudwatch
 class BrowserEventsController < ApplicationController
   EXPERIMENT_FLAG_NAME = 'browser-cloudwatch-metrics'
-  FIREHOSE_STUDY_NAME = 'browser-cloudwatch-metrics-errors'
 
-  LOGS_CLIENT = Aws::CloudWatchLogs::Client.new
   ENV_PREFIX = rack_env?(:adhoc) ? CDO.stack_name : rack_env
   LOG_GROUP_NAME = "#{ENV_PREFIX}-browser-events"
   LOG_STREAM_NAME = ENV_PREFIX
@@ -81,16 +79,5 @@ class BrowserEventsController < ApplicationController
     log_payload['release'] = GitUtils.git_revision
 
     return log_payload.to_json.to_s
-  end
-
-  private def fallback_log_to_firehose(event, data)
-    FirehoseClient.instance.put_record(
-      :analysis,
-      {
-        study: FIREHOSE_STUDY_NAME,
-        event: event,
-        data_json: data.to_json
-      }
-    )
   end
 end
