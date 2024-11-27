@@ -14,6 +14,7 @@ raise "Unit name is required" unless $options[:unit]
 
 require_relative '../../deployment'
 require_relative '../../lib/cdo/redshift'
+require_relative '../../lib/cdo/db'
 
 def execute_redshift_query(client, query)
   client.exec(query)
@@ -22,13 +23,37 @@ rescue => exception
   raise
 end
 
-def main
+def test_redshift
   client = RedshiftClient.instance
   query = "SELECT id FROM dashboard_production.scripts WHERE name = '#{$options[:unit]}'"
   results = execute_redshift_query(client, query)
   results.each do |row|
     puts row
   end
+end
+
+def get_user_level_data
+  DASHBOARD_REPORTING_DB_READER[:user_levels].
+    left_join(:levels, Sequel[:user_levels][:level_id] => Sequel[:levels][:id]).
+    left_join(:scripts, Sequel[:user_levels][:script_id] => Sequel[:scripts][:id]).
+    # must limit id range to run efficiently in production
+    # .where { (Sequel[:user_levels][:id] > 5551913388) & (Sequel[:user_levels][:id] < 5552913388) }
+    where(Sequel[:scripts][:name] => 'csd3-2023', Sequel[:levels][:type] => 'gamelab').
+    select(
+      Sequel[:user_levels][:user_id],
+      Sequel[:user_levels][:script_id],
+      Sequel[:user_levels][:level_id]
+    ).
+    limit(1).
+    first
+end
+
+def main
+  result = get_user_level_data
+  user_id = result[:user_id]
+  level_id = result[:level_id]
+  script_id = result[:script_id]
+  puts "user_id: #{user_id}, level_id: #{level_id}, script_id: #{script_id}"
 end
 
 main
