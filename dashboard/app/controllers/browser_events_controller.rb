@@ -1,4 +1,5 @@
 require 'cdo/aws/metrics'
+require 'cdo/aws/cloudwatch_logs'
 
 # A controller for reporting browser logs and metrics to Cloudwatch
 class BrowserEventsController < ApplicationController
@@ -23,17 +24,7 @@ class BrowserEventsController < ApplicationController
       {timestamp: (Time.now.to_f * 1000).to_i, message: decorate_log_payload(log_payload)}
     end
 
-    resp = LOGS_CLIENT.put_log_events(
-      {
-        log_group_name: LOG_GROUP_NAME,
-        log_stream_name: LOG_STREAM_NAME,
-        log_events: logs
-      }
-    )
-
-    if resp.rejected_log_events_info
-      fallback_log_to_firehose('rejected-log-events', resp.rejected_log_events_info)
-    end
+    Cdo::CloudWatchLogs.put_log_events(LOG_GROUP_NAME, LOG_STREAM_NAME, logs)
 
     render status: :ok, json: {}
   rescue => exception
