@@ -22,7 +22,7 @@ interface CurrentPackProps {
   noRightPadding: boolean;
 }
 
-const getFeedbackLink = () => {
+const useFeedbackLink = () => {
   const {userType, signInState} = useAppSelector(state => state.currentUser);
   const isSignedIn = signInState === SignInState.SignedIn;
   const feedbackLink =
@@ -97,7 +97,7 @@ const HeaderButtons: React.FunctionComponent<HeaderButtonsProps> = ({
   const currentPackId = useAppSelector(state => state.music.packId);
   const analyticsReporter = useContext(AnalyticsContext);
   const dialogControl = useDialogControl();
-  const {isSignedIn, feedbackLink} = getFeedbackLink();
+  const {isSignedIn, feedbackLink} = useFeedbackLink();
 
   const library = MusicLibrary.getInstance();
 
