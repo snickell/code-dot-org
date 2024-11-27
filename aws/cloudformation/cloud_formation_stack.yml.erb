@@ -264,6 +264,10 @@ Resources:
       Name: !Ref AWS::StackName
       SecurityGroups: [!ImportValue VPC-ELBSecurityGroup]
       Subnets: <%= public_subnets.to_json %>
+      # For Hour of Code 2024, pre-warm the load balancer with a minimum capacity based on PeakLCUs from 2023
+      # Remove this property after the event.
+      MinimumLoadBalancerCapacity:
+        CapacityUnits: 4500
       LoadBalancerAttributes:
         - Key: deletion_protection.enabled
           Value: <%=rack_env?(:adhoc) ? 'false' : 'true'%>
