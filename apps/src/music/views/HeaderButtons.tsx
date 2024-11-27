@@ -22,8 +22,10 @@ interface CurrentPackProps {
   noRightPadding: boolean;
 }
 
-const TEACHER_FEEDBACK_LINK = 'https://docs.google.com/forms/d/e/1FAIpQLSflGeMmY_ff1QllJfpTsWGZdn_xv6dKpPba_evTMwfbvG3FTA/viewform';
-const STUDENT_FEEDBACK_LINK = 'https://docs.google.com/forms/d/e/1FAIpQLSeZGNgX4wDvA29stId_Q2toofJN-r12zSP8yBMZ-E9KW5XPWg/viewform';
+const TEACHER_FEEDBACK_LINK =
+  'https://docs.google.com/forms/d/e/1FAIpQLSflGeMmY_ff1QllJfpTsWGZdn_xv6dKpPba_evTMwfbvG3FTA/viewform';
+const STUDENT_FEEDBACK_LINK =
+  'https://docs.google.com/forms/d/e/1FAIpQLSeZGNgX4wDvA29stId_Q2toofJN-r12zSP8yBMZ-E9KW5XPWg/viewform';
 
 const CurrentPack: React.FunctionComponent<CurrentPackProps> = ({
   packFolder,
