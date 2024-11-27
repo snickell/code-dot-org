@@ -140,13 +140,6 @@ const HeaderButtons: React.FunctionComponent<HeaderButtonsProps> = ({
     }
   }, [hideChaff, dialogControl, analyticsReporter, clearCode]);
 
-  const onFeedbackClicked = () => {
-    if (analyticsReporter) {
-      analyticsReporter.onButtonClicked('feedback');
-    }
-    window.open(feedbackLink, '_blank');
-  };
-
   const onClickSkip = useCallback(() => {
     if (dialogControl) {
       dialogControl.showDialog({
@@ -227,7 +220,7 @@ const HeaderButtons: React.FunctionComponent<HeaderButtonsProps> = ({
             </button>
             {feedbackLink && (
               <button
-                onClick={onFeedbackClicked}
+                onClick={() => window.open(feedbackLink, '_blank')}
                 type="button"
                 className={classNames(moduleStyles.button)}
               >
