@@ -22,7 +22,7 @@ import {
 import teacherSections from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
 import * as utils from '@cdo/apps/utils';
 
-import {assert, expect} from '../../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
+import {assert, expect as chaiExpect} from '../../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
 import {allowConsoleWarnings} from '../../../util/throwOnConsole';
 
 describe('CourseEditor', () => {
@@ -92,26 +92,26 @@ describe('CourseEditor', () => {
       renderDefault();
       expect(
         screen.getAllByDisplayValue('Select a unit to add to course').length
-      ).to.equal(1);
-      expect(screen.getAllByDisplayValue('CSP Unit 1').length).to.equal(1);
-      expect(screen.getAllByDisplayValue('CSP Unit 2').length).to.equal(1);
+      ).toEqual(1);
+      expect(screen.getAllByDisplayValue('CSP Unit 1').length).toEqual(1);
+      expect(screen.getAllByDisplayValue('CSP Unit 2').length).toEqual(1);
       expect(
         screen.queryAllByDisplayValue('Unit Not Part of Course').length
-      ).to.equal(0);
+      ).toEqual(0);
 
       expect(
         screen.getAllByRole('option', {name: 'Select a unit to add to course'})
           .length
-      ).to.equal(3);
+      ).toEqual(3);
       expect(
         screen.getAllByRole('option', {name: 'CSP Unit 1'}).length
-      ).to.equal(3);
+      ).toEqual(3);
       expect(
         screen.getAllByRole('option', {name: 'CSP Unit 2'}).length
-      ).to.equal(3);
+      ).toEqual(3);
       expect(
         screen.getAllByRole('option', {name: 'Unit Not Part of Course'}).length
-      ).to.equal(3);
+      ).toEqual(3);
     });
   });
 
@@ -130,7 +130,7 @@ describe('CourseEditor', () => {
             ]}
           />
         );
-        expect(wrapper.find('ResourcesEditor').first()).to.exist;
+        chaiExpect(wrapper.find('ResourcesEditor').first()).to.exist;
       });
     });
 
@@ -148,13 +148,15 @@ describe('CourseEditor', () => {
 
     it('has correct markdown for preview of course teacher and student description', () => {
       const wrapper = createWrapper({});
-      expect(wrapper.find('TextareaWithMarkdownPreview').length).to.equal(2);
-      expect(
+      chaiExpect(wrapper.find('TextareaWithMarkdownPreview').length).to.equal(
+        2
+      );
+      chaiExpect(
         wrapper.find('TextareaWithMarkdownPreview').at(0).prop('markdown')
       ).to.equal(
         '# Student description \n This is the course description with [link](https://studio.code.org/home) **Bold** *italics* '
       );
-      expect(
+      chaiExpect(
         wrapper.find('TextareaWithMarkdownPreview').at(1).prop('markdown')
       ).to.equal(
         '# Teacher description \n This is the course description with [link](https://studio.code.org/home) **Bold** *italics* '
@@ -192,13 +194,15 @@ describe('CourseEditor', () => {
         const saveBar = wrapper.find('SaveBar');
 
         const saveAndKeepEditingButton = saveBar.find('button').at(1);
-        expect(saveAndKeepEditingButton.contains('Save and Keep Editing')).to.be
-          .true;
+        chaiExpect(saveAndKeepEditingButton.contains('Save and Keep Editing'))
+          .to.be.true;
         saveAndKeepEditingButton.simulate('click');
 
         // check the the spinner is showing
-        expect(wrapper.find('.saveBar').find('FontAwesome').length).to.equal(1);
-        expect(courseEditor.state().isSaving).to.equal(true);
+        chaiExpect(
+          wrapper.find('.saveBar').find('FontAwesome').length
+        ).to.equal(1);
+        chaiExpect(courseEditor.state().isSaving).to.equal(true);
 
         clock = sinon.useFakeTimers(new Date('2020-12-01'));
         const expectedLastSaved = Date.now();
@@ -206,12 +210,14 @@ describe('CourseEditor', () => {
         clock.tick(50);
 
         courseEditor.update();
-        expect(utils.navigateToHref).to.not.have.been.called;
-        expect(courseEditor.state().isSaving).to.equal(false);
-        expect(courseEditor.state().lastSaved).to.equal(expectedLastSaved);
-        expect(wrapper.find('.saveBar').find('FontAwesome').length).to.equal(0);
+        chaiExpect(utils.navigateToHref).to.not.have.been.called;
+        chaiExpect(courseEditor.state().isSaving).to.equal(false);
+        chaiExpect(courseEditor.state().lastSaved).to.equal(expectedLastSaved);
+        chaiExpect(
+          wrapper.find('.saveBar').find('FontAwesome').length
+        ).to.equal(0);
         //check that last saved message is showing
-        expect(wrapper.find('.lastSavedMessage').length).to.equal(1);
+        chaiExpect(wrapper.find('.lastSavedMessage').length).to.equal(1);
       });
 
       it('shows error when save and keep editing has error saving', () => {
@@ -228,21 +234,25 @@ describe('CourseEditor', () => {
         const saveBar = wrapper.find('SaveBar');
 
         const saveAndKeepEditingButton = saveBar.find('button').at(1);
-        expect(saveAndKeepEditingButton.contains('Save and Keep Editing')).to.be
-          .true;
+        chaiExpect(saveAndKeepEditingButton.contains('Save and Keep Editing'))
+          .to.be.true;
         saveAndKeepEditingButton.simulate('click');
 
         // check the the spinner is showing
-        expect(wrapper.find('.saveBar').find('FontAwesome').length).to.equal(1);
-        expect(courseEditor.state().isSaving).to.equal(true);
+        chaiExpect(
+          wrapper.find('.saveBar').find('FontAwesome').length
+        ).to.equal(1);
+        chaiExpect(courseEditor.state().isSaving).to.equal(true);
 
         server.respond();
         courseEditor.update();
-        expect(utils.navigateToHref).to.not.have.been.called;
-        expect(courseEditor.state().isSaving).to.equal(false);
-        expect(courseEditor.state().error).to.equal('There was an error');
-        expect(wrapper.find('.saveBar').find('FontAwesome').length).to.equal(0);
-        expect(
+        chaiExpect(utils.navigateToHref).to.not.have.been.called;
+        chaiExpect(courseEditor.state().isSaving).to.equal(false);
+        chaiExpect(courseEditor.state().error).to.equal('There was an error');
+        chaiExpect(
+          wrapper.find('.saveBar').find('FontAwesome').length
+        ).to.equal(0);
+        chaiExpect(
           wrapper.find('.saveBar').contains('Error Saving: There was an error')
         ).to.be.true;
 
@@ -265,16 +275,18 @@ describe('CourseEditor', () => {
         const saveBar = wrapper.find('SaveBar');
 
         const saveAndCloseButton = saveBar.find('button').at(2);
-        expect(saveAndCloseButton.contains('Save and Close')).to.be.true;
+        chaiExpect(saveAndCloseButton.contains('Save and Close')).to.be.true;
         saveAndCloseButton.simulate('click');
 
         // check the the spinner is showing
-        expect(wrapper.find('.saveBar').find('FontAwesome').length).to.equal(1);
-        expect(courseEditor.state().isSaving).to.equal(true);
+        chaiExpect(
+          wrapper.find('.saveBar').find('FontAwesome').length
+        ).to.equal(1);
+        chaiExpect(courseEditor.state().isSaving).to.equal(true);
 
         server.respond();
         courseEditor.update();
-        expect(utils.navigateToHref).to.have.been.calledWith(
+        chaiExpect(utils.navigateToHref).to.have.been.calledWith(
           `/courses/test-course${window.location.search}`
         );
 
@@ -295,22 +307,26 @@ describe('CourseEditor', () => {
         const saveBar = wrapper.find('SaveBar');
 
         const saveAndCloseButton = saveBar.find('button').at(2);
-        expect(saveAndCloseButton.contains('Save and Close')).to.be.true;
+        chaiExpect(saveAndCloseButton.contains('Save and Close')).to.be.true;
         saveAndCloseButton.simulate('click');
 
         // check the the spinner is showing
-        expect(wrapper.find('.saveBar').find('FontAwesome').length).to.equal(1);
-        expect(courseEditor.state().isSaving).to.equal(true);
+        chaiExpect(
+          wrapper.find('.saveBar').find('FontAwesome').length
+        ).to.equal(1);
+        chaiExpect(courseEditor.state().isSaving).to.equal(true);
 
         server.respond();
 
         courseEditor.update();
-        expect(utils.navigateToHref).to.not.have.been.called;
+        chaiExpect(utils.navigateToHref).to.not.have.been.called;
 
-        expect(courseEditor.state().isSaving).to.equal(false);
-        expect(courseEditor.state().error).to.equal('There was an error');
-        expect(wrapper.find('.saveBar').find('FontAwesome').length).to.equal(0);
-        expect(
+        chaiExpect(courseEditor.state().isSaving).to.equal(false);
+        chaiExpect(courseEditor.state().error).to.equal('There was an error');
+        chaiExpect(
+          wrapper.find('.saveBar').find('FontAwesome').length
+        ).to.equal(0);
+        chaiExpect(
           wrapper.find('.saveBar').contains('Error Saving: There was an error')
         ).to.be.true;
 
@@ -330,18 +346,18 @@ describe('CourseEditor', () => {
         const saveBar = wrapper.find('SaveBar');
 
         const saveAndKeepEditingButton = saveBar.find('button').at(1);
-        expect(saveAndKeepEditingButton.contains('Save and Keep Editing')).to.be
-          .true;
+        chaiExpect(saveAndKeepEditingButton.contains('Save and Keep Editing'))
+          .to.be.true;
         saveAndKeepEditingButton.simulate('click');
 
-        expect($.ajax).to.not.have.been.called;
+        chaiExpect($.ajax).to.not.have.been.called;
 
-        expect(courseEditor.state().isSaving).to.equal(false);
-        expect(courseEditor.state().error).to.equal(
+        chaiExpect(courseEditor.state().isSaving).to.equal(false);
+        chaiExpect(courseEditor.state().error).to.equal(
           'Please provide a pilot experiment in order to save with published state as pilot.'
         );
 
-        expect(
+        chaiExpect(
           wrapper
             .find('.saveBar')
             .contains(
@@ -366,18 +382,18 @@ describe('CourseEditor', () => {
       const saveBar = wrapper.find('SaveBar');
 
       const saveAndKeepEditingButton = saveBar.find('button').at(1);
-      expect(saveAndKeepEditingButton.contains('Save and Keep Editing')).to.be
-        .true;
+      chaiExpect(saveAndKeepEditingButton.contains('Save and Keep Editing')).to
+        .be.true;
       saveAndKeepEditingButton.simulate('click');
 
-      expect($.ajax).to.not.have.been.called;
+      chaiExpect($.ajax).to.not.have.been.called;
 
-      expect(courseEditor.state().isSaving).to.equal(false);
-      expect(courseEditor.state().error).to.equal(
+      chaiExpect(courseEditor.state().isSaving).to.equal(false);
+      chaiExpect(courseEditor.state().error).to.equal(
         'Please set both version year and family name.'
       );
 
-      expect(
+      chaiExpect(
         wrapper
           .find('.saveBar')
           .contains(
@@ -401,18 +417,18 @@ describe('CourseEditor', () => {
       const saveBar = wrapper.find('SaveBar');
 
       const saveAndKeepEditingButton = saveBar.find('button').at(1);
-      expect(saveAndKeepEditingButton.contains('Save and Keep Editing')).to.be
-        .true;
+      chaiExpect(saveAndKeepEditingButton.contains('Save and Keep Editing')).to
+        .be.true;
       saveAndKeepEditingButton.simulate('click');
 
-      expect($.ajax).to.not.have.been.called;
+      chaiExpect($.ajax).to.not.have.been.called;
 
-      expect(courseEditor.state().isSaving).to.equal(false);
-      expect(courseEditor.state().error).to.equal(
+      chaiExpect(courseEditor.state().isSaving).to.equal(false);
+      chaiExpect(courseEditor.state().error).to.equal(
         'Please set both version year and family name.'
       );
 
-      expect(
+      chaiExpect(
         wrapper
           .find('.saveBar')
           .contains(
@@ -438,18 +454,18 @@ describe('CourseEditor', () => {
       const saveBar = wrapper.find('SaveBar');
 
       const saveAndKeepEditingButton = saveBar.find('button').at(1);
-      expect(saveAndKeepEditingButton.contains('Save and Keep Editing')).to.be
-        .true;
+      chaiExpect(saveAndKeepEditingButton.contains('Save and Keep Editing')).to
+        .be.true;
       saveAndKeepEditingButton.simulate('click');
 
-      expect($.ajax).to.not.have.been.called;
+      chaiExpect($.ajax).to.not.have.been.called;
 
-      expect(courseEditor.state().isSaving).to.equal(false);
-      expect(courseEditor.state().error).to.equal(
+      chaiExpect(courseEditor.state().isSaving).to.equal(false);
+      chaiExpect(courseEditor.state().error).to.equal(
         'Please set all device compatibilities in order to save with published state as preview or stable.'
       );
 
-      expect(
+      chaiExpect(
         wrapper
           .find('.saveBar')
           .contains(
@@ -476,18 +492,18 @@ describe('CourseEditor', () => {
       const saveBar = wrapper.find('SaveBar');
 
       const saveAndKeepEditingButton = saveBar.find('button').at(1);
-      expect(saveAndKeepEditingButton.contains('Save and Keep Editing')).to.be
-        .true;
+      chaiExpect(saveAndKeepEditingButton.contains('Save and Keep Editing')).to
+        .be.true;
       saveAndKeepEditingButton.simulate('click');
 
-      expect($.ajax).to.not.have.been.called;
+      chaiExpect($.ajax).to.not.have.been.called;
 
-      expect(courseEditor.state().isSaving).to.equal(false);
-      expect(courseEditor.state().error).to.equal(
+      chaiExpect(courseEditor.state().isSaving).to.equal(false);
+      chaiExpect(courseEditor.state().error).to.equal(
         'Please set all device compatibilities in order to save with published state as preview or stable.'
       );
 
-      expect(
+      chaiExpect(
         wrapper
           .find('.saveBar')
           .contains(
