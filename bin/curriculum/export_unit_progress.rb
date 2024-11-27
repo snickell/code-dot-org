@@ -10,7 +10,7 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-raise "Unit name is required" unless $options[:unit]
+# raise "Unit name is required" unless $options[:unit]
 
 require_relative '../../deployment'
 require_relative '../../lib/cdo/redshift'
@@ -53,7 +53,7 @@ def get_user_level_data
     first
 end
 
-def get_project_source_code(user_id, level_id, script_id)
+def get_project_main_json(user_id, level_id, script_id)
   user_storage_id = storage_id_for_user_id(user_id)
   return unless user_storage_id
 
@@ -77,8 +77,10 @@ def main
   script_id = result[:script_id]
   puts "user_id: #{user_id}, level_id: #{level_id}, script_id: #{script_id}"
 
-  source_code = get_project_source_code(user_id, level_id, script_id)
-  puts "source_code: #{source_code}"
+  main_json = get_project_main_json(user_id, level_id, script_id)
+  source_code = JSON.parse(main_json)['source']
+
+  puts "source_code:\n#{source_code}"
 end
 
 main
