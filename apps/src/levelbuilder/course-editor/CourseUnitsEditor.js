@@ -49,7 +49,7 @@ export default class CourseUnitsEditor extends Component {
                 {name}
               </option>
             ))}
-            {this.props.unitsInCourse.map((courseUnitName, index) => (
+            {this.props.initialUnitsInCourse.map((courseUnitName, index) => (
               <option key={unitNames.length + index} value={courseUnitName}>
                 {courseUnitName}
               </option>
