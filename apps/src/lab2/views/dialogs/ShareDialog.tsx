@@ -232,7 +232,7 @@ const ShareDialog: React.FunctionComponent<{
             )}
           </div>
           <div className={moduleStyles.bottom}>
-            {feedbackLink && (
+            {feedbackLink && finishUrl && (
               <a
                 href={feedbackLink}
                 target="_blank"
