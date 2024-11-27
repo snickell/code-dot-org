@@ -11,8 +11,8 @@ import {
 
 import TutorTab from '@cdo/apps/aiTutor/views/teacherDashboard/TutorTab';
 import TeacherUnitOverview from '@cdo/apps/code-studio/components/progress/TeacherUnitOverview';
-import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 import GlobalRegionWrapper from '@cdo/apps/templates/GlobalRegionWrapper';
+import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 import TeacherCourseOverview from '../courseOverview/TeacherCourseOverview';
 import ManageStudents from '../manageStudents/ManageStudents';
@@ -30,9 +30,7 @@ import {
 import TextResponses from '../textResponses/TextResponses';
 
 import ElementOrEmptyPage from './ElementOrEmptyPage';
-import LessonMaterialsContainer, {
-  lessonMaterialsLoader,
-} from './lessonMaterials/LessonMaterialsContainer';
+import LessonMaterialsContainer from './lessonMaterials/LessonMaterialsContainer';
 import PageLayout from './PageLayout';
 import TeacherNavigationBar from './TeacherNavigationBar';
 import {
@@ -102,9 +100,7 @@ const TeacherNavigationRouter: React.FC<TeacherNavigationRouterProps> = ({
           />
           <Route
             path={TEACHER_NAVIGATION_PATHS.roster}
-            element={applyV1TeacherDashboardWidth(
-              <ManageStudents studioUrlPrefix={studioUrlPrefix} />
-            )}
+            element={<ManageStudents studioUrlPrefix={studioUrlPrefix} />}
           />
           <Route
             path={TEACHER_NAVIGATION_PATHS.loginInfo}
@@ -194,7 +190,6 @@ const TeacherNavigationRouter: React.FC<TeacherNavigationRouterProps> = ({
           />
           <Route
             path={TEACHER_NAVIGATION_PATHS.lessonMaterials}
-            loader={lessonMaterialsLoader}
             element={
               <LessonMaterialsContainer
                 showNoCurriculumAssigned={

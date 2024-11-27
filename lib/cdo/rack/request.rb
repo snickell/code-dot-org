@@ -143,7 +143,7 @@ module Cdo
     # Initialize a private instance of the SessionStore used in Dashboard, so
     # we can access data stored there (ie, the id of the current user).
     private def dashboard_session_store
-      @dashboard_session_store ||= Dashboard::Application.config.session_store.new(
+      @@dashboard_session_store ||= Dashboard::Application.config.session_store.new(
         Dashboard::Application,
         Dashboard::Application.config.session_options
       )

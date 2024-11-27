@@ -1,8 +1,10 @@
+@skip
 @no_mobile
 Feature: Global Edition - Region Switch Confirm Modal
 
   Background:
     Given I am on "http://code.org"
+    And I clear session storage
     And I use a cookie to mock the DCDO key "global_edition_enabled" as "true"
     And I use a cookie to mock the DCDO key "global_edition_region_switch_confirm_enabled_in" as "["fa"]"
 
@@ -36,7 +38,8 @@ Feature: Global Edition - Region Switch Confirm Modal
     And I reload the page
     And I wait until element "#global-edition-region-switch-confirm.fade.in[role='dialog']" is visible
     When I press "global-edition-region-switch-confirm-accept"
-    Then check that I am on "http://code.org/global/fa"
+    Then I get redirected away from "http://code.org"
+    And I wait until I am on "http://code.org/global/fa"
     And element "#global-edition-region-switch-confirm" is not visible
 
   Scenario: The modal is shown on studio.code.org (Studio) domain

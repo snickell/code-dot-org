@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'request_store'
-require 'cdo'
 require 'uri'
 require 'yaml'
 
@@ -53,30 +52,6 @@ module Cdo
 
     def self.region_available?(region)
       region.present? && REGIONS.include?(region.to_s)
-    end
-
-    def self.region_locale(region)
-      configuration_for(region)[:locale]
-    end 
-
-    # Loads all default locale from config/locales.yml
-    def self.load_default_locales
-      root = File.expand_path(File.join('..', '..'), __dir__)
-      unless defined? @@default_locales
-        @@default_locales = YAML.load_file(File.join(root, "dashboard", "config", "locales.yml"))
-        @@default_locales = @@default_locales.filter_map do |locale, data|
-          next nil unless data.is_a? Hash
-          [data['native'], locale].freeze
-        end.freeze
-      end
-      @@default_locales
-    end
-
-    # Returns the available locales specified for a region in the form of an Array of Arrays
-    # containing the native name and the locale key. ['native name', 'locale-key']
-    def self.locales_for(region)
-      config = configuration_for(region)
-      config[:locale_options] || load_default_locales
     end
 
     def self.region_locales(region)

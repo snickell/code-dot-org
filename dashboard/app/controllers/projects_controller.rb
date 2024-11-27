@@ -229,7 +229,7 @@ class ProjectsController < ApplicationController
   end
 
   def combine_projects_and_featured_projects_data
-    projects = "#{CDO.dashboard_db_name}__projects".to_sym
+    projects = :"#{CDO.dashboard_db_name}__projects"
     project_featured_project_combo_data = DASHBOARD_DB[:featured_projects].
       select(*project_and_featured_project_fields).
       join(projects, id: :storage_app_id, state: 'active').all
@@ -760,7 +760,7 @@ class ProjectsController < ApplicationController
   # Temporary - will be replaced with storing in database.
   private def send_project_submission(name, username, project_type, channel_id, description)
     unless Rails.env.development? || Rails.env.test?
-      subject = 'TESTING: Featured project gallery submission'
+      subject = 'Featured project gallery submission'
       response = HTTParty.post(
         'https://codeorg.zendesk.com/api/v2/tickets.json',
         headers: {"Content-Type" => "application/json", "Accept" => "application/json"},
@@ -778,7 +778,8 @@ class ProjectsController < ApplicationController
                 "project description: #{description}",
                 "project type: #{project_type}"
               ].join("\n")
-            }
+            },
+            tags: ['project_submission', project_type]
           }
         }.to_json,
         basic_auth: {username: 'dev@code.org/token', password: Dashboard::Application.config.zendesk_dev_token}
