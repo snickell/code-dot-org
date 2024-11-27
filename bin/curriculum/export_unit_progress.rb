@@ -16,6 +16,11 @@ require_relative '../../deployment'
 require_relative '../../lib/cdo/redshift'
 require_relative '../../lib/cdo/db'
 
+start_time = Time.now
+puts "Loading Rails environment..."
+require_relative '../../dashboard/config/environment'
+puts "Rails environment loaded in: #{(Time.now - start_time).to_i} seconds"
+
 def execute_redshift_query(client, query)
   client.exec(query)
 rescue => exception
@@ -48,12 +53,32 @@ def get_user_level_data
     first
 end
 
+def get_project_source_code(user_id, level_id, script_id)
+  user_storage_id = storage_id_for_user_id(user_id)
+  return unless user_storage_id
+
+  level = Level.find(level_id)
+  return unless level
+
+  # takes project-backed levels into account
+  channel_token = ChannelToken.find_channel_token(level, user_storage_id, script_id)
+  return unless channel_token
+
+  source_data = SourceBucket.new.get(channel_token.channel, "main.json")
+  return unless source_data && source_data[:body] && source_data[:body].respond_to?(:string)
+
+  source_data[:body].string
+end
+
 def main
   result = get_user_level_data
   user_id = result[:user_id]
   level_id = result[:level_id]
   script_id = result[:script_id]
   puts "user_id: #{user_id}, level_id: #{level_id}, script_id: #{script_id}"
+
+  source_code = get_project_source_code(user_id, level_id, script_id)
+  puts "source_code: #{source_code}"
 end
 
 main
