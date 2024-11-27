@@ -53,6 +53,7 @@ class ParentLevelsChildLevel < ApplicationRecord
 
   validate :validate_child_level_type
   def validate_child_level_type
+    return if child_level.type.blank?
     if kind == CONTAINED && %w(Multi FreeResponse).exclude?(child_level.type)
       error_message = "cannot add contained level of type #{child_level.type}"
       add_child_error(error_message)

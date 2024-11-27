@@ -15,22 +15,13 @@ class LevelLoader
   #
   # @param [String] level_file_glob - dashboard-relative, wildcard-friendly path
   #   to one or more .level files.
-  #   Examples:
-  #     'config/scripts/levels/K-1 Bee 2.level'
-  #     'config/scripts/**/*.level'
-  #
   def self.import_levels(level_file_glob)
     level_file_paths = file_paths_from_glob(level_file_glob)
 
-    # This is only expected to happen when LEVEL_NAME is set and the
-    # filename is not found
-    unless level_file_paths.count > 0
-      raise 'no matching level names found. ' \
-        'please check level name for exact case and spelling. ' \
-        'the level name is the level filename without the .level suffix.'
+    unless level_file_paths.any?
+      raise 'No matching level names found. Please check level name for exact case and spelling.'
     end
 
-    # Use a transaction because loading levels requires two separate imports.
     Level.transaction do
       level_md5s_by_name = Level.pluck(:name, :md5).to_h
       existing_level_names = level_md5s_by_name.keys.to_set
@@ -40,64 +31,56 @@ class LevelLoader
       end
 
       if level_file_names.include? 'blockly'
-        raise 'custom levels must not be named "blockly"'
+        raise 'Custom levels must not be named "blockly"'
       end
 
-      # First, save stubs of any new levels - they'll need to have ids in
-      # order to create certain associations (in particular
-      # level_concept_difficulty) when we bulk-load the level properties.
-      new_level_names = level_file_names.
-        reject {|name| existing_level_names.include? name}
-      Level.import! new_level_names.map {|name| {name: name}}, batch_size: 1000
+      # Save stubs of new levels in smaller batches.
+      new_level_names = level_file_names.reject {|name| existing_level_names.include? name}
+      batch_process(new_level_names, 1000) do |batch|
+        Level.import!(batch.map {|name| {name: name}})
+      end
 
-      # Load level properties from disk and build a collection of levels that
-      # have changed.
-      changed_levels = level_file_paths.
-        filter_map {|path| Services::LevelFiles.load_custom_level(path, level_md5s_by_name)}.
-        select(&:changed?)
+      # Load level properties from disk and identify changed levels.
+      changed_levels = level_file_paths.filter_map do |path|
+        Services::LevelFiles.load_custom_level(path, level_md5s_by_name)
+      end.select(&:changed?)
 
       if [:development, :adhoc].include?(rack_env) && !CDO.properties_encryption_key
-        puts "WARNING: skipping seeding encrypted levels because CDO.properties_encryption_key is not defined"
+        puts "WARNING: Skipping encrypted levels because CDO.properties_encryption_key is not defined."
         changed_levels.reject!(&:encrypted?)
       end
 
-      dsl_levels = changed_levels.select {|l| l.is_a? DSLDefined}
-      if dsl_levels.any?
-        raise "cannot define DSLDefined level types in .level files: #{dsl_levels.map {|l| "#{l.name}.level".dump}.join(',')}"
+      raise_if_dsl_defined_levels(changed_levels)
+
+      # Process associated LevelConceptDifficulty models in smaller batches.
+      immutable_lcd_columns = %i[id level_id created_at]
+      changed_lcds = changed_levels.filter_map(&:level_concept_difficulty)
+      lcd_update_columns = LevelConceptDifficulty.columns.map(&:name).map(&:to_sym) - immutable_lcd_columns
+      batch_process(changed_lcds, 1000) do |batch|
+        LevelConceptDifficulty.import! batch, on_duplicate_key_update: lcd_update_columns
       end
 
-      # activerecord-import (with MySQL, anyway) doesn't save associated
-      # models, so we've got to do this manually.
-      immutable_lcd_columns = %i{id level_id created_at}
-      changed_lcds = changed_levels.filter_map(&:level_concept_difficulty)
-      lcd_update_columns = LevelConceptDifficulty.columns.map(&:name).map(&:to_sym).
-        reject {|column| immutable_lcd_columns.include? column}
-      LevelConceptDifficulty.import! changed_lcds, on_duplicate_key_update: lcd_update_columns, batch_size: 1000
-
-      # activerecord-import doesn't trigger before_save and before_create hooks
-      # for imported models, so we trigger these manually to make sure they're
-      # set up the same way they would be otherwise.
-      # @see https://github.com/zdennis/activerecord-import/wiki/Callbacks
+      # Trigger necessary callbacks manually.
       changed_levels.each do |level|
         level.run_callbacks(:save) {false}
         level.run_callbacks(:create) {false}
       end
 
-      # Bulk-import changed levels.
-      immutable_level_columns = %i(id name created_at)
-      update_columns = Level.columns.map(&:name).map(&:to_sym).
-        reject {|column| immutable_level_columns.include? column}
-      # Changed levels are too large to import them in batches larger than 100 due to serialized properties.
-      # When performing bulk inserts, it is faster to insert keys in primary key order. Documentation:
-      # https://dev.mysql.com/doc/refman/8.0/en/optimizing-innodb-bulk-data-loading.html
-      Level.import! changed_levels.sort_by(&:id), on_duplicate_key_update: update_columns, batch_size: 100
+      # Import changed levels in smaller batches, with size checks.
+      immutable_level_columns = %i[id name created_at]
+      update_columns = Level.columns.map(&:name).map(&:to_sym) - immutable_level_columns
+      batch_process(changed_levels.sort_by(&:id), 50) do |batch|
+        total_size = batch.sum {|level| Marshal.dump(level).bytesize}
+        Rails.logger.info("Importing batch of #{batch.size} levels (Total size: #{total_size} bytes)")
+        Level.import! batch, on_duplicate_key_update: update_columns
+      rescue ActiveRecord::Import::ValueSetTooLargeError => exception
+        Rails.logger.error("Batch too large: #{exception.message}, splitting further")
+        batch.each_slice(25) do |smaller_batch|
+          retry_import(smaller_batch, update_columns)
+        end
+      end
 
-      # now we want to run some after_save callbacks, which didn't get run when
-      # by run_callbacks earlier. it seems too risky to run all after_save
-      # callbacks automatically, because someone modifying the level edit
-      # experience of any individual level could add an after_save callback
-      # which modifies the DB and which they expect to get run only on
-      # levelbuilder. so, just run the callbacks we're sure we need instead.
+      # Run specific after_save callbacks for child levels.
       Level.setup_child_levels_for(changed_levels, ParentLevelsChildLevel::CONTAINED)
       Level.setup_child_levels_for(changed_levels, ParentLevelsChildLevel::PROJECT_TEMPLATE)
     end
@@ -105,5 +88,22 @@ class LevelLoader
 
   private_class_method def self.file_paths_from_glob(glob)
     Dir.glob(Rails.root.join(glob)).sort
+  end
+
+  private_class_method def self.batch_process(items, batch_size, &block)
+    items.each_slice(batch_size, &block)
+  end
+
+  private_class_method def self.raise_if_dsl_defined_levels(levels)
+    dsl_levels = levels.select {|l| l.is_a? DSLDefined}
+    if dsl_levels.any?
+      raise "Cannot define DSLDefined level types in .level files: #{dsl_levels.map {|l| "#{l.name}.level".dump}.join(',')}"
+    end
+  end
+
+  private_class_method def self.retry_import(batch, update_columns)
+    Level.import! batch, on_duplicate_key_update: update_columns
+  rescue ActiveRecord::Import::ValueSetTooLargeError => exception
+    Rails.logger.error("Retry smaller batch also failed: #{exception.message}")
   end
 end
