@@ -32,7 +32,10 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
   projects,
   libraryName,
 }) => {
-  const playerRef = useRef<MusicPlayer>(new MusicPlayer());
+  const playerRef = useRef<MusicPlayer | null>(null);
+  if (playerRef.current === null) {
+    playerRef.current = new MusicPlayer();
+  }
   const workspaceRef = useRef<MusicBlocklyWorkspace>(
     new MusicBlocklyWorkspace()
   );
@@ -87,14 +90,14 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
           ? advancedSequencerRef
           : simple2SequencerRef;
 
-      playerRef.current.stopSong();
+      playerRef.current?.stopSong();
 
       // If there is a pack ID, give the player its BPM and key.
       const currentLibrary = MusicLibrary.getInstance();
       const packId = project.labConfig?.music.packId || null;
       if (currentLibrary) {
         currentLibrary.setCurrentPackId(packId);
-        playerRef.current.updateConfiguration(
+        playerRef.current?.updateConfiguration(
           currentLibrary.getBPM(),
           currentLibrary.getKey()
         );
@@ -122,7 +125,7 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
       workspaceRef.current.executeCompiledSong();
 
       // Preload sounds in player
-      await playerRef.current.preloadSounds(
+      await playerRef.current?.preloadSounds(
         [...allTriggerEvents, ...sequencerRef.current.getPlaybackEvents()],
         (loadTimeMs, soundsLoaded) => {
           if (soundsLoaded > 0) {
@@ -140,7 +143,7 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
       );
 
       // Play sounds
-      playerRef.current.playSong(sequencerRef.current.getPlaybackEvents());
+      playerRef.current?.playSong(sequencerRef.current.getPlaybackEvents());
       setCurrentProjectId(project.id);
 
       // Report analytics on play button.
@@ -152,7 +155,7 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
   );
 
   const onStopSong = useCallback(async () => {
-    playerRef.current.stopSong();
+    playerRef.current?.stopSong();
     setCurrentProjectId(undefined);
   }, []);
 
