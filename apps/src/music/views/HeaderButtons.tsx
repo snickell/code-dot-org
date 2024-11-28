@@ -92,7 +92,7 @@ const HeaderButtons: React.FunctionComponent<HeaderButtonsProps> = ({
   const currentPackId = useAppSelector(state => state.music.packId);
   const analyticsReporter = useContext(AnalyticsContext);
   const dialogControl = useDialogControl();
-
+  
   const feedbackLink = useAppSelector(state => {
     const {userType, signInState} = state.currentUser;
     if (signInState !== SignInState.SignedIn) return undefined;
