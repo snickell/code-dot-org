@@ -1,6 +1,6 @@
 import {BLOCK_TYPES} from '@cdo/apps/blockly/constants';
 
-import {BlockMode} from '../constants';
+import {BlockMode, MAX_FUNCTION_CALLS_COUNT} from '../constants';
 
 import {BlockTypes} from './blockTypes';
 import {DOCS_BASE_URL} from './constants';
@@ -89,7 +89,8 @@ export function installFunctionBlocks(blockMode) {
       generator
     ) =>
       simple2FunctionCallGenerator(
-        generator.getProcedureName(block.getFieldValue('NAME'))
+        generator.getProcedureName(block.getFieldValue('NAME')),
+        block.getProcedureModel().id
       );
   }
   // Sets the help URL for each function definiton block to the appropriate
@@ -134,13 +135,15 @@ function restoreBlockDefinitions() {
 }
 
 // A helper function to generate the code for a function call to play sounds sequentially.
-function simple2FunctionCallGenerator(functionName) {
+function simple2FunctionCallGenerator(functionName, functionCallBllockId) {
   return `
-    Sequencer.startFunctionContext('${functionName}');
-    Sequencer.playSequential();
-    ${functionName}();
-    Sequencer.endSequential();
-    Sequencer.endFunctionContext();
+    if (__functionCallsCount++ < ${MAX_FUNCTION_CALLS_COUNT}) {
+      Sequencer.startFunctionContext('${functionName}', '${functionCallBllockId}');
+      Sequencer.playSequential();
+      ${functionName}();
+      Sequencer.endSequential();
+      Sequencer.endFunctionContext();
+    }
   `;
 }
 

@@ -2,7 +2,7 @@ require 'active_support/core_ext/hash/indifferent_access'
 require 'cdo/firehose'
 
 class ProjectsController < ApplicationController
-  before_action :authenticate_user!, except: [:load, :create_new, :show, :edit, :readonly, :redirect_legacy, :public, :index, :export_config, :weblab_footer, :get_or_create_for_level, :can_publish_age_status]
+  before_action :authenticate_user!, except: [:load, :create_new, :show, :edit, :readonly, :redirect_legacy, :public, :index, :export_config, :weblab_footer, :get_or_create_for_level, :can_publish_age_status, :submission_status, :submit]
   before_action :redirect_admin_from_labs, only: [:load, :create_new, :show, :edit, :remix]
   before_action :authorize_load_project!, only: [:load, :create_new, :edit, :remix]
   before_action :set_level, only: [:load, :create_new, :show, :edit, :readonly, :remix, :export_config, :export_create_channel]
@@ -229,7 +229,7 @@ class ProjectsController < ApplicationController
   end
 
   def combine_projects_and_featured_projects_data
-    projects = "#{CDO.dashboard_db_name}__projects".to_sym
+    projects = :"#{CDO.dashboard_db_name}__projects"
     project_featured_project_combo_data = DASHBOARD_DB[:featured_projects].
       select(*project_and_featured_project_fields).
       join(projects, id: :storage_app_id, state: 'active').all
@@ -523,6 +523,11 @@ class ProjectsController < ApplicationController
   def submission_status
     _, project_id = storage_decrypt_channel_id(params[:channel_id])
     project = Project.find_by(id: project_id)
+    begin
+      authorize! :submission_status, project
+    rescue CanCan::AccessDenied => exception
+      return render status: :forbidden, json: {error: exception.message}
+    end
     status = project.submission_status
     render(status: :ok, json: {status: status})
   end
@@ -537,13 +542,26 @@ class ProjectsController < ApplicationController
     project = Project.find_by(id: project_id)
     begin
       authorize! :submit, project
-    rescue CanCan::AccessDenied
+    rescue CanCan::AccessDenied => exception
+      Honeybadger.notify(
+        "Project submission error: #{exception.message}",
+        context: {
+          message:  "Project submission failed due to unauthorized submission status - user unexpectedly bypassed submission_status restriction in the share dialog and attempted to submit project."
+        }
+      )
       return render status: :forbidden, json: {error: PROJECT_SUBMISSION_ERROR_MAP[project.submission_status]}
     end
     # Publish the project, i.e., make it public.
     begin
-      Projects.new(get_storage_id).publish(channel_id, project_type, current_user)
+      storage_id, _ = storage_decrypt_channel_id(channel_id)
+      Projects.new(storage_id).publish(channel_id, project_type, current_user)
     rescue Projects::PublishError => exception
+      Honeybadger.notify(
+        exception.message,
+        context: {
+          message: "Project publish failed - user unexpectedly bypassed submission_status restriction in the share dialog and project submit authorization restrictions and attempted to publish project."
+        }
+      )
       return render(status: :forbidden, json: {error: exception.message})
     end
     # TODO: Store submission_description in our database.
@@ -742,7 +760,7 @@ class ProjectsController < ApplicationController
   # Temporary - will be replaced with storing in database.
   private def send_project_submission(name, username, project_type, channel_id, description)
     unless Rails.env.development? || Rails.env.test?
-      subject = 'TESTING: Featured project gallery submission'
+      subject = 'Featured project gallery submission'
       response = HTTParty.post(
         'https://codeorg.zendesk.com/api/v2/tickets.json',
         headers: {"Content-Type" => "application/json", "Accept" => "application/json"},
@@ -760,7 +778,8 @@ class ProjectsController < ApplicationController
                 "project description: #{description}",
                 "project type: #{project_type}"
               ].join("\n")
-            }
+            },
+            tags: ['project_submission', project_type]
           }
         }.to_json,
         basic_auth: {username: 'dev@code.org/token', password: Dashboard::Application.config.zendesk_dev_token}

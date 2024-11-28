@@ -18011,7 +18011,17 @@ en:
               name: Functions
             lesson-5:
               name: Project
-          lesson_groups: {}
+            lesson-6:
+              name: Songwriter's Toolbox
+            lesson-7:
+              name: Producer Power
+            lesson-8:
+              name: Sound Designer’s Studio
+          lesson_groups:
+            lessonGroup-3:
+              display_name: New progression
+            lessonGroup-2:
+              display_name: Original progression
           name: pilot-elem-music-lab
           title: Intro to Programming with Music Lab
           description_audience: ''
@@ -18121,6 +18131,10 @@ en:
               name: Additional Output
             lesson-9:
               name: Pre-assessment
+            lesson-10:
+              name: 'Example Project 1: Classroom Light Levels'
+            lesson-11:
+              name: Templates
           lesson_groups: {}
           name: computer-systems-playground
           title: "[PLAYGROUND] Computer Systems and Devices (with micro:bit)"
@@ -18414,9 +18428,9 @@ en:
           name: music-jam-2024
           title: 'Music Lab: Jam Session'
           description_audience: ''
-          description_short: ''
-          description: ''
-          student_description: ''
+          description_short: 'Bring music and coding together in this interactive Hour of Code tutorial. '
+          description: 'Bring music and coding together with our Music Lab: Jam Session tutorial! In this fun, self-guided activity, students remix tracks from popular artists like Sabrina Carpenter, Lady Gaga, and Shakira, learning coding basics like sequencing and functions while exploring AI-powered beat creation. Perfect for sparking creativity and confidence!'
+          student_description: 'Ready to mix music and code? In Music Lab: Jam Session, you’ll remix songs from artists like Sabrina Carpenter, Lady Gaga, and Shakira while learning cool coding skills like sequencing and creating beats with AI. It’s a fun way to get creative with coding!'
         music-keyboard-navigation-onboarding:
           lessons: {}
           lesson_groups: {}
@@ -18453,3 +18467,43 @@ en:
           description_short: ''
           description: ''
           student_description: ''
+        self-paced-pl-equitymodule-unit1:
+          lessons:
+            lesson-1:
+              name: What is Equity in CS?
+            lesson-2:
+              name: Looking at Data
+            lesson-3:
+              name: Reflecting on Personal Experiences
+          lesson_groups: {}
+          name: self-paced-pl-equitymodule-unit1
+          title: Understanding Equity in Computer Science
+          description_audience: ''
+          description_short: ''
+          description: "##### **Module 1: Understanding Equity in Computer Science** provides a conceptual foundation for equity. You'll take the time to reflect on your journey and orient yourself toward enacting equity in your classroom. There are no prerequisites for the learning in this module.\n\n##### There are three lessons in Module 1:\n\n-   ##### What is Equity in CS?\n-   ##### Looking at Data\n-   ##### Reflecting on Personal Experiences\n\n* * *\n\n##### ⏰ **Suggested total time for this module:** <mark>UPDATE</mark>"
+          student_description: "##### **Module 1: Understanding Equity in Computer Science** provides a conceptual foundation for equity. You'll take the time to reflect on your journey and orient yourself toward enacting equity in your classroom. There are no prerequisites for the learning in this module.\n\n##### There are three lessons in Module 1:\n\n-   ##### What is Equity in CS?\n-   ##### Looking at Data\n-   ##### Reflecting on Personal Experiences\n\n* * *\n\n##### Suggested total time for this module: <mark>UPDATE</mark>"
+        self-paced-pl-equitymodule-unit2:
+          lessons: {}
+          lesson_groups: {}
+          name: self-paced-pl-equitymodule-unit2
+          title: Strategies to Promote Equity in Computer Science
+          description_audience: ''
+          description_short: ''
+          description: ''
+          student_description: ''
+        sandbox-teaching-getting-started:
+          lessons:
+            lesson-5:
+              name: Next Steps
+            lesson-6:
+              name: The Student Experience
+          lesson_groups: {}
+          name: sandbox-teaching-getting-started
+          title: Getting Started Sandbox
+          description_audience: ''
+          description_short: ''
+          description: ''
+          student_description: ''
+        kt-test-123:
+          lessons: {}
+          lesson_groups: {}

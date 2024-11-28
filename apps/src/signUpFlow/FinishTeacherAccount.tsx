@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import cookies from 'js-cookie';
 import React, {useState, useEffect, useMemo} from 'react';
 
 import {Button, buttonColors} from '@cdo/apps/componentLibrary/button';
@@ -14,6 +15,8 @@ import {
 } from '@cdo/apps/componentLibrary/typography';
 import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import statsigReporter from '@cdo/apps/metrics/StatsigReporter';
+import {schoolInfoInvalid} from '@cdo/apps/schoolInfo/utils/schoolInfoInvalid';
 import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
 import SchoolDataInputs from '@cdo/apps/templates/SchoolDataInputs';
 import {getAuthenticityToken} from '@cdo/apps/util/AuthenticityTokenStore';
@@ -29,6 +32,7 @@ import {
   OAUTH_LOGIN_TYPE_SESSION_KEY,
   USER_RETURN_TO_SESSION_KEY,
   clearSignUpSessionStorage,
+  NEW_SIGN_UP_USER_TYPE,
 } from './signUpFlowConstants';
 
 import style from './signUpFlowStyles.module.scss';
@@ -48,6 +52,15 @@ const FinishTeacherAccount: React.FunctionComponent<{
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorCreatingAccountMessage, showErrorCreatingAccountMessage] =
     useState(false);
+
+  const isInSchoolRequiredExperiment = statsigReporter.getIsInExperiment(
+    'require_school_in_signup_v1',
+    'requireInfo',
+    false
+  );
+
+  // Remove oauth user_type cookie if it exists
+  cookies.remove(NEW_SIGN_UP_USER_TYPE);
 
   useEffect(() => {
     // If the user hasn't selected a user type or login type, redirect them back to the incomplete step of signup.
@@ -105,9 +118,12 @@ const FinishTeacherAccount: React.FunctionComponent<{
   };
 
   const submitTeacherAccount = async () => {
+    if (isSubmitting) {
+      return;
+    }
+    setIsSubmitting(true);
     sendFinishEvent();
     showErrorCreatingAccountMessage(false);
-    setIsSubmitting(true);
 
     const signUpParams = {
       new_sign_up: true,
@@ -188,6 +204,7 @@ const FinishTeacherAccount: React.FunctionComponent<{
           <div>
             <TextField
               name="displayName"
+              id="uitest-display-name"
               label={locale.what_do_you_want_to_be_called()}
               className={style.nameInput}
               value={name}
@@ -259,7 +276,11 @@ const FinishTeacherAccount: React.FunctionComponent<{
               iconStyle: 'solid',
               title: 'arrow-right',
             }}
-            disabled={name === '' || !gdprValid}
+            disabled={
+              name === '' ||
+              !gdprValid ||
+              (isInSchoolRequiredExperiment && schoolInfoInvalid(schoolInfo))
+            }
             isPending={isSubmitting}
           />
         </div>

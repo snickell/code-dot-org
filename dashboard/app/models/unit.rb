@@ -1620,14 +1620,16 @@ class Unit < ApplicationRecord
       title: title_for_display,
       name: name,
       unitNumber: unit_number,
+      unitName: title_for_display,
       scriptOverviewPdfUrl: get_unit_overview_pdf_url,
       scriptResourcesPdfUrl: get_unit_resources_pdf_url,
       teacher_resources: resources.sort_by(&:name).map(&:summarize_for_resources_dropdown),
       student_resources: student_resources.sort_by(&:name).map(&:summarize_for_resources_dropdown),
+      hasNumberedUnits: unit_group&.has_numbered_units?,
+      versionYear: unit_group&.version_year || version_year,
     }
     # Only get lessons with lesson plans
-    filtered_lessons = lessons.select(&:has_lesson_plan)
-    summary[:lessons] = filtered_lessons.map {|lesson| lesson.summarize_for_lesson_materials(user)}
+    summary[:lessons] = lessons.map {|lesson| lesson.summarize_for_lesson_materials(user)}
 
     summary
   end

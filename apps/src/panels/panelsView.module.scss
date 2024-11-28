@@ -69,10 +69,15 @@ $text-horizontal-padding: 2.6cqw;
         animation: 0.5s ease 0s fade-in;
         animation-fill-mode: both;
       }
+
+      &Invisible {
+        opacity: 0;
+      }
     }
 
     .text {
       background-color: $neutral_light;
+      color: $neutral_dark;
       border-radius: 5px;
       width: 40%;
       position: absolute;
@@ -100,6 +105,16 @@ $text-horizontal-padding: 2.6cqw;
 
         &:last-child {
           margin-bottom: 0;
+        }
+      }
+
+      ol, ul {
+        font-size: 1.6cqw;
+        margin: 0 0 1.1cqw 2.2cqw;
+
+        li {
+          margin-bottom: 1.1cqw;
+          line-height: 1.4em;
         }
       }
 
@@ -160,7 +175,7 @@ $text-horizontal-padding: 2.6cqw;
 
     .button {
       position: absolute;
-      right: 0;
+      inset-inline-end: 0;
       height: 38px;
 
       // After typing, the button will be ready.
