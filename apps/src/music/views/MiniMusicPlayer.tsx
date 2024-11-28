@@ -89,6 +89,17 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
 
       playerRef.current.stopSong();
 
+      // If there is a pack ID, give the player its BPM and key.
+      const currentLibrary = MusicLibrary.getInstance();
+      const packId = project.labConfig?.music.packId || null;
+      if (currentLibrary) {
+        currentLibrary.setCurrentPackId(packId);
+        playerRef.current.updateConfiguration(
+          currentLibrary.getBPM(),
+          currentLibrary.getKey()
+        );
+      }
+
       // Load code
       const projectSources = await sourcesStoreRef.current.load(project.id);
       workspaceRef.current.loadCode(
@@ -109,17 +120,6 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
 
       sequencerRef.current.clear();
       workspaceRef.current.executeCompiledSong();
-
-      // If there is a pack ID, give the player its BPM and key.
-      const currentLibrary = MusicLibrary.getInstance();
-      const packId = project.labConfig?.music.packId || null;
-      if (currentLibrary) {
-        currentLibrary.setCurrentPackId(packId);
-        playerRef.current.updateConfiguration(
-          currentLibrary.getBPM(),
-          currentLibrary.getKey()
-        );
-      }
 
       // Preload sounds in player
       await playerRef.current.preloadSounds(
