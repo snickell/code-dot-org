@@ -1,10 +1,10 @@
+import classNames from 'classnames';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
 import AnalyticsReporter from '@cdo/apps/music/analytics/AnalyticsReporter';
 import {ValueOf} from '@cdo/apps/types/utils';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
-import noteImage from '@cdo/static/music/music-note.png';
 
 import Lab2Registry from '../../lab2/Lab2Registry';
 import {
@@ -172,6 +172,7 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
       name: packFolder.name,
       artist: packFolder.artist,
       color: packFolder.color,
+      image: MusicLibrary.getInstance()?.getPackImageUrl(packId),
     };
   };
 
@@ -191,17 +192,18 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
                 : onPlaySong(project);
             }}
           >
-            <div className={moduleStyles.pack}>
-              {packId && (
+            <div
+              className={classNames(
+                moduleStyles.pack,
+                project.id === currentProjectId && moduleStyles.packPlaying
+              )}
+            >
+              {packId && packDetails?.image && (
                 <img
-                  src={noteImage}
                   className={moduleStyles.packImage}
-                  style={{
-                    background:
-                      packDetails?.color &&
-                      `radial-gradient(${packDetails.color}, #000`,
-                  }}
+                  src={packDetails.image}
                   alt=""
+                  draggable={false}
                 />
               )}
             </div>
