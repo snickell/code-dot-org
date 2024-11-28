@@ -31,9 +31,7 @@ const useFeedbackLink = () => {
   const {userType, signInState} = useAppSelector(state => state.currentUser);
   const isSignedIn = signInState === SignInState.SignedIn;
   const feedbackLink =
-    userType === 'teacher'
-      ? TEACHER_FEEDBACK_LINK
-      : STUDENT_FEEDBACK_LINK;
+    userType === 'teacher' ? TEACHER_FEEDBACK_LINK : STUDENT_FEEDBACK_LINK;
   return {isSignedIn, feedbackLink};
 };
 
