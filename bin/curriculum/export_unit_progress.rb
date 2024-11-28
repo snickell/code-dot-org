@@ -14,15 +14,18 @@ end.parse!
 
 require_relative '../../deployment'
 require_relative '../../lib/cdo/redshift'
-require_relative '../../lib/cdo/db'
+# require_relative '../../lib/cdo/db'
 
-start_time = Time.now
-puts "Loading Rails environment..."
-require_relative '../../dashboard/config/environment'
-puts "Rails environment loaded in: #{(Time.now - start_time).to_i} seconds"
+# start_time = Time.now
+# puts "Loading Rails environment..."
+# require_relative '../../dashboard/config/environment'
+# puts "Rails environment loaded in: #{(Time.now - start_time).to_i} seconds"
 
 def execute_redshift_query(client, query)
-  client.exec(query)
+  # start_time = Time.now
+  result = client.exec(query)
+  # puts "Query executed in: #{(Time.now - start_time).round(2)} seconds"
+  result
 rescue => exception
   puts "Error executing Redshift query: #{exception.message}\n#{exception.backtrace.join("\n")}"
   raise
@@ -30,7 +33,7 @@ end
 
 def test_redshift
   client = RedshiftClient.instance
-  query = "SELECT id FROM dashboard_production.scripts WHERE name = '#{$options[:unit]}'"
+  query = "SELECT count(*) FROM dashboard_production.user_levels"
   results = execute_redshift_query(client, query)
   results.each do |row|
     puts row
@@ -71,16 +74,13 @@ def get_project_main_json(user_id, level_id, script_id)
 end
 
 def main
-  result = get_user_level_data
-  user_id = result[:user_id]
-  level_id = result[:level_id]
-  script_id = result[:script_id]
-  puts "user_id: #{user_id}, level_id: #{level_id}, script_id: #{script_id}"
-
-  main_json = get_project_main_json(user_id, level_id, script_id)
-  source_code = JSON.parse(main_json)['source']
-
-  puts "source_code:\n#{source_code}"
+  filename = File.expand_path('csd3_including_contained_levels_for_stanford.sql', __dir__)
+  query = File.read(filename)
+  client = RedshiftClient.instance
+  results = execute_redshift_query(client, query)
+  results.each do |row|
+    puts row
+  end
 end
 
 main
