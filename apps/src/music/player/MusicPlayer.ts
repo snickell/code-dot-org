@@ -74,7 +74,7 @@ export default class MusicPlayer {
   }
 
   updateConfiguration(bpm?: number, key?: Key) {
-    if (bpm !== undefined) {
+    if (bpm) {
       this.bpm = this.validateBpm(bpm);
       this.audioPlayer.setBpm(this.bpm);
     }
