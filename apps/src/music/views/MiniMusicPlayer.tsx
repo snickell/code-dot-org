@@ -56,10 +56,6 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
   // Setup library and workspace, and analyticsReporter on mount
   const onMount = useCallback(async () => {
     setUpBlocklyForMusicLab();
-    // We always use the advanced function blocks for the mini-player.
-    // The differences are primarily UI, and both sets of blocks generate equivalent code.
-    // Simple2 deletes two blocks that would be needed for Advanced, but Advanced keeps all.
-    installFunctionBlocks(BlockMode.ADVANCED);
     workspaceRef.current.initHeadless();
     await MusicLibrary.loadLibrary(libraryName);
     setIsLoading(false);
@@ -83,6 +79,8 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
       const blockMode =
         (project.labConfig?.music?.blockMode as ValueOf<typeof BlockMode>) ||
         BlockMode.SIMPLE2;
+
+      installFunctionBlocks(blockMode);
 
       // Determine which sequencer reference to use based on blockMode
       const sequencerRef =
