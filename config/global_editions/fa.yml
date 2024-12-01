@@ -110,8 +110,37 @@ header:
 
 # The navigation region found at the bottom of each page
 footer:
-  # Remove these links to support pages
-  bar: false
+  links:
+    studio:
+      - title: privacy
+        url: /privacy
+        domain: code.org
+        style: 'color: #ffa400;'
+      - title: cookie_notice
+        url: /cookies
+        domain: code.org
+      - title: tos_short
+        url: /tos
+        domain: code.org
+    code_org:
+      - title: privacy_policy
+        url: https://code-org.translate.goog/privacy?_x_tr_sl=auto&_x_tr_tl=fa&_x_tr_hl=en&_x_tr_pto=wapp
+        domain: code.org
+      - title: terms
+        url: https://code-org.translate.goog/tos?_x_tr_sl=auto&_x_tr_tl=fa&_x_tr_hl=en&_x_tr_pto=wapp
+        domain: code.org
+    hour_of_code:
+      - title: terms
+        url: /tos
+        domain: code.org
+        target: _blank
+      - title: privacy
+        url: /privacy
+        domain: code.org
+        target: _blank
+      - title: cookie
+        url: /cookies
+        target: _blank
 
 # Route matching to influence properties of components
 #pages:
