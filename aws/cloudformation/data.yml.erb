@@ -681,7 +681,7 @@ Resources:
           - Name: "day"
             Type: "int"
         StorageDescriptor:
-          Location: !Sub "s3://${WebApplicationFirewallAccessControlListLogsBucket}/AWSLogs/${AWS::AccountId}/WAF/global/code-dot-org/"
+          Location: !Sub "s3://${WebApplicationFirewallAccessControlListLogsBucket}/AWSLogs/${AWS::AccountId}/WAFLogs/cloudfront/code-dot-org/"
           InputFormat: "org.apache.hadoop.mapred.TextInputFormat"
           OutputFormat: "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"
           SerdeInfo:
