@@ -143,4 +143,22 @@ footer:
         target: _blank
 
 # Route matching to influence properties of components
-#pages:
+pages:
+  # Home dashboards
+  - path: /
+    components:
+      LtiFeedbackBanner: false
+  - path: /teacher_dashboard
+    components:
+      DownloadParentLetterButton: false
+      ClassroomSetUpStep3: false
+      SectionProgressSelector:
+        showProgressTableV2: true
+      ProgressV1OrV2ToggleLink: false
+      ProgressFeedbackBanner: false
+      ParentLetterAndStudentPrivacyInfo: false
+  - path: /home
+    components:
+      MarketingAnnouncementBanner: false
+      TeacherResources: false
+      IncubatorBanner: false
