@@ -107,24 +107,18 @@
 
   .bottom {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    flex-direction: row;
-    gap: 14px;
-    width: 100%;
 
     .feedbackLink {
       display: flex;
-      align-items: center;
       color: $neutral_light;
       text-decoration: underline;
-      font-size: 14px;
     }
 
     .buttonGroup {
       display: flex;
       gap: 14px;
-      margin-left: auto;
+      margin-inline-start: auto;
     }
   }
 }
