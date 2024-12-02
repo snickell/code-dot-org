@@ -144,10 +144,27 @@ footer:
 
 # Route matching to influence properties of components
 pages:
-  # Home dashboards
+  # All pages
   - path: /
     components:
       LtiFeedbackBanner: false
+      CurriculumCatalog:
+        # Do not allow switching away from showing ONLY translated courses
+        forceTranslated: true
+      StartNewProject:
+        # Do not show all project options, just the basic ones
+        canViewFullList: false
+      CurriculumQuickAssign:
+        # For section setup, truncate the 'quick access' course listing to
+        # only items that are translated to Farsi
+        courseFilters:
+          language: fa-IR
+      AssignmentVersionSelector:
+        # When viewing a course, only populate the version selector with
+        # versions that are translated
+        courseFilters:
+          language: fa-IR
+  # Teacher dashboard
   - path: /teacher_dashboard
     components:
       DownloadParentLetterButton: false
@@ -157,6 +174,7 @@ pages:
       ProgressV1OrV2ToggleLink: false
       ProgressFeedbackBanner: false
       ParentLetterAndStudentPrivacyInfo: false
+  # Home dashboards
   - path: /home
     components:
       MarketingAnnouncementBanner: false
