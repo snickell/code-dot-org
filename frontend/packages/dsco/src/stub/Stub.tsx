@@ -4,7 +4,7 @@
 import React from 'react';
 
 export interface StubProps {
-  backgroundColor: 'black' | 'white' | 'red';
+  backgroundColor: 'black' | 'white' | 'red' | 'blue';
   label: string;
   onClick?: () => void;
 }
