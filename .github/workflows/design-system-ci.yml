@@ -4,14 +4,12 @@ on:
     workflow_dispatch:
     push:
         branches:
-            - staging
-            - cms # Temporary until merged to staging
+            - staging-next
         paths:
             - 'frontend/**'
     pull_request:
         branches:
-            - staging
-            - cms # Temporary until merged to staging
+            - staging-next
         paths:
             - 'frontend/**'
 
