@@ -4,7 +4,7 @@
 import React from 'react';
 
 export interface StubSectionProps {
-  backgroundColor: 'black' | 'white' | 'red';
+  backgroundColor: 'black' | 'white' | 'red' | 'green';
   label: string;
 }
 
