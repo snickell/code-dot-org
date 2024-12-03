@@ -72,6 +72,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "clean-package": "^2.2.0",
+    "conventional-changelog-conventionalcommits": "^7.0.2",
     "esbuild-sass-plugin": "^3.3.1",
     "eslint": "^9.15.0",
     "eslint-plugin-jest": "^28.9.0",

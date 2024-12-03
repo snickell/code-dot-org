@@ -11,6 +11,7 @@ export default {
   // Aggregates changelog entries to a single file instead of the "recommended"
   // default of per-workspace.
   changelogFilename: 'CHANGELOG.md',
+  conventionalChangelogConfig: 'conventional-changelog-conventionalcommits',
   dryRun: false,
   prerelease: true,
   prereleaseId: 'alpha',
