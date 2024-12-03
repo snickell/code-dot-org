@@ -17,6 +17,8 @@ import {MATPLOTLIB_IMG_TAG} from './pythonHelpers/patches';
 import {PyodideMessage} from './types';
 
 let callbacks: {[key: number]: (event: PyodideMessage) => void} = {};
+let inputServiceWorker: ServiceWorker | undefined;
+let lastInputId = -1;
 
 const setUpPyodideWorker = () => {
   // @ts-expect-error because TypeScript does not like this syntax.
@@ -24,7 +26,7 @@ const setUpPyodideWorker = () => {
 
   callbacks = {};
 
-  worker.onmessage = event => {
+  worker.onmessage = async event => {
     const {type, id, message} = event.data as PyodideMessage;
     const onSuccess = callbacks[id];
     switch (type) {
@@ -79,6 +81,52 @@ const setUpPyodideWorker = () => {
         );
         break;
     }
+
+    if ('serviceWorker' in navigator) {
+      try {
+        const url = new URL(
+          './inputServiceWorker.js',
+          // @ts-expect-error because TypeScript does not like this syntax.
+          import.meta.url
+        );
+        const registration = await navigator.serviceWorker.register(url);
+        if (registration.active) {
+          console.debug('Service worker active');
+          inputServiceWorker = registration.active;
+        }
+
+        registration.addEventListener('updatefound', () => {
+          const installingWorker = registration.installing;
+          if (installingWorker) {
+            console.debug('Installing new service worker');
+            installingWorker.addEventListener('statechange', () => {
+              if (installingWorker.state === 'installed') {
+                console.debug('New service worker installed');
+                inputServiceWorker = installingWorker;
+              }
+            });
+          }
+        });
+      } catch (error) {
+        console.error(`Registration failed with ${error}`);
+      }
+
+      navigator.serviceWorker.onmessage = event => {
+        console.log(`got message in main thread with type ${event.data.type}`);
+        if (event.data.type === 'CDO_PY_AWAITING_INPUT') {
+          console.log('got input request in main thread');
+          if (event.source instanceof ServiceWorker) {
+            // Update the service worker reference, in case the service worker is different to the one we registered
+            inputServiceWorker = event.source;
+          }
+          lastInputId = event.data.id;
+          // TODO: do we need to support waiting for multiple inputs at once?? Do we want to be smarter
+          // about only accepting input when we are awaiting a response?
+        }
+      };
+    } else {
+      console.error('Service workers not supported');
+    }
   };
 
   return worker;
@@ -121,4 +169,24 @@ const restartPyodideIfProgramIsRunning = () => {
   }
 };
 
-export {asyncRun, restartPyodideIfProgramIsRunning};
+const sendInput = (value: string): void => {
+  console.log('sending input?');
+  if (lastInputId < 0) {
+    console.error('Worker not awaiting input');
+    return;
+  }
+
+  if (!inputServiceWorker) {
+    console.error('No service worker registered');
+    return;
+  }
+
+  inputServiceWorker.postMessage({
+    type: 'CDO_PY_INPUT',
+    value,
+    id: lastInputId,
+  });
+  lastInputId = -1;
+};
+
+export {asyncRun, restartPyodideIfProgramIsRunning, sendInput};

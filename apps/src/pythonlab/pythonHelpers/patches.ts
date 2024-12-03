@@ -9,3 +9,33 @@ teardown_pythonlab('/${HOME_FOLDER}')
 export const SETUP_CODE = `from pythonlab_setup import setup_pythonlab
 setup_pythonlab('${MATPLOTLIB_IMG_TAG}')
 `;
+
+export const patchInputCode = (id: string) => `
+import sys, builtins
+import cdo_py
+__prompt_str__ = ""
+def get_input(prompt=""):
+    global __prompt_str__
+    __prompt_str__ = prompt
+    print(prompt)
+    s = cdo_py.getInput("${id}", prompt)
+    print()
+    return s
+builtins.input = get_input
+sys.stdin.readline = lambda: cdo_py.getInput("${id}", __prompt_str__)
+`;
+
+export const cdoPyModule = {
+  getInput: (id: string, prompt: string) => {
+    const request = new XMLHttpRequest();
+    // Synchronous request to be intercepted by service worker
+    console.log('opening request');
+    request.open(
+      'GET',
+      `/cdo-py-get-input/?id=${id}&prompt=${encodeURIComponent(prompt)}`,
+      false
+    );
+    request.send(null);
+    return request.responseText;
+  },
+};
