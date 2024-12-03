@@ -35,6 +35,10 @@ jobs:
               run: yarn install
               working-directory: ./frontend
 
+            - name: Install Playwright for Design System Storybook
+              run: npx playwright install --with-deps
+              working-directory: ./frontend/apps/design-system-storybook
+
             - name: Lint
               run: yarn lint --filter @code-dot-org/dsco --filter @code-dot-org/design-system-storybook
               working-directory: ./frontend
