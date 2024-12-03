@@ -4,11 +4,13 @@ on:
     workflow_dispatch:
     push:
         branches:
+            - staging
             - staging-next
         paths:
             - 'frontend/**'
     pull_request:
         branches:
+            - staging
             - staging-next
         paths:
             - 'frontend/**'
