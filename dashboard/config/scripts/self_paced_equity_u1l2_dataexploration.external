@@ -1,0 +1,7 @@
+name 'self-paced-equity-U1L2-dataexploration'
+title 'title'
+description 'description here'
+
+markdown <<MARKDOWN
+
+MARKDOWN

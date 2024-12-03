@@ -1,5 +1,6 @@
 <Music>
   <config><![CDATA[{
+  "published": true,
   "game_id": 70,
   "created_at": "2024-11-24T17:08:19.000Z",
   "level_num": "custom",
@@ -19,19 +20,150 @@
               "movable": false,
               "next": {
                 "block": {
-                  "type": "repeat_simple2",
-                  "id": "repeat_simple2",
-                  "fields": {
-                    "times": 2
+                  "type": "play_sounds_together",
+                  "id": "MF9P.DbQr?DY^)IHs3OF",
+                  "inputs": {
+                    "code": {
+                      "block": {
+                        "type": "play_sound_at_current_location_simple2",
+                        "id": "play_sound_at_current_location_simple2",
+                        "fields": {
+                          "sound": "sabrina_carpenter_espresso/reverse_vocal"
+                        },
+                        "next": {
+                          "block": {
+                            "type": "repeat_simple2",
+                            "id": "repeat_simple2",
+                            "fields": {
+                              "times": 2
+                            },
+                            "inputs": {
+                              "code": {
+                                "block": {
+                                  "type": "play_sound_at_current_location_simple2",
+                                  "id": "b4ygD7+k=ZTRsOSEIWIP",
+                                  "fields": {
+                                    "sound": "sabrina_carpenter_espresso/drums_fill"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
                   },
                   "next": {
                     "block": {
                       "type": "play_sounds_together",
                       "id": "play_sounds_together",
+                      "inputs": {
+                        "code": {
+                          "block": {
+                            "type": "play_sound_at_current_location_simple2",
+                            "id": "]XD7(hL;%J(6$iZ8e`o2",
+                            "fields": {
+                              "sound": "sabrina_carpenter_espresso/mmm"
+                            },
+                            "next": {
+                              "block": {
+                                "type": "play_sound_at_current_location_simple2",
+                                "id": "?s$$aMqcCR8/G;]-:u`7",
+                                "fields": {
+                                  "sound": "sabrina_carpenter_espresso/crash"
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "play_sound_at_current_location_simple2",
+                                    "id": "x$e0(WaeFkyvAwm9dQ8E",
+                                    "fields": {
+                                      "sound": "sabrina_carpenter_espresso/drums_intro"
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "play_sound_at_current_location_simple2",
+                                        "id": "3dyfgrHLHEoD;zZ:^c|G",
+                                        "fields": {
+                                          "sound": "sabrina_carpenter_espresso/bass_intro"
+                                        },
+                                        "next": {
+                                          "block": {
+                                            "type": "play_sound_at_current_location_simple2",
+                                            "id": "[/!T$d2wb49x+sSGa4F:",
+                                            "fields": {
+                                              "sound": "sabrina_carpenter_espresso/keys_chorus_1"
+                                            },
+                                            "next": {
+                                              "block": {
+                                                "type": "play_sound_at_current_location_simple2",
+                                                "id": "=.UlOn8-?-${ApVniS[V",
+                                                "fields": {
+                                                  "sound": "sabrina_carpenter_espresso/guitar_intro"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
                       "next": {
                         "block": {
                           "type": "play_sounds_together",
-                          "id": ",`25j(7yG6H[#+MU2[mX"
+                          "id": ",`25j(7yG6H[#+MU2[mX",
+                          "inputs": {
+                            "code": {
+                              "block": {
+                                "type": "play_sound_at_current_location_simple2",
+                                "id": "w_vU7]]9}^A,HRg?4vfp",
+                                "fields": {
+                                  "sound": "sabrina_carpenter_espresso/vocals_chorus_1"
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "play_sound_at_current_location_simple2",
+                                    "id": "x|8BcDMJW=|DowA[@@OX",
+                                    "fields": {
+                                      "sound": "sabrina_carpenter_espresso/bass_main"
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "play_sound_at_current_location_simple2",
+                                        "id": ":40=sU*igiaGha3$rU3~",
+                                        "fields": {
+                                          "sound": "sabrina_carpenter_espresso/drums_main_beat"
+                                        },
+                                        "next": {
+                                          "block": {
+                                            "type": "play_sound_at_current_location_simple2",
+                                            "id": "~J`Z{ZEaIxB6d(8s;WYE",
+                                            "fields": {
+                                              "sound": "sabrina_carpenter_espresso/guitar_intro"
+                                            },
+                                            "next": {
+                                              "block": {
+                                                "type": "play_sound_at_current_location_simple2",
+                                                "id": "po`EK2fc/HI!%No?`j{i",
+                                                "fields": {
+                                                  "sound": "sabrina_carpenter_espresso/keys_chorus_2"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -41,12 +173,35 @@
             }
           ]
         }
+      },
+      "library": "launch2024",
+      "packId": "sabrina_carpenter_espresso",
+      "toolbox": {
+        "type": "flyout",
+        "blocks": {
+          "Functions": [
+
+          ],
+          "Control": [
+            "play_sounds_together",
+            "repeat_simple2"
+          ],
+          "Play": [
+            "play_sound_at_current_location_simple2"
+          ]
+        }
       }
     },
+    "encrypted": "false",
+    "instructions_important": "false",
+    "hint_prompt_attempts_threshold": "1",
+    "long_instructions": "####Modify the beat drop\r\n1. First, press Run to hear how layers of sound build up to a beat drop!\r\n2. Then experiment with the code to create what you like.\r\n3. Press Finish when you are done. ",
+    "offer_browser_tts": "false",
+    "use_secondary_finish_button": "false",
+    "hide_share_and_remix": "false",
     "preload_asset_list": null
   },
-  "published": true,
-  "audit_log": "[{\"changed_at\":\"2024-11-24 17:59:30 +0000\",\"changed\":[],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
+  "audit_log": "[{\"changed_at\":\"2024-11-24 17:59:30 +0000\",\"changed\":[],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-02 19:26:37 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-02 19:29:32 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-02 19:51:57 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-02 20:01:30 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-02 20:03:33 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-02 21:52:43 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
 }]]></config>
   <blocks/>
 </Music>
