@@ -54,7 +54,7 @@ jobs:
               working-directory: ./frontend
 
             - name: UI Tests
-              run: yarn test:ui --filter @code-dot-org/dsco --filter @code-dot-org/design-system-storybook
+              run: yarn test:ui:ci --filter @code-dot-org/dsco --filter @code-dot-org/design-system-storybook
               working-directory: ./frontend
 
             
