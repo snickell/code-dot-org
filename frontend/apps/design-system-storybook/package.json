@@ -9,8 +9,8 @@
     "dev": "yarn run storybook",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test:ui": "bash ./scripts/test-storybook.sh",
-    "test-storybook": "test-storybook --url http://localhost:6006",
+    "test:ui:ci": "bash ./scripts/test-storybook.sh",
+    "test:ui:local": "test-storybook --url http://localhost:6006",
     "eyes-storybook": "dotenv-run -- eyes-storybook",
     "typecheck": "tsc --noEmit"
   },

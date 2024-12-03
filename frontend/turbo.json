@@ -30,8 +30,8 @@
     "test": {
       "dependsOn": ["^test"]
     },
-    "test:ui": {
-      "dependsOn": ["^test:ui"]
+    "test:ui:ci": {
+      "dependsOn": ["^test:ui:ci"]
     },
     "dev": {
       "cache": false,
