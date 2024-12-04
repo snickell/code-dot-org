@@ -8,8 +8,8 @@ import {
 import {Heading4} from '@cdo/apps/componentLibrary/typography';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
-import aichatI18n from '../../locale';
 import {modelDescriptions} from '../../constants';
+import aichatI18n from '../../locale';
 
 import ModelCardRow from './ModelCardRow';
 
