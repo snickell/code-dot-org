@@ -10,12 +10,12 @@ export default [
   {
     // TODO: Remove this once the following Github Issue is resolved:
     // https://github.com/vercel/next.js/issues/71763
-    name: "Next.js Linter",
+    name: 'Next.js Linter',
     plugins: {
-      "@next/next": nextPlugin,
+      '@next/next': nextPlugin,
       rules: {
         ...nextPlugin.configs.recommended.rules,
-        ...nextPlugin.configs["core-web-vitals"].rules,
+        ...nextPlugin.configs['core-web-vitals'].rules,
       },
     },
   },
