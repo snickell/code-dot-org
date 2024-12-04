@@ -1,5 +1,63 @@
 name 'self-paced-equity-U1L2-datareflection'
 
 markdown <<MARKDOWN
+# Sources of Data
 
+<div style="width:60%;">
+
+#### When considering the sources of data available to you to inform your understanding of access, inclusion and diversity of CS at your school, it’s useful think about the following key questions:
+* #### Who has access to CS at my school?
+* #### Who is in my CS class?
+* #### How can students feel they belong in my CS classroom?
+
+#### Consider also:
+* #### What from this is in your locus of control? 
+
+#### Using data at your school level can be powerful for investigating equity in computer science. Data might be quantitative or qualitative in nature, and can include:
+
+## Quantitive vs Qualitative Data
+
+</div>
+
+<div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; width: 60%;">
+    <div style="background-color: #ffffff; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 10px; width: 30%;">
+        <p style="color: black; line-height: 1.25; font-size: 18px; font-weight: bold;">Quantitative Data:</p>
+        <ul style="margin-left: 20px; line-height: 1.5; padding: 0;">
+            <li style="font-size: 16px;">Attendance</li>
+            <li style="font-size: 16px;">School Demographics</li>
+            <li style="font-size: 16px;">CS course enrollment</li>
+            <li style="font-size: 16px;">CS course progress</li>
+        </ul>
+    </div>
+    <div style="background-color: #ffffff; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 10px; width: 30%;">
+        <p style="color: black; line-height: 1.25; font-size: 18px; font-weight: bold;">Qualitative Data:</p>
+        <ul style="margin-left: 20px; line-height: 1.5; padding: 0;">
+            <li style="font-size: 16px;">Learner profiles to get to know students and their learning preferences</li>
+            <li style="font-size: 16px;">Student self-assessments/reflections to get to know what contributes or detracts from their learning</li>
+        </ul>
+    </div>
+</div>
+
+### Consider the following examples:
+
+<div style="background-color: #F7F8FA; border-radius: 40px; color: #000000; padding: 10px; margin-bottom: 20px; text-align: left; width: 60%">
+	<p style="line-height: 1.5; margin: 10px; font-size: 18px;">
+		A <b>3rd grade teacher</b> notices that students approach coding challenges in CS class differently. During her last lesson, 5 students did not complete any coding challenges, and 3 students stayed during recess to finish them all. She uses this information as data.
+	</p>
+</div>
+    
+<div style="background-color: #F7F8FA; border-radius: 40px; color: #000000; padding: 10px; margin-bottom: 20px; text-align: left; width: 60%">
+	<p style="line-height: 1.5; margin: 10px; font-size: 18px;">
+		A <b>9th and 10th grade teacher</b> just got their roster for their CS class. The roster is a data set for them as it tells them some basic data about who is in their class - how many students enrolled, what gender they are, what grade, or what race or ethnicity the students are. Teacher X also has access to school wide data about grade, gender, and race or ethnicity that they can evaluate as well.
+	</p>
+</div>
+
+<div style="width:60%;">
+
+## Reflection
+
+#### What data do you have access to in your school or district?
+#### What steps can you take to access additional data about your students?
+
+</div>
 MARKDOWN

@@ -3,5 +3,11 @@ title 'title'
 description 'description here'
 
 markdown <<MARKDOWN
+📝 Activity Guide: Participants will be reading over a lot of data in the next two sections. Introduce the note-taking section of the Activity Guide where they can take note of interesting statistics and data points.
+
+Guiding questions for data review:
+
+What surprises you about the data?
+What might the data reveal about your students’ needs?
 
 MARKDOWN

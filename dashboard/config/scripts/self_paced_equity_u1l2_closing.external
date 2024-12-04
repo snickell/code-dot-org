@@ -3,5 +3,13 @@ title 'title'
 description 'description here'
 
 markdown <<MARKDOWN
+Great job! 🎉
+
+So far, you've…
+
+Up Next
+In the next section of this professional learning module…
+
+Click continue to keep going!
 
 MARKDOWN

@@ -12,21 +12,29 @@
       {
         "text": "<i class=\"fa-duotone fa-solid fa-list-music\"></i> Music is made of patterns that repeat.\n\nLike a catchy hook or a consistent backbeat.\n",
         "imageUrl": "https://images.code.org/1541ad72a3f441247988691c81408ac6-pattern.jpg",
-        "key": "music-coding-intro-functions-panel-dd6ade9d-4ac1-4787-89e4-4fa347cf3c12"
+        "key": "music-coding-intro-functions-panel-dd6ade9d-4ac1-4787-89e4-4fa347cf3c12",
+        "layout": "text-top-left"
       },
       {
-        "text": "With a function you can replay sounds you like without adding all of the code over and over. ",
-        "imageUrl": "https://images.code.org/4c51fefca18f29fadad762405aec56d2-function1.jpg",
-        "key": "music-coding-intro-functions-panel-4e9d978e-62cf-45c0-a123-21e2c48cc3db"
+        "text": "Next, you will be learning how to repeat chunks of code anytime without rewriting all of it. ",
+        "imageUrl": "",
+        "key": "music-coding-intro-functions-panel-4e9d978e-62cf-45c0-a123-21e2c48cc3db",
+        "layout": "text-top-center"
       },
       {
-        "text": "To use the function, call it from the when run block.",
-        "imageUrl": "https://images.code.org/4c51fefca18f29fadad762405aec56d2-function1.jpg",
+        "text": "Defining a new function is like teaching the computer a new word! ",
+        "imageUrl": "",
+        "key": "music-coding-intro-functions-panel-b11022f2-164f-4e79-b32c-96ed53cf9381",
+        "layout": "text-top-center"
+      },
+      {
+        "text": "To use the new function, call it from the when run block.",
+        "imageUrl": "",
         "key": "music-coding-intro-functions-panel-13c54ec6-1d0b-4bdf-89aa-880a117202f8",
-        "layout": "text-bottom-right"
+        "layout": "text-top-right"
       }
     ]
   },
-  "audit_log": "[{\"changed_at\":\"2024-11-27 16:48:44 +0000\",\"changed\":[],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-27 16:49:33 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
+  "audit_log": "[{\"changed_at\":\"2024-11-27 16:48:44 +0000\",\"changed\":[],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-27 16:49:33 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 20:09:46 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 20:20:16 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 21:19:38 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 21:50:42 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 21:51:56 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 21:56:45 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 23:45:56 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
 }]]></config>
 </Panels>

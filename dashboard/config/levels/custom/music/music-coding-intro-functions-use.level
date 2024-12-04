@@ -13,7 +13,7 @@
     "level_data": {
       "validationTimeout": 6,
       "library": "launch2024",
-      "packId": "sabrina_carpenter_espresso",
+      "packId": "chainsmokers_coldplay_something_just_like_this",
       "startSources": {
         "blocks": {
           "languageVersion": 0,
@@ -24,7 +24,25 @@
               "x": 34,
               "y": 34,
               "deletable": false,
-              "movable": false
+              "movable": false,
+              "next": {
+                "block": {
+                  "type": "procedures_callnoreturn",
+                  "id": "B:K1.kX48{-_C:wDtIa,",
+                  "extraState": {
+                    "name": "bridge"
+                  },
+                  "next": {
+                    "block": {
+                      "type": "procedures_callnoreturn",
+                      "id": "oT8#mQBy#h@gcpH)g_a}",
+                      "extraState": {
+                        "name": "chorus"
+                      }
+                    }
+                  }
+                }
+              }
             },
             {
               "type": "procedures_defnoreturn",
@@ -48,7 +66,6 @@
                     "type": "play_sounds_together",
                     "id": "play_sounds_together",
                     "deletable": false,
-                    "movable": false,
                     "inputs": {
                       "code": {
                         "block": {
@@ -57,45 +74,57 @@
                           "deletable": false,
                           "movable": false,
                           "fields": {
-                            "sound": "sabrina_carpenter_espresso/vocals_chorus_1"
+                            "sound": "chainsmokers_coldplay_something_just_like_this/vocals_prechorus_1"
                           },
                           "next": {
                             "block": {
                               "type": "play_sound_at_current_location_simple2",
-                              "id": "kK+_!VDDrblbU@gnkz,t",
+                              "id": "qNQ1k.0XN15y#o]cKd%G",
                               "deletable": false,
-                              "movable": false,
                               "fields": {
-                                "sound": "sabrina_carpenter_espresso/drums_main_beat"
+                                "sound": "chainsmokers_coldplay_something_just_like_this/drums_drop_beat"
+                              },
+                              "next": {
+                                "block": {
+                                  "type": "play_sound_at_current_location_simple2",
+                                  "id": "zT}v;|yEx}30{XBtf}SP",
+                                  "fields": {
+                                    "sound": "chainsmokers_coldplay_something_just_like_this/wurly"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "play_sounds_together",
+                        "id": "T$nb#=2q|yC,|%Y(52St",
+                        "inputs": {
+                          "code": {
+                            "block": {
+                              "type": "play_sound_at_current_location_simple2",
+                              "id": "#Q,[%mfEY-c.CJ]!=~;X",
+                              "deletable": false,
+                              "fields": {
+                                "sound": "chainsmokers_coldplay_something_just_like_this/vocals_prechorus_2"
                               },
                               "next": {
                                 "block": {
                                   "type": "play_sound_at_current_location_simple2",
                                   "id": "P157|7U2Ycll5GaKXsto",
                                   "deletable": false,
-                                  "movable": false,
                                   "fields": {
-                                    "sound": "sabrina_carpenter_espresso/guitar_intro"
+                                    "sound": "chainsmokers_coldplay_something_just_like_this/drums_drop_beat"
                                   },
                                   "next": {
                                     "block": {
                                       "type": "play_sound_at_current_location_simple2",
-                                      "id": "#Q,[%mfEY-c.CJ]!=~;X",
-                                      "deletable": false,
-                                      "movable": false,
+                                      "id": "S+qI3$t[BQmXY5bUbtpq",
                                       "fields": {
-                                        "sound": "sabrina_carpenter_espresso/keys_chorus_1"
-                                      },
-                                      "next": {
-                                        "block": {
-                                          "type": "play_sound_at_current_location_simple2",
-                                          "id": "qNQ1k.0XN15y#o]cKd%G",
-                                          "deletable": false,
-                                          "movable": false,
-                                          "fields": {
-                                            "sound": "sabrina_carpenter_espresso/bass_main"
-                                          }
-                                        }
+                                        "sound": "chainsmokers_coldplay_something_just_like_this/wurly"
                                       }
                                     }
                                   }
@@ -116,15 +145,14 @@
               "x": 270,
               "y": 30,
               "deletable": false,
-              "editable": false,
               "extraState": {
                 "procedureId": "intro-procedure",
                 "initialDeleteConfig": false,
-                "initialEditConfig": false,
+                "initialEditConfig": true,
                 "initialMoveConfig": true
               },
               "fields": {
-                "NAME": "intro"
+                "NAME": "bridge"
               },
               "inputs": {
                 "STACK": {
@@ -141,7 +169,7 @@
                           "deletable": false,
                           "movable": false,
                           "fields": {
-                            "sound": "sabrina_carpenter_espresso/drums_intro"
+                            "sound": "chainsmokers_coldplay_something_just_like_this/vocals_do_do_do_low"
                           },
                           "next": {
                             "block": {
@@ -150,7 +178,7 @@
                               "deletable": false,
                               "movable": false,
                               "fields": {
-                                "sound": "sabrina_carpenter_espresso/bass_intro"
+                                "sound": "chainsmokers_coldplay_something_just_like_this/drums_verse_beat"
                               },
                               "next": {
                                 "block": {
@@ -159,7 +187,7 @@
                                   "deletable": false,
                                   "movable": false,
                                   "fields": {
-                                    "sound": "sabrina_carpenter_espresso/keys_intro"
+                                    "sound": "chainsmokers_coldplay_something_just_like_this/bass_sub"
                                   },
                                   "next": {
                                     "block": {
@@ -168,7 +196,7 @@
                                       "deletable": false,
                                       "movable": false,
                                       "fields": {
-                                        "sound": "sabrina_carpenter_espresso/guitar_intro"
+                                        "sound": "chainsmokers_coldplay_something_just_like_this/drums_drop_beat"
                                       }
                                     }
                                   }
@@ -203,7 +231,7 @@
           },
           {
             "id": "intro-procedure",
-            "name": "intro",
+            "name": "bridge",
             "returnTypes": null
           }
         ]
@@ -219,39 +247,55 @@
         "addFunctionCalls": true
       },
       "sounds": {
-        "sabrina_carpenter_espresso": [
-          "drums_intro",
-          "drums_main_beat",
-          "drums_hats",
-          "drums_fill",
-          "drums_percussion_1",
-          "drums_percussion_2",
-          "bass_intro",
-          "bass_main",
-          "keys_intro",
-          "keys_chorus_1",
-          "keys_chorus_2",
-          "keys_prechorus",
-          "synth",
-          "guitar_intro",
-          "guitar_1",
-          "guitar_2",
-          "crash",
-          "wow",
-          "mmm",
-          "breaths",
-          "reverse_vocal",
-          "vocals_now_hes",
-          "vocals_verse_1",
-          "vocals_verse_2",
+        "chainsmokers_coldplay_something_just_like_this": [
+          "vocals_do_do_do_low",
+          "vocals_do_do_do_high",
+          "vocals_hook_high",
+          "vocals_hook_low",
           "vocals_prechorus_1",
           "vocals_prechorus_2",
-          "vocals_chorus_1",
-          "vocals_chorus_2",
-          "vocals_chorus_backgrounds",
-          "vocals_adlib_i_know",
-          "vocals_adlib_espresso",
-          "vocals_adlib"
+          "vocals_prechorus_3",
+          "vocals_prechorus_4",
+          "vocals_verse_1",
+          "vocals_verse_2",
+          "vocals_verse_3",
+          "vocals_verse_4",
+          "drums_drop_beat",
+          "drums_fill",
+          "drums_live_beat",
+          "drums_live_build",
+          "drums_perc_build",
+          "drums_riser",
+          "drums_tom_build",
+          "drums_verse_beat",
+          "bass_live_1",
+          "bass_live_2",
+          "bass_live_3",
+          "bass_sub",
+          "bass_synth",
+          "guitar_acoustic",
+          "guitar_chime",
+          "guitar_intro",
+          "guitar_lead_1",
+          "guitar_lead_2",
+          "guitar_muted_1",
+          "guitar_muted_2",
+          "guitar_verse_1",
+          "guitar_verse_2",
+          "piano_build",
+          "piano_full_1",
+          "piano_full_2",
+          "piano_melody",
+          "wurly",
+          "synth_arp",
+          "synth_drop_1",
+          "synth_drop_2",
+          "synth_lead",
+          "vocals_glitch",
+          "drums_crash",
+          "drums_vibraslap",
+          "vocals_ahh_swell",
+          "vocals_ohahh"
         ]
       }
     },
@@ -305,10 +349,11 @@
     "name_suffix": "_final",
     "offer_browser_tts": "true",
     "use_secondary_finish_button": "false",
+    "hint_prompt_attempts_threshold": "1",
     "preload_asset_list": null
   },
   "published": true,
-  "audit_log": "[{\"changed_at\":\"2024-11-27T16:39:14.146+00:00\",\"changed\":[\"cloned from \\\"music-jam-functions-chorus\\\"\"],\"cloned_from\":\"music-jam-functions-chorus\"}]"
+  "audit_log": "[{\"changed_at\":\"2024-11-27T16:39:14.146+00:00\",\"changed\":[\"cloned from \\\"music-jam-functions-chorus\\\"\"],\"cloned_from\":\"music-jam-functions-chorus\"},{\"changed_at\":\"2024-12-03 22:47:19 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 22:48:05 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 22:51:35 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 22:59:26 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
 }]]></config>
   <blocks/>
 </Music>

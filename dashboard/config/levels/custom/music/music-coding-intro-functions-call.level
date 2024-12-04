@@ -9,7 +9,7 @@
     "encrypted": "false",
     "background": "music-black",
     "instructions_important": "false",
-    "long_instructions": "### Call a Function\r\n\r\n- Use the [hook](#clickable=flyout-first-block) function by adding it under [when run](#clickable=when-run-block). \r\n- Press [Run](#clickable=run-button) to see how it works. ",
+    "long_instructions": "### Call a Function\r\nThis function is already defined!\r\n- To use the [hook](#clickable=flyout-first-block) function add it under [when run](#clickable=when-run-block). \r\n- Press [Run](#clickable=run-button) to see how it works. ",
     "hide_share_and_remix": "true",
     "level_data": {
       "library": "launch2024",
@@ -246,7 +246,7 @@
     "hint_prompt_attempts_threshold": "1",
     "preload_asset_list": null
   },
-  "audit_log": "[{\"changed_at\":\"2024-11-27T16:36:54.030+00:00\",\"changed\":[\"cloned from \\\"music-jam-functions-intro\\\"\"],\"cloned_from\":\"music-jam-functions-intro\"},{\"changed_at\":\"2024-11-27 17:06:20 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-27 17:13:13 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-27 17:14:45 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-27 17:18:08 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-27 17:19:33 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-27 17:20:19 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
+  "audit_log": "[{\"changed_at\":\"2024-11-27T16:36:54.030+00:00\",\"changed\":[\"cloned from \\\"music-jam-functions-intro\\\"\"],\"cloned_from\":\"music-jam-functions-intro\"},{\"changed_at\":\"2024-11-27 17:06:20 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-27 17:13:13 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-27 17:14:45 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-27 17:18:08 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-27 17:19:33 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-27 17:20:19 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 20:21:25 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 21:59:34 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
 }]]></config>
   <blocks/>
 </Music>
