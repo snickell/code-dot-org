@@ -3664,6 +3664,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@blockly/field-colour@npm:^5.0.9":
+  version: 5.0.9
+  resolution: "@blockly/field-colour@npm:5.0.9"
+  peerDependencies:
+    blockly: ^11.0.0
+  checksum: b0f487b6532f67cc1f409018075b3d7242bfb630f452f527e41d4d4ffd37efad9962c82be1a1521e6656336715e1ca35397d0a7019c7633121fefa2a29de20d9
+  languageName: node
+  linkType: hard
+
 "@blockly/field-grid-dropdown@npm:~4.0.9":
   version: 4.0.10
   resolution: "@blockly/field-grid-dropdown@npm:4.0.10"
@@ -5126,6 +5135,28 @@ __metadata:
     "@types/react": ">=16"
     react: ">=16"
   checksum: 1063a597264f6a8840aa13274a99beef8983a88dd45b0c5b8e48e6216bc23d33e247da8e2d95d6e1874483f8b4e0903b166ce5046874aa7ffa2b1333057dcddf
+  languageName: node
+  linkType: hard
+
+"@microbit/microbit-fs@npm:^0.9.2":
+  version: 0.9.2
+  resolution: "@microbit/microbit-fs@npm:0.9.2"
+  dependencies:
+    "@microbit/microbit-universal-hex": 0.2.2
+    nrf-intel-hex: 1.3.0
+    text-encoder-lite: 2.0.0
+  peerDependencies:
+    tslib: ">=1.9.0"
+  checksum: e3da0b228ebb96a62d20a778858465ffe8cb37367694ceaec9396880b4a3ba55f32a21246736680a1a8217b94dc2f6962599eb6a2bbb010b8e7061ca6d37d6d7
+  languageName: node
+  linkType: hard
+
+"@microbit/microbit-universal-hex@npm:0.2.2":
+  version: 0.2.2
+  resolution: "@microbit/microbit-universal-hex@npm:0.2.2"
+  peerDependencies:
+    tslib: ">=1.11.1"
+  checksum: c32a61707b4e6735aa45c66306acb081b7acb9bc71b5d19ae21609c8a1d68f398a465ad1621ada9bb36e37ecb3f4237ef585c204d97be625607e36e322f51ad2
   languageName: node
   linkType: hard
 
@@ -9980,6 +10011,7 @@ __metadata:
     "@babel/preset-react": ^7.25.9
     "@blockly/block-shareable-procedures": ~4.0.5
     "@blockly/field-bitmap": ^4.1.0
+    "@blockly/field-colour": ^5.0.9
     "@blockly/field-grid-dropdown": ~4.0.9
     "@blockly/keyboard-navigation": ~0.5.6
     "@blockly/plugin-cross-tab-copy-paste": ~5.0.4
@@ -10019,6 +10051,7 @@ __metadata:
     "@dsco_/link": ^1.1.2
     "@lezer/highlight": ^1.2.0
     "@magenta/music": ^1.23.1
+    "@microbit/microbit-fs": ^0.9.2
     "@microsoft/immersive-reader-sdk": ^1.1.0
     "@pmmmwh/react-refresh-webpack-plugin": ^0.5.11
     "@pyodide/webpack-plugin": ^1.3.2
@@ -21265,6 +21298,13 @@ es6-shim@latest:
   languageName: node
   linkType: hard
 
+"nrf-intel-hex@npm:1.3.0":
+  version: 1.3.0
+  resolution: "nrf-intel-hex@npm:1.3.0"
+  checksum: 4085335530c1d0f40027672aa19b0d2a5db47ab928d214fecfab9501eb8d611b67a0a765b398fb49f67fb2ada5a2ff27356692872270f09b575d3cc6b87186bf
+  languageName: node
+  linkType: hard
+
 "nth-check@npm:^2.0.0, nth-check@npm:^2.0.1":
   version: 2.1.1
   resolution: "nth-check@npm:2.1.1"
@@ -27430,6 +27470,13 @@ temporal@latest:
   version: 1.4.6
   resolution: "tether@npm:1.4.6"
   checksum: 0b46fc33bac735b2492f833a20ec1c3cc1931a75ac500265f8346bcacd0ce130eb95d79e3d535d0c9ffadf86a6ebbc40cd3e8c1171108789be57e1281a39712e
+  languageName: node
+  linkType: hard
+
+"text-encoder-lite@npm:2.0.0":
+  version: 2.0.0
+  resolution: "text-encoder-lite@npm:2.0.0"
+  checksum: 25c3cb8b894c84ec3c2b8c66bcf6267e207d502e16385ca2c4ddca9b59194b5c36aa536a82923d3026be96f5c31121fb8f089cdf6e83768650a74c55416295af
   languageName: node
   linkType: hard
 

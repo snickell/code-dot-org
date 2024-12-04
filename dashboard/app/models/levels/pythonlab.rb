@@ -22,6 +22,7 @@
 #  index_levels_on_game_id    (game_id)
 #  index_levels_on_level_num  (level_num)
 #  index_levels_on_name       (name)
+#  index_levels_on_type       (type)
 #
 class Pythonlab < Level
   serialized_attrs %w(
@@ -33,6 +34,7 @@ class Pythonlab < Level
     starter_assets
     predict_settings
     validation_file
+    enable_micro_bit
   )
 
   validate :has_correct_multiple_choice_answer?

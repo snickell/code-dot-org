@@ -42,6 +42,12 @@ module SharedConstants
     }
   ).freeze
 
+  USER_LEVEL_INTERACTIONS = OpenStruct.new(
+    {
+      click_help_and_tips: "click_help_and_tips",
+    }
+  ).freeze
+
   # The set of valid login types for a section
   SECTION_LOGIN_TYPE = OpenStruct.new(
     {
@@ -105,6 +111,7 @@ module SharedConstants
     poetry_hoc
     thebadguys
     music
+    pythonlab
   ).freeze
 
   # For privacy reasons, App Lab and Game Lab can only be shared if certain conditions are met. These project types can be shared if: the user is >= 13 years old and their teacher has NOT disabled sharing OR the user is < 13 and their teacher has enabled sharing.

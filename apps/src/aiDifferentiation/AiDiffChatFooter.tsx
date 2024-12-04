@@ -12,18 +12,22 @@ import style from './ai-differentiation.module.scss';
 
 interface AiDiffChatFooterProps {
   onSubmit: (msg: string) => void;
+  onSuggestPrompts: () => void;
   messages: ChatItem[];
+  waiting: boolean;
 }
 
 const AiDiffChatFooter: React.FC<AiDiffChatFooterProps> = ({
   onSubmit,
+  onSuggestPrompts,
   messages,
+  waiting,
 }) => {
   return (
     <div className={style.chatFooter}>
       <UserMessageEditor
         onSubmit={onSubmit}
-        disabled={false}
+        disabled={waiting}
         customPlaceholder={commonI18n.aiDifferentiation_write_message()}
       />
       <div className={style.chatFooterButtons}>
@@ -32,7 +36,7 @@ const AiDiffChatFooter: React.FC<AiDiffChatFooterProps> = ({
           size="s"
           type="secondary"
           iconLeft={{iconName: 'sparkles'}}
-          onClick={() => null}
+          onClick={onSuggestPrompts}
           text={commonI18n.aiDifferentiation_suggest_prompt()}
         />
         <PDFDownloadLink
@@ -44,7 +48,7 @@ const AiDiffChatFooter: React.FC<AiDiffChatFooterProps> = ({
             size="s"
             type="secondary"
             iconLeft={{iconName: 'download'}}
-            onClick={() => null}
+            onClick={() => {}}
             text={commonI18n.aiDifferentiation_download_pdf()}
           />
         </PDFDownloadLink>

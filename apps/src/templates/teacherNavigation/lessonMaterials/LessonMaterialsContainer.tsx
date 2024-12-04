@@ -1,14 +1,17 @@
 import _ from 'lodash';
 import React, {useState, useMemo, useCallback} from 'react';
-import {useLoaderData} from 'react-router-dom';
 
 import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {getStore} from '@cdo/apps/redux';
-import {getAuthenticityToken} from '@cdo/apps/util/AuthenticityTokenStore';
+import Spinner from '@cdo/apps/sharedComponents/Spinner';
+import {selectedSectionSelector} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
+import HttpClient from '@cdo/apps/util/HttpClient';
+import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 import i18n from '@cdo/locale';
 
+import {LessonMaterialsEmptyState} from './LessonMaterialsEmptyState';
 import {Lesson} from './LessonMaterialTypes';
 import LessonResources from './LessonResources';
 import UnitResourcesDropdown from './UnitResourcesDropdown';
@@ -24,33 +27,13 @@ interface LessonMaterialsData {
   scriptResourcesPdfUrl: string;
   lessons: Lesson[];
   hasNumberedUnits: boolean;
+  versionYear?: number;
 }
 
-const lessonMaterialsCachedLoader = _.memoize(
-  async (assignedUnitId, unitName) =>
-    getAuthenticityToken()
-      .then(token =>
-        fetch(`/dashboardapi/lesson_materials/${assignedUnitId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': token,
-          },
-        })
-      )
-      .then(response => {
-        return response.json();
-      })
-      .then(json => {
-        return {...json, unitName};
-      })
-      .catch(error => {
-        console.error('Error loading lesson materials', error);
-        analyticsReporter.sendEvent(EVENTS.LESSON_MATERIALS_FAILURE, {
-          unitName: unitName,
-        });
-        return null;
-      })
+const lessonMaterialsCachedLoader = _.memoize(async (unitId: number) =>
+  HttpClient.fetchJson<LessonMaterialsData>(
+    `/dashboardapi/lesson_materials/${unitId}`
+  ).then(response => response?.value)
 );
 
 export const lessonMaterialsLoader =
@@ -59,34 +42,92 @@ export const lessonMaterialsLoader =
     const selectedSectionId = state.selectedSectionId;
     const sectionData = state.sections[selectedSectionId];
 
-    // NOTE: this page is not working for stand alone courses.
-    // this is because there is no "unitId" in the sectionData for stand alone courses.
-
     if (!selectedSectionId || !sectionData.unitId) {
       return null;
     }
 
-    return lessonMaterialsCachedLoader(
-      sectionData.unitId,
-      sectionData.unitName
-    );
+    return lessonMaterialsCachedLoader(sectionData.unitId);
   };
 
-const createDisplayName = (lessonName: string, lessonPosition: number) => {
-  return i18n.lessonNumberAndName({
-    lessonNumber: lessonPosition,
-    lessonName: lessonName,
-  });
+// Some lessons are lockable and don't have lesson plans (typically assessments or surveys).
+// In this case, we want to display the lesson name without a number.  See CSP1-2022 for an example.
+const createDisplayName = (
+  lessonName: string,
+  lessonPosition: number,
+  hasLessonPlan: boolean,
+  isLockable: boolean
+) => {
+  if (isLockable && !hasLessonPlan) {
+    return lessonName;
+  } else {
+    return i18n.lessonNumberAndName({
+      lessonNumber: lessonPosition,
+      lessonName: lessonName,
+    });
+  }
 };
 
-const LessonMaterialsContainer: React.FC = () => {
-  const loadedData = useLoaderData() as LessonMaterialsData | null;
-  const hasNumberedUnits = useMemo(
-    () => loadedData?.hasNumberedUnits || false,
-    [loadedData]
-  );
-  const lessons = useMemo(() => loadedData?.lessons || [], [loadedData]);
-  const unitNumber = useMemo(() => loadedData?.unitNumber || 1, [loadedData]);
+interface LessonMaterialsContainerProps {
+  showNoCurriculumAssigned: boolean;
+}
+
+const LessonMaterialsContainer: React.FC<LessonMaterialsContainerProps> = ({
+  showNoCurriculumAssigned,
+}) => {
+  const [lessonMaterials, setLessonMaterials] =
+    useState<LessonMaterialsData | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const selectedSection = useAppSelector(selectedSectionSelector);
+
+  React.useEffect(() => {
+    const fetchLessonMaterials = async () => {
+      const state = getStore().getState().teacherSections;
+      const selectedSectionId = state.selectedSectionId;
+      const sectionData = state.sections[selectedSectionId];
+
+      if (!selectedSectionId || !sectionData.unitId) {
+        setLessonMaterials(null);
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+
+      await lessonMaterialsCachedLoader(sectionData.unitId).then(data => {
+        setLessonMaterials(data);
+        setIsLoading(false);
+
+        if (data?.unitName) {
+          analyticsReporter.sendEvent(EVENTS.VIEW_LESSON_MATERIALS, {
+            unitName: data.unitName,
+          });
+        }
+      });
+    };
+
+    fetchLessonMaterials();
+  }, [selectedSection]);
+
+  const {hasNumberedUnits, lessons, unitNumber, versionYear} = useMemo(() => {
+    return {
+      hasNumberedUnits: lessonMaterials?.hasNumberedUnits || false,
+      lessons: lessonMaterials?.lessons || [],
+      unitNumber: lessonMaterials?.unitNumber || -1,
+      versionYear: lessonMaterials?.versionYear || -1,
+    };
+  }, [lessonMaterials]);
+  const isLegacyScript = useMemo(() => versionYear < 2021, [versionYear]);
+
+  const hasNoLessonsWithLessonPlans = useMemo(() => {
+    return lessons.every(lesson => !lesson.hasLessonPlan);
+  }, [lessons]);
+
+  const hasEmptyState =
+    isLegacyScript ||
+    showNoCurriculumAssigned ||
+    hasNoLessonsWithLessonPlans ||
+    !lessonMaterials;
 
   const getLessonFromId = (lessonId: number): Lesson | null => {
     return lessons.find(lesson => lesson.id === lessonId) || null;
@@ -102,22 +143,27 @@ const LessonMaterialsContainer: React.FC = () => {
 
   React.useEffect(() => {
     analyticsReporter.sendEvent(EVENTS.VIEW_LESSON_MATERIALS, {
-      unitName: loadedData?.unitName,
+      unitName: lessonMaterials?.unitName,
     });
-  }, [loadedData?.unitName]);
+  }, [lessonMaterials?.unitName]);
 
   const onDropdownChange = (value: string) => {
     setSelectedLesson(getLessonFromId(Number(value)));
 
     analyticsReporter.sendEvent(EVENTS.LESSON_MATERIALS_LESSON_CHANGE, {
-      unitName: loadedData?.unitName,
+      unitName: lessonMaterials?.unitName,
       lessonId: value,
     });
   };
 
   const generateLessonDropdownOptions = useCallback(() => {
     return lessons.map((lesson: Lesson) => {
-      const displayName = createDisplayName(lesson.name, lesson.position);
+      const displayName = createDisplayName(
+        lesson.name,
+        lesson.position,
+        lesson.hasLessonPlan,
+        lesson.isLockable
+      );
       return {text: displayName, value: lesson.id.toString()};
     });
   }, [lessons]);
@@ -126,6 +172,30 @@ const LessonMaterialsContainer: React.FC = () => {
     () => generateLessonDropdownOptions(),
     [generateLessonDropdownOptions]
   );
+
+  const renderHeader = () => {
+    return (
+      <div className={styles.lessonMaterialsPageHeader}>
+        <SimpleDropdown
+          labelText={i18n.chooseLesson()}
+          isLabelVisible={false}
+          onChange={event => onDropdownChange(event.target.value)}
+          items={lessonOptions}
+          selectedValue={selectedLesson ? selectedLesson.id.toString() : ''}
+          name={'lessons-in-assigned-unit-dropdown'}
+          size="s"
+        />
+        {lessonMaterials?.unitNumber && (
+          <UnitResourcesDropdown
+            hasNumberedUnits={hasNumberedUnits}
+            unitNumber={lessonMaterials.unitNumber}
+            scriptOverviewPdfUrl={lessonMaterials.scriptOverviewPdfUrl}
+            scriptResourcesPdfUrl={lessonMaterials.scriptResourcesPdfUrl}
+          />
+        )}
+      </div>
+    );
+  };
 
   const renderTeacherResources = () => {
     if (!selectedLesson) {
@@ -142,6 +212,7 @@ const LessonMaterialsContainer: React.FC = () => {
         lessonPlanUrl={selectedLesson.lessonPlanHtmlUrl}
         lessonPlanPdfUrl={selectedLesson.lessonPlanPdfUrl}
         lessonName={selectedLesson.name}
+        hasLessonPlan={selectedLesson.hasLessonPlan}
       />
     );
   };
@@ -160,27 +231,22 @@ const LessonMaterialsContainer: React.FC = () => {
     );
   };
 
+  if (isLoading) {
+    return <Spinner size={'large'} />;
+  }
+
+  if (hasEmptyState) {
+    return (
+      <LessonMaterialsEmptyState
+        isLegacyScript={isLegacyScript}
+        hasNoLessonsWithLessonPlans={hasNoLessonsWithLessonPlans}
+      />
+    );
+  }
+
   return (
     <div>
-      <div className={styles.lessonMaterialsPageHeader}>
-        <SimpleDropdown
-          labelText={i18n.chooseLesson()}
-          isLabelVisible={false}
-          onChange={event => onDropdownChange(event.target.value)}
-          items={lessonOptions}
-          selectedValue={selectedLesson ? selectedLesson.id.toString() : ''}
-          name={'lessons-in-assigned-unit-dropdown'}
-          size="s"
-        />
-        {loadedData?.unitNumber && (
-          <UnitResourcesDropdown
-            hasNumberedUnits={hasNumberedUnits}
-            unitNumber={loadedData.unitNumber}
-            scriptOverviewPdfUrl={loadedData.scriptOverviewPdfUrl}
-            scriptResourcesPdfUrl={loadedData.scriptResourcesPdfUrl}
-          />
-        )}
-      </div>
+      {renderHeader()}
       {renderTeacherResources()}
       {renderStudentResources()}
     </div>
