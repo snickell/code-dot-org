@@ -86,7 +86,7 @@ module Rack
       # @note Once the `response` instance is initialized, any changes to the `request` made afterward will not be applied.
       private def response
         @response ||= begin
-          RequestStore.store[Cdo::GlobalEdition::REGION_KEY] = request.cookies[REGION_KEY]
+          RequestStore.store[Cdo::GlobalEdition::REGION_KEY] = request.cookies[REGION_KEY].presence
           Rack::Response[*app.call(env)]
         end
       end

@@ -9,7 +9,7 @@
 
   if request.ge_region
     region_locales = Cdo::GlobalEdition.region_locales(request.ge_region)
-    options = options.select {|_name, value| region_locales.include?(value)}
+    options = options.select {|_name, value| region_locales.include?(value)} if region_locales
   end
 
 %form{method: :post, action: request.fullpath, 'accept-charset': 'UTF-8'}
