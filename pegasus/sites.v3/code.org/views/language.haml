@@ -1,7 +1,6 @@
 :ruby
   require 'cdo/global_edition'
   require 'cdo/i18n'
-  require 'cdo/rack/global_edition'
   require 'varnish_environment'
 
   selected = I18n.locale.to_s
@@ -13,8 +12,6 @@
   end
 
 %form{method: :post, action: request.fullpath, 'accept-charset': 'UTF-8'}
-  - if request.ge_region
-    %input{type: 'hidden', name: Rack::GlobalEdition::REGION_KEY, value: request.ge_region}
   %select.default{name: VarnishEnvironment::LOCALE_PARAM_KEY, onchange: 'this.form.submit();', style: 'color: black; width: 100%; max-width: 162.5px;'}
     - options.each do |name, value|
       %option{value: value, selected: value == selected}= name

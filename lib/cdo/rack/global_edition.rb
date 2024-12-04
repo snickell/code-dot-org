@@ -109,12 +109,8 @@ module Rack
         set_locale_cookie(request.cookies[LOCALE_KEY].presence)
       end
 
-      private def dashboard?
-        request.hostname == CDO.dashboard_hostname
-      end
-
       private def dashboard_route?(path = request.path)
-        return false unless dashboard?
+        return false unless request.hostname == CDO.dashboard_hostname
         Dashboard::Application.routes.recognize_path(path, method: request.request_method).present?
       rescue ActionController::RoutingError
         false
@@ -128,12 +124,8 @@ module Rack
         end
       end
 
-      private def pegasus?
-        request.hostname == CDO.pegasus_hostname
-      end
-
       private def pegasus_route?(path = request.path)
-        return false unless pegasus?
+        return false unless request.hostname == CDO.pegasus_hostname
         path = URI(path).path
         pegasus_helpers.resolve_document(path).present? || pegasus_helpers.resolve_view_template(path).present?
       rescue StandardError
@@ -144,11 +136,9 @@ module Rack
         site_locale = request.cookies[LOCALE_KEY]
 
         if Cdo::GlobalEdition.region_available?(region)
-          # Only Pegasus pages are available in all regional languages.
-          site_locale = Cdo::GlobalEdition.region_locked_locales.key(region) unless pegasus?
-
-          region_locales = Cdo::GlobalEdition.region_locales(region)
-          site_locale = Cdo::GlobalEdition.main_region_locale(region) unless region_locales.include?(site_locale)
+          unless Cdo::GlobalEdition.locale_available?(request.hostname, region, site_locale)
+            site_locale = Cdo::GlobalEdition.main_region_locale(region)
+          end
         else
           # Locales locked to a specific region should not be set during a region reset.
           site_locale = nil if Cdo::GlobalEdition.region_locked_locales[site_locale]

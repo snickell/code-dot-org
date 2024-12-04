@@ -15,7 +15,7 @@ Feature: Global Edition - Region Select
     Then I get redirected away from "http://code.org"
     And check that I am on "http://code.org/global/fa"
     And element ".language-dropdown:visible option:contains(فارسی)" is checked
-    And element ".language-dropdown:visible" has escaped text "\n\n\n\nEnglish\nفارسی\n\n\n\n"
+    And element ".language-dropdown:visible" has escaped text "\n\n\nEnglish\nفارسی\n\n\n\n"
     And element "#pagefooter #global-edition-region-reset" is visible
 
     When I am on "http://code.org"
@@ -26,7 +26,7 @@ Feature: Global Edition - Region Select
     Then I get redirected away from "http://code.org/global/fa"
     And check that I am on "http://code.org/global/fa"
     And element ".language-dropdown:visible option:contains(English)" is checked
-    And element ".language-dropdown:visible" has escaped text "\n\n\n\nEnglish\nفارسی\n\n\n\n"
+    And element ".language-dropdown:visible" has escaped text "\n\n\nEnglish\nفارسی\n\n\n\n"
     And element "#pagefooter #global-edition-region-reset" is visible
 
     When I select the "فارسی" option in dropdown with class "language-dropdown select" to load a new page
@@ -76,18 +76,18 @@ Feature: Global Edition - Region Select
     Given I am on "http://code.org/global/fa"
     And element ".language-dropdown:visible option:contains(فارسی)" is checked
     And element "#ge-region-languages" is visible
-    And element "#ge-region-languages" has escaped text "\n\n\n\n\nView in English\n\n\n\n"
+    And element "#ge-region-languages" has escaped text "\n\n\n\nView in English\n\n\n\n"
 
     When I click selector "#ge-region-languages a:contains(View in English)" to load a new page
     Then I get redirected away from "http://code.org/global/fa"
     And check that I am on "http://code.org/global/fa"
     And element ".language-dropdown:visible option:contains(English)" is checked
     And element "#ge-region-languages" is visible
-    And element "#ge-region-languages" has escaped text "\n\n\n\n\nView in فارسی\n\n\n\n"
+    And element "#ge-region-languages" has escaped text "\n\n\n\nView in فارسی\n\n\n\n"
 
     When I click selector "#ge-region-languages a:contains(View in فارسی)" to load a new page
     Then I get redirected away from "http://code.org/global/fa"
     And check that I am on "http://code.org/global/fa"
     And element ".language-dropdown:visible option:contains(فارسی)" is checked
     And element "#ge-region-languages" is visible
-    And element "#ge-region-languages" has escaped text "\n\n\n\n\nView in English\n\n\n\n"
+    And element "#ge-region-languages" has escaped text "\n\n\n\nView in English\n\n\n\n"
