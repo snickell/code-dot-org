@@ -103,8 +103,8 @@ jobs:
 
       - name: did we use skaffold cache?
         run: |
-          find ~/.skaffold/cache
-          du -h ~/.skaffold/cache
+          find ~/.skaffold/cache || true
+          du -h ~/.skaffold/cache || true
 
       # - name: Free disk space
       #   run: |
