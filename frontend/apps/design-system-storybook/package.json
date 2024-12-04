@@ -16,18 +16,18 @@
   },
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {
+    "build-storybook": "storybook build",
     "clean": "rimraf storybook-static",
     "dev": "yarn run storybook",
-    "storybook": "storybook dev -p 6006",
-    "test:ui:ci": "bash ./scripts/test-storybook.sh",
-    "test:ui:local": "test-storybook --url http://localhost:6006",
-    "build-storybook": "storybook build",
     "eyes-storybook": "dotenv-run -- eyes-storybook",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
+    "storybook": "storybook dev -p 6006",
     "test-storybook": "test-storybook",
+    "test:ui:ci": "bash ./scripts/test-storybook.sh",
+    "test:ui:local": "test-storybook --url http://localhost:6006",
     "typecheck": "tsc --noEmit"
   },
   "prettier": "@code-dot-org/lint-config/prettier/index.mjs",
@@ -50,15 +50,15 @@
     "@storybook/test-runner": "^0.19.1",
     "axe-playwright": "^2.0.3",
     "concurrently": "^9.1.0",
-    "http-server": "^14.1.1",
-    "wait-on": "^8.0.1",
     "eslint": "^9.16.0",
     "globals": "^15.13.0",
+    "http-server": "^14.1.1",
     "prettier": "3.3.3",
     "sass-loader": "^16.0.3",
     "storybook": "^8.4.4",
     "storybook-addon-rtl": "^1.0.1",
-    "typescript-eslint": "^8.17.0"
+    "typescript-eslint": "^8.17.0",
+    "wait-on": "^8.0.1"
   },
   "packageManager": "yarn@4.5.1"
 }
