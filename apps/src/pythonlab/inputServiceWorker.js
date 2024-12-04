@@ -1,3 +1,13 @@
+// import {
+//   AWAITING_INPUT,
+//   SENDING_INPUT,
+//   SERVICE_WORKER_PATH,
+// } from './pythonHelpers/constants';
+
+const AWAITING_INPUT = 'AWAITING_INPUT';
+const SENDING_INPUT = 'SENDING_INPUT';
+const SERVICE_WORKER_PATH = '/pythonlab-input-sw/';
+
 addEventListener('install', () => {
   self.skipWaiting();
 });
@@ -10,7 +20,7 @@ console.log('hi from inputServiceWorker.js');
 const resolvers = new Map();
 
 addEventListener('message', event => {
-  if (event.data.type === 'CDO_PY_INPUT') {
+  if (event.data.type === SENDING_INPUT) {
     console.log(`Received input: ${event.data.value} with id ${event.data.id}`);
     const resolverArray = resolvers.get(event.data.id);
     if (!resolverArray || resolverArray.length === 0) {
@@ -26,7 +36,7 @@ addEventListener('message', event => {
 addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  if (url.pathname === '/cdo-py-get-input/') {
+  if (url.pathname === SERVICE_WORKER_PATH) {
     console.log(`got fetch request for id ${url.searchParams.get('id')}`);
     const id = url.searchParams.get('id');
     const prompt = url.searchParams.get('prompt');
@@ -34,14 +44,14 @@ addEventListener('fetch', event => {
     event.waitUntil(
       (async () => {
         console.log('waiting for clients?');
-        // Send CDO_PY_AWAITING_INPUT message to all window clients
+        // Send AWAITING_INPUT message to all window clients
         self.clients.matchAll({includeUncontrolled: true}).then(clients => {
           console.log(`clients length: ${clients.length}`);
           clients.forEach(client => {
             if (client.type === 'window') {
               console.log('posting await message');
               client.postMessage({
-                type: 'CDO_PY_AWAITING_INPUT',
+                type: AWAITING_INPUT,
                 id,
                 prompt,
               });

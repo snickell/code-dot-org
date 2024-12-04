@@ -4,7 +4,11 @@ import {loadPyodide, PyodideInterface, version} from 'pyodide';
 import {MAIN_PYTHON_FILE} from '@cdo/apps/lab2/constants';
 
 import {HOME_FOLDER} from './pythonHelpers/constants';
-import {cdoPyModule, patchInputCode, SETUP_CODE} from './pythonHelpers/patches';
+import {
+  patchInputCode,
+  pythonlabInputModule,
+  SETUP_CODE,
+} from './pythonHelpers/patches';
 import {
   getCleanupCode,
   getUpdatedSourceAndDeleteFiles,
@@ -27,7 +31,7 @@ async function loadPyodideAndPackages() {
   });
   pyodide.setStdout(getStreamHandlerOptions('sysout'));
   pyodide.setStderr(getStreamHandlerOptions('syserr'));
-  pyodide.registerJsModule('cdo_py', cdoPyModule);
+  pyodide.registerJsModule('pythonlab_input', pythonlabInputModule);
 
   // Pre-load our custom packages (unittest_runner and pythonlab_setup), as well as
   // matplotlib, which pythonlab_setup depends on, and numpy,

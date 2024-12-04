@@ -12,6 +12,7 @@ import {setLoadedCodeEnvironment} from '@cdo/apps/lab2/redux/systemRedux';
 import {MultiFileSource, ProjectFile} from '@cdo/apps/lab2/types';
 import {getStore} from '@cdo/apps/redux';
 
+import {AWAITING_INPUT, SENDING_INPUT} from './pythonHelpers/constants';
 import {parseErrorMessage} from './pythonHelpers/messageHelpers';
 import {MATPLOTLIB_IMG_TAG} from './pythonHelpers/patches';
 import {PyodideMessage} from './types';
@@ -88,6 +89,7 @@ const setUpPyodideWorker = () => {
 };
 
 const registerServiceWorker = async () => {
+  // No-op if service workers are not supported.
   if ('serviceWorker' in navigator) {
     try {
       const url = new URL(
@@ -119,7 +121,7 @@ const registerServiceWorker = async () => {
 
     navigator.serviceWorker.onmessage = event => {
       console.log(`got message in main thread with type ${event.data.type}`);
-      if (event.data.type === 'CDO_PY_AWAITING_INPUT') {
+      if (event.data.type === AWAITING_INPUT) {
         console.log('got input request in main thread');
         if (event.source instanceof ServiceWorker) {
           // Update the service worker reference, in case the service worker is different to the one we registered
@@ -130,8 +132,6 @@ const registerServiceWorker = async () => {
         // about only accepting input when we are awaiting a response?
       }
     };
-  } else {
-    console.error('Service workers not supported');
   }
 };
 
@@ -196,7 +196,7 @@ const sendInput = (value: string): void => {
   }
 
   inputServiceWorker.postMessage({
-    type: 'CDO_PY_INPUT',
+    type: SENDING_INPUT,
     value,
     id: lastInputId,
   });

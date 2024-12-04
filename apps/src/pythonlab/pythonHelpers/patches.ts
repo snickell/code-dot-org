@@ -1,4 +1,4 @@
-import {HOME_FOLDER} from './constants';
+import {HOME_FOLDER, SERVICE_WORKER_PATH} from './constants';
 
 export const MATPLOTLIB_IMG_TAG = 'MATPLOTLIB_SHOW_IMG';
 
@@ -12,27 +12,27 @@ setup_pythonlab('${MATPLOTLIB_IMG_TAG}')
 
 export const patchInputCode = (id: string) => `
 import sys, builtins
-import cdo_py
+import pythonlab_input
 __prompt_str__ = ""
 def get_input(prompt=""):
     global __prompt_str__
     __prompt_str__ = prompt
     print(prompt)
-    s = cdo_py.getInput("${id}", prompt)
+    s = pythonlab_input.getInput("${id}", prompt)
     print()
     return s
 builtins.input = get_input
-sys.stdin.readline = lambda: cdo_py.getInput("${id}", __prompt_str__)
+sys.stdin.readline = lambda: pythonlab_input.getInput("${id}", __prompt_str__)
 `;
 
-export const cdoPyModule = {
+export const pythonlabInputModule = {
   getInput: (id: string, prompt: string) => {
     const request = new XMLHttpRequest();
     // Synchronous request to be intercepted by service worker
     console.log('opening request');
     request.open(
       'GET',
-      `/cdo-py-get-input/?id=${id}&prompt=${encodeURIComponent(prompt)}`,
+      `${SERVICE_WORKER_PATH}?id=${id}&prompt=${encodeURIComponent(prompt)}`,
       false
     );
     request.send(null);
