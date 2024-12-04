@@ -94,7 +94,7 @@ onmessage = async event => {
   try {
     writeSource(sourceToWrite, DEFAULT_FOLDER_ID, '', pyodide);
     await importPackagesFromFiles(sourceToWrite, pyodide);
-    await runInternalCode(patchInputCode(id), id);
+    await patchInputIfAvailable(id);
     results = await pyodide.runPythonAsync(python, {
       filename: `/${HOME_FOLDER}/${MAIN_PYTHON_FILE}`,
     });
@@ -140,6 +140,13 @@ async function runInternalCode(code: string, id: number) {
     await pyodide.runPythonAsync(code);
   } catch (error) {
     postMessage({type: 'system_error', message: (error as Error).message, id});
+  }
+}
+
+async function patchInputIfAvailable(id: number) {
+  // No-op if service workers are not supported.
+  if ('serviceWorker' in navigator) {
+    await runInternalCode(patchInputCode(id), id);
   }
 }
 

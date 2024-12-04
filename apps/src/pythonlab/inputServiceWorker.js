@@ -1,9 +1,3 @@
-// import {
-//   AWAITING_INPUT,
-//   SENDING_INPUT,
-//   SERVICE_WORKER_PATH,
-// } from './pythonHelpers/constants';
-
 const AWAITING_INPUT = 'AWAITING_INPUT';
 const SENDING_INPUT = 'SENDING_INPUT';
 const SERVICE_WORKER_PATH = '/pythonlab-input-sw/';

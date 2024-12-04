@@ -10,7 +10,7 @@ export const SETUP_CODE = `from pythonlab_setup import setup_pythonlab
 setup_pythonlab('${MATPLOTLIB_IMG_TAG}')
 `;
 
-export const patchInputCode = (id: string) => `
+export const patchInputCode = (id: number) => `
 import sys, builtins
 import pythonlab_input
 __prompt_str__ = ""
