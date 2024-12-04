@@ -20806,7 +20806,7 @@ es6-shim@latest:
   languageName: node
   linkType: hard
 
-"nan@npm:^2.19.0":
+"nan@npm:^2.14.0":
   version: 2.22.0
   resolution: "nan@npm:2.22.0"
   dependencies:
