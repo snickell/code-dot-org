@@ -20806,12 +20806,12 @@ es6-shim@latest:
   languageName: node
   linkType: hard
 
-"nan@npm:^2.14.0":
-  version: 2.17.0
-  resolution: "nan@npm:2.17.0"
+"nan@npm:^2.19.0":
+  version: 2.22.0
+  resolution: "nan@npm:2.22.0"
   dependencies:
     node-gyp: latest
-  checksum: ec609aeaf7e68b76592a3ba96b372aa7f5df5b056c1e37410b0f1deefbab5a57a922061e2c5b369bae9c7c6b5e6eecf4ad2dac8833a1a7d3a751e0a7c7f849ed
+  checksum: 222e3a090e326c72f6782d948f44ee9b81cfb2161d5fe53216f04426a273fd094deee9dcc6813096dd2397689a2b10c1a92d3885d2e73fd2488a51547beb2929
   languageName: node
   linkType: hard
 
