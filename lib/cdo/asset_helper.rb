@@ -38,7 +38,7 @@ class AssetHelper
     return "/assets/#{asset}" unless use_manifest
     path = webpack_manifest[asset]
     raise "Invalid webpack asset name: '#{asset}'" unless path
-    path
+    CDO.studio_url(path)
   end
 end
 
