@@ -19215,6 +19215,8 @@ en:
               name: 'Example Project 1: Classroom Light Levels'
             lesson-11:
               name: Templates
+            lesson-12:
+              name: AI Chat Examples
           lesson_groups: {}
           name: computer-systems-playground
           title: "[PLAYGROUND] Computer Systems and Devices (with micro:bit)"

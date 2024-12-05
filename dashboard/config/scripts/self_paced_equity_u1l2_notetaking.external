@@ -3,11 +3,23 @@ title 'title'
 description 'description here'
 
 markdown <<MARKDOWN
-📝 Activity Guide: Participants will be reading over a lot of data in the next two sections. Introduce the note-taking section of the Activity Guide where they can take note of interesting statistics and data points.
+# Preparing to Look at Data
 
-Guiding questions for data review:
+<div style="display: flex; align-items: center; border: solid .1px; border-radius: 20px 20px 20px 20px; padding: 15px 5px 10px 5px;">
+	<a href="code.org" target="blank" rel="noopener noreferrer"><img src="https://images.code.org/b3228ff3b84aeb85ec00b47136800a8f-image-1731959884476.png" style="width: auto; height: 50px;" alt="A piece of paper with lines and a pencil."></a>
+	<div style="background-color: #FFFFFF; border-radius: 20px 20px 20px 20px; color: #000000; margin-left: 0%; margin-right: 0%; padding: 0px 10px 5px 10px;">
+		<p style="color: black; line-height: 1.5; margin-left: 10px; margin-right: 10px; font-size: 18px"><b>Activity Guide <mark>(update icon link)</mark></b></p>
+	<p style="color: black; line-height: 1; margin-left: 10px; margin-right: 0px; font-size: 16px">These activity is also in your Activity Guide on page <mark>7.</mark></p>
+	</div>
+</div>
+<br>
 
-What surprises you about the data?
-What might the data reveal about your students’ needs?
+<img src="https://images.code.org/c837765ef5551be31c7083d46f8ca29b-image-1733351172628.22.46 PM.png" alt="The note-taking space in the Activity Guide." style="border:1px solid #000000; float: right; height: 300px; clear: both; margin: 0px 10px 10px 10px;">
 
+#### In the next level, you'll be taking a look at a lot of data. To help you organize your thoughts, we've included a note-taking section of the Activity Guide on <mark>page 7</mark>. You are welcome to take notes on whatever interests you, but here's a few questions to get you started:
+
+* #### What surprises you about the data?
+* #### What might the data reveal about your students’ needs?
+* #### How does the data compare to what you've noticed about CS access in your school/district?
+<br><br><br><br><br><br>
 MARKDOWN

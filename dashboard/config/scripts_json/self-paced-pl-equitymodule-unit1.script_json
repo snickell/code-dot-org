@@ -11,7 +11,7 @@
     },
     "new_name": null,
     "family_name": null,
-    "serialized_at": "2024-12-02 21:44:49 UTC",
+    "serialized_at": "2024-12-04 21:27:57 UTC",
     "published_state": null,
     "instruction_type": null,
     "instructor_audience": null,
@@ -42,8 +42,8 @@
       "has_lesson_plan": true,
       "relative_position": 1,
       "properties": {
-        "overview": "##### **Learning Outcomes:**\n\n* ##### I know what content is included in this professional learning experience and I can direct my learning.\n* ##### I understand key terms and concepts related to equity in computer science.\n* ##### I’ve reflected on what equity means in a computer science classroom.\n\n___\n\n##### ⏰ **Suggested time:** <mark>UPDATE</mark>\n",
-        "student_overview": "##### **Learning Outcomes:**\n\n* ##### I know what content is included in this professional learning experience and I can direct my learning.\n* ##### I understand key terms and concepts related to equity in computer science.\n* ##### I’ve reflected on what equity means in a computer science classroom.\n\n___\n\n##### ⏰ **Suggested time:** <mark>UPDATE</mark>\n"
+        "overview": "##### **Learning Outcomes:**\n\n* ##### I know what content is included in this professional learning experience and I can direct my learning.\n* ##### I understand key terms and concepts related to equity in computer science.\n* ##### I’ve reflected on what equity means in a computer science classroom.\n\n___\n\n##### ⏰ **Suggested time:** 25 minutes\n",
+        "student_overview": "##### **Learning Outcomes:**\n\n* ##### I know what content is included in this professional learning experience and I can direct my learning.\n* ##### I understand key terms and concepts related to equity in computer science.\n* ##### I’ve reflected on what equity means in a computer science classroom.\n\n___\n\n##### ⏰ **Suggested time:** 25 minutes\n"
       },
       "seeding_key": {
         "lesson.key": "lesson-1",
@@ -436,6 +436,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "self-paced-equity-U1L1-teachertestimonials"
+        ],
         "progression": "Preparing to Engage"
       },
       "bonus": false,
@@ -458,6 +461,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "self-paced-equity-U1L1-intention"
+        ],
         "progression": "Preparing to Engage"
       },
       "bonus": false,
@@ -480,6 +486,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "self-paced-equity-U1L1-forum"
+        ],
         "progression": "Preparing to Engage"
       },
       "bonus": false,
@@ -502,6 +511,9 @@
       "activity_section_position": 4,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "self-paced-equity-U1L1-lessonclose"
+        ],
         "progression": "Preparing to Engage"
       },
       "bonus": false,
@@ -524,6 +536,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "self-paced-equity-U1L2-introduction"
+        ],
         "progression": "Looking at Data"
       },
       "bonus": false,
@@ -546,6 +561,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "self-paced-equity-U1L2-cic_reflection"
+        ],
         "progression": "Looking at Data"
       },
       "bonus": false,
@@ -568,6 +586,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "self-paced-equity-U1L2-datareflection"
+        ],
         "progression": "Looking at Data"
       },
       "bonus": false,
@@ -590,6 +611,9 @@
       "activity_section_position": 4,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "self-paced-equity-U1L2-notetaking"
+        ],
         "progression": "Looking at Data"
       },
       "bonus": false,
@@ -612,6 +636,9 @@
       "activity_section_position": 5,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "self-paced-equity-U1L2-dataexploration"
+        ],
         "progression": "Looking at Data"
       },
       "bonus": false,
@@ -634,6 +661,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "self-paced-equity-U1L2-dataexplorationreflection"
+        ],
         "progression": "Reflecting on Data"
       },
       "bonus": false,
@@ -656,6 +686,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "self-paced-equity-U1L2-telladatastory"
+        ],
         "progression": "Reflecting on Data"
       },
       "bonus": false,
@@ -678,6 +711,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "self-paced-equity-U1L2-closing"
+        ],
         "progression": "Reflecting on Data"
       },
       "bonus": false,

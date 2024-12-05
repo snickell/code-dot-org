@@ -1,21 +1,23 @@
 name 'self-paced-equity-U1L2-datareflection'
 
 markdown <<MARKDOWN
-# Sources of Data
-
 <div style="width:60%;">
 
+# Sources of Data
+
+<img src="https://images.code.org/6a645816031489407ee443e9bc0ba57c-image-1733348852744.47.28 PM.png" alt="Three students sitting on the ground with their laptops." style="border-radius:40px; float: right; height: 200px; clear: both; margin: 0px 10px 10px 10px;">
+
 #### When considering the sources of data available to you to inform your understanding of access, inclusion and diversity of CS at your school, it’s useful think about the following key questions:
+
 * #### Who has access to CS at my school?
 * #### Who is in my CS class?
 * #### How can students feel they belong in my CS classroom?
-
-#### Consider also:
 * #### What from this is in your locus of control? 
-
-#### Using data at your school level can be powerful for investigating equity in computer science. Data might be quantitative or qualitative in nature, and can include:
+<br>
 
 ## Quantitive vs Qualitative Data
+
+#### Using data at your school level can be powerful for investigating equity in computer science. Data might be quantitative or qualitative in nature, and can include:
 
 </div>
 
@@ -37,27 +39,49 @@ markdown <<MARKDOWN
         </ul>
     </div>
 </div>
-
-### Consider the following examples:
-
-<div style="background-color: #F7F8FA; border-radius: 40px; color: #000000; padding: 10px; margin-bottom: 20px; text-align: left; width: 60%">
-	<p style="line-height: 1.5; margin: 10px; font-size: 18px;">
-		A <b>3rd grade teacher</b> notices that students approach coding challenges in CS class differently. During her last lesson, 5 students did not complete any coding challenges, and 3 students stayed during recess to finish them all. She uses this information as data.
-	</p>
-</div>
-    
-<div style="background-color: #F7F8FA; border-radius: 40px; color: #000000; padding: 10px; margin-bottom: 20px; text-align: left; width: 60%">
-	<p style="line-height: 1.5; margin: 10px; font-size: 18px;">
-		A <b>9th and 10th grade teacher</b> just got their roster for their CS class. The roster is a data set for them as it tells them some basic data about who is in their class - how many students enrolled, what gender they are, what grade, or what race or ethnicity the students are. Teacher X also has access to school wide data about grade, gender, and race or ethnicity that they can evaluate as well.
-	</p>
-</div>
+<br>
 
 <div style="width:60%;">
 
+### Consider the following examples about teachers using data:
+
+##### Click on the arrows below to expand each section.
+
+<details style="background-color: #ececec; padding: 10px; margin-bottom: 10px; border: 1px solid transparent; border-radius: 5px;">
+
+<summary style="font-size: 18px; font-weight: bold;">Elementary Example</summary>
+<div style="margin-top: 20px; margin-left: 20px; margin-right: 20px;">
+<p style="font-size: 18px;">A <b>3rd grade teacher</b> notices that students approach coding challenges in CS class differently. During his last lesson, 5 students did not complete any coding challenges, and 3 students stayed during recess to finish them all. He uses this information as data.
+</p></div>
+</details>
+
+<details style="background-color: #ececec; padding: 10px; margin-bottom: 10px; border: 1px solid transparent; border-radius: 5px;">
+
+<summary style="font-size: 18px; font-weight: bold;">Secondary Example</summary>
+<div style="margin-top: 20px; margin-left: 20px; margin-right: 20px;">
+<p style="font-size: 18px;">A <b>multi-grade math teacher</b> just got the roster for her CS class. The roster is a dataset as it tells basic data about who is in the class - how many students enrolled, their gender, and their grade level. This teacher also has access to school wide data about grade, gender, and race or ethnicity that they can evaluate as well. This helps her see if the class is representative of the school population as a whole. For example, are there disproportionally low rates of female students in the class?
+</p></div>
+</details>
+<br>
+
+___
+
 ## Reflection
 
-#### What data do you have access to in your school or district?
-#### What steps can you take to access additional data about your students?
+<div style="display: flex; align-items: center; border: solid .1px; border-radius: 20px 20px 20px 20px; padding: 15px 5px 10px 5px;">
+	<a href="code.org" target="blank" rel="noopener noreferrer"><img src="https://images.code.org/b3228ff3b84aeb85ec00b47136800a8f-image-1731959884476.png" style="width: auto; height: 50px;" alt="A piece of paper with lines and a pencil."></a>
+	<div style="background-color: #FFFFFF; border-radius: 20px 20px 20px 20px; color: #000000; width: 60%; margin-left: 0%; margin-right: 0%; padding: 0px 10px 5px 10px;">
+		<p style="color: black; line-height: 1.5; margin-left: 10px; margin-right: 10px; font-size: 18px"><b>Activity Guide <mark>(update icon link)</mark></b></p>
+	<p style="color: black; line-height: 1; margin-left: 10px; margin-right: 0px; font-size: 16px">These reflection is also in your Activity Guide on page <mark>6.</mark></p>
+	</div>
+</div>
+<br>
+
+#### Think about the types of data that are available to you about access and engagement in computer science in your school or district.
+
+* #### What data do you have access to in your school or district?
+* #### What steps can you take to access additional data about your students?
 
 </div>
+<br>
 MARKDOWN

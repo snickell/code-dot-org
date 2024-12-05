@@ -11,7 +11,7 @@
     },
     "new_name": null,
     "family_name": null,
-    "serialized_at": "2024-11-21 20:58:26 UTC",
+    "serialized_at": "2024-12-04 23:08:31 UTC",
     "published_state": null,
     "instruction_type": null,
     "instructor_audience": null,
@@ -478,6 +478,28 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "progression": "Overview"
+      },
+      "bonus": false,
+      "seeding_key": {
+        "script_level.level_keys": [
+          "SP-VPL-21-mod2-Task-VerifiedTeacher_physical-computing_1"
+        ],
+        "lesson.key": "Welcome to Codeorg",
+        "lesson_group.key": "",
+        "script.name": "sandbox-teaching-getting-started",
+        "activity_section.key": "3f11e31c-49a5-43f4-b97c-e2f2e0ac4ec2"
+      },
+      "level_keys": [
+        "SP-VPL-21-mod2-Task-VerifiedTeacher_physical-computing_1"
+      ]
+    },
+    {
+      "chapter": 4,
+      "position": 4,
+      "activity_section_position": 4,
+      "assessment": false,
+      "properties": {
         "level_keys": [
           "SP-VPL-24-mod1-Certificate_1"
         ],
@@ -498,8 +520,8 @@
       ]
     },
     {
-      "chapter": 4,
-      "position": 4,
+      "chapter": 5,
+      "position": 5,
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
@@ -523,8 +545,8 @@
       ]
     },
     {
-      "chapter": 5,
-      "position": 5,
+      "chapter": 6,
+      "position": 6,
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
@@ -548,8 +570,8 @@
       ]
     },
     {
-      "chapter": 6,
-      "position": 6,
+      "chapter": 7,
+      "position": 7,
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
@@ -573,7 +595,7 @@
       ]
     },
     {
-      "chapter": 7,
+      "chapter": 8,
       "position": 1,
       "activity_section_position": 1,
       "assessment": false,
@@ -598,7 +620,7 @@
       ]
     },
     {
-      "chapter": 8,
+      "chapter": 9,
       "position": 2,
       "activity_section_position": 1,
       "assessment": false,
@@ -623,33 +645,8 @@
       ]
     },
     {
-      "chapter": 9,
-      "position": 3,
-      "activity_section_position": 2,
-      "assessment": false,
-      "properties": {
-        "level_keys": [
-          "SP-VPL-21-mod2-Task-VerifiedTeacher_physical-computing_1"
-        ],
-        "progression": "Tour the Code.org Learning Platform"
-      },
-      "bonus": false,
-      "seeding_key": {
-        "script_level.level_keys": [
-          "SP-VPL-21-mod2-Task-VerifiedTeacher_physical-computing_1"
-        ],
-        "lesson.key": "Navigating the Codeorg Learning Platform",
-        "lesson_group.key": "",
-        "script.name": "sandbox-teaching-getting-started",
-        "activity_section.key": "5a4cd3f0-7c66-451e-add7-8bb1fc66ee28"
-      },
-      "level_keys": [
-        "SP-VPL-21-mod2-Task-VerifiedTeacher_physical-computing_1"
-      ]
-    },
-    {
       "chapter": 10,
-      "position": 4,
+      "position": 3,
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
@@ -674,7 +671,7 @@
     },
     {
       "chapter": 11,
-      "position": 5,
+      "position": 4,
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
@@ -699,7 +696,7 @@
     },
     {
       "chapter": 12,
-      "position": 6,
+      "position": 5,
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
@@ -724,7 +721,7 @@
     },
     {
       "chapter": 13,
-      "position": 7,
+      "position": 6,
       "activity_section_position": 4,
       "assessment": false,
       "properties": {
@@ -978,6 +975,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "PL_getting_started_assessmentsandgrading"
+        ],
         "progression": "Assessments and Grading"
       },
       "bonus": false,
@@ -1075,6 +1075,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "PRIMM_Overview"
+        ],
         "progression": "Teaching Pedagogy and Best Practices"
       },
       "bonus": false,
@@ -1318,6 +1321,18 @@
     },
     {
       "seeding_key": {
+        "level.key": "SP-VPL-21-mod2-Task-VerifiedTeacher_physical-computing_1",
+        "script_level.level_keys": [
+          "SP-VPL-21-mod2-Task-VerifiedTeacher_physical-computing_1"
+        ],
+        "lesson.key": "Welcome to Codeorg",
+        "lesson_group.key": "",
+        "script.name": "sandbox-teaching-getting-started",
+        "activity_section.key": "3f11e31c-49a5-43f4-b97c-e2f2e0ac4ec2"
+      }
+    },
+    {
+      "seeding_key": {
         "level.key": "SP-VPL-24-mod1-Certificate_1",
         "script_level.level_keys": [
           "SP-VPL-24-mod1-Certificate_1"
@@ -1381,18 +1396,6 @@
         "level.key": "SP-VPL-21-mod2-tour-vid_1",
         "script_level.level_keys": [
           "SP-VPL-21-mod2-tour-vid_1"
-        ],
-        "lesson.key": "Navigating the Codeorg Learning Platform",
-        "lesson_group.key": "",
-        "script.name": "sandbox-teaching-getting-started",
-        "activity_section.key": "5a4cd3f0-7c66-451e-add7-8bb1fc66ee28"
-      }
-    },
-    {
-      "seeding_key": {
-        "level.key": "SP-VPL-21-mod2-Task-VerifiedTeacher_physical-computing_1",
-        "script_level.level_keys": [
-          "SP-VPL-21-mod2-Task-VerifiedTeacher_physical-computing_1"
         ],
         "lesson.key": "Navigating the Codeorg Learning Platform",
         "lesson_group.key": "",
