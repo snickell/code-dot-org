@@ -1,5 +1,5 @@
 /**
- * This file is used to register custom react components with the Contentful SDK.
+ * This file is used to register custom react components for usage in Contentful Studio Experiences.
  *
  * Note: This file must be imported both server-side and client-side to ensure Contentful is able to map on both rendering modes.
  */
