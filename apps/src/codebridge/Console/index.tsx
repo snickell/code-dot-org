@@ -63,6 +63,8 @@ const Console: React.FunctionComponent = () => {
     setGraphModalOpen(true);
   };
 
+  // todo: input lines should be on the same line as the previous
+  // output line (always??)
   const getConsoleLines = () => {
     return codeOutput.map((outputLine, index) => {
       if (outputLine.type === 'img') {
@@ -147,6 +149,7 @@ const Console: React.FunctionComponent = () => {
             return (
               <div key={index}>
                 {output}
+                {/** todo: this is ugly */}
                 <input
                   id="console-input"
                   type="text"
@@ -154,6 +157,7 @@ const Console: React.FunctionComponent = () => {
                   onKeyDown={onInputKeyDown}
                   aria-label="console input"
                   ref={inputRef}
+                  className={moduleStyles.consoleInput}
                 />
               </div>
             );

@@ -144,10 +144,10 @@ async function runInternalCode(code: string, id: number) {
 }
 
 async function patchInputIfAvailable(id: number) {
-  // No-op if service workers are not supported.
-  if ('serviceWorker' in navigator) {
-    await runInternalCode(patchInputCode(id), id);
-  }
+  // TODO: pass a flag to the worker to determine if we should patch input.
+  // The check on service worker in navigator doesn't work in a web worker.
+  console.log('patching input');
+  await runInternalCode(patchInputCode(id), id);
 }
 
 // Return the options for sysout or syserr stream handler.
