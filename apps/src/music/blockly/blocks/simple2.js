@@ -117,6 +117,15 @@ export const playSoundAtCurrentLocationSimple2 = {
     }");\n`,
 };
 
+export const playSoundAtCurrentLocationSimple2NoNext = {
+  ...playSoundAtCurrentLocationSimple2,
+  definition: {
+    ...playSoundAtCurrentLocationSimple2.definition,
+    type: BlockTypes.PLAY_SOUND_AT_CURRENT_LOCATION_SIMPLE2_NO_NEXT,
+    nextStatement: undefined,
+  },
+};
+
 export const playPatternAtCurrentLocationSimple2 = {
   definition: {
     type: BlockTypes.PLAY_PATTERN_AT_CURRENT_LOCATION_SIMPLE2,

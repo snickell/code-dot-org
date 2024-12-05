@@ -45,7 +45,7 @@
               "inputs": {
                 "STACK": {
                   "block": {
-                    "type": "play_sounds_together",
+                    "type": "play_sounds_together_no_next",
                     "id": "play_sounds_together",
                     "deletable": false,
                     "movable": false,
@@ -88,7 +88,7 @@
                                       },
                                       "next": {
                                         "block": {
-                                          "type": "play_sound_at_current_location_simple2",
+                                          "type": "play_sound_at_current_location_simple2_no_next",
                                           "id": "qNQ1k.0XN15y#o]cKd%G",
                                           "deletable": false,
                                           "movable": false,
@@ -129,7 +129,7 @@
               "inputs": {
                 "STACK": {
                   "block": {
-                    "type": "play_sounds_together",
+                    "type": "play_sounds_together_no_next",
                     "id": "^fbpb)DaPk:Udqo(~A!.",
                     "deletable": false,
                     "movable": false,
@@ -163,7 +163,7 @@
                                   },
                                   "next": {
                                     "block": {
-                                      "type": "play_sound_at_current_location_simple2",
+                                      "type": "play_sound_at_current_location_simple2_no_next",
                                       "id": "~4#B+CLI?7q0bFzd|Z8[",
                                       "deletable": false,
                                       "movable": false,

@@ -15,6 +15,7 @@ export enum BlockTypes {
   PLAY_SOUND_AT_CURRENT_LOCATION = 'play_sound_at_current_location',
   SET_CURRENT_LOCATION_NEXT_MEASURE = 'set_current_location_next_measure',
   PLAY_SOUND_AT_CURRENT_LOCATION_SIMPLE2 = 'play_sound_at_current_location_simple2',
+  PLAY_SOUND_AT_CURRENT_LOCATION_SIMPLE2_NO_NEXT = 'play_sound_at_current_location_simple2_no_next',
   PLAY_PATTERN_AT_CURRENT_LOCATION_SIMPLE2 = 'play_pattern_at_current_location_simple2',
   PLAY_PATTERN_AI_AT_CURRENT_LOCATION_SIMPLE2 = 'play_pattern_ai_at_current_location_simple2',
   PLAY_CHORD_AT_CURRENT_LOCATION_SIMPLE2 = 'play_chord_at_current_location_simple2',
