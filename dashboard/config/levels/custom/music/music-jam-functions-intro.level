@@ -79,7 +79,7 @@
                                   },
                                   "next": {
                                     "block": {
-                                      "type": "play_sound_at_current_location_simple2",
+                                      "type": "play_sound_at_current_location_simple2_no_next",
                                       "id": "~4#B+CLI?7q0bFzd|Z8[",
                                       "deletable": false,
                                       "movable": false,
