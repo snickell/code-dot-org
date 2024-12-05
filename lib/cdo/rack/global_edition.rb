@@ -40,18 +40,15 @@ module Rack
         if request.params.key?(REGION_KEY)
           new_region = request.params[REGION_KEY].presence
 
-          unless new_region == request.cookies[REGION_KEY]
-            redirect_path = ::File.join('/', request_path_vars(:main_path).first || request.path)
-            redirect_path = regional_path_for(new_region, redirect_path) if Cdo::GlobalEdition.region_available?(new_region)
+          redirect_path = ::File.join('/', request_path_vars(:main_path).first || request.path)
+          redirect_path = regional_path_for(new_region, redirect_path) if Cdo::GlobalEdition.region_available?(new_region)
 
-            redirect_uri = URI(redirect_path)
-            redirect_uri.query = URI.encode_www_form(request.params.except(REGION_KEY)).presence
-            redirect_path = redirect_uri.to_s
-
-            setup_redirect_to(redirect_path)
-          end
+          redirect_uri = URI(redirect_path)
+          redirect_uri.query = URI.encode_www_form(request.params.except(REGION_KEY)).presence
+          redirect_path = redirect_uri.to_s
 
           setup_region(new_region)
+          setup_redirect_to(redirect_path)
         elsif PATH_PATTERN.match?(request.path_info)
           ge_prefix, ge_region, main_path = request_path_vars(:ge_prefix, :ge_region, :main_path)
 
