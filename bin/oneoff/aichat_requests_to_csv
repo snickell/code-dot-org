@@ -39,12 +39,12 @@ def get_blocked_by_details(blocked_by, details)
 end
 
 def main
-  options = {}
-  OptionParser.new do |opts|
-    opts.on('--section_id SECTION_ID') do |section_id|
-      options[:section_id] = Integer(section_id)
-    end
-  end.parse!
+  # options = {}
+  # OptionParser.new do |opts|
+  #   opts.on('--section_id SECTION_ID') do |section_id|
+  #     options[:section_id] = Integer(section_id)
+  #   end
+  # end.parse!
 
   CSV.open("aichat_requests.csv", "w") do |csv|
     headers = %w[
@@ -52,15 +52,15 @@ def main
     ]
     csv << headers
 
-    student_users_in_section = Section.find(options[:section_id]).followers.map(&:student_user)
-    teacher_users_in_section = Section.find(options[:section_id]).active_section_instructors.map(&:instructor)
-    all_users_in_section = student_users_in_section + teacher_users_in_section
+    # student_users_in_section = Section.find(options[:section_id]).followers.map(&:student_user)
+    # teacher_users_in_section = Section.find(options[:section_id]).active_section_instructors.map(&:instructor)
+    # all_users_in_section = student_users_in_section + teacher_users_in_section
     # start_date is when we began using OpenAI for safety layer.
-    start_date = DateTime.new(2024, 9, 26, 0, 0, 0)
-    end_date = DateTime.now
+    start_date = DateTime.new(2024, 11, 15, 0, 0, 0)
+    end_date = DateTime.new(2024, 11, 16, 0, 0, 0)
     time_range = start_date..end_date
     rows = AichatRequest.where(
-      user: all_users_in_section,
+      # user: all_users_in_section,
       created_at: time_range,
     )
 
