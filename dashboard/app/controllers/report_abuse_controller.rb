@@ -85,8 +85,7 @@ class ReportAbuseController < ApplicationController
   # POST /v3/channels/:channel_id/abuse/delete
   # Clear an abuse score. Requires project_validator permission
   def reset_abuse
-    puts "reset_abuse"
-    reset_abuse_score(params[:channel_id], -50)
+    reset_abuse_score(params[:channel_id], 0)
   end
 
   # PATCH /v3/(animations|assets|sources|files|libraries)/:channel_id?abuse_score=:abuse_score
