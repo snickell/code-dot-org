@@ -1,4 +1,4 @@
-# syntax=docker.io/docker/dockerfile:1
+# syntax=docker.io/docker/dockerfile:1.4
 # This file was built based off the Next.js recommended Dockerfile
 # See: https://github.com/vercel/next.js/tree/canary/examples/with-docker
 
@@ -49,11 +49,11 @@ RUN corepack enable
 WORKDIR /app
 
 # First install the dependencies (as they change less often)
-COPY --from=source-code /app/out/json/ .
+COPY --link --from=source-code /app/out/json/ .
 RUN yarn install
  
 # Build the project
-COPY --from=source-code /app/out/full/ .
+COPY --link --from=source-code /app/out/full/ .
 RUN yarn turbo run build
 
 ##############################################################################
@@ -76,7 +76,7 @@ USER nextjs
  
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/static ./apps/marketing/.next/static
+COPY --link --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/standalone ./
+COPY --link --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/static ./apps/marketing/.next/static
  
 CMD ["node", "apps/marketing/server.js"]
