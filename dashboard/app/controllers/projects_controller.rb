@@ -661,10 +661,8 @@ class ProjectsController < ApplicationController
       project_info['featured_status'] = 'n/a'
     end
     project_info['abuse_score'] = project['abuse_score']
-    project_info['published'] = project['published_at'] ? 'yes' : 'no'
+    project_info['is_published_project'] = project['published_at'] ? 'yes' : 'no'
 
-    puts "project['abuse_score'] #{project['abuse_score']}"
-    puts "project['published_at'] project_info['published'] #{project['published_at']} #{project_info['published']}"
     return render json: {owner_info: owner_info, project_info: project_info}
   end
 

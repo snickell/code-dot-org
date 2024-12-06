@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
+import Button, {buttonColors} from '@cdo/apps/componentLibrary/button';
 import {Heading3, StrongText} from '@cdo/apps/componentLibrary/typography';
-import Button from '@cdo/apps/legacySharedComponents/Button';
 import AccessibleDialog from '@cdo/apps/sharedComponents/AccessibleDialog';
 import HttpClient, {NetworkError} from '@cdo/apps/util/HttpClient';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
@@ -204,8 +204,9 @@ const CloneLevelButton: React.FunctionComponent<CloneLevelButtonProps> = ({
   return (
     <div>
       <Button
-        size={Button.ButtonSize.small}
-        color={Button.ButtonColor.purple}
+        size="xs"
+        color={buttonColors.purple}
+        type="secondary"
         onClick={() => setShowCloneField(!showCloneField)}
         text={showCloneField ? 'Cancel Clone' : 'Clone'}
       />
@@ -217,11 +218,7 @@ const CloneLevelButton: React.FunctionComponent<CloneLevelButtonProps> = ({
             value={clonedLevelName}
             onChange={event => setClonedLevelName(event.target.value)}
           />
-          <Button
-            onClick={handleClone}
-            text={'Clone'}
-            size={Button.ButtonSize.small}
-          />
+          <Button onClick={handleClone} text={'Clone'} size="xs" />
           {cloneError && (
             <p className={moduleStyles.errorMessage}>{cloneError}</p>
           )}
@@ -253,19 +250,17 @@ const DeleteLevelButton: React.FunctionComponent<DeleteLevelButtonProps> = ({
   return (
     <div>
       <Button
-        size={Button.ButtonSize.small}
+        size="xs"
+        type="secondary"
         text={showDeleteConfirm ? 'Cancel Delete' : 'Delete'}
-        color={Button.ButtonColor.red}
+        color={buttonColors.destructive}
         onClick={() => setShowDeleteConfirm(!showDeleteConfirm)}
+        className={moduleStyles.deleteButton}
       />
       {showDeleteConfirm && (
         <div>
           {'Are you sure you want to delete this level? '}
-          <Button
-            onClick={handleDelete}
-            text={'Confirm Delete'}
-            size={Button.ButtonSize.small}
-          />
+          <Button onClick={handleDelete} text={'Confirm Delete'} size="xs" />
           {deleteError && (
             <p className={moduleStyles.errorMessage}>{deleteError}</p>
           )}
@@ -287,8 +282,8 @@ const FeaturedProjectInfo: React.FunctionComponent<
       <>
         <div>Not a featured project</div>
         <Button
-          size={Button.ButtonSize.small}
-          color={Button.ButtonColor.purple}
+          size="xs"
+          color={buttonColors.purple}
           onClick={onBookmark}
           text={'Bookmark as featured'}
         />
@@ -356,6 +351,7 @@ const ProjectLinkData: React.FunctionComponent<ProjectLinkDataProps> = ({
                 <RemixAncestry remixList={remixList} />
               </ul>
             </li>
+            <li>Project published: {projectInfo.is_published_project}</li>
             <li>
               <FeaturedProjectInfo
                 featuredProjectStatus={featuredProjectStatus}
