@@ -149,7 +149,7 @@ module Rack
       private def redirectable?(redirect_path)
         return false unless request.get? # only GET request can be redirected
         return false if request.xhr? # only non-AJAX requests should be redirected
-        return false if request.path.start_with?('/users/auth/')
+        return false if request.path.include?('/users/auth/')
 
         # Unlike in Dashboard, where any route can be dynamically changed to a regional version,
         # Pegasus requires an existing regional template.
