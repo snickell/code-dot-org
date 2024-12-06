@@ -310,6 +310,23 @@ const RemixAncestry: React.FunctionComponent<{
   );
 };
 
+const AbuseScoreInfo: React.FunctionComponent<{
+  abuseScore: number;
+}> = ({abuseScore}) => {
+  const msg =
+    abuseScore <= 15
+      ? 'Safe to share project.'
+      : 'This project is blocked from sharing';
+
+  return (
+    <li>
+      Abuse score: {abuseScore}
+      <ul>
+        <li>{msg}</li>
+      </ul>
+    </li>
+  );
+};
 interface ProjectLinkDataProps {
   projectLinkData?: ExtraLinksProjectData;
   isStandaloneProject: boolean;
@@ -331,7 +348,6 @@ const ProjectLinkData: React.FunctionComponent<ProjectLinkDataProps> = ({
   if (!ownerInfo || !projectInfo) {
     return null;
   }
-  const remixList = projectInfo.remix_ancestry;
 
   return (
     <>
@@ -348,15 +364,18 @@ const ProjectLinkData: React.FunctionComponent<ProjectLinkDataProps> = ({
             <li>
               Remix ancestry:
               <ul>
-                <RemixAncestry remixList={remixList} />
+                <RemixAncestry remixList={projectInfo.remix_ancestry} />
               </ul>
             </li>
-            <li>Project published: {projectInfo.is_published_project}</li>
+            <li>Project submitted: {projectInfo.is_published_project}</li>
             <li>
               <FeaturedProjectInfo
                 featuredProjectStatus={featuredProjectStatus}
                 onBookmark={onBookmark}
               />
+            </li>
+            <li>
+              <AbuseScoreInfo abuseScore={projectInfo.abuse_score} />
             </li>
           </>
         )}
