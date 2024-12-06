@@ -1,6 +1,7 @@
 import $ from 'jquery';
 
 import firehoseClient from '@cdo/apps/metrics/firehose';
+import HttpClient from '@cdo/apps/util/HttpClient';
 import {AbuseConstants} from '@cdo/generated-scripts/sharedConstants';
 import msg from '@cdo/locale';
 
@@ -370,26 +371,33 @@ var projects = (module.exports = {
    * Sets abuse score, saves the project, and reloads the page
    */
   adminResetAbuseScore(score = 0) {
-    var id = this.getCurrentId();
-    if (!id) {
+    const channelId = this.getCurrentId();
+    if (!channelId) {
       return;
     }
-    channels.delete(id + '/abuse', function (err, result) {
-      if (err) {
-        throw err;
-      }
-      assets.patchAll(id, `abuse_score=${score}`, null, function (err, result) {
+    const method = score === 0 ? '/delete' : '/buffer';
+    HttpClient.post(`/v3/channels/${channelId}/abuse/${method}`, '', true);
+    assets.patchAll(
+      channelId,
+      `abuse_score=${score}`,
+      null,
+      function (err, result) {
         if (err) {
           throw err;
         }
-      });
-      files.patchAll(id, `abuse_score=${score}`, null, function (err, result) {
+      }
+    );
+    files.patchAll(
+      channelId,
+      `abuse_score=${score}`,
+      null,
+      function (err, result) {
         if (err) {
           throw err;
         }
         $('.admin-abuse-score').text(score);
-      });
-    });
+      }
+    );
   },
 
   /**

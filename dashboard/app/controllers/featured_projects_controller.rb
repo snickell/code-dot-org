@@ -46,9 +46,9 @@ class FeaturedProjectsController < ApplicationController
   # sets their abuse score such that the project needs to
   # be reported many times before being blocked.
   def buffer_abuse_score(score = -50)
-    channels_path = "/v3/channels/#{params[:project_id]}/buffer_abuse_score"
-    assets_path = "/v3/assets/#{params[:project_id]}/"
-    files_path = "/v3/files/#{params[:project_id]}/"
+    channels_path = "/v3/channels/#{params[:channel_id]}/buffer_abuse_score"
+    assets_path = "/v3/assets/#{params[:channel_id]}/"
+    files_path = "/v3/files/#{params[:channel_id]}/"
 
     ChannelsApi.call(
       'REQUEST_METHOD' => 'POST',
