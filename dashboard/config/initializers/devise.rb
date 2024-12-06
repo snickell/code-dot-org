@@ -1,3 +1,5 @@
+require 'cdo/global_edition'
+
 # Use this hook to configure devise mailer, warden hooks and so forth.
 # Many of these configuration options can be set straight in your model.
 Devise.setup do |config|
@@ -354,6 +356,15 @@ Devise.setup do |config|
 
   OmniAuth.config.before_request_phase do |env|
     request = Rack::Request.new(env)
+
+    # To make an OAuth URL valid, it should be added to the whitelist for each SSO provider.
+    # Instead of applying this for each new Global Edition region,
+    # it is more efficient to remove the Global Edition prefix and handle the path as a regular route.
+    if request.script_name && request.ge_region
+      ge_path_prefix = Cdo::GlobalEdition.path(request.ge_region)
+      request.script_name = request.script_name.sub(ge_path_prefix, '').presence
+    end
+
     Metrics::Events.log_event(
       request: request,
       event_name: "#{env['omniauth.strategy'].options[:name]}-begin-auth",
