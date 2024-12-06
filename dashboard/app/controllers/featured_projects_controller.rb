@@ -14,7 +14,6 @@ class FeaturedProjectsController < ApplicationController
 
   # Set the featured project to 'active', i.e., project will be displayed in public gallery.
   def feature
-    puts "feature"
     _, project_id = storage_decrypt_channel_id(params[:channel_id])
     return render_404 unless project_id
     @featured_project = FeaturedProject.find_or_create_by!(project_id: project_id)

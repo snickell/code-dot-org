@@ -78,7 +78,6 @@ class ReportAbuseController < ApplicationController
   # POST /v3/channels/:channel_id/abuse/buffer
   def buffer_abuse
     reset_abuse_score(params[:channel_id], -50)
-    puts "buffer abuse"
   end
 
   # DELETE /v3/channels/:channel_id/abuse
@@ -91,6 +90,7 @@ class ReportAbuseController < ApplicationController
   # PATCH /v3/(animations|assets|sources|files|libraries)/:channel_id?abuse_score=:abuse_score
   def update_file_abuse
     return head :unauthorized unless can?(:update_file_abuse, nil)
+
     value = update_file_abuse_score(params[:endpoint], params[:encrypted_channel_id], params[:abuse_score])
 
     render json: {abuse_score: value}
