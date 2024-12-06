@@ -10,7 +10,7 @@
       %p= t('auth.already_signedup')
       &nbsp;
       %p= link_to t('nav.user.signin'), new_session_path(resource_name)
-  - unless request.region
+  - unless request.ge_region
     .row
       .span7.oauth-links
         = render "devise/shared/oauth_links"

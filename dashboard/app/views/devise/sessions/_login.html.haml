@@ -35,7 +35,7 @@
       %a#signup-link.field-aligned{href: new_user_registration_path}
         %button.neutral-button{:id => 'user_signup'}= t('nav.user.signup')
 
-  - unless request.region
+  - unless request.ge_region
     %div.vertical-or
       %hr
       = t("or").upcase
