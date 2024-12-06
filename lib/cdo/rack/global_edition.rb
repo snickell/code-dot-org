@@ -15,14 +15,13 @@ module Rack
     class RouteHandler
       include Middleware::Helpers::Cookies
 
-      ROOT_PATH = '/global'
       # @example Matches paths like `/global/fa/home`, capturing:
       # - ge_prefix: "/global/fa"
       # - ge_region: "fa"
       # - main_path: "/home"
       PATH_PATTERN = Regexp.new <<~REGEXP.remove(/\s+/)
         ^(?<ge_prefix>
-          #{ROOT_PATH}/
+          #{Cdo::GlobalEdition::ROOT_PATH}/
           (?<ge_region>#{Cdo::GlobalEdition::REGIONS.join('|')})
         )
         (?<main_path>/.*|$)
@@ -170,10 +169,10 @@ module Rack
       end
 
       private def regional_path_for(region, main_path)
-        redirect_path = ::File.join(ROOT_PATH, region, main_path)
+        redirect_path = Cdo::GlobalEdition.path(region, main_path)
 
         # Pegasus requires a predefined template for each path, unlike Dashboard, which manages paths dynamically.
-        redirect_path = ::File.join(ROOT_PATH, region) if pegasus_route?(main_path) && !pegasus_route?(redirect_path)
+        redirect_path = Cdo::GlobalEdition.path(region) if pegasus_route?(main_path) && !pegasus_route?(redirect_path)
 
         redirect_path
       end
