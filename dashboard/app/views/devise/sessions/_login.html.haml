@@ -35,12 +35,13 @@
       %a#signup-link.field-aligned{href: new_user_registration_path}
         %button.neutral-button{:id => 'user_signup'}= t('nav.user.signup')
 
-  %div.vertical-or
-    %hr
-    = t("or").upcase
-    %hr
+  - unless request.region
+    %div.vertical-or
+      %hr
+      = t("or").upcase
+      %hr
 
-  = render "devise/shared/oauth_links"
+    = render "devise/shared/oauth_links"
 
 %h4#code_without_signing_in= t('signin.try_heading')
 

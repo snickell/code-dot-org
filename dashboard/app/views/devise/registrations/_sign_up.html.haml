@@ -10,15 +10,16 @@
       %p= t('auth.already_signedup')
       &nbsp;
       %p= link_to t('nav.user.signin'), new_session_path(resource_name)
-  .row
-    .span7.oauth-links
-      = render "devise/shared/oauth_links"
-  .row
-    .span7
-      %div.horizontal-or
-        %hr
-        = t("or").upcase
-        %hr
+  - unless request.region
+    .row
+      .span7.oauth-links
+        = render "devise/shared/oauth_links"
+    .row
+      .span7
+        %div.horizontal-or
+          %hr
+          = t("or").upcase
+          %hr
   .row
     .span7
       %h4.signup-header= t('signup_form.email_signup')

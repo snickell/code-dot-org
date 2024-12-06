@@ -35,7 +35,13 @@ const CHECK_ICON = 'circle-check';
 const X_ICON = 'circle-xmark';
 const EXCLAMATION_ICON = 'circle-exclamation';
 
-const LoginTypeSelection: React.FunctionComponent = () => {
+interface LoginTypeSelectionProps {
+  hideSSO: boolean;
+}
+
+const LoginTypeSelection: React.FunctionComponent<LoginTypeSelectionProps> = ({
+  hideSSO,
+}) => {
   const [password, setPassword] = useState('');
   const [passwordIcon, setPasswordIcon] = useState(X_ICON);
   const [passwordIconClass, setPasswordIconClass] = useState(style.lightGray);
@@ -186,116 +192,136 @@ const LoginTypeSelection: React.FunctionComponent = () => {
         className={style.typeHeaderBanner}
       />
       <div className={style.containerWrapper}>
-        <div className={style.container}>
-          <div className={style.headers}>
-            <Heading3 className={style.signUpWithTitle}>
-              {locale.sign_up_with()}
-            </Heading3>
-            <BodyThreeText className={style.signUpWithDesc}>
-              {locale.streamline_your_sign_in()}
-            </BodyThreeText>
-          </div>
-          <form action="/users/auth/google_oauth2" method="POST">
-            <button
-              className={style.googleButton}
-              onClick={() => selectOauthLoginType('google')}
-              type="submit"
-            >
-              <FontAwesomeV6Icon
-                iconName="brands fa-google"
-                iconStyle="solid"
-              />
-              {locale.sign_up_google()}
-            </button>
-            <input type="hidden" name="authenticity_token" value={authToken} />
-          </form>
-          <form action="/users/auth/microsoft_v2_auth" method="POST">
-            <button
-              className={style.microsoftButton}
-              onClick={() => selectOauthLoginType('microsoft')}
-              type="submit"
-            >
-              <FontAwesomeV6Icon
-                iconName="brands fa-microsoft"
-                iconStyle="light"
-              />
-              {locale.sign_up_microsoft()}
-            </button>
-            <input type="hidden" name="authenticity_token" value={authToken} />
-          </form>
-          <form action="/users/auth/facebook" method="POST">
-            <button
-              className={style.facebookButton}
-              onClick={() => selectOauthLoginType('facebook')}
-              type="submit"
-            >
-              <FontAwesomeV6Icon
-                iconName="brands fa-facebook-f"
-                iconStyle="solid"
-              />
-              {locale.sign_up_facebook()}
-            </button>
-            <input type="hidden" name="authenticity_token" value={authToken} />
-          </form>
-          <form action="/users/auth/clever" method="POST">
-            <button
-              className={style.cleverButton}
-              onClick={() => selectOauthLoginType('clever')}
-              type="submit"
-            >
-              <img src={cleverLogo} alt="" />
-              {locale.sign_up_clever()}
-            </button>
-            <input type="hidden" name="authenticity_token" value={authToken} />
-          </form>
-          <div className={style.greyTextbox}>
-            {!isTeacher && (
-              <div className={style.iconContainer}>
-                <img src={canvas} alt="Canvas logo" />
-                <img src={schoology} alt="Schoology logo" />
+        {!hideSSO && (
+          <>
+            <div className={style.container}>
+              <div className={style.headers}>
+                <Heading3 className={style.signUpWithTitle}>
+                  {locale.sign_up_with()}
+                </Heading3>
+                <BodyThreeText className={style.signUpWithDesc}>
+                  {locale.streamline_your_sign_in()}
+                </BodyThreeText>
               </div>
-            )}
-            <BodyThreeText className={style.subheader}>
-              {isTeacher
-                ? locale.using_lms_platforms()
-                : locale.does_your_school_use_an_lms()}
-            </BodyThreeText>
-            <BodyThreeText>
-              {isTeacher
-                ? locale.access_detailed_instructions()
-                : locale.ask_your_teacher_lms()}
-            </BodyThreeText>
-            {isTeacher && (
-              <div className={style.buttonContainer}>
-                <OldButton
-                  href="https://support.code.org/hc/en-us/articles/24825250283021-Single-Sign-On-with-Canvas"
-                  onClick={sendLMSAnalyticsEvent}
-                  color={OldButton.ButtonColor.white}
-                  text={'Canvas'}
-                  icon={'arrow-up-right-from-square'}
-                  __useDeprecatedTag
+              <form action="/users/auth/google_oauth2" method="POST">
+                <button
+                  className={style.googleButton}
+                  onClick={() => selectOauthLoginType('google')}
+                  type="submit"
                 >
-                  <img src={canvas} alt="" />
-                </OldButton>
-                <OldButton
-                  href="https://support.code.org/hc/en-us/articles/26677769411085-Single-Sign-On-with-Schoology"
-                  onClick={sendLMSAnalyticsEvent}
-                  color={OldButton.ButtonColor.white}
-                  text={'Schoology'}
-                  icon={'arrow-up-right-from-square'}
-                  __useDeprecatedTag
+                  <FontAwesomeV6Icon
+                    iconName="brands fa-google"
+                    iconStyle="solid"
+                  />
+                  {locale.sign_up_google()}
+                </button>
+                <input
+                  type="hidden"
+                  name="authenticity_token"
+                  value={authToken}
+                />
+              </form>
+              <form action="/users/auth/microsoft_v2_auth" method="POST">
+                <button
+                  className={style.microsoftButton}
+                  onClick={() => selectOauthLoginType('microsoft')}
+                  type="submit"
                 >
-                  <img src={schoology} alt="" />
-                </OldButton>
+                  <FontAwesomeV6Icon
+                    iconName="brands fa-microsoft"
+                    iconStyle="light"
+                  />
+                  {locale.sign_up_microsoft()}
+                </button>
+                <input
+                  type="hidden"
+                  name="authenticity_token"
+                  value={authToken}
+                />
+              </form>
+              <form action="/users/auth/facebook" method="POST">
+                <button
+                  className={style.facebookButton}
+                  onClick={() => selectOauthLoginType('facebook')}
+                  type="submit"
+                >
+                  <FontAwesomeV6Icon
+                    iconName="brands fa-facebook-f"
+                    iconStyle="solid"
+                  />
+                  {locale.sign_up_facebook()}
+                </button>
+                <input
+                  type="hidden"
+                  name="authenticity_token"
+                  value={authToken}
+                />
+              </form>
+              <form action="/users/auth/clever" method="POST">
+                <button
+                  className={style.cleverButton}
+                  onClick={() => selectOauthLoginType('clever')}
+                  type="submit"
+                >
+                  <img src={cleverLogo} alt="" />
+                  {locale.sign_up_clever()}
+                </button>
+                <input
+                  type="hidden"
+                  name="authenticity_token"
+                  value={authToken}
+                />
+              </form>
+              <div className={style.greyTextbox}>
+                {!isTeacher && (
+                  <div className={style.iconContainer}>
+                    <img src={canvas} alt="Canvas logo" />
+                    <img src={schoology} alt="Schoology logo" />
+                  </div>
+                )}
+                <BodyThreeText className={style.subheader}>
+                  {isTeacher
+                    ? locale.using_lms_platforms()
+                    : locale.does_your_school_use_an_lms()}
+                </BodyThreeText>
+                <BodyThreeText>
+                  {isTeacher
+                    ? locale.access_detailed_instructions()
+                    : locale.ask_your_teacher_lms()}
+                </BodyThreeText>
+                {isTeacher && (
+                  <div className={style.buttonContainer}>
+                    <OldButton
+                      href="https://support.code.org/hc/en-us/articles/24825250283021-Single-Sign-On-with-Canvas"
+                      onClick={sendLMSAnalyticsEvent}
+                      color={OldButton.ButtonColor.white}
+                      text={'Canvas'}
+                      icon={'arrow-up-right-from-square'}
+                      __useDeprecatedTag
+                    >
+                      <img src={canvas} alt="" />
+                    </OldButton>
+                    <OldButton
+                      href="https://support.code.org/hc/en-us/articles/26677769411085-Single-Sign-On-with-Schoology"
+                      onClick={sendLMSAnalyticsEvent}
+                      color={OldButton.ButtonColor.white}
+                      text={'Schoology'}
+                      icon={'arrow-up-right-from-square'}
+                      __useDeprecatedTag
+                    >
+                      <img src={schoology} alt="" />
+                    </OldButton>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-        <div className={style.dividerContainer}>
-          <div className={style.verticalDividerTop} />
-          <div className={style.dividerText}>{i18n.or()}</div>
-          <div className={style.verticalDividerBottom} />
-        </div>
+            </div>
+            <div className={style.dividerContainer}>
+              <div className={style.verticalDividerTop} />
+              <div className={style.dividerText}>{i18n.or()}</div>
+              <div className={style.verticalDividerBottom} />
+            </div>
+          </>
+        )}
         <div className={style.container}>
           <Heading3 className={style.headers}>
             {locale.or_sign_up_with_email()}
