@@ -1,0 +1,25 @@
+<FreeResponse>
+  <config><![CDATA[{
+  "published": true,
+  "game_id": 52,
+  "created_at": "2024-12-05T22:35:13.000Z",
+  "level_num": "custom",
+  "user_id": 21093,
+  "properties": {
+    "encrypted": "false",
+    "title": "Sources of Data",
+    "long_instructions": "<br>\r\n\r\n📝 Activity Guide: Have participants choose a specific data point that they reviewed. \r\n\r\n🔗 Curriculum Connection: Using the framework in Data Science Lesson 7: Data Storytelling, invite participants to write a persuasive data story that tells more about computer science in their school and/or district. Encourage participants to use data from their own context (such as data from their state report) to complete the activity.\r\n\r\n🧑‍💻 Code.org Forum: Invite participants to post their data story on the Forum.",
+    "allow_user_uploads": "false",
+    "submittable": "false",
+    "peer_reviewable": "false",
+    "optional": "false",
+    "allow_multiple_attempts": "true",
+    "skip_dialog": true,
+    "skip_sound": true,
+    "height": "200"
+  },
+  "audit_log": "[{\"changed_at\":\"2024-12-05T22:35:13.943+00:00\",\"changed\":[\"cloned from \\\"self-paced-equity-U1L2-datareflection1\\\"\"],\"cloned_from\":\"self-paced-equity-U1L2-datareflection1\"},{\"changed_at\":\"2024-12-05 22:36:37 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":10559,\"changed_by_email\":\"aryanna@code.org\"}]",
+  "level_concept_difficulty": {
+  }
+}]]></config>
+</FreeResponse>
