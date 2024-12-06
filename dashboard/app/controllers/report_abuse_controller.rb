@@ -75,26 +75,23 @@ class ReportAbuseController < ApplicationController
     render json: {abuse_score: value}
   end
 
+  # POST /v3/channels/:channel_id/abuse/buffer
+  def buffer_abuse
+    reset_abuse_score(params[:channel_id], -50)
+    puts "buffer abuse"
+  end
+
   # DELETE /v3/channels/:channel_id/abuse
   # POST /v3/channels/:channel_id/abuse/delete
   # Clear an abuse score. Requires project_validator permission
   def reset_abuse
-    return head :unauthorized unless can?(:destroy_abuse, nil)
-
-    channel_id = params[:channel_id]
-
-    begin
-      value = Projects.new(get_storage_id).reset_abuse(channel_id)
-    rescue ArgumentError, OpenSSL::Cipher::CipherError
-      raise ActionController::BadRequest.new, "Bad channel_id"
-    end
-    render json: {abuse_score: value}
+    puts "reset_abuse"
+    reset_abuse_score(params[:channel_id], -50)
   end
 
   # PATCH /v3/(animations|assets|sources|files|libraries)/:channel_id?abuse_score=:abuse_score
   def update_file_abuse
     return head :unauthorized unless can?(:update_file_abuse, nil)
-
     value = update_file_abuse_score(params[:endpoint], params[:encrypted_channel_id], params[:abuse_score])
 
     render json: {abuse_score: value}
@@ -182,6 +179,17 @@ class ReportAbuseController < ApplicationController
       )
       raise ZendeskError.new(response.code, response.body) unless response.success?
     end
+  end
+
+  private def reset_abuse_score(channel_id, new_score)
+    return head :unauthorized unless can?(:buffer_abuse, nil)
+
+    begin
+      value = Projects.new(get_storage_id).reset_abuse(channel_id, new_score)
+    rescue ArgumentError, OpenSSL::Cipher::CipherError
+      raise ActionController::BadRequest.new, "Bad channel_id"
+    end
+    render json: {abuse_score: value}
   end
 
   private def update_abuse_score

@@ -14,6 +14,7 @@ class FeaturedProjectsController < ApplicationController
 
   # Set the featured project to 'active', i.e., project will be displayed in public gallery.
   def feature
+    puts "feature"
     _, project_id = storage_decrypt_channel_id(params[:channel_id])
     return render_404 unless project_id
     @featured_project = FeaturedProject.find_or_create_by!(project_id: project_id)
@@ -46,17 +47,12 @@ class FeaturedProjectsController < ApplicationController
   # sets their abuse score such that the project needs to
   # be reported many times before being blocked.
   def buffer_abuse_score(score = -50)
-    channels_path = "/v3/channels/#{params[:project_id]}/buffer_abuse_score"
-    assets_path = "/v3/assets/#{params[:project_id]}/"
-    files_path = "/v3/files/#{params[:project_id]}/"
+    puts "buffer_abuse_score #{score}"
+    assets_path = "/v3/assets/#{params[:channel_id]}/"
+    files_path = "/v3/files/#{params[:channel_id]}/"
 
-    ChannelsApi.call(
-      'REQUEST_METHOD' => 'POST',
-      'PATH_INFO' => channels_path,
-      'REQUEST_PATH' => channels_path,
-      'HTTP_COOKIE' => request.env['HTTP_COOKIE'],
-      'rack.input' => StringIO.new
-    )
+    project = Project.find_by_channel_id(params[:channel_id])
+    project.update! abuse_score: score
 
     FilesApi.call(
       'REQUEST_METHOD' => 'PATCH',

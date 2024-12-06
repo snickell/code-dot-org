@@ -268,16 +268,16 @@ class Projects
     new_score
   end
 
-  def reset_abuse(channel_id)
+  def reset_abuse(channel_id, new_score = 0)
     _owner, project_id = storage_decrypt_channel_id(channel_id)
 
     row = @table.where(id: project_id).exclude(state: 'deleted').first
     raise NotFound, "channel `#{channel_id}` not found" unless row
 
-    update_count = @table.where(id: project_id).exclude(state: 'deleted').update({abuse_score: 0})
+    update_count = @table.where(id: project_id).exclude(state: 'deleted').update({abuse_score: new_score})
     raise NotFound, "channel `#{channel_id}` not found" if update_count == 0
 
-    0
+    new_score
   end
 
   def buffer_abuse_score(channel_id)
