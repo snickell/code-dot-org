@@ -1,11 +1,19 @@
 # syntax=docker.io/docker/dockerfile:1.4
-# This file was built based off the Next.js recommended Dockerfile
-# See: https://github.com/vercel/next.js/tree/canary/examples/with-docker
 
-ARG NODE_VERSION=20 # LTS EOL: 2025-04-30
-ARG DEBIAN_VERSION=bookworm # LTS EOL: 2028-06-30
+###################################################################################
+# This Dockerfile is used to produce a minial production executable image for the #
+# Code.org marketing app.                                                         #
+###################################################################################
 
-FROM node:${NODE_VERSION}-${DEBIAN_VERSION} AS base
+FROM ubuntu:20.04 AS base
+
+# install operating system dependencies
+RUN apt-get update && \
+    apt-get install -y curl
+
+# install node, based on instructions at https://github.com/nodesource/distributions#using-ubuntu-1
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs
 
 ##############################################################################
 # Source Code Layer                                                          #
