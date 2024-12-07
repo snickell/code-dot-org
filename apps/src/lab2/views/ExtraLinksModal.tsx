@@ -121,6 +121,22 @@ const ExtraLinksModal: React.FunctionComponent<ExtraLinksModalProps> = ({
     }
   };
 
+  const onResetAbuseScore = () => {
+    try {
+      console.log('Reset abuse score to 0.');
+    } catch (e) {
+      console.log('Error resetting abuse score to 0.');
+    }
+  };
+
+  const onBufferAbuseScore = () => {
+    try {
+      console.log('Update abuse score to -50.');
+    } catch (e) {
+      console.log('Error updating abuse score to -50');
+    }
+  };
+
   return isOpen ? (
     <AccessibleDialog onClose={onClose}>
       <Heading3>Extra links</Heading3>
@@ -173,6 +189,21 @@ const ExtraLinksModal: React.FunctionComponent<ExtraLinksModalProps> = ({
         featuredProjectStatus={featuredProjectStatus}
         onBookmark={onBookmark}
       />
+      <div>
+        <Button
+          size="xs"
+          text={'Reset abuse score to 0'}
+          onClick={onResetAbuseScore}
+        />
+      </div>
+      <div>
+        <Button
+          size="xs"
+          text={'Reset abuse score to -50'}
+          onClick={onBufferAbuseScore}
+          className={moduleStyles.bottomButton}
+        />
+      </div>
     </AccessibleDialog>
   ) : null;
 };
@@ -205,8 +236,6 @@ const CloneLevelButton: React.FunctionComponent<CloneLevelButtonProps> = ({
     <div>
       <Button
         size="xs"
-        color={buttonColors.purple}
-        type="secondary"
         onClick={() => setShowCloneField(!showCloneField)}
         text={showCloneField ? 'Cancel Clone' : 'Clone'}
       />
@@ -251,11 +280,10 @@ const DeleteLevelButton: React.FunctionComponent<DeleteLevelButtonProps> = ({
     <div>
       <Button
         size="xs"
-        type="secondary"
         text={showDeleteConfirm ? 'Cancel Delete' : 'Delete'}
         color={buttonColors.destructive}
         onClick={() => setShowDeleteConfirm(!showDeleteConfirm)}
-        className={moduleStyles.deleteButton}
+        className={moduleStyles.bottomButton}
       />
       {showDeleteConfirm && (
         <div>
@@ -281,12 +309,7 @@ const FeaturedProjectInfo: React.FunctionComponent<
     return (
       <>
         <div>Not a featured project</div>
-        <Button
-          size="xs"
-          color={buttonColors.purple}
-          onClick={onBookmark}
-          text={'Bookmark as featured'}
-        />
+        <Button size="xs" onClick={onBookmark} text={'Bookmark as featured'} />
       </>
     );
   }
