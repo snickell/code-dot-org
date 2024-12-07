@@ -36,7 +36,10 @@ const ExtraLinksModal: React.FunctionComponent<ExtraLinksModalProps> = ({
   const [deleteError, setDeleteError] = useState('');
   const [featuredProjectStatus, setFeaturedProjectStatus] = useState<
     string | undefined
-  >('');
+  >(projectLinkData?.project_info?.featured_status);
+  const [abuseScore, setAbuseScore] = useState<number | undefined>(
+    projectLinkData?.project_info?.abuse_score
+  );
 
   const channelId: string | undefined = useAppSelector(
     state => state.lab.channel && state.lab.channel.id
@@ -53,6 +56,12 @@ const ExtraLinksModal: React.FunctionComponent<ExtraLinksModalProps> = ({
   useEffect(() => {
     if (projectLinkData?.project_info) {
       setFeaturedProjectStatus(projectLinkData?.project_info.featured_status);
+    }
+  }, [projectLinkData]);
+
+  useEffect(() => {
+    if (projectLinkData?.project_info?.abuse_score) {
+      setAbuseScore(projectLinkData.project_info.abuse_score);
     }
   }, [projectLinkData]);
 
@@ -121,17 +130,29 @@ const ExtraLinksModal: React.FunctionComponent<ExtraLinksModalProps> = ({
     }
   };
 
-  const onResetAbuseScore = () => {
+  const onResetAbuseScore = async () => {
     try {
-      console.log('Reset abuse score to 0.');
+      await HttpClient.post(
+        `/v3/channels/${channelId}/abuse/delete`,
+        '',
+        true,
+        {contentType: 'application/json;charset=UTF-8'}
+      );
+      setAbuseScore(0);
     } catch (e) {
       console.log('Error resetting abuse score to 0.');
     }
   };
 
-  const onBufferAbuseScore = () => {
+  const onBufferAbuseScore = async () => {
     try {
-      console.log('Update abuse score to -50.');
+      await HttpClient.post(
+        `/v3/channels/${channelId}/abuse/buffer`,
+        '',
+        true,
+        {contentType: 'application/json;charset=UTF-8'}
+      );
+      setAbuseScore(-50);
     } catch (e) {
       console.log('Error updating abuse score to -50');
     }
@@ -190,6 +211,7 @@ const ExtraLinksModal: React.FunctionComponent<ExtraLinksModalProps> = ({
         onBookmark={onBookmark}
         onResetAbuseScore={onResetAbuseScore}
         onBufferAbuseScore={onBufferAbuseScore}
+        abuseScore={abuseScore}
       />
     </AccessibleDialog>
   ) : null;
@@ -321,10 +343,13 @@ const RemixAncestry: React.FunctionComponent<{
 };
 
 const AbuseScoreInfo: React.FunctionComponent<{
-  abuseScore: number;
+  abuseScore: number | undefined;
   onResetAbuseScore: () => void;
   onBufferAbuseScore: () => void;
 }> = ({abuseScore, onResetAbuseScore, onBufferAbuseScore}) => {
+  if (abuseScore === undefined) {
+    return <></>;
+  }
   const msg =
     abuseScore <= 15
       ? 'Safe to share project.'
@@ -359,6 +384,7 @@ interface ProjectLinkDataProps {
   onBookmark: () => void;
   onResetAbuseScore: () => void;
   onBufferAbuseScore: () => void;
+  abuseScore?: number;
 }
 
 const ProjectLinkData: React.FunctionComponent<ProjectLinkDataProps> = ({
@@ -368,6 +394,7 @@ const ProjectLinkData: React.FunctionComponent<ProjectLinkDataProps> = ({
   onBookmark,
   onResetAbuseScore,
   onBufferAbuseScore,
+  abuseScore,
 }) => {
   if (!projectLinkData) {
     return null;
@@ -405,7 +432,7 @@ const ProjectLinkData: React.FunctionComponent<ProjectLinkDataProps> = ({
             </li>
             <li>
               <AbuseScoreInfo
-                abuseScore={projectInfo.abuse_score}
+                abuseScore={abuseScore}
                 onResetAbuseScore={onResetAbuseScore}
                 onBufferAbuseScore={onBufferAbuseScore}
               />
