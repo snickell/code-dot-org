@@ -188,22 +188,9 @@ const ExtraLinksModal: React.FunctionComponent<ExtraLinksModalProps> = ({
         projectLinkData={projectLinkData}
         featuredProjectStatus={featuredProjectStatus}
         onBookmark={onBookmark}
+        onResetAbuseScore={onResetAbuseScore}
+        onBufferAbuseScore={onBufferAbuseScore}
       />
-      <div>
-        <Button
-          size="xs"
-          text={'Reset abuse score to 0'}
-          onClick={onResetAbuseScore}
-        />
-      </div>
-      <div>
-        <Button
-          size="xs"
-          text={'Reset abuse score to -50'}
-          onClick={onBufferAbuseScore}
-          className={moduleStyles.bottomButton}
-        />
-      </div>
     </AccessibleDialog>
   ) : null;
 };
@@ -335,7 +322,9 @@ const RemixAncestry: React.FunctionComponent<{
 
 const AbuseScoreInfo: React.FunctionComponent<{
   abuseScore: number;
-}> = ({abuseScore}) => {
+  onResetAbuseScore: () => void;
+  onBufferAbuseScore: () => void;
+}> = ({abuseScore, onResetAbuseScore, onBufferAbuseScore}) => {
   const msg =
     abuseScore <= 15
       ? 'Safe to share project.'
@@ -347,6 +336,19 @@ const AbuseScoreInfo: React.FunctionComponent<{
       <ul>
         <li>{msg}</li>
       </ul>
+      <div>
+        <Button
+          size="xs"
+          text={'Reset abuse score to 0'}
+          onClick={onResetAbuseScore}
+        />
+        <Button
+          size="xs"
+          text={'Reset abuse score to -50'}
+          onClick={onBufferAbuseScore}
+          className={moduleStyles.rightButton}
+        />
+      </div>
     </li>
   );
 };
@@ -355,6 +357,8 @@ interface ProjectLinkDataProps {
   isStandaloneProject: boolean;
   featuredProjectStatus?: string;
   onBookmark: () => void;
+  onResetAbuseScore: () => void;
+  onBufferAbuseScore: () => void;
 }
 
 const ProjectLinkData: React.FunctionComponent<ProjectLinkDataProps> = ({
@@ -362,6 +366,8 @@ const ProjectLinkData: React.FunctionComponent<ProjectLinkDataProps> = ({
   isStandaloneProject,
   featuredProjectStatus,
   onBookmark,
+  onResetAbuseScore,
+  onBufferAbuseScore,
 }) => {
   if (!projectLinkData) {
     return null;
@@ -398,7 +404,11 @@ const ProjectLinkData: React.FunctionComponent<ProjectLinkDataProps> = ({
               />
             </li>
             <li>
-              <AbuseScoreInfo abuseScore={projectInfo.abuse_score} />
+              <AbuseScoreInfo
+                abuseScore={projectInfo.abuse_score}
+                onResetAbuseScore={onResetAbuseScore}
+                onBufferAbuseScore={onBufferAbuseScore}
+              />
             </li>
           </>
         )}
