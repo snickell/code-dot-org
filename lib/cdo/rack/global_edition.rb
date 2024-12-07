@@ -28,6 +28,15 @@ module Rack
         (?<main_path>/.*|$)
       REGEXP
 
+      # HTTP paths that to be excluded from Global Edition scope.
+      EXCLUDED_PATHS = [
+        # To make an OAuth callback accessible, it must be added to the whitelist of each SSO provider.
+        # Instead of repeating this process for each new Global Edition region,
+        # it is more efficient to remove the Global Edition prefix and treat the request as a standard route.
+        # Additionally, preventing OAuth routes from being redirected, ensuring the authentication process is not disrupted.
+        ::OmniAuth.config.path_prefix, # e.g. `/users/auth`
+      ].compact.freeze
+
       attr_reader :app, :env
 
       def initialize(app, env)
@@ -61,7 +70,7 @@ module Rack
             # - `request.script_name` strips the prefix from the request path
             #   so the application processes requests as if it were running at the root level.
             # - `request.path_info` provides the specific path that should be handled by the application.
-            request.script_name = ::File.join(ge_prefix, request.script_name).chomp('/')
+            request.script_name = ::File.join(ge_prefix, request.script_name).chomp('/') unless excluded_path?(main_path)
             request.path_info = main_path
           end
 
@@ -157,14 +166,17 @@ module Rack
         site_locale
       end
 
+      private def excluded_path?(path)
+        EXCLUDED_PATHS.any? {|excluded_path| path.match?(excluded_path)}
+      end
+
       # Determines if the request is eligible for redirection.
       # To improve efficiency, the redirection should only affect the browser's address bar,
       # avoiding redirection for non-visible to user requests such as AJAX, non-GET, or asset requests.
       private def redirectable?(redirect_path)
         return false unless request.get? # only GET request can be redirected
         return false if request.xhr? # only non-AJAX requests should be redirected
-        # Prevents OmniAuth routes from being redirected to avoid disrupting the authentication process.
-        return false if ::OmniAuth.config.path_prefix && request.path.include?(::OmniAuth.config.path_prefix)
+        return false if excluded_path?(request.path)
 
         # Unlike in Dashboard, where any route can be dynamically changed to a regional version,
         # Pegasus requires an existing regional template.
