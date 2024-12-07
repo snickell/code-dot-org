@@ -36,7 +36,7 @@ const X_ICON = 'circle-xmark';
 const EXCLAMATION_ICON = 'circle-exclamation';
 
 interface LoginTypeSelectionProps {
-  hideSSO: boolean;
+  hideSSO?: boolean;
 }
 
 const LoginTypeSelection: React.FunctionComponent<LoginTypeSelectionProps> = ({
