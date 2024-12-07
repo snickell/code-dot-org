@@ -331,7 +331,7 @@ const AbuseScoreInfo: React.FunctionComponent<{
       : 'This project is blocked from sharing';
 
   return (
-    <li>
+    <>
       Abuse score: {abuseScore}
       <ul>
         <li>{msg}</li>
@@ -349,7 +349,7 @@ const AbuseScoreInfo: React.FunctionComponent<{
           className={moduleStyles.rightButton}
         />
       </div>
-    </li>
+    </>
   );
 };
 interface ProjectLinkDataProps {
