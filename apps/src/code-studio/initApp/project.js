@@ -368,7 +368,8 @@ var projects = (module.exports = {
   },
 
   /**
-   * Sets abuse score, saves the project, and reloads the page
+   * Allows admin user to reset abuse score to either 0 or -50 (for buffer abuse score)
+   * and then saves the project.
    */
   adminResetAbuseScore(score = 0) {
     const channelId = this.getCurrentId();
