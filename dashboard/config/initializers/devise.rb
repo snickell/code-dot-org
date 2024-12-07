@@ -357,10 +357,11 @@ Devise.setup do |config|
   OmniAuth.config.before_request_phase do |env|
     request = Rack::Request.new(env)
 
-    # To make an OAuth URL valid, it should be added to the whitelist for each SSO provider.
-    # Instead of applying this for each new Global Edition region,
-    # it is more efficient to remove the Global Edition prefix and handle the path as a regular route.
-    if request.script_name && request.ge_region
+    # To make an OAuth callback accessible, it must be added to the whitelist of each SSO provider.
+    # Rather than repeating this process for every new Global Edition region,
+    # it is more efficient to strip the Global Edition prefix and handle the request as a standard route.
+    # See: +Rack::GlobalEdition+
+    if request.ge_region && request.script_name
       ge_path_prefix = Cdo::GlobalEdition.path(request.ge_region)
       request.script_name = request.script_name.sub(ge_path_prefix, '').presence
     end

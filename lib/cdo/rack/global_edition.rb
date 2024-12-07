@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'active_support/all'
+require 'omniauth'
 require 'request_store'
 
 require 'cdo/global_edition'
@@ -149,7 +150,8 @@ module Rack
       private def redirectable?(redirect_path)
         return false unless request.get? # only GET request can be redirected
         return false if request.xhr? # only non-AJAX requests should be redirected
-        return false if request.path.include?('/users/auth/')
+        # Prevents OmniAuth routes from being redirected to avoid disrupting the authentication process.
+        return false if ::OmniAuth.config.path_prefix && request.path.include?(::OmniAuth.config.path_prefix)
 
         # Unlike in Dashboard, where any route can be dynamically changed to a regional version,
         # Pegasus requires an existing regional template.
