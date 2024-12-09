@@ -48,27 +48,17 @@ class FeaturedProjectsController < ApplicationController
   def buffer_abuse_score(score = -50)
     project = Project.find_by_channel_id(params[:channel_id])
     project.update! abuse_score: score
+    update_file_abuse_score('assets', score)
+    update_file_abuse_score('files', score)
+  end
 
-    assets_path = "/v3/assets/#{params[:channel_id]}/"
-    files_path = "/v3/files/#{params[:channel_id]}/"
-
-    FilesApi.call(
-      'REQUEST_METHOD' => 'PATCH',
-      'PATH_INFO' => assets_path,
-      'REQUEST_PATH' => assets_path,
-      'QUERY_STRING' => "abuse_score=#{score}",
-      'HTTP_COOKIE' => request.env['HTTP_COOKIE'],
-      'rack.input' => StringIO.new
-    )
-
-    FilesApi.call(
-      'REQUEST_METHOD' => 'PATCH',
-      'PATH_INFO' => files_path,
-      'REQUEST_PATH' => files_path,
-      'QUERY_STRING' => "abuse_score=#{score}",
-      'HTTP_COOKIE' => request.env['HTTP_COOKIE'],
-      'rack.input' => StringIO.new
-    )
+  def update_file_abuse_score(endpoint, new_score)
+    bucket_type = endpoint == 'assets' ? AssetBucket : FileBucket
+    buckets = bucket_type.new
+    files = buckets.list(params[:channel_id])
+    files.each do |file|
+      buckets.replace_abuse_score(params[:channel_id], file[:filename], new_score)
+    end
   end
 
   def freeze_featured_project(project_id)
