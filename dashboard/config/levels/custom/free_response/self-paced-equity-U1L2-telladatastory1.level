@@ -7,8 +7,8 @@
   "user_id": 21093,
   "properties": {
     "encrypted": "false",
-    "title": "Sources of Data",
-    "long_instructions": "<br>\r\n\r\n📝 Activity Guide: Have participants choose a specific data point that they reviewed. \r\n\r\n🔗 Curriculum Connection: Using the framework in Data Science Lesson 7: Data Storytelling, invite participants to write a persuasive data story that tells more about computer science in their school and/or district. Encourage participants to use data from their own context (such as data from their state report) to complete the activity.\r\n\r\n🧑‍💻 Code.org Forum: Invite participants to post their data story on the Forum.",
+    "title": "Tell a Data Story",
+    "long_instructions": "<br>\r\n\r\n<div style=\"display: flex; align-items: left;\">\r\n<img src=\"https://images.code.org/86fb480e433c7feca6d9e6df4a73a062-image-1731961341605.png\" style=\"width: auto; height: 100px;\"  alt=\"Two interconnected links.\">\r\n<div style=\"background-color: #F7F8FA; border-radius: 20px 20px 20px 20px; color: #000000; width: 80%; margin-left: 5%; margin-right: 5%; padding: 10px 10px 5px 10px;\">\r\n<p style=\"color: black; line-height: 1.5; margin-left: 10px; margin-right: 10px; font-size: 18px\"><b>Curriculum Connection</b></p>\r\n<p style=\"color: black; line-height: 1.5; margin-left: 10px; margin-right: 10px; font-size: 16px\">The following activity is taken from Data Science curriculum. Designed for 9th-12th graders, this curriculum provides students the opportunity to solve real-world problems using a comprehensive data-driven approach, culminating in a project that showcases their ability to craft compelling data stories.</p>\r\n<p style=\"color: black; line-height: 1.5; margin-left: 10px; margin-right: 10px; font-size: 16px\">If this sounds interesting to you, check it out at\r\n<a href=\"https://studio.code.org/courses/csd-2024\" target=\"_blank\" rel=\"noopener noreferrer\">this link</a>.</p>\r\n</div>\r\n</div>\r\n\r\n## Expository and Persuasive Data Stories\r\n\r\n#### \r\n\r\n\r\n📝 Activity Guide: Have participants choose a specific data point that they reviewed. \r\n\r\n🔗 Curriculum Connection: Using the framework in Data Science Lesson 7: Data Storytelling, invite participants to write a persuasive data story that tells more about computer science in their school and/or district. Encourage participants to use data from their own context (such as data from their state report) to complete the activity.\r\n\r\n🧑‍💻 Code.org Forum: Invite participants to post their data story on the Forum.",
     "allow_user_uploads": "false",
     "submittable": "false",
     "peer_reviewable": "false",
@@ -18,7 +18,7 @@
     "skip_sound": true,
     "height": "200"
   },
-  "audit_log": "[{\"changed_at\":\"2024-12-05T22:35:13.943+00:00\",\"changed\":[\"cloned from \\\"self-paced-equity-U1L2-datareflection1\\\"\"],\"cloned_from\":\"self-paced-equity-U1L2-datareflection1\"},{\"changed_at\":\"2024-12-05 22:36:37 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":10559,\"changed_by_email\":\"aryanna@code.org\"}]",
+  "audit_log": "[{\"changed_at\":\"2024-12-05T22:35:13.943+00:00\",\"changed\":[\"cloned from \\\"self-paced-equity-U1L2-datareflection1\\\"\"],\"cloned_from\":\"self-paced-equity-U1L2-datareflection1\"},{\"changed_at\":\"2024-12-05 22:36:37 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":10559,\"changed_by_email\":\"aryanna@code.org\"},{\"changed_at\":\"2024-12-06 22:50:43 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":10559,\"changed_by_email\":\"aryanna@code.org\"},{\"changed_at\":\"2024-12-06 22:52:09 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":10559,\"changed_by_email\":\"aryanna@code.org\"},{\"changed_at\":\"2024-12-06 23:00:19 +0000\",\"changed\":[\"title\",\"long_instructions\"],\"changed_by_id\":10559,\"changed_by_email\":\"aryanna@code.org\"}]",
   "level_concept_difficulty": {
   }
 }]]></config>

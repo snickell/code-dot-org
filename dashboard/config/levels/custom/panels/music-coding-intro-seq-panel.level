@@ -9,25 +9,30 @@
     "encrypted": "false",
     "panels": [
       {
-        "text": "**<i class=\"fa-solid fa-list-check\"></i> Choose Your Sequence**\n\nYou choose how to sequence your code.\n",
+        "text": "#### Welcome to Music Lab!\n\n<p style=\"color: black;\"><span style=\"color: #009EB0;\">➜</span> 1. Read the instructions.</p>\n\n<p style=\"color: black;\"><span style=\"color: #ED6060;\">➜</span> 2.  Drag blocks into the workspace.</p>\n\n<p style=\"color: black;\"><span style=\"color: #FFA400;\">➜</span> 3.  Press ▶ Run to start your song.</p>\n\n<p style=\"color: black;\"><span style=\"color: #9660BF;\">➜</span>  4. Press Continue for the next level.</p>",
+        "imageUrl": "https://images.code.org/139f3e38ff4c27559c9be3470ed54819-general (3).gif",
+        "key": "music-coding-intro-seq-panel-5c8e1776-1332-425c-8237-86189507ca3c"
+      },
+      {
+        "text": "**Getting started!** Use blocks from the toolbox to sequence your code.\n",
         "imageUrl": "https://images.code.org/cabe3ba5e668729a398daa9f5f72191f-sequence (1).gif",
         "key": "music-intro-coding-seq-panel-bc024962-11c0-46a8-a581-1b95ac378e08",
-        "layout": "text-top-right"
+        "layout": "text-top-left"
       },
       {
-        "text": "**<i class=\"fa-regular fa-list-check\"></i> Order Matters**\n\nThe computer runs your code <strong>in order</strong> from top to bottom.",
+        "text": "**<i class=\"fa-regular fa-list-check\"></i> Order Matters!** The computer runs your code in order from top to bottom.",
         "imageUrl": "https://images.code.org/e24fc5edf2d4a510be49be4cf923beb9-select-checkbox-interface-with-glowing-cursor-2024-08-13-16-05-21-utc (1) (1).gif",
         "key": "music-intro-coding-seq-panel-3ad5bdff-9161-4fad-af85-4095174d23d7",
-        "layout": "text-top-right"
+        "layout": "text-top-center"
       },
       {
-        "text": "**<i class=\"fa-solid fa-shuffle\"></i> You're In Control**\n\nYou can change the sound on every block.",
-        "imageUrl": "",
+        "text": "**<i class=\"fa-solid fa-shuffle\"></i> You're In Control** You can change the sound on every block.",
+        "imageUrl": "https://images.code.org/1e2594de35f17668394b32b160e88db3-choose sound.gif",
         "key": "music-coding-intro-seq-panel-776e2ede-79fe-423e-b643-eb359d56b3bf"
       }
     ],
     "offer_browser_tts": "true"
   },
-  "audit_log": "[{\"changed_at\":\"2024-11-21T19:20:51.884+00:00\",\"changed\":[\"cloned from \\\"music-intro-coding-seq-panel\\\"\"],\"cloned_from\":\"music-intro-coding-seq-panel\"},{\"changed_at\":\"2024-11-23 17:15:08 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 01:53:07 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 01:53:47 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 01:54:53 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 01:56:30 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 01:57:47 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
+  "audit_log": "[{\"changed_at\":\"2024-11-21T19:20:51.884+00:00\",\"changed\":[\"cloned from \\\"music-intro-coding-seq-panel\\\"\"],\"cloned_from\":\"music-intro-coding-seq-panel\"},{\"changed_at\":\"2024-11-23 17:15:08 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 01:53:07 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 01:53:47 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 01:54:53 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 01:56:30 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 01:57:47 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 17:57:28 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 18:06:12 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 18:12:13 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 18:17:19 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
 }]]></config>
 </Panels>
