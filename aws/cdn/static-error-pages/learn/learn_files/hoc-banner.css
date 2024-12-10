@@ -1,0 +1,95 @@
+/*
+   Font Awesome S3 Bucket URLs
+   Current version: 6.6.0
+   If you are changing the location of these files,
+   see the readme in this directory for more detail on manual steps to take when uploading new files.
+ */
+#fullwidth {
+  overflow: hidden;
+  background: linear-gradient(110deg, #6977CD -10.82%, #BCDEDE 43.13%, #34DFE5 68.88%, #688AED 95.85%); }
+
+#pagefooter,
+#pageheader,
+section.banner p {
+  display: none;
+}
+
+#pageheader {
+  background-color: rgba(255, 255, 255, 0.9); }
+
+section.banner.homepage {
+  padding-bottom: 4rem; }
+  section.banner.homepage h2 {
+    font-weight: 400; }
+  section.banner.homepage p {
+    margin-bottom: 1.5rem; }
+  section.banner.homepage figure {
+    margin: 0 auto 2rem; }
+  section.banner.homepage .show-tablet {
+    display: none; }
+  section.banner.homepage .wrapper.show-desktop {
+    background: url("/images/hoc-2024-graphic-bg.png") no-repeat center center;
+    background-size: contain;
+    max-width: 960px;
+    height: 552px;
+    position: relative; }
+    html[dir="rtl"] section.banner.homepage .wrapper.show-desktop {
+      background: url("/images/hoc-2024-graphic-bg-rtl.png") no-repeat center center;
+      background-size: contain; }
+    section.banner.homepage .wrapper.show-desktop .text-wrapper {
+      position: absolute;
+      bottom: 6rem;
+      left: 3rem;
+      text-align: initial;
+      max-width: 390px; }
+      html[dir="rtl"] section.banner.homepage .wrapper.show-desktop .text-wrapper {
+        right: 3rem; }
+      section.banner.homepage .wrapper.show-desktop .text-wrapper h1, section.banner.homepage .wrapper.show-desktop .text-wrapper h2, section.banner.homepage .wrapper.show-desktop .text-wrapper p {
+        color: var(--neutral_white);
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3); }
+    section.banner.homepage .wrapper.show-desktop .button-wrapper {
+      justify-content: start; }
+  @media (max-width: 1023px) {
+    section.banner.homepage .show-tablet {
+      display: block; }
+    section.banner.homepage .show-desktop {
+      display: none; } }
+
+section.banner {
+  padding: 2rem 0 6rem;
+  position: relative; }
+  section.banner .wrapper {
+    position: relative;
+    margin: 0 auto;
+    max-width: 800px;
+    text-align: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    z-index: 1; }
+    @media screen and (max-width: 992px) {
+      section.banner .wrapper {
+        width: 80%; } }
+  section.banner h1, section.banner p {
+    color: var(--neutral_dark); }
+  section.banner h1 {
+    font-size: 3rem;
+    margin-block: 0 1rem; }
+  section.banner p {
+    margin-bottom: 0; }
+  section.banner figure {
+    max-width: 344px; }
+    section.banner figure img {
+      width: 100%; }
+  section.banner .button-wrapper {
+    justify-content: center; }
+  section.banner .overlay {
+    background: linear-gradient(0deg, white 0%, rgba(255, 255, 255, 0.5) 45%, rgba(255, 255, 255, 0) 100%);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0; }
+
+/*# sourceMappingURL=hoc-banner.css.map */
