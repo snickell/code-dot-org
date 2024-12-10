@@ -17,6 +17,10 @@ import {
   getAppOptionsEditingExemplar,
   getAppOptionsViewingExemplar,
 } from '@cdo/apps/lab2/projects/utils';
+import {
+  setUserRoleInCourse,
+  CourseRoles,
+} from '@cdo/apps/templates/currentUserRedux';
 import {LevelStatus} from '@cdo/generated-scripts/sharedConstants';
 
 import {getCurrentLevel} from '../code-studio/progressReduxSelectors';
@@ -47,6 +51,7 @@ import {
   LevelProperties,
   ProjectManagerStorageType,
   ProjectSources,
+  UserAppOptions,
   Validation,
 } from './types';
 import {LifecycleEvent} from './utils/LifecycleNotifier';
@@ -138,6 +143,12 @@ export const setUpWithLevel = createAsyncThunk<
     const {isProjectLevel, usesProjects} = levelProperties;
 
     Lab2Registry.getInstance().setAppName(levelProperties.appName);
+
+    loadUserAppOptions().then(result => {
+      if (result.isInstructor) {
+        thunkAPI.dispatch(setUserRoleInCourse(CourseRoles.Instructor));
+      }
+    });
 
     if (!usesProjects) {
       // If projects are disabled on this level, we can skip loading projects data.
@@ -544,6 +555,13 @@ async function loadLevelProperties(
     levelPropertiesPath,
     {},
     LevelPropertiesValidator
+  );
+  return response.value;
+}
+
+async function loadUserAppOptions(): Promise<UserAppOptions> {
+  const response = await HttpClient.fetchJson<UserAppOptions>(
+    '/api/user_app_options/music-jam-2024/1/5/62988'
   );
   return response.value;
 }

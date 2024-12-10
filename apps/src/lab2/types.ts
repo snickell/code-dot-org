@@ -17,6 +17,12 @@ import {lab2EntryPoints} from '../../lab2EntryPoints';
 
 export {Theme};
 
+/// ------ USER APP OPTIONS ------ ///
+
+export interface UserAppOptions {
+  isInstructor: boolean;
+}
+
 /// ------ PROJECTS ------ ///
 
 /** Identifies a project. Corresponds to the "value" JSON column for the entry in the projects table. */
