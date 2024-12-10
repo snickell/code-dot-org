@@ -1,6 +1,5 @@
 <Music>
   <config><![CDATA[{
-  "published": true,
   "game_id": 70,
   "created_at": "2024-11-27T17:46:26.000Z",
   "level_num": "custom",
@@ -14,7 +13,6 @@
     "hide_share_and_remix": "false",
     "level_data": {
       "library": "launch2024",
-      "packId": "henry_moodie_pick_up_the_phone",
       "toolbox": {
       },
       "startSources": {
@@ -36,23 +34,23 @@
                     "code": {
                       "block": {
                         "type": "play_sound_at_current_location_simple2",
-                        "id": "9kTSW_VXaBT/A[T+vzw$",
+                        "id": "play_sound_at_current_location_simple2",
                         "fields": {
-                          "sound": "henry_moodie_pick_up_the_phone/drums_percussion"
+                          "sound": "dove_cameron_boyfriend/main_beat"
                         },
                         "next": {
                           "block": {
                             "type": "play_sound_at_current_location_simple2",
-                            "id": "play_sound_at_current_location_simple2",
+                            "id": "9kTSW_VXaBT/A[T+vzw$",
                             "fields": {
-                              "sound": "henry_moodie_pick_up_the_phone/piano_hook"
+                              "sound": "dove_cameron_boyfriend/vocals_chorus_1"
                             },
                             "next": {
                               "block": {
                                 "type": "play_sound_at_current_location_simple2",
-                                "id": "j~?aOr_ttL-[iBXsGQ/M",
+                                "id": "WKFEdaq)zzApgs9,+17C",
                                 "fields": {
-                                  "sound": "henry_moodie_pick_up_the_phone/drums_prechorus_beat"
+                                  "sound": "dove_cameron_boyfriend/vocals_ooh"
                                 }
                               }
                             }
@@ -64,35 +62,35 @@
                   "next": {
                     "block": {
                       "type": "play_sound_at_current_location_simple2",
-                      "id": "ct4$=hssC~:S$:ZA]~b`",
+                      "id": "@tf5unHUq]=oHQJ7fNW;",
                       "fields": {
-                        "sound": "henry_moodie_pick_up_the_phone/drum_fill_3"
+                        "sound": "dove_cameron_boyfriend/plucks"
                       },
                       "next": {
                         "block": {
                           "type": "play_sounds_together",
-                          "id": "rZ1J3L:#+?vs}z1M8=Z`",
+                          "id": "sXVk^hx@R-Xt?LmL3Ey[",
                           "inputs": {
                             "code": {
                               "block": {
                                 "type": "play_sound_at_current_location_simple2",
-                                "id": "pa=@!}vy5LqA+teWXW;Y",
+                                "id": "U0k%~xxIxb8ck?R7Sh{k",
                                 "fields": {
-                                  "sound": "henry_moodie_pick_up_the_phone/drums_percussion"
+                                  "sound": "dove_cameron_boyfriend/main_beat"
                                 },
                                 "next": {
                                   "block": {
                                     "type": "play_sound_at_current_location_simple2",
-                                    "id": "=CN6+.KSTjg=s}9-H[Sx",
+                                    "id": "%9J;,qJ;Z~F5?G$gH,UP",
                                     "fields": {
-                                      "sound": "henry_moodie_pick_up_the_phone/piano_hook"
+                                      "sound": "dove_cameron_boyfriend/vocals_chorus_1"
                                     },
                                     "next": {
                                       "block": {
                                         "type": "play_sound_at_current_location_simple2",
-                                        "id": "dzF{VsX$NShEL2(+rNrA",
+                                        "id": "_SU2ZGOf5/N-k)QvrTC+",
                                         "fields": {
-                                          "sound": "henry_moodie_pick_up_the_phone/drums_prechorus_beat"
+                                          "sound": "dove_cameron_boyfriend/vocals_ooh"
                                         }
                                       }
                                     }
@@ -104,35 +102,35 @@
                           "next": {
                             "block": {
                               "type": "play_sound_at_current_location_simple2",
-                              "id": "r`nPM0qP#/#th7)JT=If",
+                              "id": "j~?aOr_ttL-[iBXsGQ/M",
                               "fields": {
-                                "sound": "henry_moodie_pick_up_the_phone/riser_crash"
+                                "sound": "dove_cameron_boyfriend/brass"
                               },
                               "next": {
                                 "block": {
                                   "type": "play_sounds_together",
-                                  "id": "D9e#YfQGl}@Fy0sFE.:]",
+                                  "id": "@,9(VL$LHCDW9B$?*~,a",
                                   "inputs": {
                                     "code": {
                                       "block": {
                                         "type": "play_sound_at_current_location_simple2",
-                                        "id": "c9PHTSD5_Z$Jbg5GwMLm",
+                                        "id": "#JG1P/CIwLIlY=mDFayN",
                                         "fields": {
-                                          "sound": "henry_moodie_pick_up_the_phone/drums_percussion"
+                                          "sound": "dove_cameron_boyfriend/main_beat"
                                         },
                                         "next": {
                                           "block": {
                                             "type": "play_sound_at_current_location_simple2",
-                                            "id": "1C9?Db@S7ZS^FYhl]2%x",
+                                            "id": "p@(]/umL:cu-^gDyJG2{",
                                             "fields": {
-                                              "sound": "henry_moodie_pick_up_the_phone/piano_hook"
+                                              "sound": "dove_cameron_boyfriend/vocals_chorus_1"
                                             },
                                             "next": {
                                               "block": {
                                                 "type": "play_sound_at_current_location_simple2",
-                                                "id": "NAQx:a*LVtaLM%Rw6zwc",
+                                                "id": "Y)RU4YX0RY.#JAiZ9Q5{",
                                                 "fields": {
-                                                  "sound": "henry_moodie_pick_up_the_phone/drums_prechorus_beat"
+                                                  "sound": "dove_cameron_boyfriend/vocals_ooh"
                                                 }
                                               }
                                             }
@@ -154,12 +152,14 @@
             }
           ]
         }
-      }
+      },
+      "packId": "dove_cameron_boyfriend"
     },
     "long_instructions": "###<i class=\"fa-regular fa-face-thinking\"></i> What do you notice? \r\n\r\n[Replace sounds with short simple sounds when available]\r\n\r\n- Look for patterns in the code!",
     "preload_asset_list": null
   },
-  "audit_log": "[{\"changed_at\":\"2024-11-27 17:47:17 +0000\",\"changed\":[],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-27 20:01:16 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 16:35:15 +0000\",\"changed\":[],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 16:35:59 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 16:47:04 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 16:47:43 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 16:48:23 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 17:14:33 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 17:39:01 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 17:41:35 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 21:43:21 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 21:46:20 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-04 19:10:19 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
+  "published": true,
+  "audit_log": "[{\"changed_at\":\"2024-11-27 17:47:17 +0000\",\"changed\":[],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-11-27 20:01:16 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 16:35:15 +0000\",\"changed\":[],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 16:35:59 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 16:47:04 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 16:47:43 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 16:48:23 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 17:14:33 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 17:39:01 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 17:41:35 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 21:43:21 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 21:46:20 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-04 19:10:19 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-09 16:54:58 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-09 18:17:42 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-09 18:20:46 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-09 18:27:27 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
 }]]></config>
   <blocks/>
 </Music>
