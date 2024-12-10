@@ -5,6 +5,7 @@ require 'uri'
 require 'yaml'
 require 'cdo/git_utils' # Necessary for 'test' environment to load test.erb.yml
 require 'cdo'
+require 'cdo/i18n'
 
 module Cdo
   # Lazily loads global configurations for regional pages
@@ -65,14 +66,9 @@ module Cdo
     end
 
     # @note Only Pegasus pages are available in all regional languages.
-    def self.locale_available?(hostname, region, locale)
+    def self.locale_available?(region, locale)
       return true if region.nil? || region.empty?
-
-      if hostname == CDO.pegasus_hostname
-        region_locales(region)&.include?(locale)
-      else
-        locale == main_region_locale(region)
-      end
+      region_locales(region)&.include?(locale)
     end
 
     def self.locale_lock?(region)
@@ -111,6 +107,19 @@ module Cdo
 
     def self.country_region(country)
       countries_regions[country]
+    end
+
+    def self.region_locale_options(region)
+      locale_options = Cdo::I18n.locale_options
+      return locale_options unless region_available?(region)
+
+      @region_locale_options ||= {}
+
+      @region_locale_options[region] ||= begin
+        region_locales = region_locales(region)
+        locale_options = locale_options.select {|_name, value| region_locales.include?(value)} if region_locales
+        locale_options
+      end
     end
   end
 end
