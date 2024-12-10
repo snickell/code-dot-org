@@ -13,6 +13,7 @@ import {
 } from '@reduxjs/toolkit';
 
 import {
+  getPublicCaching,
   getAppOptionsEditBlocks,
   getAppOptionsEditingExemplar,
   getAppOptionsViewingExemplar,
@@ -145,16 +146,18 @@ export const setUpWithLevel = createAsyncThunk<
 
     Lab2Registry.getInstance().setAppName(levelProperties.appName);
 
-    // If there is a user app options path because we are in a script level, then make
-    // as async call to the server to find out whether the user is an instructor, and
-    // if they are, then update the user role.  This is needed for the teacher panel to
-    // appear in cached levels.
-    if (payload.userAppOptionsPath) {
-      loadUserAppOptions(payload.userAppOptionsPath).then(result => {
-        if (result.isInstructor) {
-          thunkAPI.dispatch(setUserRoleInCourse(CourseRoles.Instructor));
-        }
-      });
+    // If we are cached, and there is a user app options path because we are in a script
+    // level, then make an async call to the server to find out whether the user is an
+    // instructor, and if they are, then update the user role.  This is needed for the
+    // teacher panel to appear in cached levels.
+    if (getPublicCaching()) {
+      if (payload.userAppOptionsPath) {
+        loadUserAppOptions(payload.userAppOptionsPath).then(result => {
+          if (result.isInstructor) {
+            thunkAPI.dispatch(setUserRoleInCourse(CourseRoles.Instructor));
+          }
+        });
+      }
     }
 
     if (!usesProjects) {
