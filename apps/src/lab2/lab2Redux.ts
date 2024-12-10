@@ -110,6 +110,7 @@ export const setUpWithLevel = createAsyncThunk<
     levelId: number;
     scriptId?: number;
     levelPropertiesPath: string;
+    userAppOptionsPath?: string;
     channelId?: string;
     userId?: number;
     scriptLevelId?: string;
@@ -144,11 +145,17 @@ export const setUpWithLevel = createAsyncThunk<
 
     Lab2Registry.getInstance().setAppName(levelProperties.appName);
 
-    loadUserAppOptions().then(result => {
-      if (result.isInstructor) {
-        thunkAPI.dispatch(setUserRoleInCourse(CourseRoles.Instructor));
-      }
-    });
+    // If there is a user app options path because we are in a script level, then make
+    // as async call to the server to find out whether the user is an instructor, and
+    // if they are, then update the user role.  This is needed for the teacher panel to
+    // appear in cached levels.
+    if (payload.userAppOptionsPath) {
+      loadUserAppOptions(payload.userAppOptionsPath).then(result => {
+        if (result.isInstructor) {
+          thunkAPI.dispatch(setUserRoleInCourse(CourseRoles.Instructor));
+        }
+      });
+    }
 
     if (!usesProjects) {
       // If projects are disabled on this level, we can skip loading projects data.
@@ -559,9 +566,12 @@ async function loadLevelProperties(
   return response.value;
 }
 
-async function loadUserAppOptions(): Promise<UserAppOptions> {
+async function loadUserAppOptions(
+  userAppOptionsPath: string
+): Promise<UserAppOptions> {
   const response = await HttpClient.fetchJson<UserAppOptions>(
-    '/api/user_app_options/music-jam-2024/1/5/62988'
+    userAppOptionsPath
+    //'/api/user_app_options/music-jam-2024/1/5/62988'
   );
   return response.value;
 }
