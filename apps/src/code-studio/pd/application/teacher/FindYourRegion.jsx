@@ -1,14 +1,7 @@
 import PropTypes from 'prop-types';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 /* eslint-disable no-restricted-imports */
-import {
-  FormGroup,
-  ControlLabel,
-  Modal,
-  Button,
-  Row,
-  Col,
-} from 'react-bootstrap';
+import {Col, ControlLabel, FormGroup, Row} from 'react-bootstrap';
 
 /* eslint-enable no-restricted-imports */
 import {
@@ -17,35 +10,84 @@ import {
 } from '@cdo/apps/generated/pd/teacherApplicationConstants';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
-import SchoolAutocompleteDropdown from '@cdo/apps/templates/SchoolAutocompleteDropdown';
+import {buildSchoolData} from '@cdo/apps/schoolInfo/utils/buildSchoolData';
+import SchoolDataInputs from '@cdo/apps/templates/SchoolDataInputs';
 import {isZipCode} from '@cdo/apps/util/formatValidation';
 
-import {useRegionalPartner} from '../../components/useRegionalPartner';
 import {
   FormContext,
   getValidationState,
 } from '../../form_components_func/FormComponent';
-import {LabeledInput} from '../../form_components_func/labeled/LabeledInput';
 import {LabeledRadioButtons} from '../../form_components_func/labeled/LabeledRadioButtons';
-import {LabeledSelect} from '../../form_components_func/labeled/LabeledSelect';
 import {LabelsContext} from '../../form_components_func/LabeledFormComponent';
 
 import {getProgramInfo, styles} from './TeacherApplicationConstants';
 
-const PD_RESOURCES_URL =
-  'https://support.code.org/hc/en-us/articles/115003865532';
-const CS_TEACHERS_URL = 'https://code.org/educate/community';
-const INTERNATIONAL = 'Other country';
-const US = 'United States';
+// const PD_RESOURCES_URL =
+//   'https://support.code.org/hc/en-us/articles/115003865532';
+// const CS_TEACHERS_URL = 'https://code.org/educate/community';
+// const INTERNATIONAL = 'Other country';
+// const US = 'United States';
 
 const FindYourRegion = props => {
-  const {onChange, errors, data} = props;
+  const {onChange, errors, data, schoolInfo, regionalPartner} = props;
   const hasNoProgramSelected = data.program === undefined;
-  const resetCountry = () => onChange({country: US});
-  const [regionalPartner] = useRegionalPartner(data);
+  // const builtSchoolInfo = useMemo(
+  //   () =>
+  //     buildSchoolData({
+  //       country: schoolInfo.country,
+  //       schoolId: schoolInfo.schoolId,
+  //       schoolZip: schoolInfo.schoolZip,
+  //       schoolName: schoolInfo.schoolName,
+  //     }),
+  //   [
+  //     schoolInfo.country,
+  //     schoolInfo.schoolId,
+  //     schoolInfo.schoolZip,
+  //     schoolInfo.schoolName,
+  //   ]
+  // );
+  // console.log('🚀 ~ FindYourRegion ~ builtSchoolInfo:', builtSchoolInfo);
+  // // const resetCountry = () => onChange({country: US});
+  // const [regionalPartner] = useRegionalPartner({
+  //   ...data,
+  //   school: builtSchoolInfo?.user.school_info_attributes.schoolId,
+  //   schoolZipCode: builtSchoolInfo?.user.school_info_attributes.schoolZip,
+  // });
   const [lastRPLogged, setLastRPLogged] = useState(regionalPartner?.name);
 
   const programInfo = getProgramInfo(data.program);
+
+  const builtSchoolInfo = useMemo(
+    () =>
+      buildSchoolData({
+        country: schoolInfo.country,
+        schoolId: schoolInfo.schoolId,
+        schoolZip: schoolInfo.schoolZip,
+        schoolName: schoolInfo.schoolName,
+      }),
+    [
+      schoolInfo.country,
+      schoolInfo.schoolId,
+      schoolInfo.schoolZip,
+      schoolInfo.schoolName,
+    ]
+  );
+
+  useEffect(() => {
+    console.log('IN BUILT SCINFO USEEFFECT', builtSchoolInfo);
+    // onChange({
+    //   school: builtSchoolInfo?.user.school_info_attributes.school_id,
+    //   schoolZipCode: builtSchoolInfo?.user.school_info_attributes.zip,
+    //   country: builtSchoolInfo?.user.school_info_attributes.country,
+    //   schoolType: builtSchoolInfo?.user.school_info_attributes.school_type,
+    // });
+    // if (builtSchoolInfo?.user.school_info_attributes.school_id) {
+    //   analyticsReporter.sendEvent(EVENTS.SCHOOL_ID_CHANGED_EVENT, {
+    //     'school id': builtSchoolInfo?.user.school_info_attributes.school_id,
+    //   });
+    // }
+  }, [builtSchoolInfo]);
 
   useEffect(() => {
     onChange({
@@ -77,48 +119,48 @@ const FindYourRegion = props => {
     });
   };
 
-  const renderInternationalModal = () => {
-    return (
-      <Modal show={data.country === INTERNATIONAL}>
-        <Modal.Header>
-          <Modal.Title>
-            Thank you for your interest in Code.org’s Professional Learning
-            Program.
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          At this time, we are only able to provide this program to teachers in
-          the United States. Please visit our website for additional Code.org{' '}
-          <a href={PD_RESOURCES_URL} target="_blank" rel="noopener noreferrer">
-            professional development resources
-          </a>{' '}
-          and opportunities to connect with other{' '}
-          <a href={CS_TEACHERS_URL} target="_blank" rel="noopener noreferrer">
-            computer science teachers
-          </a>
-          .
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={resetCountry} bsStyle="primary">
-            Continue as United States Teacher
-          </Button>
-          <Button href={PD_RESOURCES_URL}>Exit Application</Button>
-        </Modal.Footer>
-      </Modal>
-    );
-  };
+  // const renderInternationalModal = () => {
+  //   return (
+  //     <Modal show={data.country === INTERNATIONAL}>
+  //       <Modal.Header>
+  //         <Modal.Title>
+  //           Thank you for your interest in Code.org’s Professional Learning
+  //           Program.
+  //         </Modal.Title>
+  //       </Modal.Header>
+  //       <Modal.Body>
+  //         At this time, we are only able to provide this program to teachers in
+  //         the United States. Please visit our website for additional Code.org{' '}
+  //         <a href={PD_RESOURCES_URL} target="_blank" rel="noopener noreferrer">
+  //           professional development resources
+  //         </a>{' '}
+  //         and opportunities to connect with other{' '}
+  //         <a href={CS_TEACHERS_URL} target="_blank" rel="noopener noreferrer">
+  //           computer science teachers
+  //         </a>
+  //         .
+  //       </Modal.Body>
+  //       <Modal.Footer>
+  //         <Button onClick={resetCountry} bsStyle="primary">
+  //           Continue as United States Teacher
+  //         </Button>
+  //         <Button href={PD_RESOURCES_URL}>Exit Application</Button>
+  //       </Modal.Footer>
+  //     </Modal>
+  //   );
+  // };
 
-  const handleSchoolChange = selectedSchool => {
-    onChange({
-      school: selectedSchool?.value,
-      schoolZipCode: selectedSchool?.school?.zip,
-    });
-    if (selectedSchool) {
-      analyticsReporter.sendEvent(EVENTS.SCHOOL_ID_CHANGED_EVENT, {
-        'school id': selectedSchool.value,
-      });
-    }
-  };
+  // const handleSchoolChange = selectedSchool => {
+  //   onChange({
+  //     school: selectedSchool?.value,
+  //     schoolZipCode: selectedSchool?.school?.zip,
+  //   });
+  //   if (selectedSchool) {
+  //     analyticsReporter.sendEvent(EVENTS.SCHOOL_ID_CHANGED_EVENT, {
+  //       'school id': selectedSchool.value,
+  //     });
+  //   }
+  // };
 
   const renderRegionalPartnerInfo = () => {
     let content;
@@ -176,7 +218,7 @@ const FindYourRegion = props => {
       return (
         <>
           <LabeledRadioButtons name="country" />
-          {renderInternationalModal()}
+          {/* {renderInternationalModal()} */}
 
           <p>
             Please provide your school’s information below. If your school is
@@ -198,16 +240,24 @@ const FindYourRegion = props => {
             </Row>
             <Row>
               <Col md={6}>
-                <SchoolAutocompleteDropdown
+                <SchoolDataInputs
+                  {...schoolInfo}
+                  fieldNames={{
+                    schoolZip: 'schoolZipCode',
+                    schoolName: 'schoolName',
+                    schoolType: 'schoolType',
+                  }}
+                />
+                {/* <SchoolAutocompleteDropdown
                   value={data.school}
                   onChange={handleSchoolChange}
-                />
+                /> */}
               </Col>
             </Row>
           </FormGroup>
 
           {/* if we have a school but it doesn't exist in our database */}
-          {data.school && data.school === '-1' && (
+          {/* {data.school && data.school === '-1' && (
             <div style={styles.indented}>
               <LabeledInput name="schoolName" />
               <LabeledInput name="schoolDistrictName" required={false} />
@@ -217,7 +267,7 @@ const FindYourRegion = props => {
               <LabeledInput name="schoolZipCode" />
               <LabeledRadioButtons name="schoolType" />
             </div>
-          )}
+          )} */}
 
           {renderRegionalPartnerInfo()}
         </>
@@ -241,6 +291,9 @@ FindYourRegion.propTypes = {
   errors: PropTypes.arrayOf(PropTypes.string).isRequired,
   data: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
+  // TODO: use shape, not object
+  schoolInfo: PropTypes.object(),
+  regionalPartner: PropTypes.object(),
 };
 
 FindYourRegion.associatedFields = [...Object.keys(PageLabels.findYourRegion)];

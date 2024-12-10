@@ -16,11 +16,18 @@ class Api::V1::Pd::RegionalPartnerWorkshopsController < ApplicationController
       state = get_us_state_abbr_from_name(state, include_dc: true) if state && state.length > 2
     end
 
+    Rails.logger.info "SCHOOL HERE!!!"
+    Rails.logger.info school.to_json
+
     # Find the matching partner, even if it has no workshops
     partner = @partners.find_by_region(zip_code, state) || RegionalPartner.find_by_region(zip_code, state)
+    partner ||= @partners.find_by_zip(zip_code)&.first || RegionalPartner.find_by_zip(zip_code)&.first if zip_code.present?
     # To preserve existing behavior after upgrading to ActiveModelSerializers 10.x,
     # initialize partner to an object with nil values if not found.
     partner ||= RegionalPartner.new
+
+    Rails.logger.info "PARTNER HERE!!!"
+    Rails.logger.info partner.to_json
 
     render json: partner,
            serializer: Api::V1::Pd::RegionalPartnerWorkshopsSerializer,

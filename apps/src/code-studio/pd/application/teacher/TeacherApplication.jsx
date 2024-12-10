@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useMemo} from 'react';
 
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import {useSchoolInfo} from '@cdo/apps/schoolInfo/hooks/useSchoolInfo';
 import {reload} from '@cdo/apps/utils';
 
 import FormController from '../../form_components_func/FormController';
@@ -34,24 +35,62 @@ const autoComputedFields = [
 ];
 
 const TeacherApplication = props => {
-  const {savedFormData, accountEmail, schoolId} = props;
+  console.log('🚀 ~ TeacherApplication ~ props:', props);
+  const {savedFormData, accountEmail, existingSchoolInfo} = props;
+
+  const dataOnPageLoad = useMemo(() => {
+    if (savedFormData) {
+      return JSON.parse(savedFormData);
+    }
+  }, [savedFormData]);
+
+  const schoolInfo = useSchoolInfo({
+    schoolId: existingSchoolInfo.school_id,
+    schoolName: existingSchoolInfo.schoolName,
+    country: existingSchoolInfo.country,
+    schoolZip: existingSchoolInfo.school_zip,
+    schoolType: existingSchoolInfo.school_type,
+  });
+  console.log('🚀 ~ TeacherApplication ~ schoolInfo:', schoolInfo);
+
+  // const builtSchoolInfo = useMemo(
+  //   () =>
+  //     buildSchoolData({
+  //       country: schoolInfo.country,
+  //       schoolId: schoolInfo.schoolId,
+  //       schoolZip: schoolInfo.schoolZip,
+  //       schoolName: schoolInfo.schoolName,
+  //     }),
+  //   [
+  //     schoolInfo.country,
+  //     schoolInfo.schoolId,
+  //     schoolInfo.schoolZip,
+  //     schoolInfo.schoolName,
+  //   ]
+  // );
+
+  // const [regionalPartner] = useRegionalPartner({
+  //   ...dataOnPageLoad,
+  //   school: builtSchoolInfo?.user.school_info_attributes.school_id,
+  //   schoolZipCode: builtSchoolInfo?.user.school_info_attributes.zip,
+  // });
 
   const getInitialData = () => {
-    const dataOnPageLoad = savedFormData && JSON.parse(savedFormData);
-
+    // const dataOnPageLoad = savedFormData && JSON.parse(savedFormData);
+    return dataOnPageLoad;
     // Extract school info saved in sessionStorage, if any
-    const reloadedSchoolId = JSON.parse(
-      sessionStorage.getItem(sessionStorageKey)
-    )?.data?.school;
+    // const reloadedSchoolId = JSON.parse(
+    //   sessionStorage.getItem(sessionStorageKey)
+    // )?.data?.school;
 
-    // Populate additional data from server only if it doesn't override data in sessionStorage
-    // (even if value in sessionStorage is null)
-    // the FormController will handle loading reloadedSchoolId as an initial value, so return empty otherwise
-    if (reloadedSchoolId === undefined && schoolId) {
-      return {school: schoolId, ...dataOnPageLoad};
-    } else {
-      return {...dataOnPageLoad};
-    }
+    // // Populate additional data from server only if it doesn't override data in sessionStorage
+    // // (even if value in sessionStorage is null)
+    // // the FormController will handle loading reloadedSchoolId as an initial value, so return empty otherwise
+    // if (reloadedSchoolId === undefined && existingSchoolInfo?.school_id) {
+    //   return {school: existingSchoolInfo?.school_id, ...dataOnPageLoad};
+    // } else {
+    //   return {...dataOnPageLoad};
+    // }
   };
 
   const onInitialize = () => {
@@ -63,6 +102,8 @@ const TeacherApplication = props => {
 
   const getPageProps = () => ({
     accountEmail: accountEmail,
+    schoolInfo: schoolInfo,
+    // regionalPartner,
   });
 
   const onSuccessfulSubmit = () => {

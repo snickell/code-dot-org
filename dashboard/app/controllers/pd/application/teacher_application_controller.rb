@@ -34,10 +34,10 @@ module Pd::Application
           requiredFields: TEACHER_APPLICATION_CLASS.camelize_required_fields,
           accountEmail: current_user.email,
           apiEndpoint: '/api/v1/pd/application/teacher',
-          schoolId: current_user.school_info&.school&.id,
           applicationId: @application_id,
           savedStatus: @saved_status,
-          savedFormData: @form_data
+          savedFormData: @form_data,
+          existingSchoolInfo: Queries::SchoolInfo.current_school(current_user),
         }.to_json
       }
     end
