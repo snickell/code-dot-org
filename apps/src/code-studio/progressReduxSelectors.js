@@ -150,9 +150,6 @@ export const getUserAppOptionsPath = state => {
     const levelId = state.progress.currentLevelId;
 
     return `/api/user_app_options/${scriptName}/${lessonPosition}/${levelPosition}/${levelId}`;
-
-    //return `/api/user_app_options/${state.progress.scriptName}/1/1/1`;
-    //return '/api/user_app_options/music-jam-2024/1/5/62988';
   } else {
     return undefined;
   }

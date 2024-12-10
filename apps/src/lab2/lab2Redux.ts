@@ -574,7 +574,6 @@ async function loadUserAppOptions(
 ): Promise<UserAppOptions> {
   const response = await HttpClient.fetchJson<UserAppOptions>(
     userAppOptionsPath
-    //'/api/user_app_options/music-jam-2024/1/5/62988'
   );
   return response.value;
 }
