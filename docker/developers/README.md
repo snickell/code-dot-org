@@ -50,11 +50,11 @@ essential services and not run AWS emulation, use this command instead:
 docker compose run dashboard-services
 ```
 
-This will tell you which items you will need to place in your `locals.yml` file for the
-server to connect to the contained database and emulated S3 environment, if you elect to
-use that (recommended).
+Either command will tell you which items you will need to place in your `locals.yml` file
+for your local dashboard server to connect to the services provided.
 
-Just copy those lines into your `locals.yml` and start your Dashboard server as normal:
+Once you have the appropriate configuration in `locals.yml`, you can start your Dashboard
+server as normal:
 
 ```shell
 ./bin/dashboard-server
