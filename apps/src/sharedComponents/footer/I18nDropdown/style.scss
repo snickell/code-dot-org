@@ -2,7 +2,11 @@
 
 #localeForm {
   min-width: 6.25rem;
-  max-width: 50%;
+  max-width: 9.75rem;
+
+  & select {
+    width: 100%;
+  }
 }
 
 .languageSelect {

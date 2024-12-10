@@ -590,6 +590,10 @@ html, body {
       @include main-font-semi-bold;
     }
   }
+  & #global-edition-region-reset-button-container {
+    width: max-content;
+    margin: 0.5em 0;
+  }
   .dim {
     display: inline-block;
     opacity: 0.8;

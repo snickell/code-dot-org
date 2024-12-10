@@ -142,7 +142,7 @@ module Rack
         site_locale = request.cookies[LOCALE_KEY]
 
         if Cdo::GlobalEdition.region_available?(region)
-          unless Cdo::GlobalEdition.locale_available?(request.hostname, region, site_locale)
+          unless Cdo::GlobalEdition.locale_available?(region, site_locale)
             site_locale = Cdo::GlobalEdition.main_region_locale(region)
           end
         else
