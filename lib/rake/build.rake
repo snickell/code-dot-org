@@ -193,7 +193,7 @@ namespace :build do
       RakeUtils.yarn_install
 
       ChatClient.log 'Building <b>frontend</b>...'
-      RakeUtils.system "yarn release:dryrun"
+      RakeUtils.system "yarn release:dryrun --filter @code-dot-org/dsco "
     end
   end
 
