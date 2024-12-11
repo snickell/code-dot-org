@@ -97,4 +97,12 @@ module TestRunUtils
       end
     end
   end
+
+  def self.run_frontend_tests
+    Dir.chdir(frontend) do
+      ChatClient.wrap('frontend tests') do
+        RakeUtils.system_stream_output 'yarn test'
+      end
+    end
+  end
 end
