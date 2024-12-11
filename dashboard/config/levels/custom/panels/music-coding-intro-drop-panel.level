@@ -10,30 +10,34 @@
     "offer_browser_tts": "false",
     "panels": [
       {
-        "text": "**Wow!** You are doing great sequencing your code and loops to make music. ",
+        "text": "**Wow!** You are doing great sequencing your code, using loops and layering sounds to make music. ",
         "imageUrl": "https://images.code.org/d98399ec84dc64988b807b100623d58e-Lesson 3 Level 9.png",
         "key": "music-coding-intro-drop-panel-0f010c7c-b724-44cd-a2a7-4066da5c4751",
         "layout": "text-top-center"
       },
       {
-        "text": "Next, you will use what you've learned to remix a build-up to a beat drop, then make your own. ",
-        "imageUrl": "",
-        "key": "music-coding-intro-drop-panel-cb35bd4b-5269-40b5-aec2-c129b71e4caa",
-        "layout": "text-top-left"
+        "text": "Songwriters layer sounds to build energy in their music to hook the listener.",
+        "imageUrl": "https://images.code.org/f570aaa2a538eb9f2795fe55e6087cb0-songwriter.jpg",
+        "key": "music-coding-intro-drop-panel-5f236761-e567-4ab9-a188-1b15d91bd048"
       },
       {
-        "text": "A beat drop is when a song suddenly shifts, usually to a stronger, more exciting part.",
-        "imageUrl": "",
+        "text": "Timing is everything. The beat drop needs to hit *just right.*\n",
+        "imageUrl": "https://images.code.org/5358a7a0739e5cb254091cb719167eef-timing.jpg",
         "key": "music-coding-intro-drop-panel-6eb6b7d4-0f8c-41c1-a1a3-db6eea1f291b",
         "layout": "text-top-center"
       },
       {
-        "text": "Songwriters build tension before the beat drops, then release it with a powerful, exciting shift!",
+        "text": "A great beat drop grabs attention and creates a moment they’ll always remember.",
+        "imageUrl": "https://images.code.org/e1e5209fd96b1bd13d76542d0af5bca5-dance.jpg",
+        "key": "music-coding-intro-drop-panel-59786f5a-bf3f-4878-be20-35e07c0ed472"
+      },
+      {
+        "text": "Now it’s your turn! Start by remixing some code, then create your own beat drop!",
         "imageUrl": "",
-        "key": "music-coding-intro-drop-panel-5f236761-e567-4ab9-a188-1b15d91bd048"
+        "key": "music-coding-intro-drop-panel-f7e711ab-365f-4a0b-aaff-5164d525d328"
       }
     ]
   },
-  "audit_log": "[{\"changed_at\":\"2024-12-06 18:36:21 +0000\",\"changed\":[],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 18:39:55 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 18:40:38 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 18:41:07 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
+  "audit_log": "[{\"changed_at\":\"2024-12-06 18:36:21 +0000\",\"changed\":[],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 18:39:55 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 18:40:38 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 18:41:07 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-10 20:40:24 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 03:09:18 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 03:39:49 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 03:43:09 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 03:59:28 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
 }]]></config>
 </Panels>

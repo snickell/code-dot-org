@@ -15,7 +15,7 @@
     },
     "new_name": null,
     "family_name": "pilot-elem-music-lab",
-    "serialized_at": "2024-12-06 18:27:38 UTC",
+    "serialized_at": "2024-12-11 02:41:54 UTC",
     "published_state": "in_development",
     "instruction_type": "teacher_led",
     "instructor_audience": "teacher",
@@ -589,14 +589,11 @@
       "activity_section_position": 4,
       "assessment": false,
       "properties": {
-        "level_keys": [
-          "music-coding-intro-order"
-        ]
       },
       "bonus": false,
       "seeding_key": {
         "script_level.level_keys": [
-          "music-coding-intro-order"
+          "music-coding-intro-play-two"
         ],
         "lesson.key": "lesson-8",
         "lesson_group.key": "lessonGroup-3",
@@ -604,7 +601,7 @@
         "activity_section.key": "c3d88520-c67b-4816-89b0-e53e266516fc"
       },
       "level_keys": [
-        "music-coding-intro-order"
+        "music-coding-intro-play-two"
       ]
     },
     {
@@ -733,6 +730,9 @@
       "activity_section_position": 10,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "music-coding-intro-drop-panel"
+        ]
       },
       "bonus": false,
       "seeding_key": {
@@ -2311,9 +2311,9 @@
     },
     {
       "seeding_key": {
-        "level.key": "music-coding-intro-order",
+        "level.key": "music-coding-intro-play-two",
         "script_level.level_keys": [
-          "music-coding-intro-order"
+          "music-coding-intro-play-two"
         ],
         "lesson.key": "lesson-8",
         "lesson_group.key": "lessonGroup-3",
