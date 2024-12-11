@@ -15,7 +15,7 @@ export interface LinkBaseProps extends HTMLAttributes<HTMLAnchorElement> {
   /** Should the link open in a new tab? */
   openInNewTab?: boolean;
   /** Link destination */
-  href: string;
+  href?: string;
   /** Is the link disabled? */
   disabled?: boolean;
   /** Callback for click event */
@@ -31,14 +31,12 @@ export interface LinkBaseProps extends HTMLAttributes<HTMLAnchorElement> {
 export type LinkWithChildren = LinkBaseProps & {
   /** Link content */
   children: React.ReactNode;
-  className?: string;
   text?: never;
 };
 
 export type LinkWithText = LinkBaseProps & {
   /** Link text content */
   text: string;
-  className?: string;
   children?: never;
 };
 
