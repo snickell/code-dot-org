@@ -186,7 +186,19 @@ namespace :build do
     end
   end
 
+  desc 'Builds frontend'
+  timed_task_with_logging :frontend do
+    Dir.chdir(frontend_dir) do
+      ChatClient.log 'Installing <b>frontend</b> dependencies...'
+      RakeUtils.yarn_install
+
+      ChatClient.log 'Building <b>frontend</b>...'
+      RakeUtils.system "yarn release:dryrun"
+    end
+  end
+
   tasks = []
+  tasks << :frontend if CDO.build_apps
   tasks << :apps if CDO.build_apps
   tasks << :dashboard if CDO.build_dashboard
   tasks << :pegasus if CDO.build_pegasus
@@ -207,7 +219,8 @@ def apps_build_trigger_paths
   [
     apps_dir,
     shared_constants_file,
-    shared_constants_dir
+    shared_constants_dir,
+    frontend_dir
   ]
 end
 
