@@ -99,7 +99,7 @@ module TestRunUtils
   end
 
   def self.run_frontend_tests
-    Dir.chdir(frontend) do
+    Dir.chdir(frontend_dir) do
       ChatClient.wrap('frontend tests') do
         RakeUtils.system_stream_output 'yarn test'
       end
