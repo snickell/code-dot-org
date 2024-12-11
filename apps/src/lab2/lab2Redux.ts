@@ -52,7 +52,7 @@ import {
   LevelProperties,
   ProjectManagerStorageType,
   ProjectSources,
-  UserAppOptions,
+  PartialUserAppOptions,
   Validation,
 } from './types';
 import {LifecycleEvent} from './utils/LifecycleNotifier';
@@ -571,8 +571,8 @@ async function loadLevelProperties(
 
 async function loadUserAppOptions(
   userAppOptionsPath: string
-): Promise<UserAppOptions> {
-  const response = await HttpClient.fetchJson<UserAppOptions>(
+): Promise<PartialUserAppOptions> {
+  const response = await HttpClient.fetchJson<PartialUserAppOptions>(
     userAppOptionsPath
   );
   return response.value;

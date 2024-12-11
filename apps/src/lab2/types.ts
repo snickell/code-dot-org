@@ -19,7 +19,9 @@ export {Theme};
 
 /// ------ USER APP OPTIONS ------ ///
 
-export interface UserAppOptions {
+// Partial definition of the UserAppOptions structure, only defining the
+// pieces we need at the moment.
+export interface PartialUserAppOptions {
   isInstructor: boolean;
 }
 
