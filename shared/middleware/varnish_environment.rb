@@ -29,11 +29,10 @@ class VarnishEnvironment < Sinatra::Base
       redirect_uri = URI(request.path)
       redirect_params = request.params.except(LOCALE_PARAM_KEY)
 
-      current_ge_region = request.cookies[Rack::GlobalEdition::REGION_KEY]
-      if Cdo::GlobalEdition.locale_available?(current_ge_region, param_locale)
+      if Cdo::GlobalEdition.locale_available?(request.ge_region, param_locale)
         # Logs the region that will be set based on the selected locale.
         locale_ge_region = Cdo::GlobalEdition.region_locked_locales[param_locale]
-        log_ge_region_select_event(locale_ge_region) if locale_ge_region && locale_ge_region != current_ge_region
+        log_ge_region_select_event(locale_ge_region) if locale_ge_region && locale_ge_region != request.ge_region
       else
         # Resets Global Edition region if the locale is not available for the region.
         redirect_params[Rack::GlobalEdition::REGION_KEY] = nil
