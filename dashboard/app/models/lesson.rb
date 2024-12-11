@@ -66,6 +66,7 @@ class Lesson < ApplicationRecord
     student_overview
     unplugged
     creative_commons_license
+    background
     assessment
     purpose
     preparation
@@ -423,6 +424,7 @@ class Lesson < ApplicationRecord
       lockable: lockable,
       hasLessonPlan: has_lesson_plan,
       creativeCommonsLicense: creative_commons_license,
+      background: background,
       purpose: purpose,
       preparation: preparation,
       announcements: announcements,
