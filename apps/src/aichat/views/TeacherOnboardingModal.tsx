@@ -50,11 +50,13 @@ const TeacherOnboardingModal: React.FunctionComponent<
                 />
               </BodyTwoText>
             </li>
-            <BodyTwoText>
-              <SafeMarkdown
-                markdown={aichatI18n.teacherOnboardingModal_modelCustomizationBullet()}
-              />
-            </BodyTwoText>
+            <li>
+              <BodyTwoText>
+                <SafeMarkdown
+                  markdown={aichatI18n.teacherOnboardingModal_modelCustomizationBullet()}
+                />
+              </BodyTwoText>
+            </li>
             <li>
               <BodyTwoText>
                 <SafeMarkdown
