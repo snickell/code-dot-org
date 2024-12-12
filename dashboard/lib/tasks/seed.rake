@@ -106,15 +106,7 @@ namespace :seed do
     interactive-games-animations-2023
     focus-on-creativity3-2023
     focus-on-coding3-2023
-    csd1-2024
-    csd2-2024
     csd3-2024
-    csd4-2024
-    csd5-2024
-    csd6a-2024
-    csd6b-2024
-    csd7-2024
-    csd-post-survey-2024
     interactive-games-animations-2024
     focus-on-creativity3-2024
     focus-on-coding3-2024
@@ -304,7 +296,7 @@ namespace :seed do
 
   timed_task_with_logging courses_ui_tests: :environment do
     # seed those courses that are needed for UI tests
-    %w(allthethingscourse csp-2017 csp-2019 csd-2024).each do |course_name|
+    %w(allthethingscourse csp-2017 csp-2019).each do |course_name|
       UnitGroup.load_from_path("config/courses/#{course_name}.course")
     end
     %w(ui-test-course-2017 ui-test-course-2019).each do |course_name|
