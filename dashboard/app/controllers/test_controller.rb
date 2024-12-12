@@ -90,10 +90,9 @@ class TestController < ApplicationController
     script = Unit.find_by_name(params.require(:script_name))
     course = UnitGroup.find_by_name(params.require(:course_name))
 
-    teacher_name = params[:teacher_name]
-    teacher_user = nil
-    if teacher_name
-      teacher_user = User.find_by_email(teacher_name)
+    teacher_email = params[:teacher_email]
+    if teacher_email
+      teacher_user = User.find_by_email(teacher_email)
     else
       name = "Fake User"
       email = "user#{Time.now.to_i}_#{rand(1_000_000)}@test.xx"

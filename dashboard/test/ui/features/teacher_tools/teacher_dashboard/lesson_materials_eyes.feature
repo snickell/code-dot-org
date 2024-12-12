@@ -5,7 +5,7 @@ Feature: Lesson materials page - Eyes
   Scenario: Lesson materials page
     When I open my eyes to test "lesson materials"
     Given I create an authorized teacher-associated student named "Sally"
-    Given I am assigned to course "csd-2024" and unit "csd3-2024" with teacher "Teacher_Sally"
+    Given I am assigned to course "allthethingscourse" and unit "allthethings" with teacher "Teacher_Sally"
 
     When I sign in as "Teacher_Sally" and go home
     And I get levelbuilder access
@@ -23,9 +23,13 @@ Feature: Lesson materials page - Eyes
 
     And I see no difference for "lesson materials"
 
-    And I select the "Lesson 3 — Drawing in Game Lab" option in dropdown "ui-test-lessons-in-assigned-unit-dropdown"
-    And I wait until element "p:contains('Lesson Plan: Drawing in Game Lab')" is visible
+    And I select the "Lesson 48 — AI Rubrics" option in dropdown "ui-test-lessons-in-assigned-unit-dropdown"
+    And I wait until element "p:contains('Lesson Plan: AI Rubrics')" is visible
 
-    And I see no difference for "lesson materials - lesson 3"
+    And I see no difference for "lesson materials - lesson 48"
+
+    And I click selector "a:contains('Lesson Plan: AI Rubrics')" to load a new tab
+    And I wait until element "h1:contains('Lesson 48: AI Rubrics')" is visible
+    And I am on "http://studio.code.org/s/allthethings/lessons/48"
 
     And I close my eyes
