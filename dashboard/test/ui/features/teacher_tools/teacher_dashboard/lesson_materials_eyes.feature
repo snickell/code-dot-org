@@ -28,8 +28,8 @@ Feature: Lesson materials page - Eyes
 
     And I see no difference for "lesson materials - lesson 48"
 
-    And I click selector "a:contains('Lesson Plan: AI Rubrics')" once I see it
-    And I wait until element "h2:contains('0 minutes')" is visible
+    And I click selector "a:contains('Lesson Plan: AI Rubrics')" to load a new tab
+    And I wait until element "h1:contains('Lesson 48: AI Rubrics')" is visible
     And I am on "http://studio.code.org/s/allthethings/lessons/48"
 
     And I close my eyes
