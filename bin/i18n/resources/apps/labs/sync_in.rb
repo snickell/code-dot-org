@@ -21,13 +21,9 @@ module I18n
           private def prepare_i18n_source_files
             Dir.glob(CDO.dir('apps/i18n/**/en_us.json')) do |filepath|
               lab_name = File.basename(File.dirname(filepath))
+              next if EXTERNAL_LABS.include?(lab_name)
               I18nScriptUtils.copy_file(filepath, File.join(I18N_SOURCE_DIR_PATH, "#{lab_name}.json"))
             end
-
-            # `@code-dot-org/ml-activities/i18n/oceans.json` is used as the i18n source for `apps/i18n/fish/*.json`
-            # instead of the original file `apps/i18n/fish/en_us.json`
-            oceans_lab_path = CDO.dir('apps/node_modules/@code-dot-org/ml-activities/i18n/oceans.json')
-            I18nScriptUtils.copy_file(oceans_lab_path, File.join(I18N_SOURCE_DIR_PATH, 'fish.json')) if File.exist?(oceans_lab_path)
           end
 
           private def redact_i18n_source_files

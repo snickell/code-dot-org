@@ -10,12 +10,16 @@ module I18n
       module ExternalSources
         class SyncIn < I18n::Utils::SyncInBase
           BLOCKLY_CORE_DIR_PATH = CDO.dir('apps/node_modules/@code-dot-org/blockly/i18n/locales/en-US').freeze
+          OCEANS_FILE_PATH = CDO.dir('apps/node_modules/@code-dot-org/ml-activities/i18n/oceans.json').freeze
           ML_PLAYGROUND_FILE_PATH = CDO.dir('apps/node_modules/@code-dot-org/ml-playground/i18n/mlPlayground.json').freeze
           DATASETS_MANIFEST_FILE_PATH = CDO.dir('apps/node_modules/@code-dot-org/ml-playground/public/datasets-manifest.json').freeze
           DATASETS_DIR_PATH = CDO.dir('apps/node_modules/@code-dot-org/ml-playground/public/datasets').freeze
 
           def process
             prepare_blockly_core_files
+            progress_bar.progress = 20
+
+            prepare_ml_activities_file
             progress_bar.progress = 40
 
             prepare_ml_playground_file
@@ -29,6 +33,10 @@ module I18n
             Dir.glob(File.join(BLOCKLY_CORE_DIR_PATH, '*.json')) do |filepath|
               I18nScriptUtils.copy_file(filepath, BLOCKLY_CORE_I18N_SOURCE_DIR)
             end
+          end
+
+          private def prepare_ml_activities_file
+            I18nScriptUtils.copy_file(OCEANS_FILE_PATH, OCEANS_I18N_SOURCE_DIR)
           end
 
           # Prepares AI Lab UI Strings
