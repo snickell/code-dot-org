@@ -15,4 +15,7 @@ export default {
   dryRun: false,
   prerelease: true,
   prereleaseId: 'alpha',
+  versionStrategy: {
+    minimumStrategy: 'patch',
+  }
 };
