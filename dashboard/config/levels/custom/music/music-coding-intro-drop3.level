@@ -2,7 +2,7 @@
   <config><![CDATA[{
   "published": true,
   "game_id": 70,
-  "created_at": "2024-11-24T17:08:19.000Z",
+  "created_at": "2024-12-12T00:10:30.000Z",
   "level_num": "custom",
   "user_id": 18605,
   "properties": {
@@ -192,7 +192,7 @@
         }
       },
       "library": "launch2024",
-      "packId": "sabrina_carpenter_espresso",
+      "packId": "chainsmokers_coldplay_something_just_like_this",
       "toolbox": {
         "type": "flyout",
         "blocks": {
@@ -214,15 +214,15 @@
     "encrypted": "false",
     "instructions_important": "false",
     "hint_prompt_attempts_threshold": "1",
-    "long_instructions": "####Modify the beat\r\n1. Start by exploring the code and listen closely to the sound layering.\r\n2. Make it your own by experimenting with different sounds, layers and timing.\r\n3. Press Continue when you are done. ",
+    "long_instructions": "####Modify the beat\r\n1. Start by exploring the code and listen closely to the sound layering.\r\n2. Make it your own by experimenting with different sounds, layers and timing.\r\n3. Press Finish when you are done. ",
     "offer_browser_tts": "false",
     "use_secondary_finish_button": "false",
     "hide_share_and_remix": "false",
-    "display_name": "Espresso",
-    "bubble_choice_description": "By Sabrina Carpenter",
+    "display_name": "Something Just Like This",
+    "bubble_choice_description": "By The Chainsmokers & Coldplay",
     "preload_asset_list": null
   },
-  "audit_log": "[{\"changed_at\":\"2024-11-24 17:59:30 +0000\",\"changed\":[],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-02 19:26:37 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-02 19:29:32 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-02 19:51:57 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-02 20:01:30 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-02 20:03:33 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-02 21:52:43 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 02:52:01 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 02:53:07 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 02:56:05 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 22:05:31 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 22:55:44 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 23:22:43 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-12 00:19:41 +0000\",\"changed\":[],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-12 00:49:47 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
+  "audit_log": "[{\"changed_at\":\"2024-12-12T00:10:30.141+00:00\",\"changed\":[\"cloned from \\\"music-coding-intro-drop\\\"\"],\"cloned_from\":\"music-coding-intro-drop\"},{\"changed_at\":\"2024-12-12 00:20:14 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-12 00:21:54 +0000\",\"changed\":[],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
 }]]></config>
   <blocks/>
 </Music>

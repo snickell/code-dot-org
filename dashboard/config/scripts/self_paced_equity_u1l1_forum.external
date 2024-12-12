@@ -5,7 +5,9 @@ description 'description here'
 markdown <<MARKDOWN
 # Introduce Yourself!
 
-#### Code.org's Teacher Forum is a great way to get involved in a community of CS teachers nationwide!
+#### Code.org's Teacher Forum is a great way to get involved in a community of CS teachers nationwide! In addition to finding posts related to this course, you can also find lots of help with our curricula and coding support.
+
+### Please join our forum using the prompt below.
 <br>
 
 <div style="display: flex; align-items: left;">
@@ -17,9 +19,9 @@ markdown <<MARKDOWN
 
 <p style="color: white; line-height: 1.5; margin-left: 10px; margin-right: 10px; font-size: 18px"><b>Post to the Code.org Forum <mark>(update icon link)</mark></b></p>
 
-<p style="color: white; line-height: 1.5; margin-left: 10px; margin-right: 10px; font-size: 16px">Join our online community of teachers! Click on the icon to the left be directed to our forum post and share the following: 
+<p style="color: white; line-height: 1.2; margin-left: 10px; margin-right: 10px; font-size: 18px">Join our online community of teachers! Click on the icon to the left be directed to our forum post and share the following: 
 
-<ul style="color: white; line-height: 2; font-size: 16px; margin-left: 20px;">
+<ul style="color: white; line-height: 2; font-size: 18px; margin-left: 20px;">
 <li>Your Name</li>
 <li>Your Teaching Context - State and Grade Level(s)</li>
 <li>Your intention for taking this course</li></ul>

@@ -19589,14 +19589,46 @@ en:
 
             ##### ⏰ **Suggested total time for this module:** 85 minutes
         self-paced-pl-equitymodule-unit2:
-          lessons: {}
+          lessons:
+            lesson-1:
+              name: Cultivating an Inclusive Classroom Culture
+            lesson-2:
+              name: Bias and Stereotype Threat
+            lesson-3:
+              name: Expanding Access to Computer Science
+            lesson-4:
+              name: Equity in Code.org’s Curriculum
           lesson_groups: {}
           name: self-paced-pl-equitymodule-unit2
           title: Strategies to Promote Equity in Computer Science
           description_audience: ''
           description_short: ''
-          description: ''
-          student_description: ''
+          description: |-
+            ##### **Module 2: Strategies to Promote Equity in Computer Science** gets concrete about strategies educators can use in their classrooms to promote equity in computer science. This unit is oriented toward resources educators can use to bridge professional learning to the classroom.
+
+            ##### There are four lessons in Module 2:
+
+            * ##### Cultivating an Inclusive Classroom Culture
+            * ##### Bias and Stereotype Threat
+            * ##### Expanding Access to Computer Science
+            * ##### Equity in Code.org’s Curriculum
+
+            ___
+
+            ##### ⏰ Suggested total time for this module: <mark>update</mark>
+          student_description: |-
+            ##### **Module 2: Strategies to Promote Equity in Computer Science** gets concrete about strategies educators can use in their classrooms to promote equity in computer science. This unit is oriented toward resources educators can use to bridge professional learning to the classroom.
+
+            ##### There are four lessons in Module 2:
+
+            * ##### Cultivating an Inclusive Classroom Culture
+            * ##### Bias and Stereotype Threat
+            * ##### Expanding Access to Computer Science
+            * ##### Equity in Code.org’s Curriculum
+
+            ___
+
+            ##### ⏰ Suggested total time for this module: <mark>update</mark>
         sandbox-teaching-getting-started:
           lessons:
             lesson-5:

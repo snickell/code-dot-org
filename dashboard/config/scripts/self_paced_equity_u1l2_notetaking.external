@@ -5,7 +5,7 @@ description 'description here'
 markdown <<MARKDOWN
 # Preparing to Look at Data
 
-<div style="display: flex; align-items: left; border: 1px solid black; border-radius: 20px 20px 20px 20px; padding: 20px 10px 10px 10px; margin: 20px 20px 20px 20px">
+<div style="display: flex; align-items: left; border: 1px solid black; border-radius: 20px; padding: 20px 10px 10px 10px; margin: 20px 0px 20px 0px">
 
 <a href="code.org" target="blank" rel="noopener noreferrer"><img src="https://images.code.org/b3228ff3b84aeb85ec00b47136800a8f-image-1731959884476.png" style="width: auto; height: 50px;" alt="A piece of paper with lines and a pencil."></a>
 
@@ -18,7 +18,7 @@ markdown <<MARKDOWN
 </div>
 </div>
 
-<img src="https://images.code.org/c837765ef5551be31c7083d46f8ca29b-image-1733351172628.22.46 PM.png" alt="The note-taking space in the Activity Guide." style="border:1px solid #000000; float: right; height: 300px; clear: both; margin: 0px 10px 10px 10px;">
+<img src="https://images.code.org/c837765ef5551be31c7083d46f8ca29b-image-1733351172628.22.46 PM.png" alt="The note-taking space in the Activity Guide." style="border:1px solid #000000; float: right; height: 300px; clear: both; margin: 0px 10px 10px 10px; border-radius: 10px">
 
 #### In the next level, you'll be taking a look at a lot of data. To help you organize your thoughts, we've included a note-taking section of the Activity Guide on <mark>page 7</mark>. You are welcome to take notes on whatever interests you, but here's a few questions to get you started:
 

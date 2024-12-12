@@ -16,28 +16,28 @@
         "layout": "text-top-center"
       },
       {
-        "text": "Songwriters layer sounds to build energy in their music to hook the listener.",
+        "text": "Songwriters layer sounds together to build energy in their music and hook the listener.",
         "imageUrl": "https://images.code.org/f570aaa2a538eb9f2795fe55e6087cb0-songwriter.jpg",
         "key": "music-coding-intro-drop-panel-5f236761-e567-4ab9-a188-1b15d91bd048"
       },
       {
-        "text": "Timing is everything. The beat drop needs to hit *just right.*\n",
+        "text": "Timing is everything in the build up. The beat drop needs to hit *just right.*\n",
         "imageUrl": "https://images.code.org/5358a7a0739e5cb254091cb719167eef-timing.jpg",
         "key": "music-coding-intro-drop-panel-6eb6b7d4-0f8c-41c1-a1a3-db6eea1f291b",
         "layout": "text-top-center"
       },
       {
-        "text": "A great beat drop grabs attention and creates a moment they’ll always remember.",
+        "text": "A great beat drop is a transition that grabs your attention and creates a moment you will always remember.",
         "imageUrl": "https://images.code.org/e1e5209fd96b1bd13d76542d0af5bca5-dance.jpg",
         "key": "music-coding-intro-drop-panel-59786f5a-bf3f-4878-be20-35e07c0ed472"
       },
       {
-        "text": "Now it’s your turn! Start by remixing some code, then create your own beat drop!",
+        "text": "Now it’s your turn! Start by remixing some code, then create your own!",
         "imageUrl": "",
         "key": "music-coding-intro-drop-panel-f7e711ab-365f-4a0b-aaff-5164d525d328"
       }
     ]
   },
-  "audit_log": "[{\"changed_at\":\"2024-12-06 18:36:21 +0000\",\"changed\":[],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 18:39:55 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 18:40:38 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 18:41:07 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-10 20:40:24 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 03:09:18 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 03:39:49 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 03:43:09 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 03:59:28 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
+  "audit_log": "[{\"changed_at\":\"2024-12-06 18:36:21 +0000\",\"changed\":[],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 18:39:55 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 18:40:38 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-06 18:41:07 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-10 20:40:24 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 03:09:18 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 03:39:49 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 03:43:09 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 03:59:28 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-11 17:38:43 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-12 00:06:58 +0000\",\"changed\":[\"panels\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
 }]]></config>
 </Panels>
