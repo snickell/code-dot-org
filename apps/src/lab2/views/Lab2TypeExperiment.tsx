@@ -1,13 +1,9 @@
-import {lab2EntryPoints} from 'lab2EntryPoints';
 import React, {useEffect, useState} from 'react';
 
-import {ProjectSources} from '../types';
-
-// List of all apps that we support, as keys of entrypoints
-type App = keyof typeof lab2EntryPoints;
+import {AppName, ProjectSources} from '../types';
 
 // Common level properties interface for all labs
-interface BaseLevelProperties<T extends App> {
+interface BaseLevelProperties<T extends AppName> {
   appName: T;
   isProjectLevel?: boolean;
   hideAndShareRemix?: boolean;
@@ -39,13 +35,13 @@ type LevelPropertiesMap = {
 };
 
 // Assume we have some selector to get the app for the current level before we load level props...
-function getAppType(levelId: number): App {
+function getAppType(levelId: number): AppName {
   // Fake implementation
   return levelId % 2 === 0 ? 'music' : 'pythonlab';
 }
 
 // Assume this does all the work to load level properties and sources for a given level (like we do in lab2Redux currently)
-async function loadData<T extends App>(
+async function loadData<T extends AppName>(
   levelId: number
 ): Promise<LevelPropertiesMap[T]> {
   const app = getAppType(levelId);
@@ -62,54 +58,57 @@ async function loadData<T extends App>(
 }
 
 // Props type for Lab view components
-interface LabProps<T extends App> {
-  levelProps: LevelPropertiesMap[T];
+interface LabProps<T extends AppName> {
+  levelProperties: LevelPropertiesMap[T];
   initialSources: ProjectSources;
 }
 
 // Sample lab-specific views that use lab-specific props that are automatically typed
 const MusicLab: React.FC<LabProps<'music'>> = ({
-  levelProps,
+  levelProperties,
   initialSources,
 }) => {
   return (
-    <div>{`Music Lab using lab-specific props! Library: ${levelProps.library}`}</div>
+    <div>{`Music Lab using lab-specific props! Library: ${levelProperties.library}`}</div>
   );
 };
 
 const PythonLab: React.FC<LabProps<'pythonlab'>> = ({
-  levelProps,
+  levelProperties,
   initialSources,
 }) => {
   return (
-    <div>{`Python Lab using lab-specific props! Validation code: ${levelProps.validationCode}`}</div>
+    <div>{`Python Lab using lab-specific props! Validation code: ${levelProperties.validationCode}`}</div>
   );
 };
 
 // Here we map each lab type to its view component (we could roll this into lab2EntryPoints)
-const AppTypeMap: {[K in App]?: React.FC<LabProps<K>>} = {
+const AppTypeMap: {[K in AppName]?: React.FC<LabProps<K>>} = {
   music: MusicLab,
   pythonlab: PythonLab,
 };
 
 // Simple Lab Container view that loads level properties and renders the appropriate lab view
 const LabContainer: React.FC<{levelId: number}> = ({levelId}) => {
-  const [levelProps, setLevelProps] = useState<LevelPropertiesMap[App]>();
+  const [levelProperties, setLevelProperties] =
+    useState<LevelPropertiesMap[AppName]>();
 
   useEffect(() => {
     // Reload data whenever level changes
-    loadData(levelId).then(setLevelProps);
+    loadData(levelId).then(setLevelProperties);
   }, [levelId]);
 
-  if (!levelProps) {
+  if (!levelProperties) {
     return null;
   }
 
   // Use the loaded level props to render the appropriate lab view
-  const appName = levelProps.appName;
+  const appName = levelProperties.appName;
   const AppView = AppTypeMap[appName] as React.FC<LabProps<typeof appName>>;
 
-  return <AppView levelProps={levelProps} initialSources={{source: ''}} />;
+  return (
+    <AppView levelProperties={levelProperties} initialSources={{source: ''}} />
+  );
 };
 
 export default LabContainer;
