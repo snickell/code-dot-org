@@ -12,17 +12,17 @@ module I18n
       module Labs
         class SyncOut < I18n::Utils::SyncOutBase
           def process(language)
-            crowdin_locale_dir = I18nScriptUtils.crowdin_locale_dir(language[:locale_s], DIR_NAME)
-            return unless File.directory?(crowdin_locale_dir)
+            tms_locale_dir = I18nScriptUtils.tms_locale_dir(language[:locale_s], DIR_NAME)
+            return unless File.directory?(tms_locale_dir)
 
-            restore_crawding_locale_files(language[:locale_s], crowdin_locale_dir)
-            distribute_crawding_locale_files(language[:locale_s], crowdin_locale_dir)
+            restore_tms_locale_files(language[:locale_s], tms_locale_dir)
+            distribute_tms_locale_files(language[:locale_s], tms_locale_dir)
 
             i18n_locale_dir = I18nScriptUtils.locale_dir(language[:locale_s], DIR_NAME)
-            I18nScriptUtils.rename_dir(crowdin_locale_dir, i18n_locale_dir)
+            I18nScriptUtils.rename_dir(tms_locale_dir, i18n_locale_dir)
           end
 
-          private def restore_crawding_locale_files(locale, crowdin_locale_dir)
+          private def restore_tms_locale_files(locale, tms_locale_dir)
             malformed_i18n_reporter = I18n::Utils::MalformedI18nReporter.new(locale)
 
             REDACTABLE_LABS.each do |lab_name|
@@ -30,7 +30,7 @@ module I18n
               next unless File.exist?(i18n_original_file_path)
 
               file_name = File.basename(i18n_original_file_path)
-              crowdin_locale_file_path = File.join(crowdin_locale_dir, file_name)
+              crowdin_locale_file_path = File.join(tms_locale_dir, file_name)
               next unless File.exist?(crowdin_locale_file_path)
 
               RedactRestoreUtils.restore(
@@ -50,10 +50,10 @@ module I18n
             CDO.dir('apps/i18n', lab_name, "#{js_locale}.json")
           end
 
-          private def distribute_crawding_locale_files(locale, crowdin_locale_dir)
+          private def distribute_tms_locale_files(locale, tms_locale_dir)
             js_locale = I18nScriptUtils.to_js_locale(locale)
 
-            Dir.glob(File.join(crowdin_locale_dir, '*.json')) do |crowdin_locale_file_path|
+            Dir.glob(File.join(tms_locale_dir, '*.json')) do |crowdin_locale_file_path|
               lab_name = File.basename(crowdin_locale_file_path, '.json')
               next if UNTRANSLATABLE_LABS.include?(lab_name)
 

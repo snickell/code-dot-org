@@ -26,15 +26,15 @@ module I18n
             File.join(ORIGIN_I18N_DIR_PATH, "#{type}.#{i18n_locale}.#{extension}")
           end
 
-          private def restore_level_content(file_subpath, crowdin_file_path)
+          private def restore_level_content(file_subpath, tms_file_path)
             original_file_path = File.join(I18N_BACKUP_DIR_PATH, file_subpath)
             return false unless File.exist?(original_file_path)
 
             # Course content should be merged with existing content, so existing data doesn't get lost
-            restored_i18n_file = RedactRestoreUtils.restore_file(original_file_path, crowdin_file_path, REDACT_PLUGINS)
+            restored_i18n_file = RedactRestoreUtils.restore_file(original_file_path, tms_file_path, REDACT_PLUGINS)
             restored_i18n_data = JSON.parse(restored_i18n_file)
-            i18n_data = JSON.load_file(crowdin_file_path)
-            File.write(crowdin_file_path, JSON.pretty_generate(i18n_data.deep_merge(restored_i18n_data)))
+            i18n_data = JSON.load_file(tms_file_path)
+            File.write(tms_file_path, JSON.pretty_generate(i18n_data.deep_merge(restored_i18n_data)))
 
             true
           end
@@ -69,25 +69,25 @@ module I18n
             result
           end
 
-          private def i18n_data_of(language, crowdin_locale_dir)
+          private def i18n_data_of(language, tms_locale_dir)
             malformed_i18n_reporter = I18n::Utils::MalformedI18nReporter.new(language[:locale_s])
 
-            crowdin_files = Dir.glob('**/*.json', base: crowdin_locale_dir)
-            progress_bar.total += crowdin_files.size
+            tms_files = Dir.glob('**/*.json', base: tms_locale_dir)
+            progress_bar.total += tms_files.size
 
-            crowdin_files.each_with_object({}) do |file_subpath, types_i18n_data|
-              crowdin_file_path = File.join(crowdin_locale_dir, file_subpath)
+            tms_files.each_with_object({}) do |file_subpath, types_i18n_data|
+              tms_file_path = File.join(tms_locale_dir, file_subpath)
 
               # Only level content are redacted, see `SyncIn#redact_level_content`
-              level_content_restored = restore_level_content(file_subpath, crowdin_file_path)
+              level_content_restored = restore_level_content(file_subpath, tms_file_path)
               # Redacted i18n files that haven't been restored shouldn't be distributed
               next unless level_content_restored
 
-              # collects malformed i18n strings from the Crowdin file
-              malformed_i18n_reporter.process_file(crowdin_file_path)
+              # collects malformed i18n strings from the tms file
+              malformed_i18n_reporter.process_file(tms_file_path)
 
-              crowdin_i18n_data = JSON.load_file(crowdin_file_path)
-              crowdin_i18n_data&.each do |level_url, level_i18n_data|
+              tms_i18n_data = JSON.load_file(tms_file_path)
+              tms_i18n_data&.each do |level_url, level_i18n_data|
                 level = mutex.synchronize {I18nScriptUtils.get_level_from_url(level_url)}
                 next unless level
 
@@ -114,13 +114,13 @@ module I18n
           # over parsing unchanged strings, and if we skipped strings without doing a
           # merge we'd end up deleting any unchanged strings.
           private def distribute_level_content(language)
-            crowdin_locale_dir = I18nScriptUtils.crowdin_locale_dir(language[:locale_s], DIR_NAME)
-            return unless File.directory?(crowdin_locale_dir)
+            tms_locale_dir = I18nScriptUtils.tms_locale_dir(language[:locale_s], DIR_NAME)
+            return unless File.directory?(tms_locale_dir)
 
-            i18n_data = i18n_data_of(language, crowdin_locale_dir) || {}
+            i18n_data = i18n_data_of(language, tms_locale_dir) || {}
 
             i18n_locale_dir = I18nScriptUtils.locale_dir(language[:locale_s], DIR_NAME)
-            I18nScriptUtils.rename_dir(crowdin_locale_dir, i18n_locale_dir)
+            I18nScriptUtils.rename_dir(tms_locale_dir, i18n_locale_dir)
 
             i18n_data.each do |type, type_i18n_data|
               # We'd like in the long term for all of our generated course content locale
@@ -141,19 +141,19 @@ module I18n
               I18nScriptUtils.sanitize_data_and_write(dashboard_i18n_data, target_i18n_file_path)
             end
 
-            I18nScriptUtils.remove_empty_dir(crowdin_locale_dir)
+            I18nScriptUtils.remove_empty_dir(tms_locale_dir)
           end
 
           private def distribute_localization_of(type, language)
-            crowdin_file_path = I18nScriptUtils.crowdin_locale_dir(language[:locale_s], I18n::Resources::Dashboard::DIR_NAME, "#{type}.yml")
-            return unless File.exist?(crowdin_file_path)
+            tms_file_path = I18nScriptUtils.tms_locale_dir(language[:locale_s], I18n::Resources::Dashboard::DIR_NAME, "#{type}.yml")
+            return unless File.exist?(tms_file_path)
 
             target_i18n_file_path = dashboard_i18n_file_path(type, language[:locale_s], 'yml')
-            I18nScriptUtils.sanitize_file_and_write(crowdin_file_path, target_i18n_file_path)
+            I18nScriptUtils.sanitize_file_and_write(tms_file_path, target_i18n_file_path)
 
             i18n_file_path = I18nScriptUtils.locale_dir(language[:locale_s], I18n::Resources::Dashboard::DIR_NAME, "#{type}.yml")
-            I18nScriptUtils.move_file(crowdin_file_path, i18n_file_path)
-            I18nScriptUtils.remove_empty_dir File.dirname(crowdin_file_path)
+            I18nScriptUtils.move_file(tms_file_path, i18n_file_path)
+            I18nScriptUtils.remove_empty_dir File.dirname(tms_file_path)
           end
         end
       end

@@ -9,6 +9,7 @@ require 'ruby-progressbar'
 require 'parallel'
 
 I18N_DIR = 'i18n'.freeze
+I18N_TMS_DIR = File.join(I18N_DIR, 'tms_provider').freeze
 I18N_CROWDIN_DIR = File.join(I18N_DIR, 'crowdin').freeze
 I18N_LOCALES_DIR = File.join(I18N_DIR, 'locales').freeze
 I18N_SOURCE_DIR = File.join(I18N_LOCALES_DIR, 'source').freeze
@@ -282,6 +283,8 @@ class I18nScriptUtils
   # Wraps hash in correct format to be loaded by our i18n backend.
   # This will most likely be JSON file data due to Crowdin only
   # setting the locale for yml files.
+  # The 'data' namespace is used to indicate what strings are populated
+  # from database content vs developer typed strings.
   def self.to_dashboard_i18n_data(locale, type, i18n_data)
     {locale => {'data' => {type => i18n_data}}}
   end
@@ -401,6 +404,10 @@ class I18nScriptUtils
     FileUtils.mkdir_p(to_dir)
     FileUtils.cp_r File.join(from_dir, '.'), to_dir
     FileUtils.rm_r(from_dir)
+  end
+
+  def self.tms_locale_dir(locale, *paths)
+    CDO.dir(I18N_TMS_DIR, locale, *paths.compact)
   end
 
   def self.crowdin_locale_dir(locale, *paths)
