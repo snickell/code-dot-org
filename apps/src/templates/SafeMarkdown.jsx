@@ -28,6 +28,11 @@ class SafeMarkdown extends React.Component {
     openExternalLinksInNewTab: PropTypes.bool,
     className: PropTypes.string,
     id: PropTypes.string,
+    wrapperElement: PropTypes.string,
+  };
+
+  static defaultProps = {
+    wrapperElement: 'div',
   };
 
   render() {
@@ -38,6 +43,8 @@ class SafeMarkdown extends React.Component {
     const processor = this.props.openExternalLinksInNewTab
       ? markdownToReactExternalLinks
       : markdownToReact;
+
+    const WrapperElement = this.props.wrapperElement || 'div';
 
     const rendered = Object(processor.processSync(this.props.markdown).result);
 
@@ -50,16 +57,12 @@ class SafeMarkdown extends React.Component {
     }
     // rehype-react will only wrap the compiled markdown in a <div> tag
     // if it needs to (ie, if there would otherwise be multiple elements
-    // returned) or we're assigning props. We prefer consistency over flexibility,
-    // so here we wrap the result in a div if it wasn't already
-    if (
-      rendered &&
-      rendered.type === 'div' &&
-      !Object.keys(markdownProps).length
-    ) {
+    // returned) or we're assigning props. Wrap everything in the specified
+    // wrapper element
+    if (rendered && rendered.type === WrapperElement) {
       return rendered;
     } else {
-      return <div {...markdownProps}>{rendered}</div>;
+      return <WrapperElement {...markdownProps}>{rendered}</WrapperElement>;
     }
   }
 }

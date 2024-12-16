@@ -60,6 +60,75 @@ describe('SafeMarkdown', () => {
     ).toBe(true);
   });
 
+  it('will render markdown wrapped in an element', () => {
+    const paragraphWrapper = shallow(
+      <SafeMarkdown
+        markdown="**some** _basic_ [inline](markdown)"
+        wrapperElement="p"
+      />
+    );
+
+    expect(
+      paragraphWrapper.equals(
+        <p>
+          <strong>some</strong> <em>basic</em> <a href="markdown">inline</a>
+        </p>
+      )
+    ).toBe(true);
+
+    const headingWrapper = shallow(
+      <SafeMarkdown
+        markdown="**some** _basic_ [inline](markdown)"
+        wrapperElement="h1"
+      />
+    );
+
+    expect(
+      headingWrapper.equals(
+        <h1>
+          <p>
+            <strong>some</strong> <em>basic</em> <a href="markdown">inline</a>
+          </p>
+        </h1>
+      )
+    ).toBe(true);
+  });
+
+  it('will render html wrapped in an element', () => {
+    const paragraphWrapper = shallow(
+      <SafeMarkdown
+        markdown='<strong>some</strong> <em>basic</em> <a href="markdown">inline</a>'
+        wrapperElement="p"
+      />
+    );
+
+    expect(
+      paragraphWrapper.equals(
+        <p>
+          <strong>some</strong> <em>basic</em> <a href="markdown">inline</a>
+        </p>
+      )
+    ).toBe(true);
+
+    // Make sure we don't add an extra div
+    const divWrapper = shallow(
+      <SafeMarkdown
+        markdown='<strong>some</strong> <em>basic</em> <a href="markdown">inline</a>'
+        wrapperElement="div"
+      />
+    );
+
+    expect(
+      divWrapper.equals(
+        <div>
+          <p>
+            <strong>some</strong> <em>basic</em> <a href="markdown">inline</a>
+          </p>
+        </div>
+      )
+    ).toBe(true);
+  });
+
   it('implements expandableImages', () => {
     const regularImage = shallow(
       <SafeMarkdown markdown="![regular](http://example.com/img.jpg)" />
