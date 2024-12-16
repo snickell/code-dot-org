@@ -1,4 +1,5 @@
 {
+  "empty_string": "Empty string",
   "abuseDetail": "Please provide details regarding the content you are reporting",
   "abuseFormDetail": "Please provide as much detail as possible regarding the content you are reporting.",
   "abuseFormAcknowledge": "By submitting this information, you acknowledge it will be handled in accordance with the terms of the [Privacy Policy]({privacy_url}) and the [Terms of Service]({tos_url}).",
