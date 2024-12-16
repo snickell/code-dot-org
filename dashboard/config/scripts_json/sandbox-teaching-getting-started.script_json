@@ -11,7 +11,7 @@
     },
     "new_name": null,
     "family_name": null,
-    "serialized_at": "2024-12-12 21:12:08 UTC",
+    "serialized_at": "2024-12-13 18:34:34 UTC",
     "published_state": null,
     "instruction_type": null,
     "instructor_audience": null,
@@ -514,15 +514,12 @@
       "activity_section_position": 4,
       "assessment": false,
       "properties": {
-        "level_keys": [
-          "SP-VPL-24-mod1-Certificate_1"
-        ],
         "progression": "Overview"
       },
       "bonus": false,
       "seeding_key": {
         "script_level.level_keys": [
-          "SP-VPL-24-mod1-Certificate_1"
+          "1SP-VPL-24-mod1-Certificate_1"
         ],
         "lesson.key": "Welcome to Codeorg",
         "lesson_group.key": "",
@@ -530,7 +527,7 @@
         "activity_section.key": "3f11e31c-49a5-43f4-b97c-e2f2e0ac4ec2"
       },
       "level_keys": [
-        "SP-VPL-24-mod1-Certificate_1"
+        "1SP-VPL-24-mod1-Certificate_1"
       ]
     },
     {
@@ -958,15 +955,12 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
-        "level_keys": [
-          "SP-VPL-21-mod2-NavigatingLessonPlans_physical-computing_1"
-        ],
         "progression": "Explore Course Lesson Plans"
       },
       "bonus": false,
       "seeding_key": {
         "script_level.level_keys": [
-          "SP-VPL-21-mod2-NavigatingLessonPlans_physical-computing_1"
+          "1SP-VPL-21-mod2-NavigatingLessonPlans_physical-computing_1"
         ],
         "lesson.key": "Navigating Lesson Plans and Resources",
         "lesson_group.key": "",
@@ -974,7 +968,7 @@
         "activity_section.key": "11b74456-fcc1-4041-848b-97bcbda11f57"
       },
       "level_keys": [
-        "SP-VPL-21-mod2-NavigatingLessonPlans_physical-computing_1"
+        "1SP-VPL-21-mod2-NavigatingLessonPlans_physical-computing_1"
       ]
     },
     {
@@ -1435,9 +1429,9 @@
     },
     {
       "seeding_key": {
-        "level.key": "SP-VPL-24-mod1-Certificate_1",
+        "level.key": "1SP-VPL-24-mod1-Certificate_1",
         "script_level.level_keys": [
-          "SP-VPL-24-mod1-Certificate_1"
+          "1SP-VPL-24-mod1-Certificate_1"
         ],
         "lesson.key": "Welcome to Codeorg",
         "lesson_group.key": "",
@@ -1651,9 +1645,9 @@
     },
     {
       "seeding_key": {
-        "level.key": "SP-VPL-21-mod2-NavigatingLessonPlans_physical-computing_1",
+        "level.key": "1SP-VPL-21-mod2-NavigatingLessonPlans_physical-computing_1",
         "script_level.level_keys": [
-          "SP-VPL-21-mod2-NavigatingLessonPlans_physical-computing_1"
+          "1SP-VPL-21-mod2-NavigatingLessonPlans_physical-computing_1"
         ],
         "lesson.key": "Navigating Lesson Plans and Resources",
         "lesson_group.key": "",
