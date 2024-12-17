@@ -5,6 +5,8 @@
  */
 import {CortexM, DAPLink, WebUSB} from 'dapjs';
 
+import {CoursesSectionsAndJoinedPLSections} from '@cdo/apps/templates/studioHomepages/TeacherHomepage.story';
+
 import {BoardSerialInfo} from './board-serial-info';
 import {ApReg, CortexSpecialReg, Csw, DapCmd, DapVal, FICR} from './constants';
 import {
@@ -26,7 +28,7 @@ export class DAPWrapper {
 
   private initialConnectionComplete: boolean = false;
 
-  constructor(public device: USBDevice, private logging: Logging) {
+  constructor(public device: USBDevice) {
     this.transport = new WebUSB(this.device);
     this.daplink = new DAPLink(this.transport);
     this.cortexM = new CortexM(this.transport);
@@ -53,10 +55,7 @@ export class DAPWrapper {
   }
 
   get boardSerialInfo(): BoardSerialInfo {
-    return BoardSerialInfo.parse(
-      this.device,
-      this.logging.log.bind(this.logging)
-    );
+    return BoardSerialInfo.parse(this.device);
   }
 
   // Drawn from https://github.com/microsoft/pxt-microbit/blob/dec5b8ce72d5c2b4b0b20aafefce7474a6f0c7b2/editor/extension.tsx#L119
@@ -66,6 +65,15 @@ export class DAPWrapper {
 
       this.transport = new WebUSB(this.device);
       this.daplink = new DAPLink(this.transport);
+      // For now, log flash progress in dev console.
+      this.daplink.on(DAPLink.EVENT_PROGRESS, progress => {
+        if (Math.floor(progress * 100) % 10 === 0) {
+          console.log('progress percent', Math.floor(progress * 100));
+        }
+        if (progress === 1) {
+          console.log('FLASH COMPLETE');
+        }
+      });
       this.cortexM = new CortexM(this.transport);
     } else {
       this.initialConnectionComplete = true;
@@ -74,30 +82,26 @@ export class DAPWrapper {
     await this.daplink.connect();
     await this.cortexM.connect();
 
-    this.logging.event({
-      type: 'WebUSB-info',
-      message: 'connected',
-    });
+    console.log('type: WebUSB-info', 'message: connected');
 
     const serialInfo = this.boardSerialInfo;
-    this.logging.log(`Detected board ID ${serialInfo.id}`);
+    console.log(`Detected board ID ${serialInfo.id}`);
 
     if (
       !this.loggedBoardSerialInfo ||
       !this.loggedBoardSerialInfo.eq(this.boardSerialInfo)
     ) {
       this.loggedBoardSerialInfo = this.boardSerialInfo;
-      this.logging.event({
-        type: 'WebUSB-info',
-        message: 'board-id/' + this.boardSerialInfo.id,
-      });
-      this.logging.event({
-        type: 'WebUSB-info',
-        message:
-          'board-family-hic/' +
+      console.log(
+        'type: WebUSB-info',
+        'message: board-id/' + this.boardSerialInfo.id
+      );
+      console.log(
+        'type: WebUSB-info',
+        'message: board-family-hic/' +
           this.boardSerialInfo.familyId +
-          this.boardSerialInfo.hic,
-      });
+          this.boardSerialInfo.hic
+      );
     }
 
     this._pageSize = await this.cortexM.readMem32(FICR.CODEPAGESIZE);
@@ -260,10 +264,11 @@ export class DAPWrapper {
       await this.cortexM.writeAP(ApReg.TAR, addr);
 
       await this.writeRegRepeat(apReg(ApReg.DRW, DapVal.WRITE), words);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       if (e.dapWait) {
         // Retry after a delay if required.
-        this.logging.log(`Transfer wait, write block`);
+        console.log(`Transfer wait, write block`);
         await new Promise(resolve => setTimeout(resolve, 100));
         return await this.writeBlockCore(addr, words);
       } else {
