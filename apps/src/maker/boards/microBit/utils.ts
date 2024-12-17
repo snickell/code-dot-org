@@ -15,14 +15,14 @@ import {MicroBitVersion} from '@cdo/apps/maker/boards/microBit/types';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 
-import {loadAddr, flashPageBIN} from './constants';
-import {DAPWrapper} from './DapWrapper';
+import {loadAddr, flashPageBIN} from './flashing/constants';
+import {DAPWrapper} from './flashing/DapWrapper';
 import {
   getFlashChecksumsAsync,
   onlyChanged,
   pageAlignBlocks,
   partialFlashCoreAsync,
-} from './partialFlashingUtils';
+} from './flashing/partialFlashingUtils';
 
 export const detectMicroBitVersion = (device: USBDevice) => {
   // Detect micro:bit version V1 or V2 from the first 4 digits of the micro:bit's serial number

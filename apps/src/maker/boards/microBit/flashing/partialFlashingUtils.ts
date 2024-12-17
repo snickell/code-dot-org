@@ -3,6 +3,8 @@
  *
  * SPDX-License-Identifier: MIT
  */
+import {Page} from '../types';
+
 import {
   DapVal,
   loadAddr,
@@ -11,7 +13,6 @@ import {
   computeChecksums2,
 } from './constants';
 import {DAPWrapper} from './DapWrapper';
-import {Page} from './types';
 
 // Represents the micro:bit's core registers
 // Drawn from https://armmbed.github.io/dapjs/docs/enums/coreregister.html
