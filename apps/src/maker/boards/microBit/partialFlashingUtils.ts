@@ -3,7 +3,15 @@
  *
  * SPDX-License-Identifier: MIT
  */
-import {DapVal} from './constants';
+import {
+  DapVal,
+  loadAddr,
+  dataAddr,
+  stackAddr,
+  computeChecksums2,
+} from './constants';
+import {DAPWrapper} from './DapWrapper';
+import {Page} from './types';
 
 // Represents the micro:bit's core registers
 // Drawn from https://armmbed.github.io/dapjs/docs/enums/coreregister.html
@@ -82,10 +90,6 @@ export const regRequest = (regId: number, isWrite: boolean = false): number => {
   return request;
 };
 
-export class Page {
-  constructor(readonly targetAddr: number, readonly data: Uint8Array) {}
-}
-
 // Split buffer into pages, each of pageSize size.
 // Drawn from https://github.com/microsoft/pxt-microbit/blob/dec5b8ce72d5c2b4b0b20aafefce7474a6f0c7b2/editor/extension.tsx#L209
 export const pageAlignBlocks = (
@@ -125,4 +129,86 @@ export const onlyChanged = (
     if (c0 === ch[0] && c1 === ch[1]) return false;
     return true;
   });
+};
+
+export const partialFlashPageAsync = async (
+  dapWrapper: DAPWrapper,
+  page: Page,
+  nextPage: Page,
+  i: number
+): Promise<void> => {
+  // TODO: This short-circuits UICR, do we need to update this?
+  if (page.targetAddr >= 0x10000000) {
+    return;
+  }
+
+  // Use two slots in RAM to allow parallelisation of the following two tasks.
+  // 1. DAPjs writes a page to one slot.
+  // 2. flashPageBIN copies a page to flash from the other slot.
+  const thisAddr = i & 1 ? dataAddr : dataAddr + dapWrapper.pageSize;
+  const nextAddr = i & 1 ? dataAddr + dapWrapper.pageSize : dataAddr;
+
+  // Write first page to slot in RAM.
+  // All subsequent pages will have already been written to RAM.
+  if (i === 0) {
+    const u32data = new Uint32Array(page.data.length / 4);
+    for (let j = 0; j < page.data.length; j += 4) {
+      u32data[j >> 2] = read32FromUInt8Array(page.data, j);
+    }
+    await dapWrapper.writeBlockAsync(thisAddr, u32data);
+  }
+
+  await runFlash(dapWrapper, page, thisAddr);
+  // Write next page to micro:bit RAM if it exists.
+  if (nextPage) {
+    const buf = new Uint32Array(nextPage.data.buffer);
+    await dapWrapper.writeBlockAsync(nextAddr, buf);
+  }
+  return dapWrapper.waitForHalt();
+};
+
+export const runFlash = async (
+  dapWrapper: DAPWrapper,
+  page: Page,
+  addr: number
+): Promise<void> => {
+  await dapWrapper.cortexM.halt(true);
+  await Promise.all([
+    dapWrapper.cortexM.writeCoreRegister(CoreRegister.PC, loadAddr + 4 + 1),
+    dapWrapper.cortexM.writeCoreRegister(CoreRegister.LR, loadAddr + 1),
+    dapWrapper.cortexM.writeCoreRegister(CoreRegister.SP, stackAddr),
+    dapWrapper.cortexM.writeCoreRegister(0, page.targetAddr),
+    dapWrapper.cortexM.writeCoreRegister(1, addr),
+    dapWrapper.cortexM.writeCoreRegister(2, dapWrapper.pageSize >> 2),
+  ]);
+  return dapWrapper.cortexM.resume(false);
+};
+
+// Runs the checksum algorithm on the micro:bit's whole flash memory, and returns the results.
+// Drawn from https://github.com/microsoft/pxt-microbit/blob/dec5b8ce72d5c2b4b0b20aafefce7474a6f0c7b2/editor/extension.tsx#L365
+export const getFlashChecksumsAsync = async (dapWrapper: DAPWrapper) => {
+  await dapWrapper.executeAsync(
+    loadAddr,
+    computeChecksums2,
+    stackAddr,
+    loadAddr + 1,
+    0xffffffff,
+    dataAddr,
+    0,
+    dapWrapper.pageSize,
+    dapWrapper.numPages
+  );
+  return dapWrapper.readBlockAsync(dataAddr, dapWrapper.numPages * 2);
+};
+
+// Write pages of data to micro:bit ROM.
+export const partialFlashCoreAsync = async (
+  dapWrapper: DAPWrapper,
+  pages: Page[]
+) => {
+  for (let i = 0; i < pages.length; ++i) {
+    console.log(`page ${i + 1} out of ${pages.length}`);
+    await partialFlashPageAsync(dapWrapper, pages[i], pages[i + 1], i);
+  }
+  console.log('FLASH COMPLETE');
 };
