@@ -5,8 +5,6 @@
  */
 import {CortexM, DAPLink, WebUSB} from 'dapjs';
 
-import {CoursesSectionsAndJoinedPLSections} from '@cdo/apps/templates/studioHomepages/TeacherHomepage.story';
-
 import {BoardSerialInfo} from './board-serial-info';
 import {ApReg, CortexSpecialReg, Csw, DapCmd, DapVal, FICR} from './constants';
 import {
@@ -126,6 +124,7 @@ export class DAPWrapper {
   async disconnectAsync(): Promise<void> {
     if (
       this.device.opened &&
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this.transport as any).interfaceNumber !== undefined
     ) {
       return this.daplink.disconnect();
