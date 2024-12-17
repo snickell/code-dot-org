@@ -5,7 +5,6 @@
  */
 import {CortexM, DAPLink, WebUSB} from 'dapjs';
 
-import {BoardSerialInfo} from './BoardSerialInfo';
 import {ApReg, CortexSpecialReg, Csw, DapCmd, DapVal, FICR} from './constants';
 import {
   apReg,
@@ -21,8 +20,6 @@ export class DAPWrapper {
 
   _pageSize: number | undefined;
   _numPages: number | undefined;
-
-  private loggedBoardSerialInfo: BoardSerialInfo | undefined;
 
   private initialConnectionComplete: boolean = false;
 
@@ -52,10 +49,6 @@ export class DAPWrapper {
     return this._numPages;
   }
 
-  get boardSerialInfo(): BoardSerialInfo {
-    return BoardSerialInfo.parse(this.device);
-  }
-
   // Drawn from https://github.com/microsoft/pxt-microbit/blob/dec5b8ce72d5c2b4b0b20aafefce7474a6f0c7b2/editor/extension.tsx#L119
   async reconnectAsync(): Promise<void> {
     if (this.initialConnectionComplete) {
@@ -72,26 +65,6 @@ export class DAPWrapper {
     await this.cortexM.connect();
 
     console.log('type: WebUSB-info', 'message: connected');
-
-    const serialInfo = this.boardSerialInfo;
-    console.log(`Detected board ID ${serialInfo.id}`);
-
-    if (
-      !this.loggedBoardSerialInfo ||
-      !this.loggedBoardSerialInfo.eq(this.boardSerialInfo)
-    ) {
-      this.loggedBoardSerialInfo = this.boardSerialInfo;
-      console.log(
-        'type: WebUSB-info',
-        'message: BoardId/' + this.boardSerialInfo.id
-      );
-      console.log(
-        'type: WebUSB-info',
-        'message: board-family-hic/' +
-          this.boardSerialInfo.familyId +
-          this.boardSerialInfo.hic
-      );
-    }
 
     this._pageSize = await this.cortexM.readMem32(FICR.CODEPAGESIZE);
     this._numPages = await this.cortexM.readMem32(FICR.CODESIZE);
