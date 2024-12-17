@@ -541,9 +541,11 @@ class User < ApplicationRecord
   has_many :teachers, through: :sections_as_student, source: :instructors
 
   belongs_to :secret_picture, optional: true
-  before_create :generate_secret_picture
 
-  before_create :generate_secret_words
+  with_options if: :sponsored? do
+    before_create :generate_secret_picture
+    before_create :generate_secret_words
+  end
 
   before_create :update_default_share_setting
 
@@ -2219,11 +2221,15 @@ class User < ApplicationRecord
       sharing_disabled: sharing_disabled?,
       has_ever_signed_in: has_ever_signed_in?,
       ai_tutor_access_denied: !!ai_tutor_access_denied,
-      at_risk_age_gated: Policies::ChildAccount.parent_permission_required?(self),
+      at_risk_age_gated_date: at_risk_age_gated_date,
       child_account_compliance_state: cap_status,
       latest_permission_request_sent_at: latest_parental_permission_request&.updated_at,
       us_state: us_state,
     }
+  end
+
+  def at_risk_age_gated_date
+    Policies::ChildAccount::StatePolicies.state_policy(self)&.dig(:lockout_date) unless Policies::ChildAccount.compliant?(self, future: true)
   end
 
   def has_ever_signed_in?
@@ -2423,17 +2429,8 @@ class User < ApplicationRecord
 
   def show_census_teacher_banner?
     # Must have an NCES school to show the banner
-    users_school = try(:school_info).try(:school)
+    users_school = school_info_school
     teacher? && users_school && (next_census_display.nil? || Time.zone.today >= next_census_display.to_date)
-  end
-
-  # Returns the name of the donor for the donor teacher banner and donor footer, or nil if none.
-  # Donors are associated with certain schools, captured in DonorSchool and populated from a Pegasus gsheet
-  def school_donor_name
-    school_id = school_info_school&.id
-    donor_name = DonorSchool.find_by(nces_id: school_id)&.name if school_id
-
-    donor_name
   end
 
   # Removes PII and other information from the user and marks the user as having been purged.
@@ -2503,7 +2500,7 @@ class User < ApplicationRecord
   # In addition, we want to have green bubbles for the levels associated with these
   # channels, so we create level progress.
   def generate_progress_from_storage_id(storage_id, script_name = 'applab-intro')
-    # applab-intro is not seeded in our minimal test env used on test/circle. We
+    # applab-intro is not seeded in our minimal test env used on test/CI. We
     # should be able to handle this gracefully
     script = begin
       Unit.get_from_cache(script_name)
