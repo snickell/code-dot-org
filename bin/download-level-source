@@ -1,0 +1,129 @@
+#!/usr/bin/env ruby
+
+# This script can write out a set of channel tokens for
+# a particular level.
+# To get a tokens file, use the script as such:
+# ./bin/download-level-source csd3-2022 3 9
+#
+# This will download a random sample of tokens for the given level found by
+# navigating the given unit name (csd3-2022), lesson (3), and level (9). It
+# will create the file `tokens-csd3-2022-3-9.json`. This script would be
+# run on the machine with access to the database containing such tokens,
+# usually the production environment.
+
+# Bail quickly if the usage is wrong
+# (The requires below can take a little bit)
+args = ARGV.dup
+if args.length != 3
+  warn "usage: #{$0} <tokens json file>"
+  warn "usage: #{$0} <course> <lesson index> <level index>"
+  warn "example: #{$0} tokens-csd3-2022-3-9.json"
+  warn "example: #{$0} csd3-2022 3 9"
+  exit(1)
+end
+
+require 'uri'
+require 'net/http'
+require 'net/https'
+require 'date'
+require 'json'
+require 'fileutils'
+
+# Searches all applab source code for each regex and prints results to a corresponding tsv file.
+# This is useful for seeing if we will break anyone's program if we change how a block works.
+# Multiple regex-filename pairs can be specified to avoid having to run the script multiple times.
+
+REMOTE_URL = ENV['REMOTE_URL'] || 'https://studio.code.org'
+
+# We will negotiate the level id
+level_id = nil
+
+# Do we have a unit/lesson/level tuple?
+if args.length == 3
+  require_relative '../deployment'
+  require_relative '../lib/cdo/aws/s3'
+  require_relative '../shared/middleware/helpers/storage_id'
+  require 'cdo/db'
+
+  puts "Getting the level identifier."
+
+  # Get a readonly view of the database
+  #DASHBOARD_REPORTING_DB_READONLY = sequel_connect CDO.dashboard_reporting_db_reader, CDO.dashboard_reporting_db_reader
+  # We need to fix the ability to connect to the readonly db in production!!!
+  # DASHBOARD_DB_REPORTING_READONLY = DASHBOARD_DB
+
+  unit = DASHBOARD_DB[:scripts].where(:name => args[0]).to_a[0]
+  unit_id = unit[:id]
+
+  stage_id = DASHBOARD_DB[:stages].where(:script_id => unit_id, :absolute_position => args[1].to_i).to_a[0][:id]
+  puts "Stage id: #{stage_id}"
+  script_level_id = DASHBOARD_DB[:script_levels].where(:stage_id => stage_id, :position => args[2].to_i).to_a[0][:id]
+  puts "Script level id: #{script_level_id}"
+  level_id = DASHBOARD_DB[:levels_script_levels].where(:script_level_id => script_level_id).to_a[0][:level_id]
+  puts "Level id: #{level_id}"
+
+  puts "Fetching a list of sections from Dashboard DB for unit id #{unit_id}."
+
+  # We should now decide if the level has a "host"
+  # Hosted levels are one with a project template. These are workspaced levels
+  # where the level progress is stored with the template level id instead of
+  # the actual level id.
+  level = DASHBOARD_DB[:levels].where(:id => level_id).to_a[0]
+  level_properties = {}
+  begin
+    level_properties = JSON.parse(level[:properties])
+  rescue
+    level_properties = {}
+  end
+  template = level_properties["project_template_level_name"]
+
+  original_level_id = level_id
+  if template
+    puts "Level template discovered. Looking instead at template: #{template}"
+    level = DASHBOARD_DB[:levels].where(:name => template).to_a[0]
+    level_id = level[:id]
+  end
+
+  puts "Fetching a list of channels from Dashboard DB for level id #{level_id}."
+
+  sections = DASHBOARD_DB[:sections].where(:script_id => unit_id).to_a.map {|row| row[:id] }
+  followers = DASHBOARD_DB[:followers].where(:section_id => sections).to_a.map {|row| row[:student_user_id] }
+
+  tokens = []
+  started = 0
+  saved = 0
+  followers.each do |follower|
+    storage_id = storage_id_for_user_id(follower)
+    channel_token = DASHBOARD_DB[:channel_tokens].where(:storage_id => storage_id, :level_id => level_id, :script_id => unit_id).to_a[0]
+    if channel_token
+      # This student has saved progress in this workspace
+      started += 1
+
+      # But have they completed the specified level?
+      user_level = DASHBOARD_DB[:user_levels].where(:user_id => follower, :script_id => unit_id, :level_id => original_level_id).to_a[0]
+      #puts "user_id #{follower} script_id #{unit_id} level_id #{original_level_id} template_id #{level_id} user_level #{user_level}"
+      #exit
+      if user_level
+        saved += 1
+        storage_app_id = channel_token[:storage_app_id]
+        token = storage_encrypt_channel_id(storage_id, storage_app_id)
+        tokens << token
+      end
+    end
+  end
+
+  puts "Found #{tokens.length} possible tokens."
+  sample_count = 20
+  puts ""
+  puts "Out of #{started} students who have a channel token,"
+  puts "a total of #{saved} students have attempted the level."
+  puts ""
+  puts "Taking #{sample_count} samples of tokens from students with attempts."
+  tokens = tokens.sample(sample_count)
+
+  puts "Tokens:"
+  puts tokens.join("\n")
+
+  puts "Done."
+  exit(0)
+end
