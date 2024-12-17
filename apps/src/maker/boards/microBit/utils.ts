@@ -97,16 +97,18 @@ export const sendPythonCodeToMicroBit = async (pythonCode: string) => {
   const fs = await getMicropythonFsHex(pythonCode, microBitVersion);
   const hexStrWithFiles = fs.getIntelHex();
   const flashBytes = await partialFlashData(fs);
-  console.log('flashBytes', flashBytes);
 
   const checkSums = await getFlashChecksumsAsync(dapWrapper);
-  console.log('checkSums', checkSums);
   dapWrapper.writeBlockAsync(loadAddr, flashPageBIN);
   let aligned = pageAlignBlocks(flashBytes, 0, dapWrapper.pageSize);
   const totalPages = aligned.length;
   console.log('Total pages: ' + totalPages);
   aligned = onlyChanged(aligned, checkSums, dapWrapper.pageSize);
   console.log('Changed pages: ' + aligned.length);
+  if (aligned.length === 0) {
+    console.log('No change in user program.');
+    return;
+  }
   if (aligned.length > totalPages / 2) {
     try {
       console.log('Partial flash beginning...');
