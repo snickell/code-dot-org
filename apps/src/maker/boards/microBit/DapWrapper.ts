@@ -5,14 +5,14 @@
  */
 import {CortexM, DAPLink, WebUSB} from 'dapjs';
 
-import {BoardSerialInfo} from './board-serial-info';
+import {BoardSerialInfo} from './BoardSerialInfo';
 import {ApReg, CortexSpecialReg, Csw, DapCmd, DapVal, FICR} from './constants';
 import {
   apReg,
   bufferConcat,
   CoreRegister,
   regRequest,
-} from './partial-flashing-utils';
+} from './partialFlashingUtils';
 
 export class DAPWrapper {
   transport: WebUSB;
@@ -63,15 +63,6 @@ export class DAPWrapper {
 
       this.transport = new WebUSB(this.device);
       this.daplink = new DAPLink(this.transport);
-      // For now, log flash progress in dev console.
-      this.daplink.on(DAPLink.EVENT_PROGRESS, progress => {
-        if (Math.floor(progress * 100) % 10 === 0) {
-          console.log('progress percent', Math.floor(progress * 100));
-        }
-        if (progress === 1) {
-          console.log('FLASH COMPLETE');
-        }
-      });
       this.cortexM = new CortexM(this.transport);
     } else {
       this.initialConnectionComplete = true;
@@ -92,7 +83,7 @@ export class DAPWrapper {
       this.loggedBoardSerialInfo = this.boardSerialInfo;
       console.log(
         'type: WebUSB-info',
-        'message: board-id/' + this.boardSerialInfo.id
+        'message: BoardId/' + this.boardSerialInfo.id
       );
       console.log(
         'type: WebUSB-info',

@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: MIT
  */
-import {BoardId} from './board-id';
+import {BoardId} from './BoardId';
 
 export class BoardSerialInfo {
   constructor(
@@ -14,7 +14,7 @@ export class BoardSerialInfo {
   static parse(device: USBDevice) {
     const serial = device.serialNumber;
     if (!serial) {
-      throw new Error("Could not detected ID from connected board.");
+      throw new Error('Could not detected ID from connected board.');
     }
     if (serial.length !== 48) {
       console.log(`USB serial number unexpected length: ${serial.length}`);

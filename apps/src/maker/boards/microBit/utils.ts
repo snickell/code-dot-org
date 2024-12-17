@@ -22,12 +22,12 @@ import {
   computeChecksums2,
   flashPageBIN,
 } from './constants';
-import {DAPWrapper} from './dap-wrapper';
+import {DAPWrapper} from './DapWrapper';
 import {
   onlyChanged,
   pageAlignBlocks,
   CoreRegister,
-} from './partial-flashing-utils';
+} from './partialFlashingUtils';
 import {Page} from './types';
 
 export const detectMicroBitVersion = (device: USBDevice) => {
@@ -109,14 +109,14 @@ export const sendPythonCodeToMicroBit = async (pythonCode: string) => {
   console.log('Changed pages: ' + aligned.length);
   if (aligned.length > totalPages / 2) {
     try {
-      console.log('full flash');
+      console.log('Partial flash beginning...');
       await flashHexString(hexStrWithFiles, device);
     } catch (error) {
       console.log(error);
       return Promise.reject('Failed to send MicroPython program to micro:bit.');
     }
   } else {
-    console.log('partial flash');
+    console.log('Full flash beginning...');
     try {
       await partialFlashCoreAsync(dapWrapper, aligned);
     } catch (e) {
@@ -129,11 +129,11 @@ export const sendPythonCodeToMicroBit = async (pythonCode: string) => {
 
 // Write pages of data to micro:bit ROM.
 const partialFlashCoreAsync = async (dapWrapper: DAPWrapper, pages: Page[]) => {
-  console.log('Partial flash');
   for (let i = 0; i < pages.length; ++i) {
-    console.log('page i', i);
+    console.log(`page ${i + 1} out of ${pages.length}`);
     await partialFlashPageAsync(dapWrapper, pages[i], pages[i + 1], i);
   }
+  console.log('FLASH COMPLETE');
 };
 
 const partialFlashPageAsync = async (
