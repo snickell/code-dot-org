@@ -66,7 +66,7 @@ export const sendPythonCodeToMicroBit = async (pythonCode: string) => {
   }
 
   const transport = new WebUSB(device);
-  const target = new DAPLink(transport);
+  const target = new DAPLink(transport); // this.daplink in python-editor-v2 dap-wrapper.ts line 38.
   // For now, log flash progress in dev console.
   target.on(DAPLink.EVENT_PROGRESS, progress => {
     if (Math.floor(progress * 100) % 10 === 0) {
