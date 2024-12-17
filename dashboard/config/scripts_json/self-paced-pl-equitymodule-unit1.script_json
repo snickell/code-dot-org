@@ -11,7 +11,7 @@
     },
     "new_name": null,
     "family_name": null,
-    "serialized_at": "2024-12-11 21:01:49 UTC",
+    "serialized_at": "2024-12-16 15:29:15 UTC",
     "published_state": null,
     "instruction_type": null,
     "instructor_audience": null,
@@ -848,6 +848,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "self-paced-equity-U1L3-readingreflection"
+        ],
         "progression": "Your Students' Identities"
       },
       "bonus": false,

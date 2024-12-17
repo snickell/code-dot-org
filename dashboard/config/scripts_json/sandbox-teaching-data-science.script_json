@@ -10,7 +10,7 @@
     },
     "new_name": null,
     "family_name": null,
-    "serialized_at": "2024-11-27 19:12:54 UTC",
+    "serialized_at": "2024-12-16 18:14:22 UTC",
     "published_state": "in_development",
     "instruction_type": "self_paced",
     "instructor_audience": "facilitator",
@@ -1113,15 +1113,12 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
-        "level_keys": [
-          "sp-pl-DS-data-story-cards"
-        ],
         "progression": "Data Questions and Stories"
       },
       "bonus": false,
       "seeding_key": {
         "script_level.level_keys": [
-          "sp-pl-DS-data-story-cards"
+          "sp-pl-DS-datastory-L7"
         ],
         "lesson.key": "lesson-2",
         "lesson_group.key": "",
@@ -1129,7 +1126,7 @@
         "activity_section.key": "57a3669f-0340-486b-8f71-c5b8b2e84cd3"
       },
       "level_keys": [
-        "sp-pl-DS-data-story-cards"
+        "sp-pl-DS-datastory-L7"
       ]
     },
     {
@@ -1613,6 +1610,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "sp-pl-DS-planningCal-Ch2"
+        ],
         "progression": "Introduction to Pandas and Python"
       },
       "bonus": false,
@@ -3756,9 +3756,9 @@
     },
     {
       "seeding_key": {
-        "level.key": "sp-pl-DS-data-story-cards",
+        "level.key": "sp-pl-DS-datastory-L7",
         "script_level.level_keys": [
-          "sp-pl-DS-data-story-cards"
+          "sp-pl-DS-datastory-L7"
         ],
         "lesson.key": "lesson-2",
         "lesson_group.key": "",
