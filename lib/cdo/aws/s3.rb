@@ -49,7 +49,7 @@ module AWS
     def self.connect_v2!
       self.s3 ||= if CDO.aws_s3_emulated?
                     Aws::S3::Client.new(
-                      endpoint: CDO.aws_s3_endpoint || CDO.aws_endpoint,
+                      endpoint: CDO.aws_s3_endpoint,
                       access_key_id: CDO.aws_access_key_id,
                       secret_access_key: CDO.aws_secret_access_key,
                       region: CDO.aws_region,
@@ -103,13 +103,6 @@ module AWS
       create_client.head_object(bucket: bucket, key: key)
       return true
     rescue Aws::S3::Errors::NotFound, Aws::S3::Errors::Forbidden
-      if CDO.aws_s3_emulated?
-        # If there was some problem and we are emulating our buckets,
-        # look to see if there is a way to 'populate' the file locally.
-
-        # Find out if we have a Populator for this bucket and path
-      end
-
       return false
     end
 

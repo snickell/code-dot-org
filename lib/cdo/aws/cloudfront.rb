@@ -320,7 +320,7 @@ module AWS
       }.to_json
 
       # If we are emulating AWS at all, we just return mock cloudfront policy output
-      if CDO.aws_emulated? || CDO.aws_s3_emulated?
+      if CDO.aws_s3_emulated?
         return {
           'CloudFront-Policy-Emulated': Base64.encode64(policy).tr('+=/', '-_~')
         }
