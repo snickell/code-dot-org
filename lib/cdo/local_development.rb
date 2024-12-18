@@ -24,10 +24,8 @@ module Cdo
       relative_path = []
       until class_parts.empty?
         begin
-          puts "class_parts: #{class_parts.inspect}"
           base = [*class_parts, 'Populate'].join('::').constantize
           relative_path << path_parts.pop
-          puts "base: #{base.inspect}"
           break if base
         rescue NameError
           class_parts.pop

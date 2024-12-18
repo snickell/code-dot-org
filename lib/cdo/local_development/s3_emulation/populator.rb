@@ -1,7 +1,6 @@
 # Common utilities for local s3 population
 require 'httparty'
-require_relative '../../../../deployment'
-require_relative '../../../../lib/cdo/aws/s3'
+require 'cdo/aws/s3'
 
 module Populator
   SOURCE_DOMAIN = "https://studio.code.org"
@@ -53,10 +52,11 @@ module Populator
   end
 
   def put(bucket, path, data)
-    unless AWS::S3.exists_in_bucket(bucket, path)
-      data = data.call if data.is_a? Proc
-      AWS::S3.upload_to_bucket(bucket, path, data, no_random: true)
-    end
+    return unless CDO.aws_s3_emulated?
+    return if AWS::S3.exists_in_bucket(bucket, path)
+
+    data = data.call if data.is_a? Proc
+    AWS::S3.upload_to_bucket(bucket, path, data, no_random: true)
   rescue Aws::S3::Errors::NoSuchBucket => exception
     puts
     puts "ERROR: The #{bucket} bucket does not exist!"
@@ -68,26 +68,17 @@ module Populator
   def download(path)
     raise "Must define API_PATH" if api_path == ""
 
+    # Fetch data for this path from studio.code.org.
     url = "#{SOURCE_DOMAIN}#{api_path}/#{path}"
+    response = HTTParty.get(url)
+    if response.code != 200
+      raise "ERROR: Cannot find the given file"
+    end
+    data = response.body
+
+    # Persist downloaded data to bucket, so we don't have to download it again.
     to = local_path(path)
     relative_path = File.path(Pathname.new(to).relative_path_from(base_path))
-    if File.exist?(to)
-      data = File.read(to)
-    else
-      response = HTTParty.get(url)
-      if response.code != 200
-        puts "ERROR: Cannot find the given file"
-      end
-
-      # Write out file
-      data = response.body
-      File.open(to, 'w+') do |f|
-        f.binmode
-        f.write(data)
-      end
-    end
-
-    # Ensure it exists in our bucket
     put(bucket_name, relative_path, data)
 
     data
