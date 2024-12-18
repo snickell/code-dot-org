@@ -5,7 +5,25 @@ module Cdo
   # development behave more like production without relying on production
   # resources.
   module LocalDevelopment
-    # Populates locally hosted buckets for development environments without full AWS access.
+    # Populates locally-hosted buckets in development environments without full AWS access
+    # by leveraging `Populate` classes. Will automatically attempt to use the
+    # most-specific one which can be applied, based on the given bucket and key.
+    #
+    # For example:
+    #
+    #    populate_local_s3_bucket("cdo-sound-library", "hoc_song_meta/songManifest2024_v4.json")
+    #
+    # Will check for classes in the following order:
+    #
+    #    CdoSoundLibrary::HocSongMeta::SongManifest2024V4.json::Populate
+    #    CdoSoundLibrary::HocSongMeta::Populate
+    #    CdoSoundLibrary::Populate
+    #    Populate
+    #
+    # And will invoke the `populate` method on the first one that actually exists; in this
+    # example, CdoSoundLibrary::HocSongMeta::Populate.
+    #
+    # See `lib/cdo/local_development/s3_emulation/`
     def self.populate_local_s3_bucket(bucket, key)
       return unless CDO.aws_s3_emulated?
       return if AWS::S3.exists_in_bucket(bucket, key)

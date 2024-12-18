@@ -1,7 +1,10 @@
-# Common utilities for local s3 population
 require 'httparty'
 require 'cdo/aws/s3'
 
+# Common utilities for local s3 population, intended to be included by the
+# Populate classes invoked by `LocalDevelopment#populate_local_s3_bucket`.
+#
+# See `lib/cdo/local_development.rb`
 module Populator
   SOURCE_DOMAIN = "https://studio.code.org"
   API_PATH = ""
