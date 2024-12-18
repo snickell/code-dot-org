@@ -85,7 +85,7 @@ docker compose run minio-install
 ```
 
 This will recreate any missing buckets corresponding to subdirectories found in
-[`docker/developers/s3`](docker/developers/s3).
+[`docker/developers/utils/s3`](docker/developers/utils/s3).
 
 ## Installing Docker
 

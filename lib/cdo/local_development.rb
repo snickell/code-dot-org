@@ -1,0 +1,40 @@
+require 'cdo/local_development/s3_emulation/populator'
+
+module Cdo
+  # Common place for any web application server logic intended to make local
+  # development behave more like production without relying on production
+  # resources.
+  module LocalDevelopment
+    # Populates locally hosted buckets for development environments without full AWS access.
+    def self.populate_local_s3_bucket(bucket, key)
+      return unless CDO.aws_s3_emulated?
+      return if AWS::S3.exists_in_bucket(bucket, key)
+
+      # Determine the Populator class that can generate files for this bucket, if it
+      # exists. We allow subdirectories to have their own populators, so this will find
+      # them, in that case, or ascend up the hierarchy instead.
+      path_parts = [bucket, *key.split('/')]
+      class_parts = path_parts.map do |part|
+        part.tr('-', '_').camelize
+      end
+
+      # The 'base' will be the most specific populator found for the path within the
+      # bucket.
+      base = nil
+      relative_path = []
+      until class_parts.empty?
+        begin
+          puts "class_parts: #{class_parts.inspect}"
+          base = [*class_parts, 'Populate'].join('::').constantize
+          relative_path << path_parts.pop
+          puts "base: #{base.inspect}"
+          break if base
+        rescue NameError
+          class_parts.pop
+        end
+      end
+
+      base.new.populate(File.join(*relative_path)) if base && relative_path
+    end
+  end
+end

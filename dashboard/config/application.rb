@@ -81,8 +81,11 @@ module Dashboard
       # autoload_paths is frozen by time it gets to development.rb, so it must be done here.
       config.autoload_paths << Rails.root.join('test/mailers/previews')
 
+      # Automatically load tools intended to make the local development
+      # environment behave more like production.
+      require 'cdo/local_development'
       if CDO.aws_s3_emulated?
-        config.autoload_paths << Rails.root.join('..', 'docker', 'developers', 's3')
+        config.autoload_paths << Rails.root.join('../lib/cdo/local_development/s3_emulation')
       end
     end
 

@@ -1,5 +1,9 @@
 require_relative '../../populator'
 
+# Dance Party - Song Metadata
+#
+# This generates the Dance Party metadata files that describe the available
+# songs. This is generally held in the cdo-sound-library S3 bucket.
 class CdoSoundLibrary::HocSongMeta::Populate
   include Populator
 

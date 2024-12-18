@@ -25,7 +25,7 @@ export AWS_ENDPOINT_URL=${AWS_S3_ENDPOINT_URL}
 # intended to store user-created data, so they just need to exist so we can
 # upload to them. Some of them, however, are expected to contain specific data
 # necessary for initial seeding or some niche features. See
-# docker/developers/s3/populator.rb for details of how we address that.
+# docker/developers/utils/s3/populator.rb for details of how we address that.
 #
 # TODO infra: figure out a way we can declare these dependencies just once in a
 # way that will work for either a prod-like environment or local development.
@@ -42,7 +42,9 @@ bucket_names=(\
   "videos.code.org"\
 )
 
-# TODO
+# Note: some other buckets which we do utilize locally but don't necessarily
+# require be present include:
+#
 # cdo-build-package
 # cdo-nces
 # cdo-v3-trained-ml-models

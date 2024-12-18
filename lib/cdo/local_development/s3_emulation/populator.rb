@@ -1,7 +1,7 @@
 # Common utilities for local s3 population
 require 'httparty'
-require_relative '../../../deployment'
-require_relative '../../../lib/cdo/aws/s3'
+require_relative '../../../../deployment'
+require_relative '../../../../lib/cdo/aws/s3'
 
 module Populator
   SOURCE_DOMAIN = "https://studio.code.org"
@@ -77,7 +77,6 @@ module Populator
       response = HTTParty.get(url)
       if response.code != 200
         puts "ERROR: Cannot find the given file"
-        exit 1
       end
 
       # Write out file

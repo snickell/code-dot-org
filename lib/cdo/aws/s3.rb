@@ -79,45 +79,15 @@ module AWS
       connect_v2!
     end
 
-    # Populates locally hosted buckets for development environments without full AWS access.
-    def self.populate_local_bucket(bucket, key)
-      return unless CDO.aws_s3_emulated?
-      return if exists_in_bucket(bucket, key)
-
-      # Determine the Populator class that can generate files for this bucket, if it
-      # exists. We allow subdirectories to have their own populators, so this will find
-      # them, in that case, or ascend up the hierarchy instead.
-      path_parts = [bucket, *key.split('/')]
-      class_parts = path_parts.map do |part|
-        part.tr('-', '_').camelize
-      end
-
-      # The 'base' will be the most specific populator found for the path within the
-      # bucket.
-      base = nil
-      relative_path = []
-      until class_parts.empty?
-        begin
-          base = [*class_parts, 'Populate'].join('::').constantize
-          relative_path << path_parts.pop
-          break if base
-        rescue NameError
-          class_parts.pop
-        end
-      end
-
-      base.new.populate(File.join(*relative_path)) if base && relative_path
-    end
-
     # Returns the value of the specified S3 key in bucket.
     # @param [String] bucket
     # @param [String] key
     # @return [String]
     def self.download_from_bucket(bucket, key, options = {})
-      if CDO.aws_s3_emulated?
+      if Rails.env.development?
         # For development environments, we look to see if we should lazily populate the
         # local bucket first.
-        populate_local_bucket(bucket, key)
+        Cdo::LocalDevelopment.populate_local_s3_bucket(bucket, key)
       end
 
       create_client.get_object(bucket: bucket, key: key).body.read.force_encoding(Encoding::BINARY)
