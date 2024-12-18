@@ -50,8 +50,8 @@ module AWS
       self.s3 ||= if CDO.aws_s3_emulated?
                     Aws::S3::Client.new(
                       endpoint: CDO.aws_s3_endpoint,
-                      access_key_id: CDO.aws_access_key_id,
-                      secret_access_key: CDO.aws_secret_access_key,
+                      access_key_id: CDO.aws_s3_access_key_id,
+                      secret_access_key: CDO.aws_s3_secret_access_key,
                       region: CDO.aws_region,
                       force_path_style: true,
                     )
