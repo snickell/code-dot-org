@@ -56,7 +56,7 @@ export const getFirmataURLByVersion = (microBitVersion: MicroBitVersion) => {
     : MICROBIT_FIRMATA_V2_URL;
 };
 
-export const flashHexString = async (hexString: string, device: USBDevice) => {
+export const fullFlashAsync = async (hexString: string, device: USBDevice) => {
   const transport = new WebUSB(device);
   const target = new DAPLink(transport); // this.daplink in python-editor-v2 dap-wrapper.ts line 38.
   // For now, log flash progress in dev console.
@@ -106,7 +106,7 @@ export const sendPythonCodeToMicroBit = async (pythonCode: string) => {
   if (aligned.length > totalPages / 2) {
     try {
       console.log('Full flash beginning...');
-      await flashHexString(hexStrWithFiles, device);
+      await fullFlashAsync(hexStrWithFiles, device);
     } catch (error) {
       console.log(error);
       return Promise.reject('Failed to send MicroPython program to micro:bit.');
@@ -118,7 +118,7 @@ export const sendPythonCodeToMicroBit = async (pythonCode: string) => {
     } catch (e) {
       console.log(e);
       console.log('Partial flash failed, attempting full flash.');
-      await flashHexString(hexStrWithFiles, device);
+      await fullFlashAsync(hexStrWithFiles, device);
     }
   }
 };
