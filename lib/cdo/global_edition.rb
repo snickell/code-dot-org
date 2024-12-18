@@ -64,6 +64,17 @@ module Cdo
       region_locales(region)&.first
     end
 
+    # @note Only Pegasus pages are available in all regional languages.
+    def self.locale_available?(hostname, region, locale)
+      return true if region.nil? || region.empty?
+
+      if hostname == CDO.pegasus_hostname
+        region_locales(region)&.include?(locale)
+      else
+        locale == main_region_locale(region)
+      end
+    end
+
     def self.locale_lock?(region)
       configuration_for(region)&.dig(:locale_lock)
     end
@@ -80,6 +91,7 @@ module Cdo
       end.freeze
     end
 
+    # @note GET requests do not trigger the region change due to +HttpCache.config+ on Pegasus. Use POST instead.
     def self.region_change_url(url, region = nil)
       uri = URI.parse(url)
 
