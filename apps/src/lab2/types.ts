@@ -190,6 +190,7 @@ export interface LevelProperties {
   // Python Lab/Codebridge specific properties
   validationFile?: ProjectFile;
   enableMicroBit?: boolean;
+  miniApp?: string;
   serializedMaze?: MazeCell[][];
   startDirection?: number;
 }
