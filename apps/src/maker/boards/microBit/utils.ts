@@ -90,7 +90,7 @@ export const sendPythonCodeToMicroBit = async (pythonCode: string) => {
 
   const fs = await getMicropythonFsHex(pythonCode, microBitVersion);
   const hexStrWithFiles = fs.getIntelHex();
-  const flashBytes = await partialFlashData(fs);
+  const flashBytes = await getFlashData(fs);
 
   const checkSums = await getFlashChecksumsAsync(dapWrapper);
   dapWrapper.writeBlockAsync(loadAddr, flashPageBIN);
@@ -148,11 +148,11 @@ const getMicropythonFsHex = async (
   return microbitFileSystem;
 };
 
-export const partialFlashData = async (fs: MicropythonFsHex) => {
+export const getFlashData = async (fs: MicropythonFsHex) => {
   try {
     return fs.getIntelHexBytes();
   } catch (e) {
     console.log(e);
-    throw Error('Error in partialFlashData');
+    throw Error('Error in getFlashData');
   }
 };

@@ -1,15 +1,4 @@
-/**
- * (c) 2021, Micro:bit Educational Foundation and contributors
- *
- * SPDX-License-Identifier: MIT
- */
-
-// https://github.com/mmoskal/dapjs/blob/a32f11f54e9e76a9c61896ddd425c1cb1a29c143/src/dap/constants.ts
-// https://github.com/mmoskal/dapjs/blob/a32f11f54e9e76a9c61896ddd425c1cb1a29c143/src/cortex/constants.ts
-
-// CRA's build tooling doesn't support const enums so we've converted them to prefixed constants here.
-// If we move this to a separate library then we can replace them.
-// In the meantime we should prune the list below to what we actually use.
+// Copied from https://github.com/microbit-foundation/python-editor-v3/blob/main/src/device/constants.ts
 
 // FICR Registers
 export const FICR = {

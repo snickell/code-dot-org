@@ -1,8 +1,5 @@
-/**
- * (c) 2021, Micro:bit Educational Foundation and contributors
- *
- * SPDX-License-Identifier: MIT
- */
+// Modified from https://github.com/microbit-foundation/python-editor-v3/blob/main/src/device/dap-wrapper.ts
+
 import {CortexM, DAPLink, WebUSB} from 'dapjs';
 
 import {ApReg, CortexSpecialReg, Csw, DapCmd, DapVal, FICR} from './constants';

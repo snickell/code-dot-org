@@ -1,10 +1,6 @@
-/**
- * (c) 2021, Micro:bit Educational Foundation and contributors
- *
- * SPDX-License-Identifier: MIT
- */
 import {Page} from '../types';
 
+// Modified from https://github.com/microbit-foundation/python-editor-v3/blob/main/src/device/partial-flashing-utils.ts
 import {
   DapVal,
   loadAddr,
@@ -132,6 +128,7 @@ export const onlyChanged = (
   });
 };
 
+// Modified from https://github.com/microbit-foundation/python-editor-v3/blob/main/src/device/partial-flashing.ts
 export const partialFlashPageAsync = async (
   dapWrapper: DAPWrapper,
   page: Page,
