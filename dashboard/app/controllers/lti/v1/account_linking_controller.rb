@@ -1,15 +1,12 @@
+require 'metrics/events'
+
 module Lti
   module V1
     class AccountLinkingController < ApplicationController
-      before_action :lti_account_linking_enabled?
+      before_action :authenticate_user!, only: %i[unlink]
 
       # GET /lti/v1/account_linking/landing
       def landing
-      end
-
-      # GET /lti/v1/account_linking/existing_account
-      def existing_account
-        @user = User.new_with_session(ActionController::Parameters.new, session)
       end
 
       # GET /lti/v1/account_linking/finish_link
@@ -38,8 +35,18 @@ module Lti
         if existing_user&.valid_password?(params[:password])
           Services::Lti::AccountLinker.call(user: existing_user, session: session)
           sign_in existing_user
+          metadata = {
+            'user_type' => existing_user.user_type,
+            'lms_name' => existing_user.lti_user_identities.first.lti_integration[:platform_name],
+          }
+          Metrics::Events.log_event(
+            user: existing_user,
+            event_name: 'lti_user_signin',
+            metadata: metadata,
+          )
           target_url = session[:user_return_to] || home_path
-          redirect_to target_url
+          flash[:notice] = I18n.t('lti.account_linking.successfully_linked')
+          redirect_to target_url and return
         else
           flash.alert = I18n.t('lti.account_linking.invalid_credentials')
           redirect_to user_session_path(lti_provider: params[:lti_provider], lms_name: params[:lms_name]) and return
@@ -49,8 +56,8 @@ module Lti
       # POST /lti/v1/account_linking/new_account
       def new_account
         if current_user
-
           current_user.lms_landing_opted_out = true
+          current_user.verify_teacher! if Policies::Lti.unverified_teacher?(current_user)
           current_user.save!
         elsif PartialRegistration.in_progress?(session)
           partial_user = User.new_with_session(ActionController::Parameters.new, session)
@@ -61,8 +68,17 @@ module Lti
         end
       end
 
-      private def lti_account_linking_enabled?
-        head :not_found unless DCDO.get('lti_account_linking_enabled', false)
+      # POST /lti/v1/account_linking/unlink
+      def unlink
+        ao_id = params[:authentication_option_id]
+        return head :not_found if ao_id.blank?
+
+        ao = AuthenticationOption.find_by(id: ao_id)
+        return head :not_found unless ao.present? && ao.user == current_user
+
+        Services::Lti::AccountUnlinker.call(user: current_user, auth_option: ao)
+        flash.notice = I18n.t('lti.account_linking.successfully_unlinked')
+        return head :ok
       end
     end
   end

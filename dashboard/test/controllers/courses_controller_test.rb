@@ -54,7 +54,7 @@ class CoursesControllerTest < ActionController::TestCase
 
     test_user_gets_response_for :show, response: :success, user: :teacher, params: -> {{course_name: @unit_group_regular.name}}, queries: 10
 
-    test_user_gets_response_for :show, response: :forbidden, user: :admin, params: -> {{course_name: @unit_group_regular.name}}, queries: 4
+    test_user_gets_response_for :show, response: :forbidden, user: :admin, params: -> {{course_name: @unit_group_regular.name}}, queries: 2
   end
 
   class CachedQueryCounts < ActionController::TestCase
@@ -88,14 +88,14 @@ class CoursesControllerTest < ActionController::TestCase
 
     test 'student views course overview with caching enabled' do
       sign_in create(:student)
-      assert_cached_queries(7) do
+      assert_cached_queries(8) do
         get :show, params: {course_name: @unit_group.name}
       end
     end
 
     test 'teacher views course overview with caching enabled' do
       sign_in create(:teacher)
-      assert_cached_queries(12) do
+      assert_cached_queries(13) do
         get :show, params: {course_name: @unit_group.name}
       end
     end
@@ -232,6 +232,44 @@ class CoursesControllerTest < ActionController::TestCase
     assert_redirected_to '/courses/csp-2018/?redirect_warning=true'
   end
 
+  test "show: redirect to latest stable version in course family and language for student" do
+    csp_2017 = create :unit_group, name: 'csp-2017', family_name: 'csp', version_year: '2017', published_state: Curriculum::SharedCourseConstants::PUBLISHED_STATE.stable
+    csp1_2017 = create(:script, name: 'csp1-2017', supported_locales: ['en-US', 'es-MX'])
+    create :unit_group_unit, unit_group: csp_2017, script: csp1_2017, position: 1
+    csp_2018 = create :unit_group, name: 'csp-2018', family_name: 'csp', version_year: '2018', published_state: Curriculum::SharedCourseConstants::PUBLISHED_STATE.stable
+    csp1_2018 = create(:script, name: 'csp1-2018', supported_locales: ['en-US'])
+    create :unit_group_unit, unit_group: csp_2018, script: csp1_2018, position: 1
+    csp_2019 = create :unit_group, name: 'csp-2019', family_name: 'csp', version_year: '2019', published_state: Curriculum::SharedCourseConstants::PUBLISHED_STATE.beta
+
+    offering = create :course_offering, key: 'csp'
+    create :course_version, course_offering: offering, content_root: csp_2017, key: '2017'
+    create :course_version, course_offering: offering, content_root: csp_2018, key: '2018'
+    create :course_version, course_offering: offering, content_root: csp_2019, key: '2019'
+
+    sign_in create(:student)
+    with_default_locale('es-MX') do
+      get :show, params: {course_name: 'csp'}
+      assert_redirected_to '/courses/csp-2017'
+
+      get :show, params: {course_name: 'csp-2017'}
+      assert_response :ok
+
+      get :show, params: {course_name: 'csp-2019'}
+      assert_redirected_to '/courses/csp-2017/?redirect_warning=true'
+    end
+
+    with_default_locale('fi-FI') do
+      get :show, params: {course_name: 'csp'}
+      assert_redirected_to '/courses/csp-2018'
+
+      get :show, params: {course_name: 'csp-2017'}
+      assert_redirected_to '/courses/csp-2018/?redirect_warning=true'
+
+      get :show, params: {course_name: 'csp-2019'}
+      assert_redirected_to '/courses/csp-2018/?redirect_warning=true'
+    end
+  end
+
   test "show: redirect to latest stable version in course family for participant" do
     create :unit_group, name: 'pl-csp-2017', family_name: 'pl-csp', version_year: '2017', published_state: Curriculum::SharedCourseConstants::PUBLISHED_STATE.stable, instructor_audience: Curriculum::SharedCourseConstants::INSTRUCTOR_AUDIENCE.facilitator, participant_audience: Curriculum::SharedCourseConstants::PARTICIPANT_AUDIENCE.teacher
     create :unit_group, name: 'pl-csp-2018', family_name: 'pl-csp', version_year: '2018', published_state: Curriculum::SharedCourseConstants::PUBLISHED_STATE.stable, instructor_audience: Curriculum::SharedCourseConstants::INSTRUCTOR_AUDIENCE.facilitator, participant_audience: Curriculum::SharedCourseConstants::PARTICIPANT_AUDIENCE.teacher
@@ -322,6 +360,18 @@ class CoursesControllerTest < ActionController::TestCase
     get :show, params: {course_name: 'new-course'}
 
     assert_response :ok
+  end
+
+  test "show: teacher in teacher-local-nav-v2 experiment is redirected to teacher dashboard if course is in a section" do
+    experiment_course = create :unit_group, name: 'experiment-course', family_name: 'experiment-course', version_year: '2024', published_state: Curriculum::SharedCourseConstants::PUBLISHED_STATE.stable
+    experiment_teacher = create :teacher
+    experiment_section = create :section, user: experiment_teacher, unit_group: experiment_course
+    SingleUserExperiment.find_or_create_by!(min_user_id: experiment_teacher.id, name: 'teacher-local-nav-v2')
+
+    sign_in experiment_teacher
+
+    get :show, params: {course_name: 'experiment-course'}
+    assert_redirected_to "/teacher_dashboard/sections/#{experiment_section.id}/courses/#{experiment_course.name}"
   end
 
   no_access_msg = "You don&#39;t have access to this course."

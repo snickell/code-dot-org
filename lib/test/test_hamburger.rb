@@ -56,7 +56,7 @@ class HamburgerTest < Minitest::Test
     assert_equal visibility[:show_teacher_options],     Hamburger::HIDE_ALWAYS
     assert_equal visibility[:show_student_options],     Hamburger::HIDE_ALWAYS
     assert_equal visibility[:show_pegasus_options],     Hamburger::SHOW_ALWAYS
-    assert_equal visibility[:show_help_options],        Hamburger::SHOW_MOBILE
+    assert_equal visibility[:show_help_options],        Hamburger::SHOW_SMALL_DESKTOP
   end
 
   def test_level_nobody_nonen
@@ -66,7 +66,7 @@ class HamburgerTest < Minitest::Test
     assert_equal visibility[:show_teacher_options],     Hamburger::HIDE_ALWAYS
     assert_equal visibility[:show_student_options],     Hamburger::HIDE_ALWAYS
     assert_equal visibility[:show_pegasus_options],     Hamburger::SHOW_ALWAYS
-    assert_equal visibility[:show_help_options],        Hamburger::SHOW_MOBILE
+    assert_equal visibility[:show_help_options],        Hamburger::SHOW_SMALL_DESKTOP
   end
 
   def test_nonlevel_teacher_en
@@ -112,28 +112,29 @@ class HamburgerTest < Minitest::Test
   def test_nonlevel_nobody_en
     visibility = Hamburger.get_visibility({level: false, user_type: nil, language: "en"})
 
-    assert_equal visibility[:hamburger_class],          Hamburger::SHOW_MOBILE
+    assert_equal visibility[:hamburger_class],          Hamburger::SHOW_SMALL_DESKTOP
     assert_equal visibility[:show_teacher_options],     Hamburger::HIDE_ALWAYS
     assert_equal visibility[:show_student_options],     Hamburger::HIDE_ALWAYS
-    assert_equal visibility[:show_pegasus_options],     Hamburger::SHOW_MOBILE
-    assert_equal visibility[:show_help_options],        Hamburger::SHOW_MOBILE
+    assert_equal visibility[:show_pegasus_options],     Hamburger::SHOW_SMALL_DESKTOP
+    assert_equal visibility[:show_help_options],        Hamburger::SHOW_SMALL_DESKTOP
   end
 
   def test_nonlevel_nobody_nonen
     visibility = Hamburger.get_visibility({level: false, user_type: nil, language: "fr"})
 
-    assert_equal visibility[:hamburger_class],          Hamburger::SHOW_MOBILE
+    assert_equal visibility[:hamburger_class],          Hamburger::SHOW_SMALL_DESKTOP
     assert_equal visibility[:show_teacher_options],     Hamburger::HIDE_ALWAYS
     assert_equal visibility[:show_student_options],     Hamburger::HIDE_ALWAYS
-    assert_equal visibility[:show_pegasus_options],     Hamburger::SHOW_MOBILE
-    assert_equal visibility[:show_help_options],        Hamburger::SHOW_MOBILE
+    assert_equal visibility[:show_pegasus_options],     Hamburger::SHOW_SMALL_DESKTOP
+    assert_equal visibility[:show_help_options],        Hamburger::SHOW_SMALL_DESKTOP
   end
 
   # Hamburger content tests.
 
   def test_hamburger_content_student
+    # Test that the header links also appear in the hamburger menu
     contents = Hamburger.get_hamburger_contents({level: nil, script_level: nil, user_type: "student", language: "en"})
-    assert_includes_id contents[:entries], "hamburger-student-projects"
+    assert_includes_id contents[:entries], "hamburger-header-student-projects"
   end
 
   def test_hamburger_content_nobody

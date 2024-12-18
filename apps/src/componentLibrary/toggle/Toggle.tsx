@@ -8,6 +8,8 @@ import Typography from '@cdo/apps/componentLibrary/typography';
 import moduleStyles from './toggle.module.scss';
 
 export interface ToggleProps {
+  /** Toggle id selector, used for UI tests */
+  id?: string;
   /** Toggle checked state */
   checked: boolean;
   /** Toggle onChange handler */
@@ -30,6 +32,7 @@ export interface ToggleProps {
 }
 
 const Toggle: React.FunctionComponent<ToggleProps> = ({
+  id,
   checked,
   onChange,
   name,
@@ -49,7 +52,7 @@ const Toggle: React.FunctionComponent<ToggleProps> = ({
         position === 'right' && moduleStyles['toggle-right']
       )}
     >
-      <div>
+      <div id={id}>
         <input
           type="checkbox"
           name={name}
@@ -78,7 +81,7 @@ const Toggle: React.FunctionComponent<ToggleProps> = ({
  *  * (✔) implementation of component approved by design team;
  *  * (✔) has storybook, covered with stories and documentation;
  *  * (✔) has tests: test every prop, every state and every interaction that's js related;
- *  * (see apps/test/unit/componentLibrary/ToggleTest.jsx)
+ *  * (see apps/test/unit/componentLibrary/ToggleTest.tsx)
  *  * (?) passes accessibility checks;
  *
  * ###  Status: ```Ready for dev```

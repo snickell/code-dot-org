@@ -1,17 +1,18 @@
 import $ from 'jquery';
+import jsonic from 'jsonic';
+
+import {getDefaultListMetadata} from '@cdo/apps/assetManagement/animationLibraryApi';
+import {installCustomBlocks} from '@cdo/apps/block_utils';
+import {BlocklyVersion} from '@cdo/apps/blockly/constants';
 import assetUrl from '@cdo/apps/code-studio/assetUrl';
 import initializeCodeMirror from '@cdo/apps/code-studio/initializeCodeMirror';
-import jsonic from 'jsonic';
-import {installCustomBlocks} from '@cdo/apps/block_utils';
-import {customInputTypes as spritelabCustomInputTypes} from '@cdo/apps/p5lab/spritelab/blocks';
 import {customInputTypes as dancelabCustomInputTypes} from '@cdo/apps/dance/blockly/blocks';
-import {valueTypeTabShapeMap} from '@cdo/apps/p5lab/spritelab/constants';
 import animationList, {
   setInitialAnimationList,
 } from '@cdo/apps/p5lab/redux/animationList';
-import {getDefaultListMetadata} from '@cdo/apps/assetManagement/animationLibraryApi';
+import {customInputTypes as spritelabCustomInputTypes} from '@cdo/apps/p5lab/spritelab/blocks';
+import {valueTypeTabShapeMap} from '@cdo/apps/p5lab/spritelab/constants';
 import {getStore, registerReducers} from '@cdo/apps/redux';
-import {BlocklyVersion} from '@cdo/apps/blockly/constants';
 
 const VALID_COLOR = 'black';
 const INVALID_COLOR = '#d00';
@@ -19,6 +20,8 @@ const INVALID_COLOR = '#d00';
 let poolField, nameField, helperEditor, configEditor, validationDiv;
 let hasLintingErrors = false;
 let isValidBlockConfig = false;
+let originalBlockName;
+let saveButton;
 
 $(document).ready(() => {
   registerReducers({animationList: animationList});
@@ -36,6 +39,9 @@ function initializeEditPage(defaultSprites) {
 
   poolField = document.getElementById('block_pool');
   nameField = document.getElementById('block_name');
+  saveButton = document.getElementById('block_submit');
+  originalBlockName = nameField.value;
+
   Blockly.inject(document.getElementById('blockly-container'), {
     assetUrl,
     valueTypeTabShapeMap: valueTypeTabShapeMap(Blockly),
@@ -149,6 +155,7 @@ function updateBlockPreview() {
     parsedConfig.func || parsedConfig.name,
     poolField.value
   );
+  checkBlockNameChanges(blockName);
   nameField.value = blockName;
   // Calling this function just so that we can catch and show errors (if any)
   installCustomBlocks({
@@ -173,4 +180,16 @@ function updateBlockPreview() {
 function onBlockSpaceChange() {
   document.getElementById('code-preview').innerText =
     Blockly.getWorkspaceCode();
+}
+
+function checkBlockNameChanges(blockName) {
+  // Add a prompt to the "Update Block" button if the user has changed the block name or pool.
+  if (originalBlockName && blockName !== originalBlockName) {
+    saveButton.setAttribute(
+      'data-confirm',
+      `Are you sure you want to update ${originalBlockName}?\n\n` +
+        `This will affect everywhere that this block is used.\n\n` +
+        `If you change the block pool or block name, this could break existing levels or projects.`
+    );
+  }
 }

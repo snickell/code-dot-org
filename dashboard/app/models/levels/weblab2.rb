@@ -22,10 +22,11 @@
 #  index_levels_on_game_id    (game_id)
 #  index_levels_on_level_num  (level_num)
 #  index_levels_on_name       (name)
+#  index_levels_on_type       (type)
 #
 class Weblab2 < Level
   serialized_attrs %w(
-    source
+    start_sources
     hide_share_and_remix
     is_project_level
     encrypted_exemplar_sources

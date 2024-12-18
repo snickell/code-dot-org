@@ -1,6 +1,8 @@
-var xml = require('./xml');
-var msg = require('@cdo/locale');
 var _ = require('lodash');
+
+var msg = require('@cdo/locale');
+
+var xml = require('./xml');
 
 /**
  * Create the textual XML for a math_number block.
@@ -25,6 +27,10 @@ exports.makeMathNumber = function (number) {
 exports.simpleBlock = function (block_type) {
   return {
     test: function (block) {
+      // Special case for old static variable blocks. Newer parameter blocks are equivalent.
+      if (block_type.startsWith('variables_get_')) {
+        return [block_type, 'parameters_get'].includes(block.type);
+      }
       return block.type === block_type;
     },
     type: block_type,

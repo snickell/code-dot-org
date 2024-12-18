@@ -2,8 +2,9 @@ import cookies from 'js-cookie';
 import PropTypes from 'prop-types';
 import React, {useState, useEffect, useReducer} from 'react';
 
-import {EVENTS, PLATFORMS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import Button from '@cdo/apps/legacySharedComponents/Button';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import parentalPermissionRequestReducer, {
   REQUEST_PARENTAL_PERMISSION_SUCCESS,
   requestParentalPermission,
@@ -13,11 +14,10 @@ import usePrevious from '@cdo/apps/util/usePrevious';
 import {ChildAccountComplianceStates} from '@cdo/generated-scripts/sharedConstants';
 import i18n from '@cdo/locale';
 
-import Spinner from '../../code-studio/pd/components/spinner';
 import {getStore} from '../../redux';
+import Spinner from '../../sharedComponents/Spinner';
 import * as color from '../../util/color';
 import {hashString} from '../../utils';
-import Button from '../Button';
 
 /**
  * This component allows students whose personal account linking has been
@@ -27,7 +27,7 @@ import Button from '../Button';
  */
 export default function LockoutLinkedAccounts(props) {
   const reportEvent = (eventName, payload = {}) => {
-    analyticsReporter.sendEvent(eventName, payload, PLATFORMS.AMPLITUDE);
+    analyticsReporter.sendEvent(eventName, payload);
   };
 
   const validateEmail = email => {
@@ -65,10 +65,12 @@ export default function LockoutLinkedAccounts(props) {
 
   useEffect(() => {
     reportEvent(EVENTS.CAP_SETTINGS_SHOWN, {
+      providers: props.providers,
       inSection: props.inSection,
       consentStatus: props.permissionStatus,
+      us_state: props.usState,
     });
-  }, [props.inSection, props.permissionStatus]);
+  }, [props]);
 
   /**
    * This useEffect hook is responsible for reporting successful parent permission request events:
@@ -83,21 +85,27 @@ export default function LockoutLinkedAccounts(props) {
 
     if (!prevPendingEmail) {
       reportEvent(EVENTS.CAP_SETTINGS_EMAIL_SUBMITTED, {
+        providers: props.providers,
         inSection: props.inSection,
         consentStatus: parentalPermissionRequest.consent_status,
+        us_state: props.usState,
       });
     } else if (parentalPermissionRequest.parent_email === prevPendingEmail) {
       reportEvent(EVENTS.CAP_SETTINGS_EMAIL_RESEND, {
+        providers: props.providers,
         inSection: props.inSection,
         consentStatus: parentalPermissionRequest.consent_status,
+        us_state: props.usState,
       });
     } else {
       reportEvent(EVENTS.CAP_SETTINGS_EMAIL_UPDATED, {
+        providers: props.providers,
         inSection: props.inSection,
         consentStatus: parentalPermissionRequest.consent_status,
+        us_state: props.usState,
       });
     }
-  }, [action, prevPendingEmail, parentalPermissionRequest, props.inSection]);
+  }, [action, prevPendingEmail, parentalPermissionRequest, props]);
 
   // When the email field is updated, also update the disability state of the
   // submit button.
@@ -298,6 +306,8 @@ LockoutLinkedAccounts.propTypes = {
   permissionStatus: PropTypes.string,
   userEmail: PropTypes.string,
   inSection: PropTypes.bool,
+  providers: PropTypes.arrayOf(PropTypes.string),
+  usState: PropTypes.string,
 };
 
 const styles = {

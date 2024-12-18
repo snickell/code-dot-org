@@ -122,10 +122,10 @@ class ActivitiesController < ApplicationController
         track_progress_in_session
       end
 
-      # If a student in the pilot is submitting work on an AI-enabled level, and their teachers haven't opted-out, trigger the AI evaluation job.
-      is_ai_experiment_enabled = current_user && Experiment.enabled?(user: current_user, script: @script_level&.script, experiment_name: 'ai-rubrics') && Policies::Ai.ai_rubrics_enabled_for_script_level?(current_user, @script_level)
+      # If a student is submitting work on an AI-enabled level, and their teachers haven't opted-out, trigger the AI evaluation job.
+      is_ai_enabled = current_user && Policies::Ai.ai_rubrics_enabled_for_script_level?(current_user, @script_level)
       is_level_ai_enabled = AiRubricConfig.ai_enabled?(@script_level)
-      if is_ai_experiment_enabled && is_level_ai_enabled && params[:submitted] == 'true'
+      if is_ai_enabled && is_level_ai_enabled && params[:submitted] == 'true'
         metadata = {
           'studentId' => current_user.id,
           'unitName' => @script_level.script.name,
@@ -196,6 +196,7 @@ class ActivitiesController < ApplicationController
         submitted: params[:submitted] == 'true',
         level_source_id: @level_source.try(:id),
         pairing_user_ids: pairing_user_ids,
+        locale: locale,
         time_spent: time_since_last_milestone
       )
 
@@ -215,6 +216,7 @@ class ActivitiesController < ApplicationController
           submitted: false,
           level_source_id: nil,
           pairing_user_ids: pairing_user_ids,
+          locale: locale,
           time_spent: time_since_last_milestone
         )
       end
@@ -252,7 +254,7 @@ class ActivitiesController < ApplicationController
     log_string = 'Milestone Report:'
     log_string +=
       if current_user || session.id
-        "\t#{(current_user ? current_user.id.to_s : ('s:' + session.id.to_s))}"
+        "\t#{current_user ? current_user.id.to_s : ('s:' + session.id.to_s)}"
       else
         "\tanon"
       end

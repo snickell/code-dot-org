@@ -1,14 +1,14 @@
 import {render, screen} from '@testing-library/react';
 import React from 'react';
-import sinon, {SinonStub} from 'sinon';
+import sinon, {SinonStub} from 'sinon'; // eslint-disable-line no-restricted-imports
 
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import ChildAccountConsent, {
   ChildAccountConsentProps,
 } from '@cdo/apps/templates/policy_compliance/ChildAccountConsent';
 import i18n from '@cdo/locale';
 
-import {expect} from '../../../util/reconfiguredChai';
+import {expect} from '../../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
 
 describe('ChildAccountConsent', () => {
   let sendEventSpy: SinonStub;
@@ -20,7 +20,7 @@ describe('ChildAccountConsent', () => {
     (analyticsReporter.sendEvent as sinon.SinonStub).restore();
   });
 
-  context('no parent permission', () => {
+  describe('no parent permission', () => {
     const props: ChildAccountConsentProps = {
       permissionGranted: false,
     };
@@ -39,12 +39,13 @@ describe('ChildAccountConsent', () => {
     });
   });
 
-  context('has parent permission', () => {
+  describe('has parent permission', () => {
     const permissionGrantedDate = new Date();
     const props: ChildAccountConsentProps = {
       permissionGranted: true,
       permissionGrantedDate: permissionGrantedDate,
       studentId: 12345,
+      usState: 'CA',
     };
     const dateOptions: Intl.DateTimeFormatOptions = {
       year: 'numeric',
@@ -68,6 +69,7 @@ describe('ChildAccountConsent', () => {
       expect(sendEventSpy).to.be.calledOnce;
       expect(sendEventSpy).calledWith('CAP Parent Consent Granted', {
         studentId: props.studentId,
+        us_state: props.usState,
       });
     });
   });

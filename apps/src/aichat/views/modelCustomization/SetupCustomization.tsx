@@ -5,11 +5,12 @@ import {useSelector} from 'react-redux';
 import {AichatLevelProperties, ModelDescription} from '@cdo/apps/aichat/types';
 import Button from '@cdo/apps/componentLibrary/button/Button';
 import SimpleDropdown from '@cdo/apps/componentLibrary/dropdown/simpleDropdown/SimpleDropdown';
-import {StrongText} from '@cdo/apps/componentLibrary/typography/TypographyElements';
+import Slider, {SliderProps} from '@cdo/apps/componentLibrary/slider/Slider';
 import {isReadOnlyWorkspace} from '@cdo/apps/lab2/lab2Redux';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 import {modelDescriptions} from '../../constants';
+import aichatI18n from '../../locale';
 import {setAiCustomizationProperty} from '../../redux/aichatRedux';
 
 import CompareModelsDialog from './CompareModelsDialog';
@@ -19,6 +20,8 @@ import {
   MIN_TEMPERATURE,
   SET_TEMPERATURE_STEP,
 } from './constants';
+import FieldLabel from './FieldLabel';
+import SaveChangesAlerts from './SaveChangesAlerts';
 import UpdateButton from './UpdateButton';
 import {isVisible, isDisabled, isEditable} from './utils';
 
@@ -77,9 +80,15 @@ const SetupCustomization: React.FunctionComponent = () => {
 
   const renderChooseAndCompareModels = () => {
     return (
-      <div className={styles.inputContainer}>
+      <div>
+        <FieldLabel
+          id="selected-model"
+          label={aichatI18n.modelCustomization_comparisonHeader()}
+          tooltipText={aichatI18n.modelCustomization_comparisonTooltipText()}
+        />
         <SimpleDropdown
-          labelText="Selected model:"
+          labelText={aichatI18n.modelCustomization_comparisonHeader()}
+          isLabelVisible={false}
           onChange={event =>
             dispatch(
               setAiCustomizationProperty({
@@ -99,9 +108,10 @@ const SetupCustomization: React.FunctionComponent = () => {
         />
         {isEditable(selectedModelId) && (
           <Button
-            text="Compare Models"
+            text={aichatI18n.modelCustomization_compareButtonText()}
             onClick={() => setIsShowingModelDialog(true)}
             type="secondary"
+            color="gray"
             className={classNames(
               styles.updateButton,
               styles.compareModelsButton
@@ -119,42 +129,70 @@ const SetupCustomization: React.FunctionComponent = () => {
     );
   };
 
+  // The reason we're multiplying by 10 and dividing by 10 is because the slider
+  // component adds and subtracts by the step value, and with float math, those values
+  // can end up being slightly off after multiple increments/decrements by 0.1.
+  // This way, we can avoid any issues from funky float math.
+  const sliderProps: SliderProps = {
+    name: 'temperature-slider',
+    value: Math.round(aiCustomizations.temperature * 10),
+    minValue: Math.round(MIN_TEMPERATURE * 10),
+    maxValue: Math.round(MAX_TEMPERATURE * 10),
+    step: Math.round(SET_TEMPERATURE_STEP * 10),
+    hideValue: true,
+    disabled: isDisabled(temperature) || readOnlyWorkspace,
+    onChange: event => {
+      const value = parseInt(event.target.value) / 10;
+      dispatch(
+        setAiCustomizationProperty({
+          property: 'temperature',
+          value: value,
+        })
+      );
+    },
+    className: styles.temperatureSlider,
+    leftButtonProps: {
+      icon: {
+        iconName: 'minus',
+        title: aichatI18n.modelCustomization_sliderDecrease(),
+      },
+      ['aria-label']: aichatI18n.modelCustomization_sliderDecrease(),
+    },
+    rightButtonProps: {
+      icon: {
+        iconName: 'plus',
+        title: aichatI18n.modelCustomization_sliderIncrease(),
+      },
+      ['aria-label']: aichatI18n.modelCustomization_sliderIncrease(),
+    },
+  };
+
   return (
     <div className={styles.verticalFlexContainer}>
       <div className={styles.customizationContainer}>
         {isVisible(selectedModelId) && renderChooseAndCompareModels()}
         {isVisible(temperature) && (
-          <div className={styles.inputContainer}>
+          <>
             <div className={styles.horizontalFlexContainer}>
-              <label htmlFor="temperature">
-                <StrongText>Temperature</StrongText>
-              </label>
+              <FieldLabel
+                id="temperature"
+                label={aichatI18n.technicalInfoHeader_temperature()}
+                tooltipText={aichatI18n.modelCustomization_temperatureTooltipText()}
+              />
               {aiCustomizations.temperature}
             </div>
-            <input
-              type="range"
-              min={MIN_TEMPERATURE}
-              max={MAX_TEMPERATURE}
-              step={SET_TEMPERATURE_STEP}
-              value={aiCustomizations.temperature}
-              disabled={isDisabled(temperature) || readOnlyWorkspace}
-              onChange={event =>
-                dispatch(
-                  setAiCustomizationProperty({
-                    property: 'temperature',
-                    value: event.target.value,
-                  })
-                )
-              }
-            />
-          </div>
+            <Slider {...sliderProps} />
+          </>
         )}
         {isVisible(systemPrompt) && (
-          <div className={styles.inputContainer}>
-            <label htmlFor="system-prompt">
-              <StrongText>System prompt</StrongText>
-            </label>
+          <>
+            <FieldLabel
+              id="system-prompt"
+              label={aichatI18n.technicalInfoHeader_systemPrompt()}
+              tooltipText={aichatI18n.modelCustomization_systemPromptTooltipText()}
+            />
             <textarea
+              className={styles.systemPromptInput}
               id="system-prompt"
               value={aiCustomizations.systemPrompt}
               disabled={isDisabled(systemPrompt) || readOnlyWorkspace}
@@ -167,12 +205,13 @@ const SetupCustomization: React.FunctionComponent = () => {
                 )
               }
             />
-          </div>
+          </>
         )}
       </div>
       <div className={styles.footerButtonContainer}>
         <UpdateButton isDisabledDefault={allFieldsDisabled} />
       </div>
+      <SaveChangesAlerts isReadOnly={allFieldsDisabled} />
     </div>
   );
 };

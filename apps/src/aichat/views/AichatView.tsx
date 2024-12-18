@@ -1,9 +1,9 @@
 /** @file Top-level view for AI Chat Lab */
 
-import React, {useCallback, useContext, useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 
-import {sendSuccessReport} from '@cdo/apps/code-studio/progressRedux';
 import Button from '@cdo/apps/componentLibrary/button/Button';
+import ActionDropdown from '@cdo/apps/componentLibrary/dropdown/actionDropdown/ActionDropdown';
 import SegmentedButtons, {
   SegmentedButtonsProps,
 } from '@cdo/apps/componentLibrary/segmentedButtons/SegmentedButtons';
@@ -11,26 +11,29 @@ import {isProjectTemplateLevel} from '@cdo/apps/lab2/lab2Redux';
 import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
 import Instructions from '@cdo/apps/lab2/views/components/Instructions';
 import PanelContainer from '@cdo/apps/lab2/views/components/PanelContainer';
-import {
-  DialogContext,
-  DialogType,
-} from '@cdo/apps/lab2/views/dialogs/DialogManager';
-import {EVENTS, PLATFORMS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
-import ProjectTemplateWorkspaceIcon from '@cdo/apps/templates/ProjectTemplateWorkspaceIcon';
+import {useDialogControl, DialogType} from '@cdo/apps/lab2/views/dialogs';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import {SignInState} from '@cdo/apps/templates/currentUserRedux';
+import ProjectTemplateWorkspaceIconV2 from '@cdo/apps/templates/ProjectTemplateWorkspaceIconV2';
 import {commonI18n} from '@cdo/apps/types/locale';
+import {NetworkError} from '@cdo/apps/util/HttpClient';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 
+import {getUserHasAichatAccess} from '../aichatApi';
+import {ModalTypes} from '../constants';
 import aichatI18n from '../locale';
 import {
-  addNotification,
+  addChatEvent,
   clearChatMessages,
   onSaveComplete,
   onSaveFail,
   onSaveNoop,
   resetToDefaultAiCustomizations,
   selectAllFieldsHidden,
+  sendAnalytics,
+  setShowModalType,
   setStartingAiCustomizations,
+  setUserHasAichatAccess,
   setViewMode,
   updateAiCustomization,
 } from '../redux/aichatRedux';
@@ -38,7 +41,6 @@ import {getNewMessageId} from '../redux/utils';
 import {AichatLevelProperties, Notification, ViewMode} from '../types';
 
 import ChatWorkspace from './ChatWorkspace';
-import CopyButton from './CopyButton';
 import {isDisabled} from './modelCustomization/utils';
 import ModelCustomizationWorkspace from './ModelCustomizationWorkspace';
 import PresentationView from './presentation/PresentationView';
@@ -47,19 +49,17 @@ import moduleStyles from './aichatView.module.scss';
 
 const getResetModelNotification = (): Notification => ({
   id: getNewMessageId(),
-  text: 'Model customizations and model card information have been reset to default settings.',
+  text: aichatI18n.modelResetNotification(),
   notificationType: 'success',
   timestamp: Date.now(),
+  includeInChatHistory: true,
 });
 
 const AichatView: React.FunctionComponent = () => {
   const dispatch = useAppDispatch();
 
   const viewAsUserId = useAppSelector(state => state.progress.viewAsUserId);
-
-  const beforeNextLevel = useCallback(() => {
-    dispatch(sendSuccessReport('aichat'));
-  }, [dispatch]);
+  const isUserTeacher = useAppSelector(state => state.currentUser.isTeacher);
 
   const levelAichatSettings = useAppSelector(
     state =>
@@ -78,6 +78,9 @@ const AichatView: React.FunctionComponent = () => {
   const {currentAiCustomizations, viewMode} = useAppSelector(
     state => state.aichat
   );
+
+  const signInState = useAppSelector(state => state.currentUser.signInState);
+
   const {botName, isPublished} = currentAiCustomizations.modelCardInfo;
 
   const allFieldsHidden = useAppSelector(selectAllFieldsHidden);
@@ -109,7 +112,30 @@ const AichatView: React.FunctionComponent = () => {
         studentAiCustomizations,
       })
     );
+    dispatch(
+      addChatEvent({
+        timestamp: Date.now(),
+        descriptionKey: 'LOAD_LEVEL',
+        hideForParticipants: true,
+      })
+    );
   }, [dispatch, initialSources, levelAichatSettings]);
+
+  useEffect(() => {
+    if (signInState === SignInState.SignedIn) {
+      getUserHasAichatAccess()
+        .then(hasAccess => dispatch(setUserHasAichatAccess(hasAccess)))
+        .catch(error => {
+          if (
+            !(error instanceof NetworkError && error.response.status === 403)
+          ) {
+            Lab2Registry.getInstance()
+              .getMetricsReporter()
+              .logError('Error in fetching user aichat access', error as Error);
+          }
+        });
+    }
+  }, [dispatch, signInState]);
 
   // When the level changes or if we are viewing aichat level as a different user
   // (e.g., teacher viewing student work), clear the chat message history and start a new session.
@@ -132,18 +158,23 @@ const AichatView: React.FunctionComponent = () => {
   const viewModeButtonsProps: SegmentedButtonsProps = {
     buttons: [
       {
-        label: 'Edit',
+        label: aichatI18n.editModeButtonText(),
         value: ViewMode.EDIT,
-        iconLeft: {iconName: 'wrench', iconStyle: 'solid', title: 'Edit Mode'},
+        iconLeft: {
+          iconName: 'wrench',
+          iconStyle: 'solid',
+          title: aichatI18n.aichatView_screenReader_EditModeButton(),
+        },
       },
       {
-        label: 'User View',
+        label: aichatI18n.userViewButtonText(),
         value: ViewMode.PRESENTATION,
         iconLeft: {
           iconName: 'user-group',
           iconStyle: 'solid',
-          title: 'User View Mode',
+          title: aichatI18n.aichatView_screenReader_UserViewModeButton(),
         },
+        id: 'uitest-user-view-button',
       },
     ],
     size: 's',
@@ -152,13 +183,16 @@ const AichatView: React.FunctionComponent = () => {
   };
 
   const chatWorkspaceHeader = (
-    <div>
-      {projectTemplateLevel && (
-        <ProjectTemplateWorkspaceIcon tooltipPlace="bottom" />
-      )}
+    <div className={moduleStyles.workspaceHeaderContent}>
       {viewMode === ViewMode.EDIT
         ? aichatI18n.aichatWorkspaceHeader()
         : botName}
+      {projectTemplateLevel && (
+        <ProjectTemplateWorkspaceIconV2
+          tooltipPlace="onBottom"
+          className={moduleStyles.icon}
+        />
+      )}
     </div>
   );
 
@@ -167,21 +201,43 @@ const AichatView: React.FunctionComponent = () => {
     // Save the customizations to the user's project.
     dispatch(updateAiCustomization());
     dispatch(clearChatMessages());
-    dispatch(addNotification(getResetModelNotification()));
+    dispatch(addChatEvent(getResetModelNotification()));
   }, [dispatch, levelAichatSettings]);
 
-  const dialogControl = useContext(DialogContext);
+  const dialogControl = useDialogControl();
 
   const onClickStartOver = useCallback(() => {
     if (dialogControl) {
-      dialogControl.showDialog(DialogType.StartOver, resetProject);
+      dialogControl.showDialog({
+        type: DialogType.StartOver,
+        handleConfirm: resetProject,
+      });
     }
   }, [dialogControl, resetProject]);
+
+  const onClear = useCallback(() => {
+    dispatch(clearChatMessages());
+    dispatch(
+      addChatEvent({
+        timestamp: Date.now(),
+        descriptionKey: 'CLEAR_CHAT',
+        hideForParticipants: true,
+      })
+    );
+    dispatch(
+      sendAnalytics(EVENTS.CHAT_ACTION, {
+        action: 'Clear chat history',
+      })
+    );
+  }, [dispatch]);
 
   return (
     <div id="aichat-lab" className={moduleStyles.aichatLab}>
       {showPresentationToggle() && (
-        <div className={moduleStyles.viewModeButtons}>
+        <div
+          id="uitest-view-mode-toggle-container"
+          className={moduleStyles.viewModeButtons}
+        >
           <SegmentedButtons {...viewModeButtonsProps} />
         </div>
       )}
@@ -192,24 +248,32 @@ const AichatView: React.FunctionComponent = () => {
               <PanelContainer
                 id="aichat-instructions-panel"
                 headerContent={commonI18n.instructions()}
+                className={moduleStyles.panelContainer}
+                headerClassName={moduleStyles.panelHeader}
+                rightHeaderContent={renderInstructionsHeaderRight(
+                  isUserTeacher,
+                  () => {
+                    dispatch(setShowModalType(ModalTypes.TEACHER_ONBOARDING));
+                  }
+                )}
               >
-                <Instructions beforeNextLevel={beforeNextLevel} />
+                <Instructions className={moduleStyles.instructions} />
               </PanelContainer>
             </div>
             {!allFieldsHidden && (
               <div className={moduleStyles.customizationArea}>
                 <PanelContainer
                   id="aichat-model-customization-panel"
-                  headerContent="Model Customization"
+                  headerContent={aichatI18n.modelCustomizationHeader()}
+                  className={moduleStyles.panelContainer}
+                  headerClassName={moduleStyles.panelHeader}
                   rightHeaderContent={renderModelCustomizationHeaderRight(
                     () => {
                       onClickStartOver();
-                      analyticsReporter.sendEvent(
-                        EVENTS.AICHAT_START_OVER,
-                        {
+                      dispatch(
+                        sendAnalytics(EVENTS.AICHAT_START_OVER, {
                           levelPath: window.location.pathname,
-                        },
-                        PLATFORMS.BOTH
+                        })
                       );
                     }
                   )}
@@ -221,10 +285,15 @@ const AichatView: React.FunctionComponent = () => {
           </>
         )}
         {viewMode === ViewMode.PRESENTATION && (
-          <div className={moduleStyles.presentationArea}>
+          <div
+            id="uitest-presentation-view-container"
+            className={moduleStyles.presentationArea}
+          >
             <PanelContainer
               id="aichat-presentation-panel"
-              headerContent={'Model Card'}
+              headerContent={aichatI18n.modelCardPanelHeader()}
+              className={moduleStyles.panelContainer}
+              headerClassName={moduleStyles.panelHeader}
             >
               <PresentationView />
             </PanelContainer>
@@ -234,18 +303,10 @@ const AichatView: React.FunctionComponent = () => {
           <PanelContainer
             id="aichat-workspace-panel"
             headerContent={chatWorkspaceHeader}
-            rightHeaderContent={renderChatWorkspaceHeaderRight(() => {
-              dispatch(clearChatMessages());
-              analyticsReporter.sendEvent(
-                EVENTS.CHAT_ACTION,
-                {
-                  action: 'Clear chat history',
-                },
-                PLATFORMS.BOTH
-              );
-            })}
+            className={moduleStyles.panelContainer}
+            headerClassName={moduleStyles.panelHeader}
           >
-            <ChatWorkspace />
+            <ChatWorkspace onClear={onClear} />
           </PanelContainer>
         </div>
       </div>
@@ -253,38 +314,48 @@ const AichatView: React.FunctionComponent = () => {
   );
 };
 
-const renderChatWorkspaceHeaderRight = (onClear: () => void) => {
-  return (
-    <div className={moduleStyles.chatHeaderRight}>
-      <Button
-        onClick={onClear}
-        text="Clear"
-        iconLeft={{iconName: 'paintbrush'}}
-        size="xs"
-        color="white"
-        type="secondary"
-        className={moduleStyles.aichatViewButton}
-      />
-      <CopyButton />
-    </div>
-  );
-};
-
 const renderModelCustomizationHeaderRight = (onStartOver: () => void) => {
   return (
-    <div className={moduleStyles.chatHeaderRight}>
+    <div>
       <Button
         icon={{iconStyle: 'solid', iconName: 'refresh'}}
         isIconOnly={true}
-        color={'white'}
+        color={'black'}
         onClick={onStartOver}
         ariaLabel={'Start Over'}
         size={'xs'}
         type="tertiary"
-        className={moduleStyles.aichatViewButton}
+        className={moduleStyles.startOverButton}
       />
     </div>
   );
+};
+
+const renderInstructionsHeaderRight = (
+  isUserTeacher: boolean | undefined,
+  onInfoClick: () => void
+) => {
+  return isUserTeacher ? (
+    <ActionDropdown
+      name="instructionsInfoDropdown"
+      labelText={aichatI18n.instructionsHeaderRight()}
+      size="xs"
+      triggerButtonProps={{
+        type: 'tertiary',
+        isIconOnly: true,
+        color: 'black',
+        icon: {iconName: 'ellipsis-vertical', iconStyle: 'solid'},
+      }}
+      options={[
+        {
+          value: 'teacherOnboardingModal',
+          label: aichatI18n.aboutAichatLab(),
+          icon: {iconName: 'circle-info', iconStyle: 'solid'},
+          onClick: onInfoClick,
+        },
+      ]}
+    />
+  ) : null;
 };
 
 export default AichatView;

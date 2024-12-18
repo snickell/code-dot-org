@@ -1,13 +1,15 @@
-import React from 'react';
 import PropTypes from 'prop-types';
-import i18n from '@cdo/locale';
-import {studio} from '@cdo/apps/lib/util/urlHelpers';
-import Link from '@cdo/apps/componentLibrary/link';
+import React from 'react';
+
 import {LinkButton} from '@cdo/apps/componentLibrary/button';
+import Link from '@cdo/apps/componentLibrary/link';
 import {
   BodyThreeText,
   BodyFourText,
 } from '@cdo/apps/componentLibrary/typography';
+import {studio} from '@cdo/apps/lib/util/urlHelpers';
+import i18n from '@cdo/locale';
+
 import styles from './selfPacedProgressTable.module.scss';
 // Generic table styles that are shared with LandingPage.jsx
 import './tableStyles.scss';
@@ -39,6 +41,7 @@ const CourseRow = ({
             {percent_completed}% {i18n.selfPacedPlCompleted()}
           </BodyThreeText>
           {/* Progress bar */}
+          {/* eslint-disable-next-line react/forbid-dom-props */}
           <div className={styles.progressBar} data-testid="progress-bar">
             <span
               className={styles.progressBarFill}

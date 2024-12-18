@@ -10,10 +10,13 @@ import {connect} from 'react-redux';
 
 import {queryParams} from '@cdo/apps/code-studio/utils';
 import {ViewType} from '@cdo/apps/code-studio/viewAsRedux';
-import firehoseClient from '@cdo/apps/lib/util/firehose';
+import Button from '@cdo/apps/legacySharedComponents/Button';
+import firehoseClient from '@cdo/apps/metrics/firehose';
 import TeacherFeedbackTab from '@cdo/apps/templates/instructions/teacherFeedback/TeacherFeedbackTab';
 import {rubricShape} from '@cdo/apps/templates/rubrics/rubricShapes';
 import StudentRubricView from '@cdo/apps/templates/rubrics/StudentRubricView';
+import {logUserLevelInteraction} from '@cdo/apps/userLevelInteractionsLogger/userLevelInteractionsApi';
+import {UserLevelInteractions} from '@cdo/generated-scripts/sharedConstants';
 import i18n from '@cdo/locale';
 
 import commonStyles from '../../commonStyles';
@@ -26,7 +29,6 @@ import {
 } from '../../redux/instructions';
 import styleConstants from '../../styleConstants';
 import color from '../../util/color';
-import Button from '../Button';
 import ContainedLevel from '../ContainedLevel';
 import ContainedLevelAnswer from '../ContainedLevelAnswer';
 import {Z_INDEX as OVERLAY_Z_INDEX} from '../Overlay';
@@ -473,6 +475,11 @@ class TopInstructions extends Component {
   handleHelpTabClick = () => {
     this.handleTabClick(TabType.RESOURCES);
     this.recordEvent('click-help-and-tips-tab');
+    logUserLevelInteraction({
+      levelId: this.props.serverLevelId,
+      scriptId: this.props.serverScriptId,
+      interaction: UserLevelInteractions.click_help_and_tips,
+    });
   };
 
   handleCommentTabClick = () => {

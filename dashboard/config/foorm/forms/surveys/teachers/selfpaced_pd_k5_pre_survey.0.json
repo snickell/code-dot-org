@@ -32,7 +32,7 @@
                 },
                 {
                   "value": "csf_maker_mb",
-                  "text": "Computer Science Foundations: Maker with micro:bit"
+                  "text": "Maker with micro:bit"
                 }
               ]
             },
@@ -89,7 +89,7 @@
             {
               "value": "better_understand_course_csf_maker_mb",
               "visibleIf": "{survey_variable_name}='csf_maker_mb'",
-              "text": "Better understand Code.org's Computer Science Foundations: Maker with micro:bit curriculum"
+              "text": "Better understand Code.org's Maker with micro:bit curriculum"
             },
             {
               "value": "learn_programming",
@@ -149,6 +149,10 @@
           "natalia_comment": "Added to replace plan_to_teach_csc using survey variable for the module's title -- 02/28/2024",
           "choices": [
             {
+              "value": "def_no",
+              "text": "Definitely no"
+            },
+            {
               "value": "no",
               "text": "No"
             },
@@ -165,12 +169,12 @@
               "text": "Probably yes"
             },
             {
-              "value": "def_yes",
-              "text": "Definitely yes"
-            },
-            {
               "value": "yes",
               "text": "Yes"
+            },
+            {
+              "value": "def_yes",
+              "text": "Definitely yes"
             }
           ]
         },
@@ -250,7 +254,7 @@
           "title": "How interested are you in learning computer science?",
           "visibleIf": "{first_time_csb}<>'no'",
           "rateMax": 7,
-          "minRateDescription": "Very uninterested",
+          "minRateDescription": "Not interested at all",
           "maxRateDescription": "Very interested"
         },
         {
@@ -259,7 +263,7 @@
           "title": "How interested are you in teaching computer science?",
           "visibleIf": "{first_time_csb}<>'no'",
           "rateMax": 7,
-          "minRateDescription": "Very uninterested",
+          "minRateDescription": "Not interested at all",
           "maxRateDescription": "Very interested"
         },
         {
@@ -268,7 +272,7 @@
           "title": "How confident do you feel in your ability to teach computer science effectively right now?",
           "visibleIf": "{first_time_csb}<>'no'",
           "rateMax": 7,
-          "minRateDescription": "Very unconfident",
+          "minRateDescription": "Not confident at all",
           "maxRateDescription": "Very confident"
         },
         {
@@ -277,7 +281,7 @@
           "title": "How necessary is it for students to learn computer science?",
           "visibleIf": "{first_time_csb}<>'no'",
           "rateMax": 7,
-          "minRateDescription": "Very unnecessary",
+          "minRateDescription": "Not necessary at all",
           "maxRateDescription": "Very necessary"
         }
       ]

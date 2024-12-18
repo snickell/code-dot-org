@@ -13,6 +13,10 @@ class ScriptLevelsController < ApplicationController
   before_action :set_redirect_override, only: [:show]
   before_action :check_script_id_is_name, only: [:show, :lesson_extras]
 
+  # The TA scores alert will be shown at most once for each lesson. This
+  # is the maximum number of times it will be shown across all lessons.
+  MAX_SHOW_TA_SCORES_ALERT = 3
+
   # Return true if request is one that can be publicly cached.
   def cachable_request?(request)
     script = ScriptLevelsController.get_script(request)
@@ -85,7 +89,6 @@ class ScriptLevelsController < ApplicationController
       new_path = request.fullpath.sub(%r{^/s/#{params[:script_id]}/}, "/s/#{new_script.name}/")
 
       if Unit.family_names.include?(params[:script_id])
-        session[:show_unversioned_redirect_warning] = true unless new_script.is_course
         Unit.log_redirect(params[:script_id], new_script.name, request, 'unversioned-script-level-redirect', current_user&.user_type)
       end
 
@@ -98,9 +101,6 @@ class ScriptLevelsController < ApplicationController
       redirect_to new_path
       return
     end
-
-    @show_unversioned_redirect_warning = !!session[:show_unversioned_redirect_warning]
-    session[:show_unversioned_redirect_warning] = false
 
     # will be true if the user is in any unarchived section where tts autoplay is enabled
     @tts_autoplay_enabled = current_user&.sections_as_student&.where({hidden: false})&.map(&:tts_autoplay_enabled)&.reduce(false, :|)
@@ -170,19 +170,29 @@ class ScriptLevelsController < ApplicationController
       @responses = []
       # We use this for the level summary entry point, so on contained levels
       # what we actually care about are responses to the contained level.
-      level = @level.contained_levels.any? ? @level.contained_levels.first : @level
+
+      levels =
+        if @level.is_a?(LevelGroup)
+          @level.levels
+        else
+          [@level.contained_levels.any? ? @level.contained_levels.first : @level]
+        end
 
       # TODO: Change/remove this check as we add support for more level types.
-      if level.is_a?(FreeResponse) || level.is_a?(Multi)
-        @responses = UserLevel.where(level: level, user: @section&.students)
+      if levels[0].is_a?(FreeResponse) || levels[0].is_a?(Multi) || levels[0].predict_level? || levels[0].is_a?(LevelGroup)
+        @responses = levels.map do |sublevel|
+          UserLevel.where(level: sublevel, user: @section&.students)
+        end
       end
     end
 
     @body_classes = @level.properties['background']
 
     @rubric = @script_level.lesson.rubric
-    if @rubric
+    ai_rubrics_enabled_for_user = @view_as_user&.verified_teacher? || @view_as_user&.teachers&.any?(&:verified_teacher?)
+    if @rubric && ai_rubrics_enabled_for_user
       @rubric_data = {rubric: @rubric.summarize}
+      @rubric_data[:canShowTaScoresAlert] = can_show_ta_scores_alert?
       if @script_level.lesson.rubric && view_as_other
         viewing_user_level = @view_as_user.user_levels.find_by(script: @script_level.script, level: @level)
         @rubric_data[:studentLevelInfo] = {
@@ -621,5 +631,12 @@ class ScriptLevelsController < ApplicationController
     return nil if redirect_script == script
 
     redirect_script
+  end
+
+  private def can_show_ta_scores_alert?
+    return false if LearningGoalTeacherEvaluation.where(teacher_id: current_user.id).where.not(understanding: nil).exists?
+    seen_ta_scores_map = current_user&.seen_ta_scores_map || {}
+    return false if seen_ta_scores_map.keys.length >= MAX_SHOW_TA_SCORES_ALERT
+    !seen_ta_scores_map[@script_level.lesson.id.to_s]
   end
 end

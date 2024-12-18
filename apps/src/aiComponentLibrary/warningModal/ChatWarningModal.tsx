@@ -6,7 +6,7 @@ import {
   Heading3,
   StrongText,
 } from '@cdo/apps/componentLibrary/typography';
-import AccessibleDialog from '@cdo/apps/templates/AccessibleDialog';
+import AccessibleDialog from '@cdo/apps/sharedComponents/AccessibleDialog';
 import i18n from '@cdo/locale';
 
 import moduleStyles from './warning-modal.module.scss';
@@ -23,22 +23,18 @@ const ChatWarningModal: React.FunctionComponent<ChatWarningModalProps> = ({
   onClose,
 }) => (
   <AccessibleDialog onClose={onClose} className={moduleStyles.chatWarningModal}>
-    <Heading3>{i18n.aiWarningModalHeader()}</Heading3>
-
-    <button
-      type="button"
-      onClick={onClose}
-      className={moduleStyles.xCloseButton}
-    >
-      <i id="x-close" className="fa-solid fa-xmark" />
-    </button>
+    <div className={moduleStyles.headerContainer}>
+      <Heading3>{i18n.aiWarningModalHeader()}</Heading3>
+    </div>
     <hr />
-    <BodyTwoText>
-      <StrongText>{i18n.aiWarningModalMessagesAreRecorded()}</StrongText>
-    </BodyTwoText>
-    <BodyTwoText>{i18n.aiWarningModalInappropriateFlagged()}</BodyTwoText>
-    <br />
-    <BodyTwoText>{i18n.aiWarningModalPersonalNotSubmitted()}</BodyTwoText>
+    <div className={moduleStyles.warningModuleTextContainer}>
+      <BodyTwoText>
+        <StrongText>{i18n.aiWarningModalMessagesAreRecorded()}</StrongText>
+      </BodyTwoText>
+      <BodyTwoText>{i18n.aiWarningModalInappropriateFlagged()}</BodyTwoText>
+      <BodyTwoText>{i18n.aiWarningUnsaved()}</BodyTwoText>
+      <BodyTwoText>{i18n.aiWarningModalPersonalNotSubmitted()}</BodyTwoText>
+    </div>
     <hr />
     <div className={moduleStyles.bottomSection}>
       <Button

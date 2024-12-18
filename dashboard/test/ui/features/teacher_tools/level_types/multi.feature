@@ -41,6 +41,7 @@ Scenario: Rendering in another language
   And element ".submitButton" is visible
   Then element ".multi h1" has "es-MX" text from key "data.dsls.2-3 Algorithms Multi 1.title"
 
+@no_phone
 Scenario: Does not scroll horizontally
   Given I am on "http://studio.code.org/s/allthethings/lessons/9/levels/2?noautoplay=true"
   When element ".submitButton" is visible
@@ -51,7 +52,6 @@ Scenario: Can render without a question
   When element ".submitButton" is visible
   Then element ".multi-question" is not visible
 
-@no_mobile
 Scenario: Standalone level without retries locks after answer is submitted
   Given I create a student named "Sally Student"
   And I sign in as "Sally Student"

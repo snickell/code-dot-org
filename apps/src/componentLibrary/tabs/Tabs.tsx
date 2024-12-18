@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import {ComponentSizeXSToL} from '@cdo/apps/componentLibrary/common/types';
 import _Tab, {TabModel} from '@cdo/apps/componentLibrary/tabs/_Tab';
@@ -12,7 +12,9 @@ export interface TabsProps {
   tabs: TabModel[];
   /** The function that is called when a Tab is clicked/selected tab is changed */
   onChange: (value: string) => void;
-  /** The value of the default selected Tab */
+  /** The function that is called when a Tab is closed (If it's closable) */
+  onTabClose?: (value: string, name?: string) => void;
+  /** The value of the default selected Tab. Also can be used to change Selected tab from Consumer(Parent Component) */
   defaultSelectedTabValue: string;
   /** The name attribute specifies the name of a Tabs group.
      The name attribute is used to reference elements in a JavaScript.
@@ -20,11 +22,13 @@ export interface TabsProps {
   name: string;
   /** Type of Tabs */
   type?: 'primary' | 'secondary';
+  /** Mode (color) of Tabs */
+  mode?: 'light' | 'dark';
   /** Size of Tabs */
   size?: ComponentSizeXSToL;
   /** Custom className for Tabs container */
   tabsContainerClassName?: string;
-  /** Custom className for Tab Panels container */
+  /** Custom id for Tabs container */
   tabsContainerId?: string;
   /** Custom className for Tab Panels container */
   tabPanelsContainerClassName?: string;
@@ -37,7 +41,7 @@ export interface TabsProps {
  * * (✔) implementation of component approved by design team;
  * * (✔) has storybook, covered with stories and documentation;
  * * (✔) has tests: test every prop, every state and every interaction that's js related;
- * * (see apps/test/unit/componentLibrary/TabsTest.jsx)
+ * * (see apps/test/unit/componentLibrary/TabsTest.tsx)
  * * (?) passes accessibility checks;
  *
  * ###  Status: ```Ready for dev```
@@ -49,17 +53,20 @@ const Tabs: React.FunctionComponent<TabsProps> = ({
   tabs,
   name,
   onChange,
+  onTabClose = () => {},
   defaultSelectedTabValue,
   tabsContainerId,
   tabsContainerClassName,
   tabPanelsContainerId,
   tabPanelsContainerClassName,
   type = 'primary',
+  mode = 'light',
   size = 'm',
 }) => {
   const [selectedTabValue, setSelectedValue] = useState(
     defaultSelectedTabValue
   );
+
   const handleChange = useCallback(
     (value: string) => {
       setSelectedValue(value);
@@ -70,6 +77,25 @@ const Tabs: React.FunctionComponent<TabsProps> = ({
     [setSelectedValue, onChange]
   );
 
+  const handleTabClose = useCallback(
+    (value: string) => {
+      onTabClose(value, name);
+    },
+    [name, onTabClose]
+  );
+
+  // Reset selected tab whenever default selected value changes.
+  useEffect(() => {
+    setSelectedValue(defaultSelectedTabValue);
+  }, [defaultSelectedTabValue]);
+
+  // If selected tab value is not in tabs array, set selected tab value to first tab value.
+  useEffect(() => {
+    if (!tabs.find(tab => tab.value === selectedTabValue)) {
+      setSelectedValue(tabs[0].value);
+    }
+  }, [tabs, selectedTabValue]);
+
   const nameStripped = name.replace(' ', '-');
 
   return (
@@ -79,6 +105,7 @@ const Tabs: React.FunctionComponent<TabsProps> = ({
           moduleStyles.tabs,
           moduleStyles[`tabs-${size}`],
           moduleStyles[`tabs-${type}`],
+          moduleStyles[`tabs-${mode}`],
           tabsContainerClassName
         )}
         id={tabsContainerId}
@@ -90,6 +117,8 @@ const Tabs: React.FunctionComponent<TabsProps> = ({
               key={tab.value}
               isSelected={tab.value === selectedTabValue}
               onClick={handleChange}
+              size={size}
+              onClose={handleTabClose}
               tabPanelId={`${nameStripped}-panel-${tab.value}`}
               tabButtonId={`${nameStripped}-tab-${tab.value}`}
             />

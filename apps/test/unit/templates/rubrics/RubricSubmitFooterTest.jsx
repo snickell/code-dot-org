@@ -3,7 +3,7 @@ import {render, screen, act} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import {Provider} from 'react-redux';
-import sinon from 'sinon';
+import sinon from 'sinon'; // eslint-disable-line no-restricted-imports
 
 import {
   getStore,
@@ -18,7 +18,7 @@ import RubricSubmitFooter from '@cdo/apps/templates/rubrics/RubricSubmitFooter';
 import HttpClient from '@cdo/apps/util/HttpClient';
 import i18n from '@cdo/locale';
 
-import {expect} from '../../../util/reconfiguredChai';
+import {expect} from '../../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
 
 describe('RubricSubmitFooter', () => {
   let store;
@@ -64,11 +64,7 @@ describe('RubricSubmitFooter', () => {
         true,
         sinon.match.any
       )
-      .returns(
-        new Promise(resolve => {
-          throw new Error('some error');
-        })
-      );
+      .rejects();
   }
 
   // Stubs HttpClient.post() to respond with some incorrect response body
@@ -227,6 +223,7 @@ describe('RubricSubmitFooter', () => {
           reportingData={{}}
           studentLevelInfo={defaultStudentInfo}
           open
+          onSubmitTeacherFeedback={() => {}}
         />
       </Provider>
     );
@@ -248,6 +245,7 @@ describe('RubricSubmitFooter', () => {
     const priorDate = new Date(priorTimestamp);
     const priorCheck = priorDate.toLocaleString();
     expect(
+      // eslint-disable-next-line no-restricted-properties
       container.querySelector('#ui-feedback-submitted-timestamp').textContent
     ).to.contain(priorCheck);
 
@@ -266,6 +264,7 @@ describe('RubricSubmitFooter', () => {
     const lastSubmittedDateObj = new Date(timestamp);
     const check = lastSubmittedDateObj.toLocaleString();
     expect(
+      // eslint-disable-next-line no-restricted-properties
       container.querySelector('#ui-feedback-submitted-timestamp').textContent
     ).to.contain(check);
   });
@@ -288,6 +287,7 @@ describe('RubricSubmitFooter', () => {
           reportingData={{}}
           studentLevelInfo={defaultStudentInfo}
           open
+          onSubmitTeacherFeedback={() => {}}
         />
       </Provider>
     );
@@ -300,6 +300,7 @@ describe('RubricSubmitFooter', () => {
 
     // There's no prior timestamp
     expect(
+      // eslint-disable-next-line no-restricted-properties
       container.querySelector('#ui-feedback-submitted-timestamp').textContent
     ).to.equal('');
 
@@ -335,6 +336,7 @@ describe('RubricSubmitFooter', () => {
           reportingData={{}}
           studentLevelInfo={defaultStudentInfo}
           open
+          onSubmitTeacherFeedback={() => {}}
         />
       </Provider>
     );
@@ -368,12 +370,14 @@ describe('RubricSubmitFooter', () => {
           reportingData={{}}
           studentLevelInfo={defaultStudentInfo}
           open
+          onSubmitTeacherFeedback={() => {}}
         />
       </Provider>
     );
 
     // There's no prior timestamp
     expect(
+      // eslint-disable-next-line no-restricted-properties
       container.querySelector('#ui-feedback-submitted-timestamp').textContent
     ).to.equal('');
 
@@ -391,6 +395,7 @@ describe('RubricSubmitFooter', () => {
     sinon.assert.called(postStub);
 
     // Assert that the feedback error is NOT there
+    // eslint-disable-next-line no-restricted-properties
     expect(container.querySelector('#ui-feedback-submitted-error')).to.be.null;
   });
 
@@ -411,12 +416,14 @@ describe('RubricSubmitFooter', () => {
           reportingData={{}}
           studentLevelInfo={defaultStudentInfo}
           open
+          onSubmitTeacherFeedback={() => {}}
         />
       </Provider>
     );
 
     // There's no prior timestamp
     expect(
+      // eslint-disable-next-line no-restricted-properties
       container.querySelector('#ui-feedback-submitted-timestamp').textContent
     ).to.equal('');
 
@@ -429,6 +436,7 @@ describe('RubricSubmitFooter', () => {
 
     // Assert that the feedback error appears
     expect(
+      // eslint-disable-next-line no-restricted-properties
       container.querySelector('#ui-feedback-submitted-error').textContent
     ).to.contain(i18n.errorSubmittingFeedback());
   });
@@ -451,12 +459,14 @@ describe('RubricSubmitFooter', () => {
           reportingData={{}}
           studentLevelInfo={defaultStudentInfo}
           open
+          onSubmitTeacherFeedback={() => {}}
         />
       </Provider>
     );
 
     // There's no prior timestamp
     expect(
+      // eslint-disable-next-line no-restricted-properties
       container.querySelector('#ui-feedback-submitted-timestamp').textContent
     ).to.equal('');
 
@@ -469,6 +479,7 @@ describe('RubricSubmitFooter', () => {
 
     // Assert that the feedback error appears
     expect(
+      // eslint-disable-next-line no-restricted-properties
       container.querySelector('#ui-feedback-submitted-error').textContent
     ).to.contain(i18n.errorSubmittingFeedback());
   });
@@ -491,12 +502,14 @@ describe('RubricSubmitFooter', () => {
           reportingData={{}}
           studentLevelInfo={defaultStudentInfo}
           open
+          onSubmitTeacherFeedback={() => {}}
         />
       </Provider>
     );
 
     // There's no prior timestamp
     expect(
+      // eslint-disable-next-line no-restricted-properties
       container.querySelector('#ui-feedback-submitted-timestamp').textContent
     ).to.equal('');
 
@@ -509,6 +522,7 @@ describe('RubricSubmitFooter', () => {
 
     // Assert that the feedback error appears
     expect(
+      // eslint-disable-next-line no-restricted-properties
       container.querySelector('#ui-feedback-submitted-error').textContent
     ).to.contain(i18n.errorSubmittingFeedback());
   });

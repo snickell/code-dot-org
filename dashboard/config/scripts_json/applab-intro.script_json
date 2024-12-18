@@ -4,16 +4,21 @@
     "wrapup_video_id": null,
     "login_required": false,
     "properties": {
+      "content_area": "hoc",
       "curriculum_umbrella": "HOC",
       "is_course": true,
       "is_migrated": true,
       "student_detail_progress_view": true,
+      "supported_locales": [
+        "es-MX",
+        "es-ES"
+      ],
       "tts": true,
       "version_year": "unversioned"
     },
     "new_name": null,
     "family_name": "applab-intro",
-    "serialized_at": "2022-03-17 22:34:54 UTC",
+    "serialized_at": "2024-11-19 01:13:55 UTC",
     "published_state": "stable",
     "instruction_type": "teacher_led",
     "instructor_audience": "teacher",
@@ -809,6 +814,15 @@
 
   ],
   "lessons_opportunity_standards": [
+
+  ],
+  "rubrics": [
+
+  ],
+  "learning_goals": [
+
+  ],
+  "learning_goal_evidence_levels": [
 
   ]
 }

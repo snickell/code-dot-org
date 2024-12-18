@@ -6,6 +6,7 @@ import {connect} from 'react-redux';
 
 import {lessonHasLevels} from '../progress/progressHelpers';
 import {studentLessonProgressType} from '../progress/progressTypes';
+import {addExpandedLesson} from '../sectionProgress/sectionProgressRedux';
 import {teacherDashboardUrl} from '../teacherDashboard/urlHelpers';
 
 import {ITEM_TYPE} from './ItemType';
@@ -17,6 +18,7 @@ import styles from './progress-table-v2.module.scss';
 function LessonDataCell({
   lesson,
   sectionId,
+  unitId,
   locked,
   studentLessonProgress,
   addExpandedLesson,
@@ -41,6 +43,7 @@ function LessonDataCell({
           href={teacherDashboardUrl(sectionId, '/assessments')}
           openInNewTab
           external
+          // eslint-disable-next-line react/forbid-component-props
           data-testid={'lesson-data-cell-' + lesson.id + '-' + studentId}
         >
           {children}
@@ -57,6 +60,7 @@ function LessonDataCell({
           interactive && styles.lessonInteractive
         )}
         onClick={expandLesson}
+        // eslint-disable-next-line react/forbid-dom-props
         data-testid={'lesson-data-cell-' + lesson.id + '-' + studentId}
       >
         {children}
@@ -65,7 +69,7 @@ function LessonDataCell({
   };
 
   const expandLesson = interactive
-    ? () => addExpandedLesson(lesson)
+    ? () => addExpandedLesson(unitId, sectionId, lesson)
     : undefined;
 
   const lessonCellUnexpanded = getCellComponent(
@@ -80,10 +84,17 @@ function LessonDataCell({
     return (
       <div className={styles.lessonDataCellExpanded}>
         {lessonCellUnexpanded}
-        <div className={classNames(styles.gridBox, styles.gridBoxMetadata)}>
+        <div
+          className={classNames(styles.gridBox, styles.gridBoxMetadata, {
+            [`ui-test-time-spent-${lesson.relative_position}`]: true,
+          })}
+        >
           {formatTimeSpent(studentLessonProgress)}
         </div>
-        <div className={classNames(styles.gridBox, styles.gridBoxMetadata)}>
+        <div
+          id={'ui-test-last-updated-' + lesson.relative_position}
+          className={classNames(styles.gridBox, styles.gridBoxMetadata)}
+        >
           {formatLastUpdated(studentLessonProgress)}
         </div>
       </div>
@@ -95,13 +106,22 @@ function LessonDataCell({
 
 export const UnconnectedLessonDataCell = LessonDataCell;
 
-export default connect(state => ({
-  sectionId: state.teacherSections.selectedSectionId,
-}))(LessonDataCell);
+export default connect(
+  state => ({
+    sectionId: state.teacherSections.selectedSectionId,
+    unitId: state.unitSelection.scriptId,
+  }),
+  dispatch => ({
+    addExpandedLesson(unitId, sectionId, lessonId) {
+      dispatch(addExpandedLesson(unitId, sectionId, lessonId));
+    },
+  })
+)(LessonDataCell);
 
 LessonDataCell.propTypes = {
   locked: PropTypes.bool,
   sectionId: PropTypes.number,
+  unitId: PropTypes.number,
   studentLessonProgress: studentLessonProgressType,
   lesson: PropTypes.object.isRequired,
   addExpandedLesson: PropTypes.func.isRequired,

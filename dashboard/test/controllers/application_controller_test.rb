@@ -4,14 +4,12 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
   describe 'CAP lockout' do
     let(:user) {create(:student)}
 
-    let(:cpa_experience_phase) {Cpa::ALL_USER_LOCKOUT}
     let(:user_is_locked_out?) {true}
 
     let(:expect_grace_period_handler_call) {Services::ChildAccount::GracePeriodHandler.expects(:call).with(user: user)}
     let(:expect_lockout_handler_call) {Services::ChildAccount::LockoutHandler.expects(:call).with(user: user)}
 
     before do
-      Cpa.stubs(:cpa_experience).returns(cpa_experience_phase)
       Services::ChildAccount::LockoutHandler.stubs(:call).with(user: user).returns(user_is_locked_out?)
 
       sign_in user
@@ -32,8 +30,18 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_redirected_to lockout_path
     end
 
+    it 'allows current user data retrieving' do
+      get api_v1_users_current_path
+      refute_redirect_to lockout_path
+    end
+
     it 'allows sign out' do
       get destroy_user_session_path
+      refute_redirect_to lockout_path
+    end
+
+    it 'allows CSRF token retrieving' do
+      get get_token_path
       refute_redirect_to lockout_path
     end
 
@@ -57,6 +65,16 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       refute_redirect_to lockout_path
     end
 
+    it 'allows student to visit the join page' do
+      get student_user_new_path
+      refute_redirect_to lockout_path
+    end
+
+    it 'allows student to join a section' do
+      post student_register_path
+      refute_redirect_to lockout_path
+    end
+
     context 'when user is not sign in' do
       before do
         sign_out user
@@ -73,25 +91,6 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     context 'when user is not locked out' do
       let(:user_is_locked_out?) {false}
-
-      it 'does not redirect to lockout page' do
-        get root_path
-        refute_redirect_to lockout_path
-      end
-    end
-
-    context 'when no CPA experience' do
-      let(:cpa_experience_phase) {nil}
-
-      it 'does not call CAP grace period handler' do
-        expect_grace_period_handler_call.never
-        get root_path
-      end
-
-      it 'does not call CAP lockout handler' do
-        expect_lockout_handler_call.never
-        get root_path
-      end
 
       it 'does not redirect to lockout page' do
         get root_path

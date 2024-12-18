@@ -1,6 +1,8 @@
 import {Meta, StoryFn} from '@storybook/react';
 import React from 'react';
 
+import Tags from '@cdo/apps/componentLibrary/tags';
+
 import {
   RadioButton,
   RadioButtonProps,
@@ -25,7 +27,6 @@ export default {
 // TEMPLATE
 //
 // This is needed to fix children type error (passing string instead of React.ReactNode type)
-// eslint-disable-next-line
 const SingleTemplate: StoryFn<RadioButtonProps> = args => (
   <RadioButton {...args} />
 );
@@ -66,6 +67,43 @@ DisabledRadioButton.args = {
       value: 'test-disabled-checked',
       label: 'Disabled checked radioButton',
       disabled: true,
+    },
+  ],
+};
+
+export const RadioButtonsWithCustomContent = MultipleTemplate.bind({});
+RadioButtonsWithCustomContent.args = {
+  radioButtons: [
+    {
+      name: 'test-custom-content-0',
+      value: 'test-custom-content-0',
+      label: '',
+      size: 'm',
+      children: (
+        <>
+          <span>With Custom Content</span>
+          <button type="button">Custom content</button>
+        </>
+      ),
+    },
+    {
+      name: 'test-custom-content-1',
+      value: 'test-custom-content-1',
+      label: 'With Custom Content and Label',
+      size: 'm',
+      children: (
+        <Tags
+          tagsList={[
+            {label: 'Tag1', tooltipContent: 'Tag tooltip', tooltipId: ''},
+          ]}
+        />
+      ),
+    },
+    {
+      name: 'test-custom-content-2',
+      value: 'test-custom-content-2',
+      label: 'Without Custom Content',
+      size: 'm',
     },
   ],
 };

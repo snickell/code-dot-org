@@ -1,7 +1,10 @@
 import classnames from 'classnames';
 import React from 'react';
 
-import {ComponentSizeXSToL} from '@cdo/apps/componentLibrary/common/types';
+import {
+  ComponentPlacementDirection,
+  ComponentSizeXSToL,
+} from '@cdo/apps/componentLibrary/common/types';
 import FontAwesomeV6Icon, {
   FontAwesomeV6IconProps,
 } from '@cdo/apps/componentLibrary/fontAwesomeV6Icon';
@@ -21,7 +24,7 @@ export interface TooltipProps {
   /** Tooltip right icon */
   iconRight?: FontAwesomeV6IconProps;
   /** Tooltip direction/position relative to connected element */
-  direction?: 'onTop' | 'onRight' | 'onBottom' | 'onLeft';
+  direction?: ComponentPlacementDirection;
   /** Tooltip custom className */
   className?: string;
   /** Tooltip size */
@@ -54,7 +57,7 @@ export const TooltipOverlay: React.FunctionComponent<TooltipOverlayProps> = ({
  *  * (✔) implementation of component approved by design team;
  *  * (✔) has storybook, covered with stories and documentation;
  *  * (✔) has tests: test every prop, every state and every interaction that's js related;
- *  * (see apps/test/unit/componentLibrary/TooltipTest.jsx)
+ *  * (see apps/test/unit/componentLibrary/TooltipTest.tsx)
  *  * (?) passes accessibility checks;
  *
  * ###  Status: ```Ready for dev```

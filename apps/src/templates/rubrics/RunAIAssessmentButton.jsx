@@ -1,9 +1,11 @@
 import PropTypes from 'prop-types';
 import React, {useEffect, useMemo, useState} from 'react';
+import {connect} from 'react-redux';
 
-import {EVENTS, PLATFORMS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
-import Button from '@cdo/apps/templates/Button';
+import Button from '@cdo/apps/legacySharedComponents/Button';
+import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import {setUserAiEvalStatus} from '@cdo/apps/templates/rubrics/teacherRubricRedux';
 import {RubricAiEvaluationStatus} from '@cdo/generated-scripts/sharedConstants';
 import i18n from '@cdo/locale';
 
@@ -32,6 +34,8 @@ export const STATUS = {
   PROFANITY_ERROR: 'profanity_error',
   // request too large
   REQUEST_TOO_LARGE: 'request_too_large',
+  // teacher exceeded limit of evaluations per student project
+  TEACHER_LIMIT_EXCEEDED: 'teacher_limit_exceeded',
 };
 
 const fetchAiEvaluationStatus = (rubricId, studentUserId) => {
@@ -40,7 +44,7 @@ const fetchAiEvaluationStatus = (rubricId, studentUserId) => {
   );
 };
 
-export default function RunAIAssessmentButton({
+function RunAIAssessmentButton({
   canProvideFeedback,
   studentUserId,
   refreshAiEvaluations,
@@ -49,6 +53,7 @@ export default function RunAIAssessmentButton({
   status,
   setStatus,
   reportingData,
+  setUserAiEvalStatus,
 }) {
   const rubricId = rubric.id;
   const [csrfToken, setCsrfToken] = useState('');
@@ -94,6 +99,10 @@ export default function RunAIAssessmentButton({
               data.status === RubricAiEvaluationStatus.REQUEST_TOO_LARGE
             ) {
               setStatus(STATUS.REQUEST_TOO_LARGE);
+            } else if (
+              data.status === RubricAiEvaluationStatus.TEACHER_LIMIT_EXCEEDED
+            ) {
+              setStatus(STATUS.TEACHER_LIMIT_EXCEEDED);
             } else {
               setStatus(STATUS.READY);
             }
@@ -117,6 +126,7 @@ export default function RunAIAssessmentButton({
                 data.status === RubricAiEvaluationStatus.SUCCESS
               ) {
                 setStatus(STATUS.SUCCESS);
+                setUserAiEvalStatus(studentUserId, 'READY_TO_REVIEW');
                 refreshAiEvaluations();
               } else if (data.status === RubricAiEvaluationStatus.QUEUED) {
                 setStatus(STATUS.EVALUATION_PENDING);
@@ -136,6 +146,10 @@ export default function RunAIAssessmentButton({
                 data.status === RubricAiEvaluationStatus.REQUEST_TOO_LARGE
               ) {
                 setStatus(STATUS.REQUEST_TOO_LARGE);
+              } else if (
+                data.status === RubricAiEvaluationStatus.TEACHER_LIMIT_EXCEEDED
+              ) {
+                setStatus(STATUS.TEACHER_LIMIT_EXCEEDED);
               }
             });
           }
@@ -143,7 +157,14 @@ export default function RunAIAssessmentButton({
       }, 5000);
       return () => clearInterval(intervalId);
     }
-  }, [rubricId, studentUserId, polling, refreshAiEvaluations, setStatus]);
+  }, [
+    rubricId,
+    studentUserId,
+    polling,
+    refreshAiEvaluations,
+    setStatus,
+    setUserAiEvalStatus,
+  ]);
 
   const handleRunAiAssessment = () => {
     setStatus(STATUS.EVALUATION_PENDING);
@@ -204,4 +225,13 @@ RunAIAssessmentButton.propTypes = {
   status: PropTypes.string,
   setStatus: PropTypes.func,
   reportingData: reportingDataShape,
+
+  // from redux
+  setUserAiEvalStatus: PropTypes.func,
 };
+
+export default connect(null, dispatch => ({
+  setUserAiEvalStatus(userId, status) {
+    dispatch(setUserAiEvalStatus(userId, status));
+  },
+}))(RunAIAssessmentButton);

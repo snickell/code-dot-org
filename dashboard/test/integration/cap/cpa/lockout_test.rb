@@ -11,19 +11,25 @@ module CAP
         let(:current_date) {DateTime.now}
         let(:new_user_lockout_date) {DateTime.parse('2023-07-01T00:00:00MDT')}
         let(:all_user_lockout_date) {DateTime.parse('2024-07-01T00:00:00MDT')}
-        let(:grace_period_duration) {14.days}
+        let(:grace_period_duration) {14.days.seconds}
+        let(:state_policies) do
+          {
+            'CO' => {
+              name: 'CPA',
+              max_age: 12,
+              grace_period_duration: grace_period_duration,
+              lockout_date: all_user_lockout_date,
+              start_date: new_user_lockout_date,
+            },
+          }
+        end
 
         around do |test|
           Timecop.freeze(current_date) {test.call}
         end
 
         before do
-          allow(DCDO).to receive(:get).and_call_original
-
-          allow(DCDO).to receive(:get).with('cpa_schedule', anything).and_return(
-            'cpa_new_user_lockout' => new_user_lockout_date.iso8601,
-            'cpa_all_user_lockout' => all_user_lockout_date.iso8601,
-          )
+          allow(Policies::ChildAccount::StatePolicies).to receive(:state_policies).and_return(state_policies)
 
           sign_in student
         end
@@ -33,6 +39,10 @@ module CAP
 
           it 'student should not be locked out' do
             assert_student_is_not_locked_out
+          end
+
+          it 'student should be redirected away from the lockout page' do
+            assert_student_is_redirected_away_from_lockout
           end
         end
 
@@ -49,13 +59,9 @@ module CAP
             it 'student should not be locked out yet' do
               assert_student_is_not_locked_out
             end
-          end
 
-          context 'when student was create before P20-937-exception-date' do
-            let(:student) {create(:cpa_non_compliant_student, :before_p20_937_exception_date)}
-
-            it 'student should not be locked out yet' do
-              assert_student_is_not_locked_out
+            it 'student should be redirected away from the lockout page' do
+              assert_student_is_redirected_away_from_lockout
             end
           end
 
@@ -67,6 +73,10 @@ module CAP
             it 'student should not be locked out yet' do
               assert_student_is_not_locked_out
             end
+
+            it 'student should be redirected away from the lockout page' do
+              assert_student_is_redirected_away_from_lockout
+            end
           end
 
           context 'when student is CAP compliant' do
@@ -74,6 +84,10 @@ module CAP
 
             it 'student should not be locked out' do
               assert_student_is_not_locked_out
+            end
+
+            it 'student should be redirected away from the lockout page' do
+              assert_student_is_redirected_away_from_lockout
             end
           end
         end
@@ -85,16 +99,27 @@ module CAP
             assert_student_is_locked_out_until_permission_granted
           end
 
-          context 'when student was create before policy took effect' do
+          context 'when student was created before policy took effect' do
             let(:student) {create(:cpa_non_compliant_student, :predates_policy)}
 
-            it 'student should be locked out after his grace period has ended' do
+            it 'student should be locked out after their grace period has ended' do
               assert_enqueued_with job: CAP::LockoutJob, args: [user_id: student.id, reschedules: 1], at: grace_period_duration.from_now.since(1.minute) do
                 assert_student_in_grace_period
               end
 
+              assert_latest_student_cap_event(
+                CAP::UserEvent::GRACE_PERIOD_START,
+                nil,
+                Policies::ChildAccount::ComplianceState::GRACE_PERIOD
+              )
+
               # A new lockout job is not scheduled during the grace period.
               assert_no_enqueued_jobs only: CAP::LockoutJob do
+                assert_student_in_grace_period
+              end
+
+              # No new CAP user events have been logged
+              assert_no_difference -> {CAP::UserEvent.where(user: student).count} do
                 assert_student_in_grace_period
               end
 
@@ -104,45 +129,59 @@ module CAP
               end
             end
 
+            it 'student should be redirected away from the lockout page' do
+              assert_student_is_redirected_away_from_lockout
+            end
+
             context 'when student provider is Clever' do
               let(:student) {create(:cpa_non_compliant_student, :predates_policy, :clever_sso_provider, :migrated_imported_from_clever)}
 
-              it 'student should be neither transited to grace period state nor locked out' do
+              it 'student should be neither transitioned to grace period state nor locked out' do
                 assert_student_is_not_locked_out
                 refute Policies::ChildAccount::ComplianceState.grace_period?(student.reload)
+              end
+
+              it 'student should be redirected away from the lockout page' do
+                assert_student_is_redirected_away_from_lockout
               end
             end
 
             context 'when student provider is LTI' do
               let(:student) {create(:cpa_non_compliant_student, :predates_policy, :qwiklabs_sso_provider, :with_lti_auth)}
 
-              it 'student should be neither transited to grace period state nor locked out' do
+              it 'student should be neither transitioned to grace period state nor locked out' do
                 assert_student_is_not_locked_out
                 refute Policies::ChildAccount::ComplianceState.grace_period?(student.reload)
+              end
+
+              it 'student should be redirected away from the lockout page' do
+                assert_student_is_redirected_away_from_lockout
               end
             end
           end
 
-          context 'when student was create before P20-937-exception-date' do
-            let(:student) {create(:cpa_non_compliant_student, :before_p20_937_exception_date)}
-
-            it 'student should be transited to grace period state' do
-              assert_student_in_grace_period
-            end
-          end
-
-          context 'when student became compliant during his grace period' do
+          context 'when student became compliant during their grace period' do
             let(:student) {create(:cpa_non_compliant_student, :predates_policy, :in_grace_period)}
 
             before do
               Timecop.travel(grace_period_duration.from_now)
-              student.update!(age: 13)
+              student.update_attribute(:age, 13) # bypass validation
             end
 
             it 'student should not be locked out' do
               assert_changes -> {Policies::ChildAccount::ComplianceState.grace_period?(student.reload)}, from: true, to: false do
                 assert_student_is_not_locked_out
+
+                assert_latest_student_cap_event(
+                  CAP::UserEvent::COMPLIANCE_REMOVING,
+                  Policies::ChildAccount::ComplianceState::GRACE_PERIOD,
+                  nil,
+                )
               end
+            end
+
+            it 'student should be redirected away from the lockout page' do
+              assert_student_is_redirected_away_from_lockout
             end
           end
 
@@ -156,6 +195,10 @@ module CAP
 
               it 'student should be transited to grace period state' do
                 assert_student_in_grace_period
+              end
+
+              it 'student should be redirected away from the lockout page' do
+                assert_student_is_redirected_away_from_lockout
               end
             end
 
@@ -178,6 +221,19 @@ module CAP
           refute Policies::ChildAccount::ComplianceState.locked_out?(student.reload)
         end
 
+        private def assert_latest_student_cap_event(event_name, state_before, state_after)
+          latest_cap_user_event = CAP::UserEvent.where(user: student).last
+
+          refute_nil latest_cap_user_event
+
+          assert_attributes latest_cap_user_event, {
+            policy: CAP::UserEvent.policies.key('CPA'),
+            name: event_name,
+            state_before: state_before,
+            state_after: state_after,
+          }
+        end
+
         private def assert_student_in_grace_period
           get home_path
 
@@ -185,13 +241,22 @@ module CAP
           assert_equal home_path, path
 
           assert_attributes student.reload, {
-            child_account_compliance_state: Policies::ChildAccount::ComplianceState::GRACE_PERIOD,
-            child_account_compliance_state_last_updated: DateTime.now.iso8601(3),
-            child_account_compliance_lock_out_date: nil,
+            cap_status: Policies::ChildAccount::ComplianceState::GRACE_PERIOD,
+            cap_status_date: DateTime.now,
           }
         end
 
+        private def assert_student_is_redirected_away_from_lockout
+          get lockout_path
+          follow_redirect!
+
+          assert_equal 200, status
+          assert_equal home_path, path
+        end
+
         private def assert_student_is_locked_out_until_permission_granted
+          initial_cap_compliance_state = student.cap_status
+
           get home_path
 
           follow_redirect!
@@ -199,10 +264,15 @@ module CAP
           assert_equal lockout_path, path
 
           assert_attributes student.reload, {
-            child_account_compliance_state: Policies::ChildAccount::ComplianceState::LOCKED_OUT,
-            child_account_compliance_state_last_updated: DateTime.now.iso8601(3),
-            child_account_compliance_lock_out_date: DateTime.now.iso8601(3),
+            cap_status: Policies::ChildAccount::ComplianceState::LOCKED_OUT,
+            cap_status_date: DateTime.now,
           }
+
+          assert_latest_student_cap_event(
+            CAP::UserEvent::ACCOUNT_LOCKING,
+            initial_cap_compliance_state,
+            Policies::ChildAccount::ComplianceState::LOCKED_OUT,
+          )
 
           student_parental_permission_request = create(:parental_permission_request, user: student)
           Services::ChildAccount.grant_permission_request!(student_parental_permission_request)
@@ -213,10 +283,15 @@ module CAP
           assert_equal home_path, path
 
           assert_attributes student.reload, {
-            child_account_compliance_state: Policies::ChildAccount::ComplianceState::PERMISSION_GRANTED,
-            child_account_compliance_state_last_updated: DateTime.now.iso8601(3),
-            child_account_compliance_lock_out_date: nil,
+            cap_status: Policies::ChildAccount::ComplianceState::PERMISSION_GRANTED,
+            cap_status_date: DateTime.now,
           }
+
+          assert_latest_student_cap_event(
+            CAP::UserEvent::PERMISSION_GRANTING,
+            Policies::ChildAccount::ComplianceState::LOCKED_OUT,
+            Policies::ChildAccount::ComplianceState::PERMISSION_GRANTED,
+          )
         end
       end
     end

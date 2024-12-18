@@ -1,13 +1,17 @@
 import $ from 'jquery';
 import queryString from 'query-string';
+
 import {getCurrentLevel} from './progressReduxSelectors';
 
 const SET_LEVELS_WITH_PROGRESS = 'progress/SET_LEVELS_WITH_PROGRESS';
 const SET_LOADING_LEVELS_WITH_PROGRESS =
   'progress/SET_LOADING_LEVELS_WITH_PROGRESS';
+const SET_LOADED_LEVELS_WITH_PROGRESS =
+  'progress/SET_LOADED_LEVELS_WITH_PROGRESS';
 
 const initialState = {
   isLoadingLevelsWithProgress: false,
+  hasLoadedLevelsWithProgress: false,
   levelsWithProgress: [],
 };
 
@@ -26,10 +30,18 @@ export default function reducer(state = initialState, action) {
     };
   }
 
+  if (action.type === SET_LOADED_LEVELS_WITH_PROGRESS) {
+    return {
+      ...state,
+      hasLoadedLevelsWithProgress: true,
+    };
+  }
+
   return state;
 }
 
-const setLevelsWithProgress = levelsWithProgress => ({
+// exported only for testing
+export const setLevelsWithProgress = levelsWithProgress => ({
   type: SET_LEVELS_WITH_PROGRESS,
   levelsWithProgress,
 });
@@ -38,6 +50,12 @@ const setLoadingLevelsWithProgress = isLoading => ({
   type: SET_LOADING_LEVELS_WITH_PROGRESS,
   isLoading,
 });
+
+const setLoadedLevelsWithProgress = () => ({
+  type: SET_LOADED_LEVELS_WITH_PROGRESS,
+});
+
+export const setLoadedLevelsWithProgressForTest = setLoadedLevelsWithProgress;
 
 export const loadLevelsWithProgress = () => (dispatch, getState) => {
   const state = getState();
@@ -59,6 +77,7 @@ export const loadLevelsWithProgress = () => (dispatch, getState) => {
     .done(data => {
       dispatch(setLevelsWithProgress(data));
       dispatch(setLoadingLevelsWithProgress(false));
+      dispatch(setLoadedLevelsWithProgress());
     })
     .fail(err => {
       console.log(

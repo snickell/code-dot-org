@@ -29,7 +29,6 @@ module Cdo::CloudFormation
     CHEF_KEY = rack_env?(:adhoc) ? 'adhoc/chef' : 'chef'
     # Use AMI for Ubuntu 20 (ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20230517)
     IMAGE_ID = ENV['IMAGE_ID'] || 'ami-0261755bbcb8c4a84'
-    INSTANCE_TYPE = rack_env?(:production) ? 'm5.12xlarge' : 't2.2xlarge'
     ORIGIN = "https://github.com/code-dot-org/code-dot-org.git"
     CHEF_VERSION = '17.6.18'
     DOMAIN = 'cdn-code.org'
@@ -187,11 +186,11 @@ To specify an alternate branch name, run `rake adhoc:start branch=BRANCH`."
         subdomain('origin'),
         app == 'Dashboard' ?
           [studio_subdomain] :
-          [subdomain] + (CDO.partners + ['advocacy']).map {|x| subdomain(nil, x)},
+          [subdomain] + CDO.partners.map {|x| subdomain(nil, x)},
         {
           AcmCertificateArn: certificate_arn,
-          MinimumProtocolVersion: 'TLSv1',
-          SslSupportMethod: domain == 'code.org' ? 'vip' : 'sni-only'
+          MinimumProtocolVersion: 'TLSv1.2_2021',
+          SslSupportMethod: 'sni-only'
         }
       )
     end

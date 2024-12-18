@@ -3,8 +3,6 @@ import React from 'react';
 
 import {UnconnectedLessonDataCell} from '@cdo/apps/templates/sectionProgressV2/LessonDataCell';
 
-import {expect} from '../../../util/reconfiguredChai';
-
 const DEFAULT_PROPS = {
   locked: false,
   sectionId: 1,
@@ -32,8 +30,9 @@ describe('LevelDataCell', () => {
   it('Shows empty if no progress', () => {
     renderDefault({studentLessonProgress: null});
 
+    // eslint-disable-next-line no-restricted-properties
     const cell = screen.getByTestId('lesson-data-cell-1-1');
-    expect(cell.children).to.be.empty;
+    expect(cell.children).toHaveLength(0);
   });
 
   it('Shows No Online Work', () => {

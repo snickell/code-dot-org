@@ -1,14 +1,17 @@
+import classNames from 'classnames';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {connect} from 'react-redux';
 
+import {queryParams} from '@cdo/apps/code-studio/utils';
 import Link from '@cdo/apps/componentLibrary/link';
 import DCDO from '@cdo/apps/dcdo';
-import {EVENTS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
 import UserPreferences from '@cdo/apps/lib/util/UserPreferences';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {setShowProgressTableV2} from '@cdo/apps/templates/currentUserRedux';
+import GlobalEditionWrapper from '@cdo/apps/templates/GlobalEditionWrapper';
 import experiments from '@cdo/apps/util/experiments';
 import i18n from '@cdo/locale';
 
@@ -25,14 +28,34 @@ function SectionProgressSelector({
   setShowProgressTableV2,
   progressTableV2ClosedBeta,
   sectionId,
+  hasSeenProgressTableInvite,
+  isInV1Navigaton,
 }) {
-  const [hasJustSwitchedToV2, setHasJustSwitchedToV2] = React.useState(false);
+  const [hasJustToggledViews, setHasJustToggledViews] = useState(false);
+
+  useEffect(() => {
+    const params = queryParams('view');
+    if (params === 'v2') {
+      setShowProgressTableV2(true);
+      setHasJustToggledViews(true);
+      new UserPreferences().setShowProgressTableV2(true);
+    }
+  }, [setShowProgressTableV2, setHasJustToggledViews]);
+
+  const removeQueryParams = () => {
+    const url =
+      window.location.protocol +
+      '//' +
+      window.location.host +
+      window.location.pathname;
+    window.history.pushState({path: url}, '', url);
+  };
 
   const onShowProgressTableV2Change = useCallback(() => {
     const shouldShowV2 = !showProgressTableV2;
     new UserPreferences().setShowProgressTableV2(shouldShowV2);
     setShowProgressTableV2(shouldShowV2);
-    setHasJustSwitchedToV2(true);
+    setHasJustToggledViews(true);
 
     if (shouldShowV2) {
       analyticsReporter.sendEvent(EVENTS.PROGRESS_V2_VIEW_NEW_PROGRESS, {
@@ -42,6 +65,7 @@ function SectionProgressSelector({
       analyticsReporter.sendEvent(EVENTS.PROGRESS_V2_VIEW_OLD_PROGRESS, {
         sectionId: sectionId,
       });
+      removeQueryParams();
     }
   }, [showProgressTableV2, setShowProgressTableV2, sectionId]);
 
@@ -79,11 +103,18 @@ function SectionProgressSelector({
   // If the user has not selected manually the v1 or v2 table, show the DCDO defined default.
   // If a user has selected manually, show that version.
   const isPreferenceSet = showProgressTableV2 !== undefined;
-  const displayV2 = isPreferenceSet
-    ? showProgressTableV2
-    : DCDO.get('progress-table-v2-default-v2', false);
+  const params = queryParams('view');
 
-  const toggleV1OrV2Link = () => (
+  // If there is a url pram, use that param to determine to show V2.
+  const displayV2FromUrl = params === 'v2';
+
+  const displayV2 =
+    displayV2FromUrl ||
+    (isPreferenceSet
+      ? showProgressTableV2
+      : DCDO.get('progress-table-v2-default-v2', false));
+
+  const ProgressV1OrV2ToggleLink = () => (
     <div className={styles.toggleViews}>
       <Link
         type="primary"
@@ -100,25 +131,35 @@ function SectionProgressSelector({
 
   const includeModalIfAvailable = () => {
     const disableModal = DCDO.get('disable-try-new-progress-view-modal', false);
-    if (!disableModal) {
+    if (disableModal || hasJustToggledViews) {
+      return;
+    }
+    if (!hasSeenProgressTableInvite) {
       return (
         <InviteToV2ProgressModal
           sectionId={sectionId}
-          setHasJustSwitchedToV2={setHasJustSwitchedToV2}
+          setHasJustSwitchedToV2={setHasJustToggledViews}
         />
       );
     }
   };
 
   return (
-    <div className={styles.pageContent}>
-      {displayV2 && (
-        <ProgressBanners hasJustSwitchedToV2={hasJustSwitchedToV2} />
+    <div
+      className={classNames(
+        styles.pageContent,
+        !isInV1Navigaton && styles.navView
       )}
-      {toggleV1OrV2Link()}
-
+    >
+      {displayV2 && (
+        <ProgressBanners hasJustSwitchedToV2={hasJustToggledViews} />
+      )}
+      <GlobalEditionWrapper
+        component={ProgressV1OrV2ToggleLink}
+        componentId="ProgressV1OrV2ToggleLink"
+      />
       {displayV2 ? (
-        <SectionProgressV2 />
+        <SectionProgressV2 hideTopHeading={!isInV1Navigaton} />
       ) : (
         <>
           {includeModalIfAvailable()}
@@ -134,6 +175,8 @@ SectionProgressSelector.propTypes = {
   progressTableV2ClosedBeta: PropTypes.bool,
   setShowProgressTableV2: PropTypes.func.isRequired,
   sectionId: PropTypes.number,
+  hasSeenProgressTableInvite: PropTypes.bool,
+  isInV1Navigaton: PropTypes.bool,
 };
 
 export const UnconnectedSectionProgressSelector = SectionProgressSelector;
@@ -143,6 +186,7 @@ export default connect(
     showProgressTableV2: state.currentUser.showProgressTableV2,
     progressTableV2ClosedBeta: state.currentUser.progressTableV2ClosedBeta,
     sectionId: state.teacherSections.selectedSectionId,
+    hasSeenProgressTableInvite: state.currentUser.hasSeenProgressTableInvite,
   }),
   dispatch => ({
     setShowProgressTableV2: showProgressTableV2 =>

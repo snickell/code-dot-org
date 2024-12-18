@@ -12,6 +12,11 @@ export type GetResponse<ResponseType> = {
   response: Response;
 };
 
+// Narrow the type of an error to NetworkError
+export function isNetworkError(error: unknown): error is NetworkError {
+  return error instanceof NetworkError;
+}
+
 /**
  * Error thrown by these functions when the response is not ok, which includes a
  * reference to the response object.
@@ -103,6 +108,18 @@ async function sendRequest(
   return response;
 }
 
+/**
+ * Performs a GET request to the given endpoint. Use {@link fetchJson}
+ * to automatically unwrap the response JSON as a typed object.
+ */
+async function get(
+  endpoint: string,
+  useAuthenticityToken = false,
+  headers: Record<string, string> = {}
+): Promise<Response> {
+  return sendRequest('GET', endpoint, undefined, useAuthenticityToken, headers);
+}
+
 async function put(
   endpoint: string,
   body?: string,
@@ -136,8 +153,9 @@ async function deleteRequest(
 }
 
 export default {
-  put,
-  post,
   delete: deleteRequest,
   fetchJson,
+  post,
+  put,
+  get,
 };

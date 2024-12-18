@@ -9,8 +9,8 @@ import {
   Heading5,
   BodyTwoText,
 } from '@cdo/apps/componentLibrary/typography';
-import AccessibleDialog from '@cdo/apps/templates/AccessibleDialog';
-import Button from '@cdo/apps/templates/Button';
+import Button from '@cdo/apps/legacySharedComponents/Button';
+import AccessibleDialog from '@cdo/apps/sharedComponents/AccessibleDialog';
 import {sectionForDropdownShape} from '@cdo/apps/templates/teacherDashboard/shapes';
 import {
   assignToSection,
@@ -39,35 +39,43 @@ const MultipleSectionsAssigner = ({
   assignToSection,
   updateHiddenScript,
 }) => {
-  let initialSectionsAssigned = [];
+  const [currentSectionsAssigned, setCurrentSectionsAssigned] = useState([]);
 
-  // check to see if this is coming from the UNIT landing page - if so add courses featuring this unit
-  if (!isAssigningCourse) {
-    if (isStandAloneUnit) {
-      for (let i = 0; i < sections.length; i++) {
-        if (courseVersionId === sections[i].courseVersionId) {
-          initialSectionsAssigned.push(sections[i]);
+  const initialSectionsAssigned = React.useMemo(() => {
+    let initialSectionsAssigned = [];
+    // check to see if this is coming from the UNIT landing page - if so add courses featuring this unit
+    if (!isAssigningCourse) {
+      if (isStandAloneUnit) {
+        for (let i = 0; i < sections.length; i++) {
+          if (courseVersionId === sections[i].courseVersionId) {
+            initialSectionsAssigned.push(sections[i]);
+          }
+        }
+      } else {
+        for (let i = 0; i < sections.length; i++) {
+          if (scriptId === sections[i].unitId) {
+            initialSectionsAssigned.push(sections[i]);
+          }
         }
       }
-    } else {
+    } else if (isAssigningCourse) {
+      // checks to see if this is coming from the COURSE landing page
       for (let i = 0; i < sections.length; i++) {
-        if (scriptId === sections[i].unitId) {
+        if (courseId === sections[i].courseId) {
           initialSectionsAssigned.push(sections[i]);
         }
       }
     }
-  } else if (isAssigningCourse) {
-    // checks to see if this is coming from the COURSE landing page
-    for (let i = 0; i < sections.length; i++) {
-      if (courseId === sections[i].courseId) {
-        initialSectionsAssigned.push(sections[i]);
-      }
-    }
-  }
-
-  const [currentSectionsAssigned, setCurrentSectionsAssigned] = useState(
-    initialSectionsAssigned
-  );
+    setCurrentSectionsAssigned(initialSectionsAssigned);
+    return initialSectionsAssigned;
+  }, [
+    isAssigningCourse,
+    isStandAloneUnit,
+    sections,
+    courseId,
+    scriptId,
+    courseVersionId,
+  ]);
 
   const handleChangedCheckbox = currentSection => {
     const isUnchecked = currentSectionsAssigned.some(

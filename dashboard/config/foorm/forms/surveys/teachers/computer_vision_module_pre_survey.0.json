@@ -94,7 +94,7 @@
           "type": "comment",
           "name": "teaching_experience_computer_vision_details",
           "visibleIf": "{teaching_experience_computer_vision} = 'yes'",
-          "title": "Please describe briefly the computer vision content you have taight and context in which you taught it.",
+          "title": "Please describe briefly the computer vision content you have taught and context in which you taught it.",
           "rows": 3
         },
         {
@@ -138,7 +138,7 @@
           "type": "text",
           "name": "module_goals_other_comment",
           "visibleIf": "{module_goals} anyOf ['other']",
-          "title": "Please describe what other goal do you have for this unit?"
+          "title": "Please describe what other goal do you have for this unit."
         },
         {
           "type": "checkbox",
@@ -172,7 +172,7 @@
           "type": "text",
           "name": "module_challenges_other_comment",
           "visibleIf": "{module_challenges} anyOf ['other']",
-          "title": "Please describe what other goal do you have for this unit?"
+          "title": "Please describe what other challenges you anticipate for this unit."
         },
         {
           "type": "checkbox",

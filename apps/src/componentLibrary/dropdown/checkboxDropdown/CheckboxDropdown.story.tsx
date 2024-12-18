@@ -27,14 +27,22 @@ const SingleTemplate: StoryFn<CheckboxDropdownProps> = args => {
     [args, selectedValues, setValues]
   );
   const onSelectAll = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
+    (
+      e:
+        | React.MouseEvent<HTMLButtonElement>
+        | React.MouseEvent<HTMLAnchorElement>
+    ) => {
       setValues(args.allOptions.map(option => option.value));
       args.onSelectAll(e);
     },
     [args]
   );
   const onClearAll = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
+    (
+      e:
+        | React.MouseEvent<HTMLButtonElement>
+        | React.MouseEvent<HTMLAnchorElement>
+    ) => {
       setValues([]);
       args.onClearAll(e);
     },
@@ -92,7 +100,11 @@ const MultipleTemplate: StoryFn<{
             }
             componentArg.onChange(e);
           };
-          const onSelectAll = (e: React.MouseEvent<HTMLButtonElement>) => {
+          const onSelectAll = (
+            e:
+              | React.MouseEvent<HTMLButtonElement>
+              | React.MouseEvent<HTMLAnchorElement>
+          ) => {
             setValues({
               ...values,
               [componentArg.name]: componentArg.allOptions.map(
@@ -101,7 +113,11 @@ const MultipleTemplate: StoryFn<{
             });
             componentArg.onSelectAll(e);
           };
-          const onClearAll = (e: React.MouseEvent<HTMLButtonElement>) => {
+          const onClearAll = (
+            e:
+              | React.MouseEvent<HTMLButtonElement>
+              | React.MouseEvent<HTMLAnchorElement>
+          ) => {
             setValues({...values, [componentArg.name]: []});
             componentArg.onClearAll(e);
           };
@@ -141,6 +157,23 @@ DefaultCheckboxDropdown.args = {
   size: 'm',
 };
 
+export const ReadOnlyCheckboxDropdown = SingleTemplate.bind({});
+ReadOnlyCheckboxDropdown.args = {
+  name: 'readOnly-dropdown',
+  allOptions: [
+    {value: 'option-1', label: 'Option 1'},
+    {value: 'option-2', label: 'Option 2'},
+  ],
+  checkedOptions: ['option-1'],
+  labelText: 'ReadOnly Dropdown',
+  onChange: args => null,
+  onSelectAll: args => null,
+  onClearAll: args => null,
+  readOnly: true,
+  color: dropdownColors.black,
+  size: 'm',
+};
+
 export const DisabledCheckboxDropdown = SingleTemplate.bind({});
 DisabledCheckboxDropdown.args = {
   name: 'disabled-dropdown',
@@ -173,6 +206,66 @@ WithDisabledOptionCheckboxDropdown.args = {
   onChange: args => null,
   onSelectAll: args => null,
   onClearAll: args => null,
+  size: 'm',
+};
+
+export const StyledAsFieldCheckboxDropdown = SingleTemplate.bind({});
+StyledAsFieldCheckboxDropdown.args = {
+  name: 'styled-as-field-checkbox-dropdown',
+  allOptions: [
+    {value: 'option-1', label: 'Option 1'},
+    {value: 'option-2', label: 'Option 2'},
+  ],
+  checkedOptions: ['option-1'],
+  labelText: 'Helper Message Checkbox Dropdown',
+  onChange: args => console.log(args),
+  helperMessage: 'Helper message',
+  styleAsFormField: true,
+  size: 'm',
+};
+
+export const WithErrorCheckboxDropdown = SingleTemplate.bind({});
+WithErrorCheckboxDropdown.args = {
+  name: 'error-checkbox-dropdown',
+  allOptions: [
+    {value: 'option-1', label: 'Option 1'},
+    {value: 'option-2', label: 'Option 2'},
+  ],
+  checkedOptions: ['option-1'],
+  labelText: 'Error Checkbox Dropdown',
+  onChange: args => console.log(args),
+  errorMessage: 'Error message',
+  size: 'm',
+};
+
+export const WithHelperMessageCheckboxDropdown = SingleTemplate.bind({});
+WithHelperMessageCheckboxDropdown.args = {
+  name: 'helper-message-checkbox-dropdown',
+  allOptions: [
+    {value: 'option-1', label: 'Option 1'},
+    {value: 'option-2', label: 'Option 2'},
+  ],
+  checkedOptions: ['option-1'],
+  labelText: 'Helper Message Checkbox Dropdown',
+  onChange: args => console.log(args),
+  helperMessage: 'Helper message',
+  size: 'm',
+};
+
+export const WithHelperMessageAndIconCheckboxDropdown = SingleTemplate.bind({});
+WithHelperMessageAndIconCheckboxDropdown.args = {
+  name: 'helper-icon-checkbox-dropdown',
+  allOptions: [
+    {value: 'option-1', label: 'Option 1'},
+    {value: 'option-2', label: 'Option 2'},
+  ],
+  checkedOptions: ['option-1'],
+  labelText: 'Helper Icon Checkbox Dropdown',
+  onChange: args => console.log(args),
+  helperIcon: {
+    iconName: 'info-circle',
+  },
+  helperMessage: 'Helper message',
   size: 'm',
 };
 

@@ -1,12 +1,32 @@
 import $ from 'jquery';
-import msg from '@cdo/locale';
-import * as utils from '../../utils';
-import {CIPHER, ALPHABET} from '../../constants';
-import {files as filesApi} from '../../clientApi';
-import firehoseClient from '@cdo/apps/lib/util/firehose';
+
+import firehoseClient from '@cdo/apps/metrics/firehose';
+import HttpClient from '@cdo/apps/util/HttpClient';
 import {AbuseConstants} from '@cdo/generated-scripts/sharedConstants';
+import msg from '@cdo/locale';
+
+import {files as filesApi} from '../../clientApi';
+import {CIPHER, ALPHABET} from '../../constants';
+import {CP_API} from '../../maker/boards/circuitPlayground/PlaygroundConstants';
+import {getStore} from '../../redux';
+import * as utils from '../../utils';
+import header from '../header';
 import NameFailureError from '../NameFailureError';
-import {CP_API} from '../../lib/kits/maker/boards/circuitPlayground/PlaygroundConstants';
+import {
+  workspaceAlertTypes,
+  displayWorkspaceAlert,
+  refreshInRestrictedShareMode,
+  refreshTeacherHasConfirmedUploadWarning,
+} from '../projectRedux';
+import {queryParams, hasQueryParam, updateQueryParam} from '../utils';
+
+var showProjectAdmin = require('../showProjectAdmin');
+
+var assets = require('./clientApi').create('/v3/assets');
+var files = require('./clientApi').create('/v3/files');
+var sources = require('./clientApi').create('/v3/sources');
+var sourcesPublic = require('./clientApi').create('/v3/sources-public');
+var channels = require('./clientApi').create('/v3/channels');
 
 // Attempt to save projects every 30 seconds
 var AUTOSAVE_INTERVAL = 30 * 1000;
@@ -18,23 +38,6 @@ var ABUSE_THRESHOLD = AbuseConstants.ABUSE_THRESHOLD;
 var hasProjectChanged = false;
 let projectSaveInProgress = false;
 let projectChangedWhileSaveInProgress = false;
-
-var assets = require('./clientApi').create('/v3/assets');
-var files = require('./clientApi').create('/v3/files');
-var sources = require('./clientApi').create('/v3/sources');
-var sourcesPublic = require('./clientApi').create('/v3/sources-public');
-var channels = require('./clientApi').create('/v3/channels');
-
-var showProjectAdmin = require('../showProjectAdmin');
-import header from '../header';
-import {queryParams, hasQueryParam, updateQueryParam} from '../utils';
-import {getStore} from '../../redux';
-import {
-  workspaceAlertTypes,
-  displayWorkspaceAlert,
-  refreshInRestrictedShareMode,
-  refreshTeacherHasConfirmedUploadWarning,
-} from '../projectRedux';
 
 // Name of the packed source file
 var SOURCE_FILE = 'main.json';
@@ -365,28 +368,24 @@ var projects = (module.exports = {
   },
 
   /**
-   * Sets abuse score, saves the project, and reloads the page
+   * Allows admin user to reset abuse score to 0 and then saves the project.
    */
-  adminResetAbuseScore(score = 0) {
-    var id = this.getCurrentId();
-    if (!id) {
+  adminResetAbuseScore() {
+    const channelId = this.getCurrentId();
+    if (!channelId) {
       return;
     }
-    channels.delete(id + '/abuse', function (err, result) {
+    HttpClient.post(`/v3/channels/${channelId}/abuse/delete`, '', true);
+    assets.patchAll(channelId, 'abuse_score=0', null, function (err, result) {
       if (err) {
         throw err;
       }
-      assets.patchAll(id, `abuse_score=${score}`, null, function (err, result) {
-        if (err) {
-          throw err;
-        }
-      });
-      files.patchAll(id, `abuse_score=${score}`, null, function (err, result) {
-        if (err) {
-          throw err;
-        }
-        $('.admin-abuse-score').text(score);
-      });
+    });
+    files.patchAll(channelId, 'abuse_score=0', null, function (err, result) {
+      if (err) {
+        throw err;
+      }
+      $('.admin-abuse-score').text(0);
     });
   },
 

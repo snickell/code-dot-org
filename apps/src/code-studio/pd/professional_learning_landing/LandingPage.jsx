@@ -4,36 +4,46 @@
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {connect, useDispatch} from 'react-redux';
-import i18n from '@cdo/locale';
-import {pegasus} from '@cdo/apps/lib/util/urlHelpers';
+
+import Tabs from '@cdo/apps/componentLibrary/tabs';
 import {Heading2} from '@cdo/apps/componentLibrary/typography';
-import {EnrolledWorkshops, WorkshopsTable} from './EnrolledWorkshops';
+import DCDO from '@cdo/apps/dcdo';
+import {pegasus} from '@cdo/apps/lib/util/urlHelpers';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import HeaderBannerNoImage from '@cdo/apps/templates/HeaderBannerNoImage';
+import ActionBlocksWrapper from '@cdo/apps/templates/studioHomepages/ActionBlocksWrapper';
+import BorderedCallToAction from '@cdo/apps/templates/studioHomepages/BorderedCallToAction';
+import CoteacherInviteNotification from '@cdo/apps/templates/studioHomepages/CoteacherInviteNotification';
+import JoinSectionArea from '@cdo/apps/templates/studioHomepages/JoinSectionArea';
+import SetUpSections from '@cdo/apps/templates/studioHomepages/SetUpSections';
+import shapes from '@cdo/apps/templates/studioHomepages/shapes';
+import TwoColumnActionBlock from '@cdo/apps/templates/studioHomepages/TwoColumnActionBlock';
+import AddSectionDialog from '@cdo/apps/templates/teacherDashboard/AddSectionDialog';
+import OwnedSections from '@cdo/apps/templates/teacherDashboard/OwnedSections';
+import {
+  asyncLoadSectionData,
+  asyncLoadCoteacherInvite,
+} from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
+import {hiddenPlSectionIds} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
+import {getAuthenticityToken} from '@cdo/apps/util/AuthenticityTokenStore';
+import i18n from '@cdo/locale';
+
+import {queryParams, updateQueryParam} from '../../utils';
 import {
   COURSE_CSF,
   COURSE_CSD,
   COURSE_CSP,
   COURSE_CSA,
 } from '../workshop_dashboard/workshopConstants';
+import WorkshopEnrollmentCelebrationDialog from '../workshop_enrollment/WorkshopEnrollmentCelebrationDialog';
+
+import {EnrolledWorkshops, WorkshopsTable} from './EnrolledWorkshops';
 import SelfPacedProgressTable from './SelfPacedProgressTable';
-import HeaderBannerNoImage from '@cdo/apps/templates/HeaderBannerNoImage';
-import TwoColumnActionBlock from '@cdo/apps/templates/studioHomepages/TwoColumnActionBlock';
-import ActionBlocksWrapper from '@cdo/apps/templates/studioHomepages/ActionBlocksWrapper';
-import CoteacherInviteNotification from '@cdo/apps/templates/studioHomepages/CoteacherInviteNotification';
-import OwnedSections from '@cdo/apps/templates/teacherDashboard/OwnedSections';
-import SetUpSections from '@cdo/apps/templates/studioHomepages/SetUpSections';
-import AddSectionDialog from '@cdo/apps/templates/teacherDashboard/AddSectionDialog';
-import JoinSectionArea from '@cdo/apps/templates/studioHomepages/JoinSectionArea';
-import BorderedCallToAction from '@cdo/apps/templates/studioHomepages/BorderedCallToAction';
+
 import style from './landingPage.module.scss';
+
 import './tableStyles.scss';
-import Tabs from '@cdo/apps/componentLibrary/tabs';
-import {
-  asyncLoadSectionData,
-  asyncLoadCoteacherInvite,
-  hiddenPlSectionIds,
-} from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
-import shapes from '@cdo/apps/templates/studioHomepages/shapes';
-import DCDO from '@cdo/apps/dcdo';
 
 const getAvailableTabs = permissions => {
   let tabs = [
@@ -76,15 +86,32 @@ const getAvailableTabs = permissions => {
   return tabs;
 };
 
+const getEnrollSucessWorkshopName = () => {
+  // If sent here from successfully enrolling in a workshop, log WORKSHOP_ENROLLMENT_COMPLETED_EVENT.
+  const urlParams = queryParams();
+  if (urlParams && Object.keys(urlParams).includes('wsCourse')) {
+    const workshopCourseName = urlParams['wsCourse'];
+
+    analyticsReporter.sendEvent(EVENTS.WORKSHOP_ENROLLMENT_COMPLETED_EVENT, {
+      'regional partner': urlParams['rpName'],
+      'workshop course': workshopCourseName,
+      'workshop subject': urlParams['wsSubject'],
+    });
+
+    updateQueryParam('rpName', undefined, false);
+    updateQueryParam('wsCourse', undefined, false);
+    updateQueryParam('wsSubject', undefined, false);
+
+    return workshopCourseName;
+  }
+};
+
 function LandingPage({
   lastWorkshopSurveyUrl,
   lastWorkshopSurveyCourse,
-  deeperLearningCourseData,
+  showDeeperLearning,
   currentYearApplicationId,
   hasEnrolledInWorkshop,
-  workshopsAsFacilitator,
-  workshopsAsOrganizer,
-  workshopsAsRegionalPartner,
   plCoursesStarted,
   userPermissions,
   joinedStudentSections,
@@ -94,21 +121,107 @@ function LandingPage({
   hiddenPlSectionIds,
 }) {
   const availableTabs = getAvailableTabs(userPermissions);
+  const [enrollSuccessWorkshopName, setEnrollSuccessWorkshopName] = useState(
+    getEnrollSucessWorkshopName()
+  );
   const [currentTab, setCurrentTab] = useState(availableTabs[0].value);
+  const [workshopsAsFacilitator, setWorkshopsAsFacilitator] = useState([]);
+  const [workshopsAsOrganizer, setWorkshopsAsOrganizer] = useState([]);
+  const [workshopsAsProgramManager, setWorkshopsAsProgramManager] = useState(
+    []
+  );
+
   const headerContainerStyles =
     availableTabs.length > 1
       ? style.headerWithTabsContainer
       : style.headerWithoutTabsContainer;
-
   const joinedPlSectionsStyling =
     joinedPlSections?.length > 0 ? '' : style.joinedPlSectionsWithNoSections;
 
-  // Load PL section info into redux
+  // Load PL section into redux and fetch applicable workshop info
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(asyncLoadSectionData());
     dispatch(asyncLoadCoteacherInvite());
-  }, [dispatch]);
+
+    if (userPermissions.includes('facilitator')) {
+      const fetchFacilitatorData = async () => {
+        try {
+          const response = await fetch(
+            '/dashboardapi/v1/pd/workshops_as_facilitator_for_pl_page',
+            {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': await getAuthenticityToken(),
+              },
+            }
+          );
+
+          if (response.ok) {
+            const jsonData = await response.json();
+            setWorkshopsAsFacilitator(jsonData.workshops_as_facilitator);
+          }
+        } catch (error) {
+          console.error('Error fetching facilitator data:', error);
+        }
+      };
+
+      fetchFacilitatorData();
+    }
+
+    if (userPermissions.includes('workshop_organizer')) {
+      const fetchWorkshopOrganizerData = async () => {
+        try {
+          const response = await fetch(
+            '/dashboardapi/v1/pd/workshops_as_organizer_for_pl_page',
+            {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': await getAuthenticityToken(),
+              },
+            }
+          );
+
+          if (response.ok) {
+            const jsonData = await response.json();
+            setWorkshopsAsOrganizer(jsonData.workshops_as_organizer);
+          }
+        } catch (error) {
+          console.error('Error fetching workshop organizer data:', error);
+        }
+      };
+
+      fetchWorkshopOrganizerData();
+    }
+
+    if (userPermissions.includes('program_manager')) {
+      const fetchProgramManagerWorkshops = async () => {
+        try {
+          const response = await fetch(
+            '/dashboardapi/v1/pd/workshops_as_program_manager_for_pl_page',
+            {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': await getAuthenticityToken(),
+              },
+            }
+          );
+
+          if (response.ok) {
+            const jsonData = await response.json();
+            setWorkshopsAsProgramManager(jsonData.workshops_as_program_manager);
+          }
+        } catch (error) {
+          console.error('Error fetching program manager data:', error);
+        }
+      };
+
+      fetchProgramManagerWorkshops();
+    }
+  }, [dispatch, userPermissions]);
 
   const RenderLastWorkshopSurveyBanner = () => (
     <TwoColumnActionBlock
@@ -276,7 +389,7 @@ function LandingPage({
       });
     });
 
-    if (deeperLearningCourseData?.length >= 1) {
+    if (showDeeperLearning) {
       allResources.push({
         headingText: i18n.plSectionsOnboardingTitle(),
         descriptionText: i18n.plSectionsOnboardingDesc(),
@@ -341,6 +454,12 @@ function LandingPage({
   const RenderMyPlTab = () => {
     return (
       <>
+        {enrollSuccessWorkshopName && (
+          <WorkshopEnrollmentCelebrationDialog
+            workshopName={enrollSuccessWorkshopName}
+            onClose={() => setEnrollSuccessWorkshopName(null)}
+          />
+        )}
         {RenderBanner()}
         {plCoursesStarted?.length >= 1 && RenderSelfPacedPL()}
         <div className={joinedPlSectionsStyling}>
@@ -392,9 +511,9 @@ function LandingPage({
           <Heading2>{i18n.plSectionsRegionalPartnerResources()}</Heading2>
           {RenderRegionalPartnerResources()}
         </section>
-        {workshopsAsRegionalPartner?.length > 0 && (
+        {workshopsAsProgramManager?.length > 0 && (
           <WorkshopsTable
-            workshops={workshopsAsRegionalPartner}
+            workshops={workshopsAsProgramManager}
             forMyPlPage={true}
             tableHeader={i18n.inProgressAndUpcomingWorkshops()}
           />
@@ -467,12 +586,9 @@ export default connect(state => ({
 LandingPage.propTypes = {
   lastWorkshopSurveyUrl: PropTypes.string,
   lastWorkshopSurveyCourse: PropTypes.string,
-  deeperLearningCourseData: PropTypes.array,
+  showDeeperLearning: PropTypes.bool,
   currentYearApplicationId: PropTypes.number,
   hasEnrolledInWorkshop: PropTypes.bool,
-  workshopsAsFacilitator: PropTypes.array,
-  workshopsAsOrganizer: PropTypes.array,
-  workshopsAsRegionalPartner: PropTypes.array,
   plCoursesInstructed: PropTypes.array,
   plCoursesStarted: PropTypes.array,
   userPermissions: PropTypes.arrayOf(PropTypes.string),
