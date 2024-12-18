@@ -84,7 +84,7 @@ module AWS
     # @param [String] key
     # @return [String]
     def self.download_from_bucket(bucket, key, options = {})
-      if Rails.env.development?
+      if rack_env?(:development)
         # For development environments, we look to see if we should lazily populate the
         # local bucket first.
         Cdo::LocalDevelopment.populate_local_s3_bucket(bucket, key)

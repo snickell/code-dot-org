@@ -28,7 +28,7 @@ class SoundLibraryApi < Sinatra::Base
   get %r{/api/v1/sound-library/(.+)} do |sound_name|
     not_found if sound_name.empty?
 
-    if Rails.env.development?
+    if rack_env?(:development)
       # For development environments, we look to see if we should lazily populate the
       # local bucket first.
       Cdo::LocalDevelopment.populate_local_s3_bucket(SOUND_LIBRARY_BUCKET, sound_name)
