@@ -1,7 +1,7 @@
 {
   "abuseDetail": "Please provide details regarding the content you are reporting",
-  "abuseFormDetail": "Please provide as much detail as possible regarding the content you are reporting.",
-  "abuseFormAcknowledge": "By submitting this information, you acknowledge it will be handled in accordance with the terms of the [Privacy Policy]({privacy_url}) and the [Terms of Service]({tos_url}).",
+  "abuseFormDetail": "Please provide as little detail as possible regarding the content you are reporting, but dont change {added_variable}.",
+  "abuseFormAcknowledge": "By submitting this information, you acknowledge it will be handled in accordance with the terms of the [Privacy Policy]({modified_link}) and the [Service Agreement]({tos_url}).",
   "abuseType": "Please answer how this content violates the Terms of Service",
   "abuseTypes": "Abuse types",
   "abuseTypeHarassment": "Threats, cyberbullying, harassment",
