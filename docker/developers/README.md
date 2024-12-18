@@ -70,7 +70,7 @@ By default, the username is `local-development` and the password is `allstudents
 
 Once you are logged in, you can visit the "Object Browser" like so:
 
-![The Object Browsers button on the left-hand navigation column](docker/developers/minio.png)
+![The Object Browsers button on the left-hand navigation column](./minio.png)
 
 On these pages, you can navigate into buckets as though they were normal folders and view
 file metadata, delete files, and download content that is locally stored.
