@@ -239,7 +239,7 @@ class AichatControllerTest < ActionController::TestCase
   # chat_request tests
   test 'GET chat_request returns not found if request does not exist' do
     sign_in(@authorized_student1)
-    get :chat_request, params: {id: 1}, as: :json
+    get :chat_request, params: {id: 100}, as: :json
     assert_response :not_found
   end
 
