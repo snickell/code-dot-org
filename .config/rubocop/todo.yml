@@ -444,12 +444,6 @@ Style/RedundantCurrentDirectoryInPath:
 Style/RedundantDoubleSplatHashBraces:
   Enabled: false
 
-# Offense count: 2
-# This cop supports unsafe autocorrection (--autocorrect-all).
-# Configuration parameters: AutoCorrect, AllowComments.
-Style/RedundantInitialize:
-  Enabled: false
-
 # Offense count: 15
 # This cop supports safe autocorrection (--autocorrect).
 Style/RedundantParentheses:
