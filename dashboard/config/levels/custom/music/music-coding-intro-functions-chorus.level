@@ -9,7 +9,7 @@
     "encrypted": "false",
     "background": "music-black",
     "instructions_important": "false",
-    "long_instructions": "####<i class=\"fa-solid fa-drum\"></i> Repeat the beat\r\nThis song uses a function so the beat is the same throughout the song.\r\n1. Add a few drum and bass sounds to the beat function. \r\n\r\n\r\n",
+    "long_instructions": "####<i class=\"fa-solid fa-drum\"></i> Repeat the beat\r\n\r\nSome beats play all the way through a song to keep it steady. \r\n\r\nAdd drum and bass sounds to the [beat](#clickable=id-up-left:beat_function) function to build your song!\r\n\r\n\r\n\r\n\r\n\r\n\r\n",
     "hide_share_and_remix": "true",
     "validations": [
       {
@@ -19,32 +19,24 @@
         "conditions": [
           {
             "name": "played_sound_in_function",
-            "value": "verse_workspace"
-          }
-        ]
-      },
-      {
-        "key": "music-ai-skill-function-verse_03ed3be5-172e-4df5-97cb-075d4032388f",
-        "message": "That chorus sounds great! Now, add sounds into the [verse](#clickable=id:verse_workspace) function. ",
-        "next": false,
-        "conditions": [
-          {
-            "name": "played_sound_in_function",
-            "value": "chorus_workspace"
+            "value": "beat"
           }
         ]
       },
       {
         "key": "music-ai-skill-sequence_a0f44420-3323-439a-be62-f0aa67dbcbe1",
-        "message": "Nothing played yet. ",
+        "message": "Nothing played in your [beat](#clickable=id:beat_function) function yet. ",
         "next": false,
         "conditions": [
-
-        ]
+          {
+            "name": "played_sound_in_any_function"
+          }
+        ],
+        "callout": "play-sound-block---id-up-left:beat_function"
       }
     ],
     "level_data": {
-      "validationTimeout": 1,
+      "validationTimeout": 3,
       "library": "launch2024",
       "packId": "rosa_linn_snap",
       "startSources": {
@@ -192,12 +184,12 @@
             },
             {
               "type": "procedures_defnoreturn",
-              "id": "!^sDFN@95hnMYj/jj2LP",
+              "id": "beat_function",
               "x": 370,
               "y": 50,
               "deletable": false,
               "extraState": {
-                "procedureId": "chorus_workspace",
+                "procedureId": "beat_function",
                 "initialDeleteConfig": false,
                 "initialEditConfig": true,
                 "initialMoveConfig": true
@@ -209,7 +201,7 @@
                 "STACK": {
                   "block": {
                     "type": "play_sounds_together",
-                    "id": "play_sounds_together"
+                    "id": "play_sounds_together2"
                   }
                 }
               }
@@ -218,7 +210,7 @@
         },
         "procedures": [
           {
-            "id": "chorus_workspace",
+            "id": "beat_workspace",
             "name": "beat",
             "returnTypes": null
           }
@@ -263,7 +255,7 @@
     "hint_prompt_attempts_threshold": "1",
     "preload_asset_list": null
   },
-  "audit_log": "[{\"changed_at\":\"2024-11-27T16:40:42.570+00:00\",\"changed\":[\"cloned from \\\"music-jam-functions-verse\\\"\"],\"cloned_from\":\"music-jam-functions-verse\"},{\"changed_at\":\"2024-12-03 23:03:34 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 23:05:19 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-04 20:13:57 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-04 20:20:15 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-04 21:15:07 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-04 21:19:00 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-04 21:20:55 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-09 19:50:48 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-09 20:01:46 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-13 20:30:26 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-17 22:58:15 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
+  "audit_log": "[{\"changed_at\":\"2024-11-27T16:40:42.570+00:00\",\"changed\":[\"cloned from \\\"music-jam-functions-verse\\\"\"],\"cloned_from\":\"music-jam-functions-verse\"},{\"changed_at\":\"2024-12-03 23:03:34 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 23:05:19 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-04 20:13:57 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-04 20:20:15 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-04 21:15:07 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-04 21:19:00 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-04 21:20:55 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-09 19:50:48 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-09 20:01:46 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-13 20:30:26 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-17 22:58:15 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-18 17:38:39 +0000\",\"changed\":[\"long_instructions\",\"validations\",\"level_data\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-12-18 17:41:05 +0000\",\"changed\":[\"long_instructions\",\"validations\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-12-18 17:44:07 +0000\",\"changed\":[\"long_instructions\",\"validations\",\"level_data\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-12-18 17:47:38 +0000\",\"changed\":[\"long_instructions\",\"validations\",\"level_data\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-12-18 19:34:23 +0000\",\"changed\":[],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
 }]]></config>
   <blocks/>
 </Music>

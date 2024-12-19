@@ -25,25 +25,7 @@
               "x": 34,
               "y": 34,
               "deletable": false,
-              "movable": false,
-              "next": {
-                "block": {
-                  "type": "procedures_callnoreturn",
-                  "id": "A.n,9Rbl#J)3e=JWiHa#",
-                  "extraState": {
-                    "name": "verse"
-                  },
-                  "next": {
-                    "block": {
-                      "type": "procedures_callnoreturn",
-                      "id": "4I.z,-a_n*rm.$5k5Q?I",
-                      "extraState": {
-                        "name": "chorus"
-                      }
-                    }
-                  }
-                }
-              }
+              "movable": false
             },
             {
               "type": "procedures_defnoreturn",
@@ -328,43 +310,46 @@
         "conditions": [
           {
             "name": "played_sound_in_function",
-            "value": "chorus-procedure"
+            "value": "chorus"
           },
           {
             "name": "played_sound_in_function",
-            "value": "intro-procedure"
+            "value": "verse"
           }
         ]
       },
       {
         "key": "music-ai-functions-doubleChorus_2_d72de94c-fc7b-4fa8-a9bf-4c67ec49841c",
-        "message": "Are both function blocks added? Make sure to add the [chorus](#clickable=flyout-second-block) block under [when run](#clickable=when-run-block). ",
+        "message": "You added the [verse](#clickable=flyout-first-block) block. Now add the [chorus](#clickable=flyout-second-block) block under [when run](#clickable=when-run-block). ",
         "next": false,
         "conditions": [
           {
             "name": "played_sound_in_function",
-            "value": "intro-procedure"
+            "value": "verse"
           }
-        ]
+        ],
+        "callout": "flyout-second-block"
       },
       {
         "key": "music-ai-functions-doubleChorus_2_211ec330-8549-468a-9359-6f58deb212a2",
-        "message": "Almost there! Make sure to add the [intro](#clickable=flyout-first-block) block under [when run](#clickable=when-run-block).",
+        "message": "Almost there! Make sure to add the [verse](#clickable=flyout-first-block) block under [when run](#clickable=when-run-block).",
         "next": false,
         "conditions": [
           {
             "name": "played_sound_in_function",
-            "value": "chorus-procedure"
+            "value": "chorus"
           }
-        ]
+        ],
+        "callout": "flyout-first-block"
       },
       {
         "key": "music-ai-functions-chorus_e1d6c731-90ed-4e26-a2cd-040bfc5c373f",
-        "message": "Connect the [intro](#clickable=flyout-first-block) and [chorus](#clickable=flyout-second-block) blocks under [when run](#clickable=when-run-block) to play the sounds in each function.",
+        "message": "Connect the [verse](#clickable=flyout-first-block) and [chorus](#clickable=flyout-second-block) blocks under [when run](#clickable=when-run-block) to play the sounds in each function.",
         "next": false,
         "conditions": [
 
-        ]
+        ],
+        "callout": "flyout-first-block---when-run-block"
       }
     ],
     "name_suffix": "_final",
@@ -373,7 +358,7 @@
     "hint_prompt_attempts_threshold": "1",
     "preload_asset_list": null
   },
-  "audit_log": "[{\"changed_at\":\"2024-11-27T16:39:14.146+00:00\",\"changed\":[\"cloned from \\\"music-jam-functions-chorus\\\"\"],\"cloned_from\":\"music-jam-functions-chorus\"},{\"changed_at\":\"2024-12-03 22:47:19 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 22:48:05 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 22:51:35 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 22:59:26 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-04 21:55:45 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-09 19:42:07 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-13 20:21:11 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-13 20:23:00 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-17 22:47:56 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-17 22:48:12 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-17 22:55:56 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-17 23:14:33 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
+  "audit_log": "[{\"changed_at\":\"2024-11-27T16:39:14.146+00:00\",\"changed\":[\"cloned from \\\"music-jam-functions-chorus\\\"\"],\"cloned_from\":\"music-jam-functions-chorus\"},{\"changed_at\":\"2024-12-03 22:47:19 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 22:48:05 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 22:51:35 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-03 22:59:26 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-04 21:55:45 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-09 19:42:07 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-13 20:21:11 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-13 20:23:00 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-17 22:47:56 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-17 22:48:12 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-17 22:55:56 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-17 23:14:33 +0000\",\"changed\":[\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-18 16:34:37 +0000\",\"changed\":[\"level_data\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2024-12-18 17:21:56 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-12-18 17:23:34 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-12-18 17:26:45 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"},{\"changed_at\":\"2024-12-18 17:28:17 +0000\",\"changed\":[\"validations\"],\"changed_by_id\":1196,\"changed_by_email\":\"amy.woodman@code.org\"}]"
 }]]></config>
   <blocks/>
 </Music>

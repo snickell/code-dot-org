@@ -18977,6 +18977,8 @@ en:
               name: Python and Data Science [Chapter 2]
             lesson-4:
               name: Teaching Resources for Data Science
+            lesson-5:
+              name: 'Advanced Data Science and Python [Unit 2: Part 2]'
           lesson_groups: {}
           name: sandbox-teaching-data-science
           title: Teaching Data Science
@@ -19648,3 +19650,12 @@ en:
         dan-test:
           lessons: {}
           lesson_groups: {}
+        sandbox-pl-teaching-k5-music-lab:
+          lessons: {}
+          lesson_groups: {}
+          name: sandbox-pl-teaching-k5-music-lab
+          title: Teaching K-5 Music Lab (Sandbox)
+          description_audience: ''
+          description_short: ''
+          description: ''
+          student_description: ''
