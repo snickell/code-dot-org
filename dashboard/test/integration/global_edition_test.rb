@@ -174,7 +174,7 @@ class GlobalEditionTest < ActionDispatch::IntegrationTest
         _ {get_regional_page}.must_change -> {incubator_path}, from: international_page_path, to: regional_page_path
       end
 
-      context 'when not region locked locale is set via params' do
+      context 'on locale change via params' do
         let(:params) {{set_locale: locale}}
         let(:extra_params) {{foo: 'bar'}}
 
@@ -184,20 +184,42 @@ class GlobalEditionTest < ActionDispatch::IntegrationTest
           params.merge!(extra_params)
         end
 
-        it 'redirects to international page with extra params' do
+        it 'changes region page language' do
           get_regional_page
 
-          expect(Metrics::Events).to have_received(:log_event).with(
+          expect(Metrics::Events).not_to have_received(:log_event).with(
             event_name: 'Global Edition Region Selected',
             request: anything,
-            metadata: {
-              region: nil,
-              locale: locale,
-            }
-          ).once
+            metadata: anything,
+          )
 
           must_respond_with 302
-          must_redirect_to "#{regional_page_path}?#{extra_params.to_query}&ge_region"
+          must_redirect_to "#{regional_page_path}?#{extra_params.to_query}"
+
+          follow_redirect!
+
+          must_respond_with 200
+          _(request.fullpath).must_equal "#{regional_page_path}?#{extra_params.to_query}"
+        end
+
+        context 'when locale is not available in region' do
+          let(:locale) {'uk-UA'}
+
+          it 'redirects to international page' do
+            get_regional_page
+
+            expect(Metrics::Events).to have_received(:log_event).with(
+              event_name: 'Global Edition Region Selected',
+              request: anything,
+              metadata: {
+                region: nil,
+                locale: locale,
+              }
+            ).once
+
+            must_respond_with 302
+            must_redirect_to "#{regional_page_path}?#{extra_params.to_query}&ge_region"
+          end
         end
       end
 
@@ -213,8 +235,18 @@ class GlobalEditionTest < ActionDispatch::IntegrationTest
   end
 
   describe 'oauth' do
+    let(:omniauth_test_mode) {OmniAuth.config.test_mode}
+
     before do
       cookies[:ge_region] = ge_region
+
+      # Disables OmniAuth test mode to generate real OAuth URLs.
+      OmniAuth.config.test_mode = false
+    end
+
+    after do
+      # Restores the initial OmniAuth test mode configuration.
+      OmniAuth.config.test_mode = omniauth_test_mode
     end
 
     {
@@ -222,23 +254,19 @@ class GlobalEditionTest < ActionDispatch::IntegrationTest
       AuthenticationOption::MICROSOFT => 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
       AuthenticationOption::FACEBOOK  => 'https://www.facebook.com/v2.12/dialog/oauth',
       AuthenticationOption::CLEVER    => 'https://clever.com/oauth/authorize',
-    }.each do |provider, oauth_url|
+    }.each do |provider, expected_oauth_url|
       it "#{provider} authentication process is not affected by regional redirection" do
-        OmniAuth.config.test_mode = false
-
-        # POST /global/fa/users/auth/:provider
-        post Cdo::GlobalEdition.path(ge_region, OmniAuth.config.path_prefix, provider.to_s)
-        must_redirect_to %r(^#{oauth_url})
+        post "/global/fa/users/auth/#{provider}"
+        must_redirect_to %r(^#{expected_oauth_url})
 
         oauth_uri = URI.parse(response.location)
         oauth_params = URI.decode_www_form(oauth_uri.query.to_s).to_h
         oauth_callback_url = oauth_params['redirect_uri']
         _(oauth_callback_url).must_equal "https://test-studio.code.org/users/auth/#{provider}/callback"
 
-        OmniAuth.config.test_mode = true
         # GET /users/auth/:provider/callback
         get oauth_callback_url
-        must_respond_with 200
+        must_redirect_to '/users/sign_in'
       end
     end
   end

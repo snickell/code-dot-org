@@ -110,10 +110,6 @@ module Cdo
       countries_regions[country]
     end
 
-    def self.path(region, *paths)
-      ::File.join(ROOT_PATH, region, *paths)
-    end
-
     def self.region_locale_options(region)
       locale_options = Cdo::I18n.locale_options
       return locale_options unless region_available?(region)
@@ -125,6 +121,10 @@ module Cdo
         locale_options = locale_options.select {|_name, value| region_locales.include?(value)} if region_locales
         locale_options
       end
+    end
+
+    def self.path(region, *paths)
+      ::File.join(ROOT_PATH, region, *paths)
     end
   end
 end
