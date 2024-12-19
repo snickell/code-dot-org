@@ -157,7 +157,6 @@ describe('Design System - Chips', () => {
         values={values}
         options={options}
         required={true}
-        requiredMessageText="Please choose at least one option"
         setValues={setValues}
         label="Chips label"
       />
@@ -186,7 +185,6 @@ describe('Design System - Chips', () => {
         values={values}
         options={options}
         required={true}
-        requiredMessageText="Please choose at least one option"
         setValues={setValues}
         label="Chips label"
       />
@@ -213,7 +211,6 @@ describe('Design System - Chips', () => {
         values={values}
         options={options}
         required={true}
-        requiredMessageText="Please choose at least one option"
         setValues={setValues}
         label="Chips label"
       />
