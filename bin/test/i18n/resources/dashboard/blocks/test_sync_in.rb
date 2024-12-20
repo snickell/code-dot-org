@@ -13,7 +13,7 @@ describe I18n::Resources::Dashboard::Blocks::SyncIn do
     assert_equal I18n::Utils::SyncInBase, described_class.superclass
   end
 
-  let(:origin_i18n_file_path) {CDO.dir('dashboard/config/locales/blocks.en.yml')}
+  let(:origin_i18n_file_path) {CDO.dir('dashboard/config/locales/blocks/en.yml')}
   let(:i18n_source_file_path) {CDO.dir('i18n/locales/source/dashboard/blocks.yml')}
   let(:i18n_original_file_path) {CDO.dir('i18n/locales/original/dashboard/blocks.yml')}
 

@@ -40,7 +40,7 @@ module I18n
           end
 
           private def distribute_localization(locale, crowdin_file_path)
-            target_i18n_file_path = CDO.dir("dashboard/config/locales/blocks.#{locale}.yml")
+            target_i18n_file_path = CDO.dir("dashboard/config/locales/blocks/#{locale}.yml")
             I18nScriptUtils.sanitize_file_and_write(crowdin_file_path, target_i18n_file_path)
           end
         end

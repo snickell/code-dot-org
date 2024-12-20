@@ -156,7 +156,7 @@ class UnitGroup < ApplicationRecord
   # @param name [string] - name of the course being updated
   # @param course_strings[Hash{String => String}]
   def self.update_strings(name, course_strings)
-    courses_yml = File.expand_path('config/locales/courses.en.yml')
+    courses_yml = File.expand_path('config/locales/courses/en.yml')
     i18n = File.exist?(courses_yml) ? YAML.load_file(courses_yml) : {}
 
     i18n.deep_merge!({'en' => {'data' => {'course' => {'name' => {name => course_strings.to_h}}}}})

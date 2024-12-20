@@ -101,7 +101,7 @@ namespace :build do
         end
 
         # Commit dsls.en.yml changes on staging
-        dsls_file = dashboard_dir('config/locales/dsls.en.yml')
+        dsls_file = dashboard_dir('config/locales/dsls/en.yml')
         if rack_env?(:staging) && GitUtils.file_changed_from_git?(dsls_file)
           RakeUtils.system 'git', 'add', dsls_file
           ChatClient.log 'Committing updated dsls.en.yml file...', color: 'purple'

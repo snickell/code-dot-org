@@ -38,7 +38,7 @@ describe I18n::Resources::Dashboard::Blocks::SyncOut do
     end
     let(:expect_localization_distribution) do
       I18nScriptUtils.expects(:sanitize_file_and_write).with(
-        crowdin_file_path, CDO.dir('dashboard/config/locales', "blocks.#{i18n_locale}.yml")
+        crowdin_file_path, CDO.dir('dashboard/config/locales/blocks', "#{i18n_locale}.yml")
       )
     end
     let(:expect_crowdin_file_to_i18n_locale_dir_moving) do

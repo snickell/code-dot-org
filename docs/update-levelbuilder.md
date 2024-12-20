@@ -70,7 +70,7 @@ If you also need to rebuild levelbuilder:
 
 (you may have to remove the .seeded file as above also).
 
-## Merge conflict with `dashboard/config/locales/dsls.en.yml`
+## Merge conflict with `dashboard/config/locales/dsls/en.yml`
 
 This file is owned by levelbuilder, but can be (incorrectly) modified by
 the staging build process. If you experience a merge conflict, resolve it
