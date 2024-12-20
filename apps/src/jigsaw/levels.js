@@ -23,12 +23,16 @@ var jigsawBlockWithDeletableAttr = function (
   if (childType === 'statement') {
     childAttr = " name='child'";
   }
+  // We add a static block ID to the first block in the lesson
+  // so that we can validate whether or not it is clicked.
+  const idAttr = type === 'jigsaw_1A' ? ' id="block1"' : '';
   return (
     '<block type="' +
     type +
     '" deletable="' +
     deletable +
     '"' +
+    idAttr +
     ' x="' +
     x +
     '"' +
@@ -213,7 +217,7 @@ module.exports = {
       width: 200,
       height: 200,
     },
-    backgroundHSV: [209, 0.57, 0.6],
+    backgroundHSV: [209, 0.66, 0.59],
     ghost: {
       x: 400,
       y: 100,
@@ -242,7 +246,7 @@ module.exports = {
       width: 200,
       height: 200,
     },
-    backgroundHSV: [25, 0.57, 0.96],
+    backgroundHSV: [25, 0.87, 0.96],
     ghost: {
       x: 400,
       y: 100,

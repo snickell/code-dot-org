@@ -21,7 +21,7 @@
     },
     "new_name": null,
     "family_name": "customizing-llms",
-    "serialized_at": "2024-11-14 18:24:10 UTC",
+    "serialized_at": "2024-12-04 16:10:39 UTC",
     "published_state": "stable",
     "instruction_type": "teacher_led",
     "instructor_audience": "teacher",
@@ -5233,6 +5233,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "gen-ai-customizing-project-L0_2024"
+        ],
         "progression": "Example Projects"
       },
       "bonus": false,
