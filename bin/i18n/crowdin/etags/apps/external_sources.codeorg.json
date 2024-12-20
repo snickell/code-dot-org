@@ -1,6 +1,6 @@
 {
   "ar-SA": {
-    "/blockly-core/core.json": "cb0779682951c0e902fe4d1624d8b307",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "d547f9d3b845c97d080e29fd3df7811f",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "d547f9d3b845c97d080e29fd3df7811f",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "d547f9d3b845c97d080e29fd3df7811f",
@@ -46,10 +46,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "d547f9d3b845c97d080e29fd3df7811f",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "d547f9d3b845c97d080e29fd3df7811f",
     "/external-sources/ml-playground/datasets/zoo.json": "d547f9d3b845c97d080e29fd3df7811f",
-    "/external-sources/ml-playground/mlPlayground.json": "81c6f11a00b06ad1f3e6718ff6eccd28"
+    "/external-sources/ml-playground/mlPlayground.json": "c04f292e1acca6017b154f7ae5aa1cc5"
   },
   "az-AZ": {
-    "/blockly-core/core.json": "cb0779682951c0e902fe4d1624d8b307",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "c41224a1c60452c5c42b86774a0cf171",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "c41224a1c60452c5c42b86774a0cf171",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "c41224a1c60452c5c42b86774a0cf171",
@@ -95,10 +95,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "c41224a1c60452c5c42b86774a0cf171",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "c41224a1c60452c5c42b86774a0cf171",
     "/external-sources/ml-playground/datasets/zoo.json": "c41224a1c60452c5c42b86774a0cf171",
-    "/external-sources/ml-playground/mlPlayground.json": "2bf015c3e149068623a5e7db2fcb51a7"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "bg-BG": {
-    "/blockly-core/core.json": "cb0779682951c0e902fe4d1624d8b307",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "6488d5aaa16e0d86bcc56848255b11a4",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "7a4e196ac6df42ac5be38b5a5001711a",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "7a4e196ac6df42ac5be38b5a5001711a",
@@ -144,7 +144,7 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "7a4e196ac6df42ac5be38b5a5001711a",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "6488d5aaa16e0d86bcc56848255b11a4",
     "/external-sources/ml-playground/datasets/zoo.json": "7a4e196ac6df42ac5be38b5a5001711a",
-    "/external-sources/ml-playground/mlPlayground.json": "2bf015c3e149068623a5e7db2fcb51a7"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "bn-BD": {
     "/blockly-core/core.json": "be0c0f17a460d80d077a71fe2515c59a",
@@ -196,7 +196,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "cc17a8a9d9b46ae03d9c67ded2f54c39"
   },
   "bs-BA": {
-    "/blockly-core/core.json": "cb0779682951c0e902fe4d1624d8b307",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "2ede141ce2cfbc296021b8467fd9e283",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "2ede141ce2cfbc296021b8467fd9e283",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "2ede141ce2cfbc296021b8467fd9e283",
@@ -242,10 +242,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "2ede141ce2cfbc296021b8467fd9e283",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "2ede141ce2cfbc296021b8467fd9e283",
     "/external-sources/ml-playground/datasets/zoo.json": "2ede141ce2cfbc296021b8467fd9e283",
-    "/external-sources/ml-playground/mlPlayground.json": "a0c2eb43ece73a47c95ed60f27e0c7db"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "ca-ES": {
-    "/blockly-core/core.json": "cb0779682951c0e902fe4d1624d8b307",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "bf99d30255e0aa5b3185b56cafc2cd39",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "bf99d30255e0aa5b3185b56cafc2cd39",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "bf99d30255e0aa5b3185b56cafc2cd39",
@@ -291,7 +291,7 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "bf99d30255e0aa5b3185b56cafc2cd39",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "f6cff23461aa7ba0253ca4252ccd0054",
     "/external-sources/ml-playground/datasets/zoo.json": "bf99d30255e0aa5b3185b56cafc2cd39",
-    "/external-sources/ml-playground/mlPlayground.json": "2bf015c3e149068623a5e7db2fcb51a7"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "co-CO": {
     "/blockly-core/core.json": "be0c0f17a460d80d077a71fe2515c59a",
@@ -343,7 +343,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "a88615b495ca04bd3cbc5a2957a00132"
   },
   "cs-CZ": {
-    "/blockly-core/core.json": "cb0779682951c0e902fe4d1624d8b307",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "8ccaf9af820abd4f55906b61aa0f82e0",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "8ccaf9af820abd4f55906b61aa0f82e0",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "8ccaf9af820abd4f55906b61aa0f82e0",
@@ -389,10 +389,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "8ccaf9af820abd4f55906b61aa0f82e0",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "7690da230f93528946bf3f60090bda10",
     "/external-sources/ml-playground/datasets/zoo.json": "8ccaf9af820abd4f55906b61aa0f82e0",
-    "/external-sources/ml-playground/mlPlayground.json": "2bf015c3e149068623a5e7db2fcb51a7"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "da-DK": {
-    "/blockly-core/core.json": "cb0779682951c0e902fe4d1624d8b307",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "e8f4f5a72c0c9d16623298c458c3710e",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "e8f4f5a72c0c9d16623298c458c3710e",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "e8f4f5a72c0c9d16623298c458c3710e",
@@ -438,10 +438,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "e8f4f5a72c0c9d16623298c458c3710e",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "e8f4f5a72c0c9d16623298c458c3710e",
     "/external-sources/ml-playground/datasets/zoo.json": "e8f4f5a72c0c9d16623298c458c3710e",
-    "/external-sources/ml-playground/mlPlayground.json": "2bf015c3e149068623a5e7db2fcb51a7"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "de-DE": {
-    "/blockly-core/core.json": "cb0779682951c0e902fe4d1624d8b307",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "7b03de655bd291814d0cbdf9cde2988a",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "216559181b2144f7baaa7feb13af8415",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "216559181b2144f7baaa7feb13af8415",
@@ -487,10 +487,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "216559181b2144f7baaa7feb13af8415",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "216559181b2144f7baaa7feb13af8415",
     "/external-sources/ml-playground/datasets/zoo.json": "216559181b2144f7baaa7feb13af8415",
-    "/external-sources/ml-playground/mlPlayground.json": "81c6f11a00b06ad1f3e6718ff6eccd28"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "dv-MV": {
-    "/blockly-core/core.json": "cb0779682951c0e902fe4d1624d8b307",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "9fd06f8b3b21afe64f4da332b91e3bd0",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "9fd06f8b3b21afe64f4da332b91e3bd0",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "9fd06f8b3b21afe64f4da332b91e3bd0",
@@ -536,10 +536,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "9fd06f8b3b21afe64f4da332b91e3bd0",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "9fd06f8b3b21afe64f4da332b91e3bd0",
     "/external-sources/ml-playground/datasets/zoo.json": "9fd06f8b3b21afe64f4da332b91e3bd0",
-    "/external-sources/ml-playground/mlPlayground.json": "2bf015c3e149068623a5e7db2fcb51a7"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "el-GR": {
-    "/blockly-core/core.json": "cb0779682951c0e902fe4d1624d8b307",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "105a287fbf5fb87cab431096aae6fde5",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "7ecaf0b87f2aea829fabfa3c9640cbdb",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "7ecaf0b87f2aea829fabfa3c9640cbdb",
@@ -585,10 +585,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "7ecaf0b87f2aea829fabfa3c9640cbdb",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "105a287fbf5fb87cab431096aae6fde5",
     "/external-sources/ml-playground/datasets/zoo.json": "7ecaf0b87f2aea829fabfa3c9640cbdb",
-    "/external-sources/ml-playground/mlPlayground.json": "2bf015c3e149068623a5e7db2fcb51a7"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "en-GB": {
-    "/blockly-core/core.json": "b2e82b0fef282c83be7a2c75b6baa6f1",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "e0ea915f21bc54d812f5a2716ec9ea75",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "5fc08f5469e7817f103be172e7083dfc",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "5fc08f5469e7817f103be172e7083dfc",
@@ -634,10 +634,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "5fc08f5469e7817f103be172e7083dfc",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "e0ea915f21bc54d812f5a2716ec9ea75",
     "/external-sources/ml-playground/datasets/zoo.json": "5fc08f5469e7817f103be172e7083dfc",
-    "/external-sources/ml-playground/mlPlayground.json": "5b385f888f3d4495332e10fa005d35e5"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "es-ES": {
-    "/blockly-core/core.json": "b2e82b0fef282c83be7a2c75b6baa6f1",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "2ba33dc37d51e27705353892df030b2d",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "2ba33dc37d51e27705353892df030b2d",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "2ba33dc37d51e27705353892df030b2d",
@@ -683,10 +683,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "2ba33dc37d51e27705353892df030b2d",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "2ba33dc37d51e27705353892df030b2d",
     "/external-sources/ml-playground/datasets/zoo.json": "2ba33dc37d51e27705353892df030b2d",
-    "/external-sources/ml-playground/mlPlayground.json": "3cea3c8dfb163e3f740951b37d42ffd6"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "es-MX": {
-    "/blockly-core/core.json": "b2e82b0fef282c83be7a2c75b6baa6f1",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "e3011fafc1abd8ccdfce81021a5573a4",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "e3011fafc1abd8ccdfce81021a5573a4",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "e3011fafc1abd8ccdfce81021a5573a4",
@@ -732,10 +732,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "faf7e65246f6f2e132dbfb9f68d41cd2",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "e3011fafc1abd8ccdfce81021a5573a4",
     "/external-sources/ml-playground/datasets/zoo.json": "faf7e65246f6f2e132dbfb9f68d41cd2",
-    "/external-sources/ml-playground/mlPlayground.json": "3cea3c8dfb163e3f740951b37d42ffd6"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "et-EE": {
-    "/blockly-core/core.json": "b2e82b0fef282c83be7a2c75b6baa6f1",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "6773f9fc148a66ba1e527dca4fbbd462",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "6773f9fc148a66ba1e527dca4fbbd462",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "6773f9fc148a66ba1e527dca4fbbd462",
@@ -781,10 +781,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "6773f9fc148a66ba1e527dca4fbbd462",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "6773f9fc148a66ba1e527dca4fbbd462",
     "/external-sources/ml-playground/datasets/zoo.json": "6773f9fc148a66ba1e527dca4fbbd462",
-    "/external-sources/ml-playground/mlPlayground.json": "3cea3c8dfb163e3f740951b37d42ffd6"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "eu-ES": {
-    "/blockly-core/core.json": "b2e82b0fef282c83be7a2c75b6baa6f1",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "dcd2620400ea3325e5c6d3e560c948de",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "dcd2620400ea3325e5c6d3e560c948de",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "dcd2620400ea3325e5c6d3e560c948de",
@@ -830,7 +830,7 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "dcd2620400ea3325e5c6d3e560c948de",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "dcd2620400ea3325e5c6d3e560c948de",
     "/external-sources/ml-playground/datasets/zoo.json": "dcd2620400ea3325e5c6d3e560c948de",
-    "/external-sources/ml-playground/mlPlayground.json": "e1cd449b4f27c10c77a6725b22092d1c"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "fa-AF": {
     "/blockly-core/core.json": "96f401478d5c918595627cb1410e2865",
@@ -882,7 +882,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "ce107bad0dba25c532075900ad586400"
   },
   "fa-IR": {
-    "/blockly-core/core.json": "b2e82b0fef282c83be7a2c75b6baa6f1",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "b97f4963aea02d936e21949a99ef0b01",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "b97f4963aea02d936e21949a99ef0b01",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "b97f4963aea02d936e21949a99ef0b01",
@@ -928,10 +928,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "4d0139902bf52d69be1e695dee193921",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "b97f4963aea02d936e21949a99ef0b01",
     "/external-sources/ml-playground/datasets/zoo.json": "4d0139902bf52d69be1e695dee193921",
-    "/external-sources/ml-playground/mlPlayground.json": "e1cd449b4f27c10c77a6725b22092d1c"
+    "/external-sources/ml-playground/mlPlayground.json": "94a2b04e61524eabe352ddaf3c065526"
   },
   "fi-FI": {
-    "/blockly-core/core.json": "b2e82b0fef282c83be7a2c75b6baa6f1",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "3ac368bbddbb1833bbf9dd52ebab5027",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "3ac368bbddbb1833bbf9dd52ebab5027",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "3ac368bbddbb1833bbf9dd52ebab5027",
@@ -977,10 +977,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "3ac368bbddbb1833bbf9dd52ebab5027",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "3ac368bbddbb1833bbf9dd52ebab5027",
     "/external-sources/ml-playground/datasets/zoo.json": "3ac368bbddbb1833bbf9dd52ebab5027",
-    "/external-sources/ml-playground/mlPlayground.json": "e1cd449b4f27c10c77a6725b22092d1c"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "fil-PH": {
-    "/blockly-core/core.json": "b2e82b0fef282c83be7a2c75b6baa6f1",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "722973eb445976937ece6077401c65e3",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "722973eb445976937ece6077401c65e3",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "722973eb445976937ece6077401c65e3",
@@ -1026,10 +1026,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "722973eb445976937ece6077401c65e3",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "722973eb445976937ece6077401c65e3",
     "/external-sources/ml-playground/datasets/zoo.json": "722973eb445976937ece6077401c65e3",
-    "/external-sources/ml-playground/mlPlayground.json": "3cea3c8dfb163e3f740951b37d42ffd6"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "fr-FR": {
-    "/blockly-core/core.json": "b2e82b0fef282c83be7a2c75b6baa6f1",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "403fff0274202269e4934170b4c1400e",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "403fff0274202269e4934170b4c1400e",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "403fff0274202269e4934170b4c1400e",
@@ -1075,10 +1075,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "403fff0274202269e4934170b4c1400e",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "403fff0274202269e4934170b4c1400e",
     "/external-sources/ml-playground/datasets/zoo.json": "403fff0274202269e4934170b4c1400e",
-    "/external-sources/ml-playground/mlPlayground.json": "02bf98a5418535ed6163385697784058"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "ga-IE": {
-    "/blockly-core/core.json": "792b2398ff4e9ba96d721ce81452e8fa",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "259a3dcd5c79e0ba32c1eb6f4b21f005",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "259a3dcd5c79e0ba32c1eb6f4b21f005",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "259a3dcd5c79e0ba32c1eb6f4b21f005",
@@ -1124,10 +1124,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "259a3dcd5c79e0ba32c1eb6f4b21f005",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "259a3dcd5c79e0ba32c1eb6f4b21f005",
     "/external-sources/ml-playground/datasets/zoo.json": "259a3dcd5c79e0ba32c1eb6f4b21f005",
-    "/external-sources/ml-playground/mlPlayground.json": "3cea3c8dfb163e3f740951b37d42ffd6"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "gl-ES": {
-    "/blockly-core/core.json": "792b2398ff4e9ba96d721ce81452e8fa",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "2a0f4a3895d338a9ffcc4c69b609fbca",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "2a0f4a3895d338a9ffcc4c69b609fbca",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "2a0f4a3895d338a9ffcc4c69b609fbca",
@@ -1173,10 +1173,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "2a0f4a3895d338a9ffcc4c69b609fbca",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "2a0f4a3895d338a9ffcc4c69b609fbca",
     "/external-sources/ml-playground/datasets/zoo.json": "2a0f4a3895d338a9ffcc4c69b609fbca",
-    "/external-sources/ml-playground/mlPlayground.json": "d7b7012255e899e69869839e0d55c6e0"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "haw-HI": {
-    "/blockly-core/core.json": "792b2398ff4e9ba96d721ce81452e8fa",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "e2a817440f06da15ce82c98f83f1bf7d",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "e2a817440f06da15ce82c98f83f1bf7d",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "e2a817440f06da15ce82c98f83f1bf7d",
@@ -1222,10 +1222,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "e2a817440f06da15ce82c98f83f1bf7d",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "e2a817440f06da15ce82c98f83f1bf7d",
     "/external-sources/ml-playground/datasets/zoo.json": "e2a817440f06da15ce82c98f83f1bf7d",
-    "/external-sources/ml-playground/mlPlayground.json": "d7b7012255e899e69869839e0d55c6e0"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "he-IL": {
-    "/blockly-core/core.json": "792b2398ff4e9ba96d721ce81452e8fa",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "dcd3228b680b4953757d610f84106061",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "dcd3228b680b4953757d610f84106061",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "dcd3228b680b4953757d610f84106061",
@@ -1271,10 +1271,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "dcd3228b680b4953757d610f84106061",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "dcd3228b680b4953757d610f84106061",
     "/external-sources/ml-playground/datasets/zoo.json": "dcd3228b680b4953757d610f84106061",
-    "/external-sources/ml-playground/mlPlayground.json": "d7b7012255e899e69869839e0d55c6e0"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "hi-IN": {
-    "/blockly-core/core.json": "792b2398ff4e9ba96d721ce81452e8fa",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "32745b13c5c28827b4a7247f97d3b7cd",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "32745b13c5c28827b4a7247f97d3b7cd",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "32745b13c5c28827b4a7247f97d3b7cd",
@@ -1320,10 +1320,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "32745b13c5c28827b4a7247f97d3b7cd",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "32745b13c5c28827b4a7247f97d3b7cd",
     "/external-sources/ml-playground/datasets/zoo.json": "32745b13c5c28827b4a7247f97d3b7cd",
-    "/external-sources/ml-playground/mlPlayground.json": "f31b96137388f158269db12ad593163b"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "hr-HR": {
-    "/blockly-core/core.json": "792b2398ff4e9ba96d721ce81452e8fa",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "1cfeb490238280dd98e1508d54922244",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "861658bd8f21da095a980db33e82341e",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "861658bd8f21da095a980db33e82341e",
@@ -1369,10 +1369,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "861658bd8f21da095a980db33e82341e",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "1cfeb490238280dd98e1508d54922244",
     "/external-sources/ml-playground/datasets/zoo.json": "861658bd8f21da095a980db33e82341e",
-    "/external-sources/ml-playground/mlPlayground.json": "f31b96137388f158269db12ad593163b"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "hu-HU": {
-    "/blockly-core/core.json": "792b2398ff4e9ba96d721ce81452e8fa",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "233d6af1c5d1451353c1778fc89878ae",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "233d6af1c5d1451353c1778fc89878ae",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "66c5cdb1cfc3f6308259f325c38f6d59",
@@ -1418,10 +1418,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "66c5cdb1cfc3f6308259f325c38f6d59",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "233d6af1c5d1451353c1778fc89878ae",
     "/external-sources/ml-playground/datasets/zoo.json": "66c5cdb1cfc3f6308259f325c38f6d59",
-    "/external-sources/ml-playground/mlPlayground.json": "f31b96137388f158269db12ad593163b"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "hy-AM": {
-    "/blockly-core/core.json": "792b2398ff4e9ba96d721ce81452e8fa",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "046bbedf61905da18e0a5b046b007f94",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "046bbedf61905da18e0a5b046b007f94",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "046bbedf61905da18e0a5b046b007f94",
@@ -1467,10 +1467,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "046bbedf61905da18e0a5b046b007f94",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "046bbedf61905da18e0a5b046b007f94",
     "/external-sources/ml-playground/datasets/zoo.json": "046bbedf61905da18e0a5b046b007f94",
-    "/external-sources/ml-playground/mlPlayground.json": "f31b96137388f158269db12ad593163b"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "id-ID": {
-    "/blockly-core/core.json": "792b2398ff4e9ba96d721ce81452e8fa",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "c41634eef0c9bd1d6af59e92324b2c2e",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "c41634eef0c9bd1d6af59e92324b2c2e",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "c41634eef0c9bd1d6af59e92324b2c2e",
@@ -1516,10 +1516,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "c41634eef0c9bd1d6af59e92324b2c2e",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "c41634eef0c9bd1d6af59e92324b2c2e",
     "/external-sources/ml-playground/datasets/zoo.json": "c41634eef0c9bd1d6af59e92324b2c2e",
-    "/external-sources/ml-playground/mlPlayground.json": "f31b96137388f158269db12ad593163b"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "is-IS": {
-    "/blockly-core/core.json": "792b2398ff4e9ba96d721ce81452e8fa",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "b81f7a59fbd22766d2a43e6e7f47ee98",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "845ee4219eb002e3868fa7873c836e99",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "845ee4219eb002e3868fa7873c836e99",
@@ -1565,10 +1565,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "845ee4219eb002e3868fa7873c836e99",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "b81f7a59fbd22766d2a43e6e7f47ee98",
     "/external-sources/ml-playground/datasets/zoo.json": "845ee4219eb002e3868fa7873c836e99",
-    "/external-sources/ml-playground/mlPlayground.json": "f01c94fa2e65afda4e3178a6ff850cd6"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "it-IT": {
-    "/blockly-core/core.json": "db96e92816bdbb4b78cd48388e140d3b",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "9186a00f91a0cf78f48ab531ae72949f",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "9186a00f91a0cf78f48ab531ae72949f",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "9186a00f91a0cf78f48ab531ae72949f",
@@ -1614,10 +1614,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "9186a00f91a0cf78f48ab531ae72949f",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "9186a00f91a0cf78f48ab531ae72949f",
     "/external-sources/ml-playground/datasets/zoo.json": "9186a00f91a0cf78f48ab531ae72949f",
-    "/external-sources/ml-playground/mlPlayground.json": "37fa15841abb1eb70a56d16e6cc26275"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "ja-JP": {
-    "/blockly-core/core.json": "db96e92816bdbb4b78cd48388e140d3b",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "89eb5e29a28f20c85983658e5103efbb",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "89eb5e29a28f20c85983658e5103efbb",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "89eb5e29a28f20c85983658e5103efbb",
@@ -1663,10 +1663,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "89eb5e29a28f20c85983658e5103efbb",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "89eb5e29a28f20c85983658e5103efbb",
     "/external-sources/ml-playground/datasets/zoo.json": "89eb5e29a28f20c85983658e5103efbb",
-    "/external-sources/ml-playground/mlPlayground.json": "4232e9ad922f3ba406c8f92eec360064"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "ka-GE": {
-    "/blockly-core/core.json": "db96e92816bdbb4b78cd48388e140d3b",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "f80f250e7c782420182d18159bff5e8a",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "f80f250e7c782420182d18159bff5e8a",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "f80f250e7c782420182d18159bff5e8a",
@@ -1712,10 +1712,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "6a85b71d45dd86f5f3eb7b2dca695b62",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "f80f250e7c782420182d18159bff5e8a",
     "/external-sources/ml-playground/datasets/zoo.json": "6a85b71d45dd86f5f3eb7b2dca695b62",
-    "/external-sources/ml-playground/mlPlayground.json": "4232e9ad922f3ba406c8f92eec360064"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "kk-KZ": {
-    "/blockly-core/core.json": "db96e92816bdbb4b78cd48388e140d3b",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "923cc1eeaf21da1df581f967372c7df5",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "923cc1eeaf21da1df581f967372c7df5",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "923cc1eeaf21da1df581f967372c7df5",
@@ -1761,10 +1761,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "923cc1eeaf21da1df581f967372c7df5",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "923cc1eeaf21da1df581f967372c7df5",
     "/external-sources/ml-playground/datasets/zoo.json": "923cc1eeaf21da1df581f967372c7df5",
-    "/external-sources/ml-playground/mlPlayground.json": "4232e9ad922f3ba406c8f92eec360064"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "kn-IN": {
-    "/blockly-core/core.json": "db96e92816bdbb4b78cd48388e140d3b",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "4b49de3f85172f11def49f7f2a97bca1",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "4b49de3f85172f11def49f7f2a97bca1",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "4b49de3f85172f11def49f7f2a97bca1",
@@ -1810,10 +1810,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "4b49de3f85172f11def49f7f2a97bca1",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "4b49de3f85172f11def49f7f2a97bca1",
     "/external-sources/ml-playground/datasets/zoo.json": "4b49de3f85172f11def49f7f2a97bca1",
-    "/external-sources/ml-playground/mlPlayground.json": "1fca4eed8434a9217cbac59a966ada65"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "km-KH": {
-    "/blockly-core/core.json": "db96e92816bdbb4b78cd48388e140d3b",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "439fe5d15549c5c08226afcfc15a1b69",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "439fe5d15549c5c08226afcfc15a1b69",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "439fe5d15549c5c08226afcfc15a1b69",
@@ -1859,59 +1859,59 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "439fe5d15549c5c08226afcfc15a1b69",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "439fe5d15549c5c08226afcfc15a1b69",
     "/external-sources/ml-playground/datasets/zoo.json": "439fe5d15549c5c08226afcfc15a1b69",
-    "/external-sources/ml-playground/mlPlayground.json": "1fca4eed8434a9217cbac59a966ada65"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "ko-KR": {
-    "/blockly-core/core.json": "db96e92816bdbb4b78cd48388e140d3b",
-    "/external-sources/ml-playground/datasets/abalone.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/auto_mpg.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/basketball_shots.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/bike_sharing.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/billionaires.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/boba_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/car_evaluation.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/census_part.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/club_biased_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/club_random_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/club_sparse_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/club_specific_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/cookies_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/exoplanets.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/global_happiness_raw.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/heart.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/housing_data.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/icecream_toppings_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/insurance_cost.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/jeans.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/loneliness_interests.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/loneliness_movies.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/loneliness_music.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/loneliness_personality.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/loneliness_phobias.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/medical_priority.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/movies.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/naan_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/nutrition.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/pizza_toppings_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/poke_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/poutine_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/raspado_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/safari_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/salad_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/salsa_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/shapes_v1_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/shapes_v2_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/shoe_survey_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/songs.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/student_alcohol_consumption.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/student_survey.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/thanksgiving.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/datasets/zoo.json": "e545395ab2cc135246bd6254bf8bd781",
-    "/external-sources/ml-playground/mlPlayground.json": "1fca4eed8434a9217cbac59a966ada65"
+    "/blockly-core/core.json": "aba12da3a364eded3b8f849a13b9a8cf",
+    "/external-sources/ml-playground/datasets/abalone.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/auto_mpg.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/basketball_shots.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/bike_sharing.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/billionaires.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/boba_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/car_evaluation.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/census_part.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/club_biased_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/club_random_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/club_sparse_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/club_specific_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/cookies_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/exoplanets.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/global_happiness_raw.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/heart.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/housing_data.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/icecream_toppings_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/insurance_cost.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/jeans.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/loneliness_interests.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/loneliness_movies.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/loneliness_music.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/loneliness_personality.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/loneliness_phobias.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/medical_priority.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/movies.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/naan_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/nutrition.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/pizza_toppings_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/poke_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/poutine_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/raspado_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/safari_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/salad_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/salsa_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/shapes_v1_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/shapes_v2_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/shoe_survey_toy.json": "f91a5860b8e39e26ab0046bc74320700",
+    "/external-sources/ml-playground/datasets/songs.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/student_alcohol_consumption.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/student_survey.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/thanksgiving.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/datasets/zoo.json": "0e076b3a4cffabe632087450d09775c7",
+    "/external-sources/ml-playground/mlPlayground.json": "f91a5860b8e39e26ab0046bc74320700"
   },
   "ku-IQ": {
-    "/blockly-core/core.json": "db96e92816bdbb4b78cd48388e140d3b",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "6e8b60e6d8d8db0633b15a17a83d548b",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "4da366df6cc7eb98baacda136c7a9f2d",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "4da366df6cc7eb98baacda136c7a9f2d",
@@ -1957,7 +1957,7 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "4da366df6cc7eb98baacda136c7a9f2d",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "6e8b60e6d8d8db0633b15a17a83d548b",
     "/external-sources/ml-playground/datasets/zoo.json": "4da366df6cc7eb98baacda136c7a9f2d",
-    "/external-sources/ml-playground/mlPlayground.json": "1fca4eed8434a9217cbac59a966ada65"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "ky-KG": {
     "/blockly-core/core.json": "8a3fe74e3e8e9c0bbfe0736bb21024d2",
@@ -2009,7 +2009,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "11307424bf6e2c1c3d9efdf3a8fb2b83"
   },
   "lt-LT": {
-    "/blockly-core/core.json": "db96e92816bdbb4b78cd48388e140d3b",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "d74e7bb796bc591a0b3e5d092c31ce25",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "074a2ec8cc8c601a0b972648a781ad71",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "074a2ec8cc8c601a0b972648a781ad71",
@@ -2055,10 +2055,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "074a2ec8cc8c601a0b972648a781ad71",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "d74e7bb796bc591a0b3e5d092c31ce25",
     "/external-sources/ml-playground/datasets/zoo.json": "074a2ec8cc8c601a0b972648a781ad71",
-    "/external-sources/ml-playground/mlPlayground.json": "1fca4eed8434a9217cbac59a966ada65"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "lv-LV": {
-    "/blockly-core/core.json": "db96e92816bdbb4b78cd48388e140d3b",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "e85f929da86af0ee11790fe9285e4528",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "e85f929da86af0ee11790fe9285e4528",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "e85f929da86af0ee11790fe9285e4528",
@@ -2104,10 +2104,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "e85f929da86af0ee11790fe9285e4528",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "e85f929da86af0ee11790fe9285e4528",
     "/external-sources/ml-playground/datasets/zoo.json": "e85f929da86af0ee11790fe9285e4528",
-    "/external-sources/ml-playground/mlPlayground.json": "df94ef40d1622abac14ae80962e52299"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "mi-NZ": {
-    "/blockly-core/core.json": "dad6adbc98f8091e2fb7f605f9f11069",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "3350c81d74d09611d1c258764e116e7e",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "3350c81d74d09611d1c258764e116e7e",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "20ab98f0067772114b54265fb6419189",
@@ -2153,10 +2153,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "20ab98f0067772114b54265fb6419189",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "3350c81d74d09611d1c258764e116e7e",
     "/external-sources/ml-playground/datasets/zoo.json": "20ab98f0067772114b54265fb6419189",
-    "/external-sources/ml-playground/mlPlayground.json": "bbda00b8440db6ab49cc299a07a487d3"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "mk-MK": {
-    "/blockly-core/core.json": "dad6adbc98f8091e2fb7f605f9f11069",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "7369322d571da1020ae47ceed8e05611",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "7369322d571da1020ae47ceed8e05611",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "7369322d571da1020ae47ceed8e05611",
@@ -2202,10 +2202,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "7369322d571da1020ae47ceed8e05611",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "7369322d571da1020ae47ceed8e05611",
     "/external-sources/ml-playground/datasets/zoo.json": "7369322d571da1020ae47ceed8e05611",
-    "/external-sources/ml-playground/mlPlayground.json": "4f3d6d34eddd656aebd6f09eee9d2b97"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "mn-MN": {
-    "/blockly-core/core.json": "dad6adbc98f8091e2fb7f605f9f11069",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "a1048003f798ed379c6745080a29e765",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "a1048003f798ed379c6745080a29e765",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "a1048003f798ed379c6745080a29e765",
@@ -2251,10 +2251,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "123883f8db7b4c405f72cfa27b060ad2",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "a1048003f798ed379c6745080a29e765",
     "/external-sources/ml-playground/datasets/zoo.json": "a1048003f798ed379c6745080a29e765",
-    "/external-sources/ml-playground/mlPlayground.json": "4f3d6d34eddd656aebd6f09eee9d2b97"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "mr-IN": {
-    "/blockly-core/core.json": "dad6adbc98f8091e2fb7f605f9f11069",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "b2252706eb8cde41e448826da6df8686",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "b2252706eb8cde41e448826da6df8686",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "b2252706eb8cde41e448826da6df8686",
@@ -2300,10 +2300,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "b2252706eb8cde41e448826da6df8686",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "b2252706eb8cde41e448826da6df8686",
     "/external-sources/ml-playground/datasets/zoo.json": "b2252706eb8cde41e448826da6df8686",
-    "/external-sources/ml-playground/mlPlayground.json": "4f3d6d34eddd656aebd6f09eee9d2b97"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "ms-MY": {
-    "/blockly-core/core.json": "dad6adbc98f8091e2fb7f605f9f11069",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "b26c392b7702f1077f6de3ed9e8ebe38",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "b26c392b7702f1077f6de3ed9e8ebe38",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "b26c392b7702f1077f6de3ed9e8ebe38",
@@ -2349,10 +2349,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "b26c392b7702f1077f6de3ed9e8ebe38",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "b26c392b7702f1077f6de3ed9e8ebe38",
     "/external-sources/ml-playground/datasets/zoo.json": "b26c392b7702f1077f6de3ed9e8ebe38",
-    "/external-sources/ml-playground/mlPlayground.json": "c8c24c5c8a0506badd8227cc1f64d354"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "mt-MT": {
-    "/blockly-core/core.json": "dad6adbc98f8091e2fb7f605f9f11069",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "aa6a25746838dd9baa52fb9836d4fd38",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "aa6a25746838dd9baa52fb9836d4fd38",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "aa6a25746838dd9baa52fb9836d4fd38",
@@ -2398,10 +2398,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "aa6a25746838dd9baa52fb9836d4fd38",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "aa6a25746838dd9baa52fb9836d4fd38",
     "/external-sources/ml-playground/datasets/zoo.json": "aa6a25746838dd9baa52fb9836d4fd38",
-    "/external-sources/ml-playground/mlPlayground.json": "c8c24c5c8a0506badd8227cc1f64d354"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "my-MM": {
-    "/blockly-core/core.json": "dad6adbc98f8091e2fb7f605f9f11069",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "3752e24bdb329b26e2fca71903bdcba5",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "3752e24bdb329b26e2fca71903bdcba5",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "3752e24bdb329b26e2fca71903bdcba5",
@@ -2447,10 +2447,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "3752e24bdb329b26e2fca71903bdcba5",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "3752e24bdb329b26e2fca71903bdcba5",
     "/external-sources/ml-playground/datasets/zoo.json": "3752e24bdb329b26e2fca71903bdcba5",
-    "/external-sources/ml-playground/mlPlayground.json": "c8c24c5c8a0506badd8227cc1f64d354"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "ne-NP": {
-    "/blockly-core/core.json": "dad6adbc98f8091e2fb7f605f9f11069",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "6e6cea48af44e11427021cfc87ef695a",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "6e6cea48af44e11427021cfc87ef695a",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "6e6cea48af44e11427021cfc87ef695a",
@@ -2496,10 +2496,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "6e6cea48af44e11427021cfc87ef695a",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "6e6cea48af44e11427021cfc87ef695a",
     "/external-sources/ml-playground/datasets/zoo.json": "6e6cea48af44e11427021cfc87ef695a",
-    "/external-sources/ml-playground/mlPlayground.json": "c8c24c5c8a0506badd8227cc1f64d354"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "nl-NL": {
-    "/blockly-core/core.json": "dad6adbc98f8091e2fb7f605f9f11069",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "c7c00dc3a15f1721a6e255a128ff75c2",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "c7c00dc3a15f1721a6e255a128ff75c2",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "c7c00dc3a15f1721a6e255a128ff75c2",
@@ -2545,10 +2545,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "c7c00dc3a15f1721a6e255a128ff75c2",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "c7c00dc3a15f1721a6e255a128ff75c2",
     "/external-sources/ml-playground/datasets/zoo.json": "c7c00dc3a15f1721a6e255a128ff75c2",
-    "/external-sources/ml-playground/mlPlayground.json": "c8c24c5c8a0506badd8227cc1f64d354"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "nn-NO": {
-    "/blockly-core/core.json": "dad6adbc98f8091e2fb7f605f9f11069",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "d94307232cbf9af859f8317e54b82259",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "d94307232cbf9af859f8317e54b82259",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "d94307232cbf9af859f8317e54b82259",
@@ -2594,10 +2594,10 @@
     "/external-sources/ml-playground/datasets/taco_toppings_toy.json": "d94307232cbf9af859f8317e54b82259",
     "/external-sources/ml-playground/datasets/thanksgiving.json": "d94307232cbf9af859f8317e54b82259",
     "/external-sources/ml-playground/datasets/zoo.json": "d94307232cbf9af859f8317e54b82259",
-    "/external-sources/ml-playground/mlPlayground.json": "f4bfd45f95d8cba71134b85e8b803030"
+    "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "no-NO": {
-    "/blockly-core/core.json": "7f7499e4313c64e74692f474bafddedf",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "c9e4d32f7f4d76b7ed69d957b7a702a2",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "c9e4d32f7f4d76b7ed69d957b7a702a2",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "c9e4d32f7f4d76b7ed69d957b7a702a2",
@@ -2646,7 +2646,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "pl-PL": {
-    "/blockly-core/core.json": "7f7499e4313c64e74692f474bafddedf",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "53b373aaa587bc916b0acdf1a25aae37",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "53b373aaa587bc916b0acdf1a25aae37",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "53b373aaa587bc916b0acdf1a25aae37",
@@ -2744,7 +2744,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "3cc89da073fa07e2f1f176809f5efe42"
   },
   "pt-BR": {
-    "/blockly-core/core.json": "7f7499e4313c64e74692f474bafddedf",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "b233004b6b85d3d47346a1b5f6ff8b75",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "b233004b6b85d3d47346a1b5f6ff8b75",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "4f325d7a7a3cb246ca2bb98dd699142d",
@@ -2793,7 +2793,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "pt-PT": {
-    "/blockly-core/core.json": "7f7499e4313c64e74692f474bafddedf",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "29dc9791c12a0675efe229c08f9267eb",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "1ae57ab6c4ce45fa630fdb38b501a52b",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "1ae57ab6c4ce45fa630fdb38b501a52b",
@@ -2842,7 +2842,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "ro-RO": {
-    "/blockly-core/core.json": "7f7499e4313c64e74692f474bafddedf",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "6661aa99c9ba29818d58c32bb4524614",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "fe21d42c10a6d23021c6128a01ec033d",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "fe21d42c10a6d23021c6128a01ec033d",
@@ -2891,7 +2891,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "ru-RU": {
-    "/blockly-core/core.json": "7f7499e4313c64e74692f474bafddedf",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "77ae78af9c63ea7689cb082c3b47d0a7",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "ba9c3aee93f8454d593d4ce7391498b1",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "ba9c3aee93f8454d593d4ce7391498b1",
@@ -2940,7 +2940,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "se-FI": {
-    "/blockly-core/core.json": "7f7499e4313c64e74692f474bafddedf",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "70874dc07cc5020788eb6d0856eb377e",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "70874dc07cc5020788eb6d0856eb377e",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "62a88207d137038663929274f8027fa7",
@@ -2989,7 +2989,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "sm-WS": {
-    "/blockly-core/core.json": "7f7499e4313c64e74692f474bafddedf",
+    "/blockly-core/core.json": "1330cb4a9d3c32f1fcbd0b53b08974ca",
     "/external-sources/ml-playground/datasets/abalone.json": "850087e360e7ad26e7e2c6fbf30bda52",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "850087e360e7ad26e7e2c6fbf30bda52",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "850087e360e7ad26e7e2c6fbf30bda52",
@@ -3038,7 +3038,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "si-LK": {
-    "/blockly-core/core.json": "7f7499e4313c64e74692f474bafddedf",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "adce8db4f51a2b7668d65c1caced0fa8",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "adce8db4f51a2b7668d65c1caced0fa8",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "adce8db4f51a2b7668d65c1caced0fa8",
@@ -3087,7 +3087,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "sk-SK": {
-    "/blockly-core/core.json": "7f7499e4313c64e74692f474bafddedf",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "8dad6928ed92357ad8d65c5882333c75",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "8dad6928ed92357ad8d65c5882333c75",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "8dad6928ed92357ad8d65c5882333c75",
@@ -3136,7 +3136,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "sl-SI": {
-    "/blockly-core/core.json": "0492c402359abb7c3f2a3268bcb1710a",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "9aa12eaa756058b446fe8bffb59b91ec",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "9aa12eaa756058b446fe8bffb59b91ec",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "9aa12eaa756058b446fe8bffb59b91ec",
@@ -3185,7 +3185,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "sq-AL": {
-    "/blockly-core/core.json": "0492c402359abb7c3f2a3268bcb1710a",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "d7ee542b4119131cb0876acfe4d02fa3",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "d7ee542b4119131cb0876acfe4d02fa3",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "d6ebc3bb978f8c528ba9e1cefcbab7f4",
@@ -3234,7 +3234,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "c04f292e1acca6017b154f7ae5aa1cc5"
   },
   "sr-SP": {
-    "/blockly-core/core.json": "0492c402359abb7c3f2a3268bcb1710a",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "08ce55f11a05333b4015bc84421e1a05",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "cade72bfbf6f13a0bfba7770eed75260",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "cade72bfbf6f13a0bfba7770eed75260",
@@ -3283,7 +3283,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "sv-SE": {
-    "/blockly-core/core.json": "0492c402359abb7c3f2a3268bcb1710a",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "15c79457d3afb19b245f11d76abfad50",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "15c79457d3afb19b245f11d76abfad50",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "15c79457d3afb19b245f11d76abfad50",
@@ -3332,7 +3332,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "ta-IN": {
-    "/blockly-core/core.json": "0492c402359abb7c3f2a3268bcb1710a",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "25d5236ba792885d232ca9416d4c2eee",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "5d278be6243c81ee0548a3f4c1473e3f",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "5d278be6243c81ee0548a3f4c1473e3f",
@@ -3381,7 +3381,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "te-IN": {
-    "/blockly-core/core.json": "0492c402359abb7c3f2a3268bcb1710a",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "6d60d33820187ece10595cc886192308",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "6d60d33820187ece10595cc886192308",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "6d60d33820187ece10595cc886192308",
@@ -3479,7 +3479,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "c0cc91e5afbdfb48cf4dd6fe64ced2b2"
   },
   "th-TH": {
-    "/blockly-core/core.json": "0492c402359abb7c3f2a3268bcb1710a",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "c2b2e20bdeb8e6289c35a6e4c56e0989",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "c2b2e20bdeb8e6289c35a6e4c56e0989",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "c2b2e20bdeb8e6289c35a6e4c56e0989",
@@ -3528,7 +3528,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "tr-TR": {
-    "/blockly-core/core.json": "0492c402359abb7c3f2a3268bcb1710a",
+    "/blockly-core/core.json": "155c33be03d1ae8c1791dc5eb7b13a0b",
     "/external-sources/ml-playground/datasets/abalone.json": "32485a8b71dd4d73626e8f73a637163d",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "32485a8b71dd4d73626e8f73a637163d",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "9b70ebc9e0c535626d8213552dc5b54d",
@@ -3577,7 +3577,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "uk-UA": {
-    "/blockly-core/core.json": "0492c402359abb7c3f2a3268bcb1710a",
+    "/blockly-core/core.json": "1330cb4a9d3c32f1fcbd0b53b08974ca",
     "/external-sources/ml-playground/datasets/abalone.json": "44b18463476b97e3972de8d204313f0d",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "44b18463476b97e3972de8d204313f0d",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "44b18463476b97e3972de8d204313f0d",
@@ -3626,7 +3626,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "ur-PK": {
-    "/blockly-core/core.json": "0492c402359abb7c3f2a3268bcb1710a",
+    "/blockly-core/core.json": "1330cb4a9d3c32f1fcbd0b53b08974ca",
     "/external-sources/ml-playground/datasets/abalone.json": "f4e984074fbcdc2eadee92d681e9b502",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "f4e984074fbcdc2eadee92d681e9b502",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "f4e984074fbcdc2eadee92d681e9b502",
@@ -3675,7 +3675,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "uz-UZ": {
-    "/blockly-core/core.json": "5e6a79b4434ce79e5927f79f3c9672c9",
+    "/blockly-core/core.json": "1330cb4a9d3c32f1fcbd0b53b08974ca",
     "/external-sources/ml-playground/datasets/abalone.json": "35c376f2387fd383e22d468eed71df1c",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "35c376f2387fd383e22d468eed71df1c",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "35c376f2387fd383e22d468eed71df1c",
@@ -3724,7 +3724,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "vi-VN": {
-    "/blockly-core/core.json": "5e6a79b4434ce79e5927f79f3c9672c9",
+    "/blockly-core/core.json": "1330cb4a9d3c32f1fcbd0b53b08974ca",
     "/external-sources/ml-playground/datasets/abalone.json": "d054599dd10a3ae4578a422d3668254f",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "c4d61e94bd3d61aeb507cdeb7d79c8c3",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "c4d61e94bd3d61aeb507cdeb7d79c8c3",
@@ -3773,7 +3773,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "zh-CN": {
-    "/blockly-core/core.json": "5e6a79b4434ce79e5927f79f3c9672c9",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "0dad144d31db2b2bca203a8b55357807",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "0dad144d31db2b2bca203a8b55357807",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "0dad144d31db2b2bca203a8b55357807",
@@ -3822,7 +3822,7 @@
     "/external-sources/ml-playground/mlPlayground.json": "2621baec5b3e6eb5cbbe5e53a6e6074c"
   },
   "zh-TW": {
-    "/blockly-core/core.json": "5e6a79b4434ce79e5927f79f3c9672c9",
+    "/blockly-core/core.json": "ad8fcafa5093aacd9010f70bc430e953",
     "/external-sources/ml-playground/datasets/abalone.json": "99f1ccdbf4d5e4f53af9bcf8b302cc41",
     "/external-sources/ml-playground/datasets/auto_mpg.json": "99f1ccdbf4d5e4f53af9bcf8b302cc41",
     "/external-sources/ml-playground/datasets/basketball_shots.json": "99f1ccdbf4d5e4f53af9bcf8b302cc41",
