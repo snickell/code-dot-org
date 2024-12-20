@@ -60,73 +60,18 @@ describe('SafeMarkdown', () => {
     ).toBe(true);
   });
 
-  it('will render markdown wrapped in an element', () => {
-    const paragraphWrapper = shallow(
+  it('will render markdown wrapped in an Typography element', () => {
+    const typographyWrapper = shallow(
       <SafeMarkdown
         markdown="**some** _basic_ [inline](markdown)"
-        wrapperElement="p"
+        typographyProps={{semanticTag: 'p', visualAppearance: 'body-two'}}
       />
     );
 
-    expect(
-      paragraphWrapper.equals(
-        <p>
-          <strong>some</strong> <em>basic</em> <a href="markdown">inline</a>
-        </p>
-      )
-    ).toBe(true);
-
-    const headingWrapper = shallow(
-      <SafeMarkdown
-        markdown="**some** _basic_ [inline](markdown)"
-        wrapperElement="h1"
-      />
+    const renderedHtml = typographyWrapper.html();
+    expect(renderedHtml).toBe(
+      '<p class="body-two"><strong>some</strong> <em>basic</em> <a href="markdown">inline</a></p>'
     );
-
-    expect(
-      headingWrapper.equals(
-        <h1>
-          <p>
-            <strong>some</strong> <em>basic</em> <a href="markdown">inline</a>
-          </p>
-        </h1>
-      )
-    ).toBe(true);
-  });
-
-  it('will render html wrapped in an element', () => {
-    const paragraphWrapper = shallow(
-      <SafeMarkdown
-        markdown='<strong>some</strong> <em>basic</em> <a href="markdown">inline</a>'
-        wrapperElement="p"
-      />
-    );
-
-    expect(
-      paragraphWrapper.equals(
-        <p>
-          <strong>some</strong> <em>basic</em> <a href="markdown">inline</a>
-        </p>
-      )
-    ).toBe(true);
-
-    // Make sure we don't add an extra div
-    const divWrapper = shallow(
-      <SafeMarkdown
-        markdown='<strong>some</strong> <em>basic</em> <a href="markdown">inline</a>'
-        wrapperElement="div"
-      />
-    );
-
-    expect(
-      divWrapper.equals(
-        <div>
-          <p>
-            <strong>some</strong> <em>basic</em> <a href="markdown">inline</a>
-          </p>
-        </div>
-      )
-    ).toBe(true);
   });
 
   it('implements expandableImages', () => {
