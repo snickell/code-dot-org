@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-# removes all remaining lesson fields from scripts.en.yml.
+# removes all remaining lesson fields from scripts/en.yml.
 
 require_relative '../../dashboard/config/environment'
 

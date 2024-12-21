@@ -152,7 +152,7 @@ class UnitGroup < ApplicationRecord
     raise new_e
   end
 
-  # Updates courses.en.yml with our new localizeable strings
+  # Updates courses/en.yml with our new localizeable strings
   # @param name [string] - name of the course being updated
   # @param course_strings[Hash{String => String}]
   def self.update_strings(name, course_strings)

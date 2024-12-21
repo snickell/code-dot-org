@@ -1102,7 +1102,7 @@ class Unit < ApplicationRecord
       # script edit page. therefore, touch the `updated_at` column whenever we
       # we save, even if it did not result an a change to the actual script
       # object. that way, we'll prevent write conflicts on changes to lesson
-      # groups, as well as on fields which live only in scripts.en.yml.
+      # groups, as well as on fields which live only in scripts/en.yml.
       unit.touch(:updated_at) if unit.is_migrated
 
       unit.save!
@@ -1413,7 +1413,7 @@ class Unit < ApplicationRecord
     Rake::FileTask['config/scripts/.seeded'].invoke
   end
 
-  # This method updates scripts.en.yml with i18n data from the units.
+  # This method updates scripts/en.yml with i18n data from the units.
   # There are three types of i18n data
   # 1. Lesson names are passed in as lessons_i18n here. The script edit page
   #   will add to these when creating a new lesson.
@@ -1709,7 +1709,7 @@ class Unit < ApplicationRecord
 
   # Creates an object representing all translations associated with this unit
   # and its lessons, in a format that can be deep-merged with the contents of
-  # scripts.en.yml.
+  # scripts/en.yml.
   def summarize_i18n_for_copy(new_name, new_course_version)
     resource_markdown_replacement_proc = proc {|r| "[r #{Services::GloballyUniqueIdentifiers.build_resource_key(r.copy_to_course_version(new_course_version))}]"}
     vocab_markdown_replacement_proc = proc {|v| "[v #{Services::GloballyUniqueIdentifiers.build_vocab_key(v.copy_to_course_version(new_course_version))}]"}
