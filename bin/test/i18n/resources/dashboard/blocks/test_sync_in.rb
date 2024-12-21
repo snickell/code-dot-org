@@ -87,7 +87,7 @@ describe I18n::Resources::Dashboard::Blocks::SyncIn do
       JSON.expects(:pretty_generate).with(expected_i18n_data).once.returns(expected_i18n_json)
     end
 
-    it 'prepares clocks data and writes source file to a JSON file' do
+    it 'prepares blocks data and writes source file to a JSON file' do
       prepare_i18n_source_file
       assert File.exist?(i18n_source_file_path)
       assert_equal expected_i18n_json, File.read(i18n_source_file_path)
