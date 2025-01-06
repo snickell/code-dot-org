@@ -166,7 +166,7 @@ module.exports = function (grunt) {
     const preprocessMessage = msg => {
       if (typeof msg === 'string') {
         return msg.replace(
-          /\{([a-zA-Z0-9_]+)\}/g,
+          /\{([\w_]+)\}(?![^{}]*\})/g,
           (match, varName) => `{${varName}, l}`
         );
       }
