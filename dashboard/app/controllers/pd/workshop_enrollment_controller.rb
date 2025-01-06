@@ -39,7 +39,7 @@ class Pd::WorkshopEnrollmentController < ApplicationController
       }
       render :logged_out
     elsif current_user.user_type == 'student'
-      render :students_cannot_enroll
+      render :students_cannot_enroll, locals: {workshop_id: params[:workshop_id]}
     elsif missing_application?
       render :missing_application
     elsif current_user.teacher? && current_user.email.blank?

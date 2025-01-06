@@ -1,6 +1,9 @@
+- script_data = {}
+- script_data[:workshopId] = workshop_id
+
 - content_for(:head) do
   = stylesheet_link_tag 'css/pd', media: 'all'
-  %script{src: webpack_asset_path('js/pd/workshop_enrollment/students_cannot_enroll.js')}
+  %script{src: webpack_asset_path('js/pd/workshop_enrollment/students_cannot_enroll.js'), data: {studentCannotEnroll: script_data.to_json}}
 
 #workshop-enroll-students-cannot-enroll
   -# populated by React
