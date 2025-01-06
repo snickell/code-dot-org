@@ -165,9 +165,8 @@ module.exports = function (grunt) {
 
     const preprocessMessage = msg => {
       if (typeof msg === 'string') {
-        return msg.replace(
-          /\{([\w_]+)\}(?![^{}]*\})/g,
-          (match, varName) => `{${varName}, l}`
+        return msg.replace(/\{((?:[^{}]*|\{[^{}]*\})*)\}/g, (interp, varName) =>
+          varName.includes(',') ? interp : `{${varName}, l}`
         );
       }
 
