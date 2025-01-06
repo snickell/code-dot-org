@@ -6,6 +6,7 @@ module Cdo
     module Plugins
       module InterpolationL10n
         NUMBER_PATTERN = /^\d+(\.\d+)?$/ # Matches integers and floating-point numbers, e.g., "1" or "1.0"
+        DIGIT_GROUP_SEPARATOR = ',' # The character used to group digits in numbers, e.g., "1,000"
 
         # Localizes Western Arabic numbers, e.g., "1234.5678" to "۱٬۲۳۴٫۵۶۷۸" for "fa-IR".
         # @param locale [String|Symbol] The locale
@@ -14,7 +15,7 @@ module Cdo
         protected def localize_number(locale, value)
           value.to_s.sub(NUMBER_PATTERN) do |number|
             formatted_number = number.include?('.') ? number.to_f : number.to_i
-            TwitterCldr::Localized::LocalizedNumber.new(formatted_number, locale).to_s
+            TwitterCldr::Localized::LocalizedNumber.new(formatted_number, locale).to_s.delete(DIGIT_GROUP_SEPARATOR)
           end
         rescue StandardError
           value

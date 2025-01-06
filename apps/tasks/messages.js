@@ -139,6 +139,7 @@ module.exports = function (grunt) {
         // Localizes Western Arabic numbers, e.g., "1234.5678" -> "۱٬۲۳۴٫۵۶۷۸" for "fa-IR".
         value = String(value).replace(/^(\d+(\.\d+)?)$/, function (match, number) {
           return new Intl.NumberFormat(lang, {
+            useGrouping: false, // Prevents grouping (e.g., 1,000).
             minimumFractionDigits: number.includes('.') ? number.split('.')[1].length : 0,
             maximumFractionDigits: 100, // Prevents rounding (100 is max allowed by ECMA-402).
           }).format(number);
