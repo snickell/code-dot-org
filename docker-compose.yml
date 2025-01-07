@@ -45,6 +45,6 @@ services:
         echo 'slack_bot_token: localoverride' &&
         echo \"properties_encryption_key: ''\" &&
         echo 'aws_s3_endpoint: http://localhost:9000' &&
-        echo 'aws_access_key_id: local-development' &&
-        echo 'aws_secret_access_key: allstudents'
+        echo 'aws_s3_access_key_id: local-development' &&
+        echo 'aws_s3_secret_access_key: allstudents'
       "
