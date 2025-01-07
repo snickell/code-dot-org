@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 
+import Button from '@cdo/apps/componentLibrary/button';
 import fontConstants from '@cdo/apps/fontConstants';
-import Button from '@cdo/apps/legacySharedComponents/Button';
 import {pegasus} from '@cdo/apps/lib/util/urlHelpers';
 import {useSchoolInfo} from '@cdo/apps/schoolInfo/hooks/useSchoolInfo';
 import {schoolInfoInvalid} from '@cdo/apps/schoolInfo/utils/schoolInfoInvalid';
@@ -174,18 +174,19 @@ export default function CensusTeacherBanner({
         </div>
         <div style={{...styles.buttonDiv, ...styles.updateSchoolButtonDiv}}>
           <Button
-            __useDeprecatedTag
             onClick={dismissSchoolInfoForm}
             style={styles.button}
+            type="secondary"
             color="gray"
-            size="large"
+            size="l"
             text="Dismiss"
           />
           <Button
-            __useDeprecatedTag
             onClick={handleSchoolInfoSubmit}
             style={styles.button}
-            size="large"
+            type="primary"
+            color="purple"
+            size="l"
             text="Submit"
             disabled={submitDisabled}
           />
@@ -203,17 +204,19 @@ export default function CensusTeacherBanner({
       buttons = (
         <div style={styles.buttonDiv}>
           <Button
-            __useDeprecatedTag
             onClick={onDismiss}
             style={styles.button}
-            color={Button.ButtonColor.neutralDark}
+            type="secondary"
+            size="s"
+            color="black"
             text="No thanks"
           />
           <Button
-            __useDeprecatedTag
             onClick={handleCensusBannerSubmit}
             style={styles.button}
-            color={Button.ButtonColor.brandSecondaryDefault}
+            type="primary"
+            size="s"
+            color="purple"
             text="Add my school to the map!"
           />
         </div>
@@ -235,21 +238,20 @@ export default function CensusTeacherBanner({
       buttons = (
         <div style={styles.buttonDiv}>
           <Button
-            __useDeprecatedTag
             onClick={onPostpone}
             style={styles.button}
+            type="secondary"
             color="gray"
-            size="large"
+            size="s"
             text="Not now"
           />
           <Button
-            __useDeprecatedTag
-            onClick={onPostpone}
+            useAsLink={true}
             href={pegasus(link)}
             target="_blank"
             rel="noopener noreferrer"
             style={styles.button}
-            size="large"
+            size="s"
             text="Take the survey"
           />
         </div>
