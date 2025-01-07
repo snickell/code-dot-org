@@ -134,17 +134,14 @@ module.exports = function (grunt) {
       // Converts the locale to the BCP 47 format, e.g., "en_us" -> "en-US".
       var lang = locale.replace(/_(\w+)$/, function (match, region) { return '-' + region.toUpperCase(); });
 
-      // If not a URL.
-      if (!/^(http|www|\/)/i.test(value)) {
-        // Localizes Western Arabic numbers, e.g., "1234.5678" -> "۱٬۲۳۴٫۵۶۷۸" for "fa-IR".
-        value = String(value).replace(/^(\d+(\.\d+)?)$/, function (match, number) {
-          return new Intl.NumberFormat(lang, {
-            useGrouping: false, // Prevents grouping (e.g., 1,000).
-            minimumFractionDigits: number.includes('.') ? number.split('.')[1].length : 0,
-            maximumFractionDigits: 100, // Prevents rounding (100 is max allowed by ECMA-402).
-          }).format(number);
-        });
-      }
+      // Localizes Western Arabic numbers, e.g., "1234.5678" -> "۱٬۲۳۴٫۵۶۷۸" for "fa-IR".
+      value = String(value).replace(/^(\d+(\.\d+)?)$/, function (match, number) {
+        return new Intl.NumberFormat(lang, {
+          useGrouping: false, // Prevents grouping (e.g., 1,000).
+          minimumFractionDigits: number.includes('.') ? number.split('.')[1].length : 0,
+          maximumFractionDigits: 100, // Prevents rounding (100 is max allowed by ECMA-402).
+        }).format(number);
+      });
     } catch (e) {
       window.console.error(e);
     }
