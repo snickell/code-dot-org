@@ -9,64 +9,66 @@ $default-spacing: 2px;
   display: flex;
   flex-direction: column;
   position: relative;
-}
+  gap: $default-spacing;
 
-%panel-container-header {
-  min-height: 30px;
-  position: relative;
-  //z-index: 1;
-  display: flex;
-  gap: 6px;
-  padding-left: 6px;
-}
-
-.panelContainerHeader-dark {
-  @extend %panel-container-header;
-  background-color: $light_gray_900;
-  color: $light_white;
-  margin-bottom: $default-spacing;
-}
-
-.panelContainerHeader-light {
-  @extend %panel-container-header;
-  background-color: $neutral_gray10;
-  color: $light_black;
-  border-bottom: 1px $light_gray_200 solid;
-}
-
-.panelContainerHeaderItem-light {
-  color: $light_black;
-}
-
-.panelContainerHeaderItem-dark {
-  color: $light_white;
-}
-
-
-.panelContainerHeaderItem {
-  //position: absolute;
-  //top: 50%;
-  //transform: translateY(-50%);
-  margin: 0;
-  font-size: 13px;
-
-  &Text {
-    flex: 1;
-    justify-content: center;
+  .panelContainerHeader {
+    height: 30px;
+    flex-shrink: 0;
+    position: relative;
+    //z-index: 1;
     display: flex;
-    align-items: center;
-  }
+    gap: 6px;
+    padding-left: 6px;
+    padding-right: 6px;
 
-  [dir='ltr'] &Right,
-  [dir='rtl'] &Left {
-    right: 4px;
-    z-index: 1;
-    overflow: hidden;
-  }
+    &Dark {
+      background-color: $light_gray_900;
+      color: $light_white;
+    }
 
-  [dir='ltr'] &Left,
-  [dir='rtl'] &Right {
-    left: 4px;
-    z-index: 1;
+    &Light {
+      background-color: $neutral_gray10;
+      color: $light_black;
+      //border-bottom: 1px $light_gray_200 solid;
+    }
+
+    &Item {
+      //flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      overflow: hidden;
+      margin: 0;
+      font-size: 13px;
+
+      &Text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &Dark {
+          color: $light_white;
+        }
+
+        &Light {
+          color: $light_black;
+        }
+      }
+
+      &Center {
+        flex: 1;
+      }
+
+      [dir='ltr'] &Right,
+      [dir='rtl'] &Left {
+        margin-left: auto;
+      }
+
+      [dir='ltr'] &Left,
+      [dir='rtl'] &Right {
+        margin-right: auto;
+      }
+    }
   }
 }

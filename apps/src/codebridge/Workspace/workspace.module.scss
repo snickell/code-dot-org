@@ -6,6 +6,7 @@
   color: $white;
   overflow: visible;
   z-index: 2;
+  gap: 0;
 }
 
 .workspaceContainer {
@@ -61,7 +62,6 @@
 
 .workspaceHeader {
   border-bottom: 1px solid $light_gray_800;
-  margin-bottom: 0;
 }
 
 .centerHeaderContent {

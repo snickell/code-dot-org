@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import React, {useContext} from 'react';
 
 import {Heading2} from '@cdo/apps/componentLibrary/typography';
+import {capitalizeFirstLetter} from '@cdo/apps/util/capitalizeFirstLetter';
 
 import {ThemeContext} from '../ThemeWrapper';
 
@@ -36,6 +37,7 @@ const PanelContainer: React.FunctionComponent<PanelContainerProps> = ({
   headerClassName,
 }) => {
   const {theme} = useContext(ThemeContext);
+  const capitalizedTheme = capitalizeFirstLetter(theme);
 
   return (
     <div
@@ -50,7 +52,8 @@ const PanelContainer: React.FunctionComponent<PanelContainerProps> = ({
         <div
           className={classNames(
             'panelContainerHeader',
-            moduleStyles['panelContainerHeader-' + theme],
+            moduleStyles.panelContainerHeader,
+            moduleStyles[`panelContainerHeader${capitalizedTheme}`],
             headerClassName
           )}
         >
@@ -69,12 +72,18 @@ const PanelContainer: React.FunctionComponent<PanelContainerProps> = ({
             className={classNames(
               'panelContainerHeaderItemText',
               moduleStyles.panelContainerHeaderItem,
-              moduleStyles['panelContainerHeaderItem-' + theme],
-              moduleStyles.panelContainerHeaderItemText
+              moduleStyles.panelContainerHeaderItemCenter
             )}
             visualAppearance={'body-three'}
           >
-            {headerContent}
+            <span
+              className={classNames(
+                moduleStyles.panelContainerHeaderItemText,
+                moduleStyles[`panelContainerHeaderItemText${capitalizedTheme}`]
+              )}
+            >
+              {headerContent}
+            </span>
           </Heading2>
           {rightHeaderContent && (
             <div
