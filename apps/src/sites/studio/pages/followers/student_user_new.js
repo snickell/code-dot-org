@@ -7,7 +7,7 @@ $(document).ready(() => {
   analyticsReporter.sendEvent(
     EVENTS.SIGN_UP_STARTED_EVENT,
     {source: 'section code sign up form'},
-    PLATFORMS.STATSIG
+    PLATFORMS.BOTH
   );
 
   document
@@ -15,8 +15,13 @@ $(document).ready(() => {
     .addEventListener('click', () => {
       analyticsReporter.sendEvent(
         EVENTS.SIGN_UP_FINISHED_EVENT,
-        {source: 'section code sign up form'},
-        PLATFORMS.STATSIG
+        {
+          source: 'section code sign up form',
+          'user type': 'student',
+          'has school': false,
+          'has marketing value selected': true,
+        },
+        PLATFORMS.BOTH
       );
     });
 });

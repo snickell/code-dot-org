@@ -5,7 +5,6 @@ https://github.com/code-dot-org/code-dot-org/blob/b2efc7ca8331f8261ebd55a326e23f
 */
 
 /* eslint-disable react/jsx-no-target-blank */
-/* eslint-disable react/no-danger */
 import _ from 'lodash';
 import debounce from 'lodash/debounce';
 import PropTypes from 'prop-types';
@@ -180,8 +179,8 @@ export default class SmallFooter extends React.Component {
           {this.props.i18nDropdownInBase && (
             <I18nDropdown
               localeUrl={this.props.localeUrl}
-              selectedLocale={this.props.currentLocale}
-              optionsForLocaleSelect={this.props.localeOptions}
+              selected={this.props.currentLocale}
+              options={this.props.localeOptions}
             />
           )}
           {this.props.copyrightInBase && this.renderCopyright()}

@@ -15,6 +15,8 @@ import {
 } from '@cdo/apps/componentLibrary/typography';
 import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import statsigReporter from '@cdo/apps/metrics/StatsigReporter';
+import {schoolInfoInvalid} from '@cdo/apps/schoolInfo/utils/schoolInfoInvalid';
 import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
 import SchoolDataInputs from '@cdo/apps/templates/SchoolDataInputs';
 import {getAuthenticityToken} from '@cdo/apps/util/AuthenticityTokenStore';
@@ -51,6 +53,12 @@ const FinishTeacherAccount: React.FunctionComponent<{
   const [errorCreatingAccountMessage, showErrorCreatingAccountMessage] =
     useState(false);
 
+  const isInSchoolRequiredExperiment = statsigReporter.getIsInExperiment(
+    'require_school_in_signup_v1',
+    'requireInfo',
+    false
+  );
+
   // Remove oauth user_type cookie if it exists
   cookies.remove(NEW_SIGN_UP_USER_TYPE);
 
@@ -64,6 +72,12 @@ const FinishTeacherAccount: React.FunctionComponent<{
     ) {
       navigateToHref('/users/new_sign_up/login_type');
     }
+
+    analyticsReporter.sendEvent(
+      EVENTS.FINISH_ACCOUNT_PAGE_LOADED,
+      {'user type': 'teacher', country: countryCode},
+      PLATFORMS.BOTH
+    );
 
     const fetchGdprData = async () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -88,7 +102,7 @@ const FinishTeacherAccount: React.FunctionComponent<{
     if (userReturnToHref) {
       setUserReturnTo(userReturnToHref);
     }
-  }, []);
+  }, [countryCode, usIp]);
 
   // GDPR is valid if
   // 1. The fetch call has completed AND
@@ -110,9 +124,12 @@ const FinishTeacherAccount: React.FunctionComponent<{
   };
 
   const submitTeacherAccount = async () => {
+    if (isSubmitting) {
+      return;
+    }
+    setIsSubmitting(true);
     sendFinishEvent();
     showErrorCreatingAccountMessage(false);
-    setIsSubmitting(true);
 
     const signUpParams = {
       new_sign_up: true,
@@ -160,6 +177,7 @@ const FinishTeacherAccount: React.FunctionComponent<{
         'has school': hasSchool,
         'has marketing value selected': true,
         'has display name': !showNameError,
+        country: countryCode,
       },
       PLATFORMS.BOTH
     );
@@ -209,7 +227,11 @@ const FinishTeacherAccount: React.FunctionComponent<{
               </BodyThreeText>
             )}
           </div>
-          <SchoolDataInputs {...schoolInfo} includeHeaders={false} />
+          <SchoolDataInputs
+            {...schoolInfo}
+            includeHeaders={false}
+            markFieldsAsRequired={isInSchoolRequiredExperiment}
+          />
           {showGDPR && (
             <div>
               <BodyThreeText
@@ -265,7 +287,11 @@ const FinishTeacherAccount: React.FunctionComponent<{
               iconStyle: 'solid',
               title: 'arrow-right',
             }}
-            disabled={name === '' || !gdprValid}
+            disabled={
+              name === '' ||
+              !gdprValid ||
+              (isInSchoolRequiredExperiment && schoolInfoInvalid(schoolInfo))
+            }
             isPending={isSubmitting}
           />
         </div>

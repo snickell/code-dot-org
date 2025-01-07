@@ -91,10 +91,6 @@
       }
     }
 
-    .doneButton {
-      margin-left: auto;
-    }
-
     .closeButton {
       background-color: initial;
       box-shadow: initial;
@@ -102,6 +98,7 @@
       position: absolute;
       top: 0;
       right: 0;
+      color: $neutral_dark30;
 
       &Icon {
         font-size: 24px;
@@ -111,7 +108,19 @@
 
   .bottom {
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+
+    .feedbackLink {
+      display: flex;
+      color: $neutral_light;
+      text-decoration: underline;
+    }
+
+    .buttonGroup {
+      display: flex;
+      gap: 14px;
+      margin-inline-start: auto;
+    }
   }
 }
 
@@ -119,7 +128,7 @@
   display: contents;
 }
 
-.projectButton {
+.shareDialogButton, .afeText {
   width: 100%;
   margin-top: auto;
 }

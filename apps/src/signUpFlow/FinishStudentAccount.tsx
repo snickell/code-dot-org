@@ -78,6 +78,12 @@ const FinishStudentAccount: React.FunctionComponent<{
       navigateToHref('/users/new_sign_up/login_type');
     }
 
+    analyticsReporter.sendEvent(
+      EVENTS.FINISH_ACCOUNT_PAGE_LOADED,
+      {'user type': 'student'},
+      PLATFORMS.BOTH
+    );
+
     const fetchGdprData = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const forceInEu = urlParams.get('force_in_eu');
@@ -120,9 +126,14 @@ const FinishStudentAccount: React.FunctionComponent<{
     analyticsReporter.sendEvent(
       EVENTS.PARENT_OR_GUARDIAN_SIGN_UP_CLICKED,
       {},
-      PLATFORMS.STATSIG
+      PLATFORMS.BOTH
     );
     const newIsParentCheckedChoice = !isParent;
+    // If the user unchecks the parent checkbox, clear the parent email field
+    if (!newIsParentCheckedChoice) {
+      setParentEmail('');
+      setShowParentEmailError(false);
+    }
     setIsParent(newIsParentCheckedChoice);
   };
 
@@ -186,9 +197,12 @@ const FinishStudentAccount: React.FunctionComponent<{
   };
 
   const submitStudentAccount = async () => {
+    if (isSubmitting) {
+      return;
+    }
+    setIsSubmitting(true);
     sendFinishEvent();
     showErrorCreatingAccountMessage(false);
-    setIsSubmitting(true);
 
     const signUpParams = {
       new_sign_up: true,
@@ -342,7 +356,6 @@ const FinishStudentAccount: React.FunctionComponent<{
             name="userGender"
             label={locale.what_is_your_gender()}
             value={gender}
-            placeholder={locale.female()}
             onChange={e => setGender(e.target.value)}
           />
           {showGDPR && (
@@ -388,7 +401,7 @@ const FinishStudentAccount: React.FunctionComponent<{
               name === '' ||
               age === '' ||
               (usIp && state === '') ||
-              (isParent && parentEmail === '') ||
+              (isParent && (parentEmail === '' || showParentEmailError)) ||
               !gdprValid
             }
             isPending={isSubmitting}

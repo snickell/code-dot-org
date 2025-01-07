@@ -27,13 +27,7 @@ export const MusicConditions: ConditionNames = {
     name: 'played_sound_in_function',
     valueType: 'string',
     description:
-      "Checks if a sound is playing in a given function.  The function is identified by name, which doesn't work if it's localized. Simple2 only. Ex. Value: chorus",
-  },
-  PLAYED_SOUND_IN_FUNCTION_BY_ID: {
-    name: 'played_sound_in_function_by_id',
-    valueType: 'string',
-    description:
-      "Checks if a sound is playing in a given function. The function is identified by the calling block's ID.  Simple2 only. Ex. Value: chorus",
+      "Checks if a sound is playing in a given function.  The function is identified by name, which doesn't work if it's localized, or by procedure ID. Simple2 only. Ex. Value: chorus",
   },
   PLAYED_SOUND_IN_ANY_FUNCTION: {
     name: 'played_sound_in_any_function',
@@ -48,7 +42,7 @@ export const MusicConditions: ConditionNames = {
     name: 'played_anything_in_same_function',
     valueType: 'number',
     description:
-      'Checks if something is playing from within a function definition block, at least this many times. Ex. Value: 3',
+      'Tracks how many times a specific block (e.g., sound, drum beat, chord) is played within a function.  Useful for checking how many times a function is called. Ex. Value: 3',
   },
   PLAYED_ANYTHING_IN_SAME_LOOP: {
     name: 'played_anything_in_same_loop',
