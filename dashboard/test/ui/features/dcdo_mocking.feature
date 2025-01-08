@@ -11,7 +11,7 @@ Feature: DCDO mocking
     # Tests re-mocking of DCDO
     When I use a cookie to mock the DCDO key "test_dcdo_on_pegasus" as "{"dcdo":"re-mocked"}"
     And I reload the page
-    Then element "#fetched_dcdo_value" has text "{\"dcdo\"=>\"re-mocked\"}"
+    Then element "#fetched_dcdo_value" has text "{\"dcdo\" => \"re-mocked\"}"
 
     # Tests cleaning of DCDO
     When I delete the cookie named "DCDO"
