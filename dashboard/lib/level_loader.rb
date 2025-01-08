@@ -1,5 +1,3 @@
-require 'set'
-
 class LevelLoader
   # Top-level entry point, called by rake seed:custom_levels
   def self.load_custom_levels(level_name, root_dir)
