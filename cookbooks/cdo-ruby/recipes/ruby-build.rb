@@ -6,7 +6,7 @@
 
 # Arbitrarily use the latest version of ruby build at time this code was
 # written; this probably doesn't matter, but we need to pick something.
-RUBY_BUILD_VERSION = '20240727'.freeze
+RUBY_BUILD_VERSION = '20241225.2'.freeze
 
 remote_file "/tmp/ruby-build-#{RUBY_BUILD_VERSION}.tar.gz" do
   source "https://github.com/rbenv/ruby-build/archive/refs/tags/v#{RUBY_BUILD_VERSION}.tar.gz"
