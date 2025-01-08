@@ -37,7 +37,7 @@ module I18n
 
           private def prepare
             # Writing source data in i18n/locales directory (current Crowdin integration)
-            I18nScriptUtils.copy_file(ORIGIN_I18N_FILE_PATH, I18N_SOURCE_FILE_PATH)
+            I18nScriptUtils.write_json_file(I18N_SOURCE_FILE_PATH, blocks_data)
           end
         end
       end
