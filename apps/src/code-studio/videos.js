@@ -91,6 +91,7 @@ window.onYouTubeIframeAPIReady = function () {
       onError: function (error) {
         if (currentVideoOptions) {
           var size = error.target.f.getBoundingClientRect();
+          console.log("ADDING BECAUSE OF ERROR", error);
           addFallbackVideoPlayer(currentVideoOptions, size.width, size.height);
         }
       },
@@ -380,6 +381,7 @@ function setupVideoFallback(
     if (!shouldStillAddCallback()) {
       return;
     }
+    console.log("ADDING BECAUSE OF BLOCKED");
     addFallbackVideoPlayer(videoInfo, playerWidth, playerHeight);
   }, videoInfo);
 }
