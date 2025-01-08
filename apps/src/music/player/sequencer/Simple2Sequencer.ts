@@ -48,6 +48,10 @@ export default class Simple2Sequencer extends Sequencer {
   private startMeasure: number;
   private inTrigger: boolean;
 
+  // A set of strings (e.g. "electro/beat-4", which is an event ID and when to play) that are used
+  // to ensure the same sound isn't played multiple times at the same time.
+  private uniqueEvents: Set<string>;
+
   private currentEventCount: number;
 
   constructor(
@@ -60,6 +64,7 @@ export default class Simple2Sequencer extends Sequencer {
     this.randomStack = [];
 
     this.functionMap = {};
+    this.uniqueEvents = new Set();
     this.uniqueInvocationIdUpTo = 0;
     this.startMeasure = 1;
     this.inTrigger = false;
@@ -74,6 +79,7 @@ export default class Simple2Sequencer extends Sequencer {
   clear(existingEventCount: number = 0) {
     this.newSequence();
     this.functionMap = {};
+    this.uniqueEvents.clear();
 
     this.currentEventCount = existingEventCount;
   }
@@ -341,8 +347,12 @@ export default class Simple2Sequencer extends Sequencer {
     }
     const currentFunction = this.functionMap[currentFunctionId];
 
-    currentFunction.playbackEvents.push(event);
-    this.updateMeasureForPlayByLength(event.length);
+    const uniqueEventKey = `${event.id}-${event.when}`;
+    if (!this.uniqueEvents.has(uniqueEventKey)) {
+      currentFunction.playbackEvents.push(event);
+      this.updateMeasureForPlayByLength(event.length);
+      this.uniqueEvents.add(uniqueEventKey);
+    }
   }
 
   // Internal helper to get the entry at the top of the stack, or null
