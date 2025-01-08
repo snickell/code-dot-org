@@ -242,13 +242,13 @@ class UnconnectedMusicView extends React.Component {
     this.stopSong();
 
     // Load and initialize the library and player if not done already.
-    // Read the library name first from level data, or from the project
-    // sources if not present on the level. If there is no library name
-    // specified on the level or sources, we will fallback to loading the
-    // default library.
-    let libraryName = levelData?.library;
-    if (!libraryName && initialSources?.labConfig?.music) {
-      libraryName = initialSources.labConfig.music.library;
+    // Read the library name first from project sources, or from the level
+    // data if not present in the project sources. If there is no library name
+    // specified on the project sources or the level, we will fallback to loading
+    // the default library.
+    let libraryName = initialSources?.labConfig?.music?.library;
+    if (!libraryName) {
+      libraryName = levelData?.library;
     }
     // What was previously the default library (mapping to music-library.json)
     // is now 'intro2024' (mapping to music-library-intro2024.json).
