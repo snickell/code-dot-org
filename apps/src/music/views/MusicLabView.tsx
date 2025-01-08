@@ -33,7 +33,7 @@ import usePlaybackUpdate from './hooks/usePlaybackUpdate';
 import useUpdateAnalytics from './hooks/useUpdateAnalytics';
 import useUpdatePlayer from './hooks/useUpdatePlayer';
 import MusicPlayView from './MusicPlayView';
-import PackDialog2 from './PackDialog2';
+import PackDialog from './PackDialog';
 import Timeline from './Timeline';
 
 import moduleStyles from './music-view.module.scss';
@@ -273,7 +273,7 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
 
   return (
     <div id="music-lab" className={moduleStyles.musicLab}>
-      {allowPackSelection && <PackDialog2 player={player} />}
+      {allowPackSelection && <PackDialog player={player} />}
 
       {showInstructions &&
         instructionsPosition === InstructionsPosition.TOP &&

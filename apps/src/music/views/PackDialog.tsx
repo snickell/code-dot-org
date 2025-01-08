@@ -21,7 +21,7 @@ import MusicLibrary, {SoundFolder} from '../player/MusicLibrary';
 import MusicPlayer from '../player/MusicPlayer';
 import {setPackId} from '../redux/musicRedux';
 
-import styles from './PackDialog2.module.scss';
+import styles from './PackDialog.module.scss';
 
 interface PackEntryProps {
   playingPreview: string | null;
@@ -124,7 +124,7 @@ type Mode = 'popular' | 'song' | 'artist';
  * The PackDialog allows the user to preview and choose from the set of restricted
  * sound packs.
  */
-const PackDialog2: React.FunctionComponent<PackDialogProps> = ({player}) => {
+const PackDialog: React.FunctionComponent<PackDialogProps> = ({player}) => {
   const dispatch = useAppDispatch();
 
   const currentPackId = useAppSelector(state => state.music.packId);
@@ -324,4 +324,4 @@ const PackDialog2: React.FunctionComponent<PackDialogProps> = ({player}) => {
   );
 };
 
-export default PackDialog2;
+export default PackDialog;
