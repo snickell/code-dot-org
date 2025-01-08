@@ -48,8 +48,8 @@ export default class Simple2Sequencer extends Sequencer {
   private startMeasure: number;
   private inTrigger: boolean;
 
-  // A set of strings (e.g. "electro/beat-4", which is an event ID and when to play) that are used
-  // to ensure the same sound isn't played multiple times at the same time.
+  // A set of strings (e.g. "electro/beat-4", which is a hyphen-separated event ID and measure) that are
+  // used to ensure the same sound isn't played more than once at the same time.
   private uniqueEvents: Set<string>;
 
   private currentEventCount: number;
@@ -332,6 +332,11 @@ export default class Simple2Sequencer extends Sequencer {
   }
 
   private addNewEvent<T extends PlaybackEvent>(event: T) {
+    const uniqueEventKey = `${event.id}-${event.when}`;
+    if (this.uniqueEvents.has(uniqueEventKey)) {
+      return;
+    }
+
     this.currentEventCount++;
     if (this.currentEventCount === MAX_NUMBER_EVENTS) {
       console.log(`Reached MAX_NUMBER_EVENTS (${MAX_NUMBER_EVENTS}) events.`);
@@ -347,12 +352,9 @@ export default class Simple2Sequencer extends Sequencer {
     }
     const currentFunction = this.functionMap[currentFunctionId];
 
-    const uniqueEventKey = `${event.id}-${event.when}`;
-    if (!this.uniqueEvents.has(uniqueEventKey)) {
-      currentFunction.playbackEvents.push(event);
-      this.updateMeasureForPlayByLength(event.length);
-      this.uniqueEvents.add(uniqueEventKey);
-    }
+    currentFunction.playbackEvents.push(event);
+    this.updateMeasureForPlayByLength(event.length);
+    this.uniqueEvents.add(uniqueEventKey);
   }
 
   // Internal helper to get the entry at the top of the stack, or null
