@@ -276,7 +276,7 @@ describe I18nScriptUtils do
         I18nScriptUtils.sanitize_data_and_write(data, dest_path)
 
         assert File.exist?(dest_path)
-        assert_equal '{"expected"=>"sorted_and_sanitized_data"}', dest_file_data
+        assert_equal '{"expected" => "sorted_and_sanitized_data"}', dest_file_data
       end
     end
   end
