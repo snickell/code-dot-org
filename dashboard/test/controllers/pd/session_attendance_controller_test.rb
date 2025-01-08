@@ -81,7 +81,7 @@ class Pd::SessionAttendanceControllerTest < ActionController::TestCase
   end
 
   test 'attend with a matching enrollment by email updates the enrollment.user' do
-    enrollment = create :pd_enrollment, workshop: @workshop, user: nil, email: @teacher.email_for_enrollments
+    enrollment = create :pd_enrollment, workshop: @workshop, user: nil, email: @teacher.email
     sign_in @teacher
 
     assert_creates Pd::Attendance do
