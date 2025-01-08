@@ -301,14 +301,12 @@ class RegistrationsControllerTest < ActionController::TestCase
     assert_equal ["Age is required"], assigns(:user).errors.full_messages
   end
 
-  test "create does not allow pandas in name" do
+  test "create does allow pandas in name" do
     params_with_panda_name = @default_params.update(name: panda_panda)
 
-    assert_does_not_create(User) do
+    assert_creates(User) do
       post :create, params: {user: params_with_panda_name}
     end
-
-    assert_equal ["Display Name is invalid"], assigns(:user).errors.full_messages
   end
 
   test "create does not allow pandas in email" do
@@ -535,48 +533,48 @@ class RegistrationsControllerTest < ActionController::TestCase
     assert_equal("Validation failed: Email has already been taken", exception.message)
   end
 
-  # test "create as student with age [new sign up flow]" do
-  #   Timecop.travel Time.local(2013, 9, 1, 12, 0, 0) do
-  #     student_params = set_up_partial_registration(@default_params)
-  #     assert_creates(User) do
-  #       post :create, params: {new_sign_up: true, user: student_params}
-  #     end
+  test "create as student with age [new sign up flow]" do
+    Timecop.travel Time.local(2013, 9, 1, 12, 0, 0) do
+      student_params = set_up_partial_registration(@default_params)
+      assert_creates(User) do
+        post :create, params: {new_sign_up: true, user: student_params}
+      end
 
-  #     student = User.last
+      student = User.last
 
-  #     assert_equal 'A name', student.name
-  #     assert_equal 'f', student.gender
-  #     assert_equal Time.zone.today - 13.years, student.birthday
-  #     assert_equal AuthenticationOption::EMAIL, student.primary_contact_info.credential_type
-  #     assert_equal User::TYPE_STUDENT, student.user_type
-  #     assert_equal '', student.email
-  #     assert_equal User.hash_email('an@email.address'), student.hashed_email
-  #   end
-  # end
+      assert_equal 'A name', student.name
+      assert_equal 'f', student.gender
+      assert_equal Time.zone.today - 13.years, student.birthday
+      assert_equal AuthenticationOption::EMAIL, student.primary_contact_info.credential_type
+      assert_equal User::TYPE_STUDENT, student.user_type
+      assert_equal '', student.email
+      assert_equal User.hash_email('an@email.address'), student.hashed_email
+    end
+  end
 
-  # test "create as under 13 student with client side hashed email [new sign up flow]" do
-  #   Timecop.travel Time.local(2013, 9, 1, 12, 0, 0) do
-  #     student_params = set_up_partial_registration(@default_params)
-  #     student_params.delete(:email)
-  #     params_with_hashed_email = student_params.merge(
-  #       {hashed_email: User.hash_email('an@email.address')}
-  #     )
+  test "create as under 13 student with client side hashed email [new sign up flow]" do
+    Timecop.travel Time.local(2013, 9, 1, 12, 0, 0) do
+      student_params = set_up_partial_registration(@default_params)
+      student_params.delete(:email)
+      params_with_hashed_email = student_params.merge(
+        {hashed_email: User.hash_email('an@email.address')}
+      )
 
-  #     assert_creates(User) do
-  #       post :create, params: {new_sign_up: true, user: params_with_hashed_email}
-  #     end
+      assert_creates(User) do
+        post :create, params: {new_sign_up: true, user: params_with_hashed_email}
+      end
 
-  #     student = User.last
+      student = User.last
 
-  #     assert_equal 'A name', student.name
-  #     assert_equal 'f', student.gender
-  #     assert_equal Time.zone.today - 13.years, student.birthday
-  #     assert_equal AuthenticationOption::EMAIL, student.primary_contact_info.credential_type
-  #     assert_equal User::TYPE_STUDENT, student.user_type
-  #     assert_equal '', student.email
-  #     assert_equal User.hash_email('an@email.address'), student.hashed_email
-  #   end
-  # end
+      assert_equal 'A name', student.name
+      assert_equal 'f', student.gender
+      assert_equal Time.zone.today - 13.years, student.birthday
+      assert_equal AuthenticationOption::EMAIL, student.primary_contact_info.credential_type
+      assert_equal User::TYPE_STUDENT, student.user_type
+      assert_equal '', student.email
+      assert_equal User.hash_email('an@email.address'), student.hashed_email
+    end
+  end
 
   test "create as student requires age [new sign up flow]" do
     params_without_age = set_up_partial_registration(@default_params.update(age: ''))
@@ -587,12 +585,11 @@ class RegistrationsControllerTest < ActionController::TestCase
     end
   end
 
-  test "create does not allow pandas in name [new sign up flow]" do
+  test "create allows pandas in name [new sign up flow]" do
     params_with_panda_name = set_up_partial_registration(@default_params.update(name: panda_panda))
 
-    assert_does_not_create(User) do
-      exception = assert_raise(Exception) {post :create, params: {new_sign_up: true, user: params_with_panda_name}}
-      assert_equal("Validation failed: Display Name is invalid", exception.message)
+    assert_creates(User) do
+      post :create, params: {new_sign_up: true, user: params_with_panda_name}
     end
   end
 
@@ -742,14 +739,51 @@ class RegistrationsControllerTest < ActionController::TestCase
     assert_equal frozen_time, sign_in.sign_in_at
   end
 
+  test "student can add a parent email without opt in [new sign up flow]" do
+    student_with_parent_params = set_up_partial_registration(@default_params.update(parent_email_preference_email: 'parent@example.com', parent_email_preference_opt_in: ''))
+
+    ParentMailer.any_instance.expects(:parent_email_added_to_student_account).once
+    assert_creates(User) do
+      post :create, params: {new_sign_up: true, user: student_with_parent_params}
+    end
+    student = User.last
+    student.reload
+
+    assert_equal 'parent@example.com', student.parent_email
+
+    email_preference = EmailPreference.last
+    assert_equal 'parent@example.com', email_preference[:email]
+    refute email_preference[:opt_in]
+    assert_equal EmailPreference::ACCOUNT_SIGN_UP, email_preference[:source]
+  end
+
+  test "student can add a parent email with opt in [new sign up flow]" do
+    student_with_parent_params = set_up_partial_registration(@default_params.update(parent_email_preference_email: 'parent@example.com', parent_email_preference_opt_in: true))
+
+    ParentMailer.any_instance.expects(:parent_email_added_to_student_account).once
+    assert_creates(User) do
+      post :create, params: {new_sign_up: true, user: student_with_parent_params}
+    end
+    student = User.last
+    student.reload
+
+    assert_equal 'parent@example.com', student.parent_email
+
+    email_preference = EmailPreference.last
+    assert_equal 'parent@example.com', email_preference[:email]
+    assert email_preference[:opt_in]
+    assert_equal EmailPreference::ACCOUNT_SIGN_UP, email_preference[:source]
+  end
+
   # USING NEW SIGN-UP FLOW [END]
 
-  test "existing account sign in/up links redirect to user edit page" do
-    get :existing_account, params: {email: "test@email.com", provider: "facebook"}
-    assert_response :success
-    assert_select "a[href=?]", "/users/sign_in?user_return_to=%2Fusers%2Fedit"
-    assert_select "a[href=?]", "/users/sign_up?user_return_to=%2Fusers%2Fedit"
-  end
+  ### TODO: Create an equivalent test for this in new sign up flow ACQ-2871
+  # test "existing account sign in/up links redirect to user edit page" do
+  #   get :existing_account, params: {email: "test@email.com", provider: "facebook"}
+  #   assert_response :success
+  #   assert_select "a[href=?]", "/users/sign_in?user_return_to=%2Fusers%2Fedit"
+  #   assert_select "a[href=?]", "/users/sign_up?user_return_to=%2Fusers%2Fedit"
+  # end
 
   test "the us_state and country_code attributes can be set and updated" do
     user = create :student, us_state: "CO", country_code: "US"

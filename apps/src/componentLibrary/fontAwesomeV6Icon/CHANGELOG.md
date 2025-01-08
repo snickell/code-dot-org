@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0](https://github.com/code-dot-org/code-dot-org/pull/62803)
+
+- rewritten `FontAwesomeV6IconTest` in typescript
+- refactored/optimized `FontAwesomeV6IconTest.tsx`
+
+## [0.4.0](https://github.com/code-dot-org/code-dot-org/pull/61754)
+
+- updated `FontAwesomeV6Icon` props to support native HTML Element attributes
+
 ## [0.3.1](https://github.com/code-dot-org/code-dot-org/pull/61647)
 
 - added new custom icons support

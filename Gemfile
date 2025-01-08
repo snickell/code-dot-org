@@ -109,11 +109,12 @@ group :development, :test do
   gem 'net-http-persistent'
   gem 'rinku'
   gem 'rspec', require: false
-  gem 'selenium-webdriver', '~> 4.0'
+  # Starting with version 4.6, Selenium uses Selenium Manager, eliminating the need for the webdriver gem.
+  # See: https://github.com/titusfortner/webdrivers/commit/5b3dc29ff5cdb7bec110de949e78184c789ef63a
+  gem 'selenium-webdriver', '~> 4.6'
   gem 'simplecov', '~> 0.22.0', require: false
   gem 'spring', '~> 3.1.1'
   gem 'spring-commands-testunit'
-  gem 'webdrivers', '~> 5.2'
 
   # For pegasus PDF generation / merging testing.
   gem 'parallel_tests'
@@ -160,7 +161,7 @@ gem 'devise_invitable', '~> 2.0.2'
 
 gem 'omniauth-clever', '~> 2.0.1', github: 'code-dot-org/omniauth-clever', tag: 'v2.0.1'
 gem 'omniauth-facebook', '~> 4.0.0'
-gem 'omniauth-google-oauth2', '~> 0.6.0'
+gem 'omniauth-google-oauth2', '~> 1.1.3'
 gem 'omniauth-microsoft_v2_auth', github: 'dooly-ai/omniauth-microsoft_v2_auth'
 
 # Resolve CVE 2015 9284
@@ -361,3 +362,5 @@ gem 'json-jwt', '~> 1.15'
 gem "json-schema", "~> 4.3"
 
 gem "csv"
+
+gem "async", "~> 1.32"

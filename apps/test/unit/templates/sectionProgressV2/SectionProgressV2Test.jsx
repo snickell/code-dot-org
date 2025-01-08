@@ -41,6 +41,12 @@ describe('SectionProgressV2', () => {
     jest
       .spyOn(sectionProgressLoader, 'loadUnitProgress')
       .mockResolvedValue(Promise.resolve());
+
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        json: () => Promise.resolve({}),
+      })
+    );
   });
 
   afterEach(() => {
@@ -70,6 +76,7 @@ describe('SectionProgressV2', () => {
 
     screen.getByText('Progress (beta)');
     screen.getByText('Students');
+    // eslint-disable-next-line no-restricted-properties
     screen.getAllByTestId('skeleton-cell');
     expect(screen.queryAllByText(/Student [1-9]/)).toHaveLength(0);
   });

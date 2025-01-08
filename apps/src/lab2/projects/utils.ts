@@ -13,6 +13,7 @@ export interface PartialAppOptions {
   share: boolean;
   isEditingExemplar: boolean;
   isViewingExemplar: boolean;
+  publicCaching: boolean;
 }
 
 /**
@@ -86,6 +87,18 @@ export function getIsShareView(): boolean | undefined {
 }
 
 /**
+ * Fetch whether the page is cached.
+ *
+ * @returns true if the page is cached.
+ */
+export function getPublicCaching(): boolean | undefined {
+  if (hasScriptData('script[data-appoptions]')) {
+    const appOptions = getScriptData('appoptions') as PartialAppOptions;
+    return appOptions.publicCaching;
+  }
+}
+
+/**
  * Given a map of {fileId: ProjectFile}, return the first file with the given name.
  * @param files - Map of {fileId: ProjectFile}
  * @param name - Name of the file to find
@@ -115,7 +128,11 @@ export function getActiveFileForProject(project: MultiFileSource) {
   // No files are hidden in start mode. In non-start mode, only show starter files
   // (or files without a type, which default to starter files).
   const visibleFiles = files.filter(
-    f => isStartMode || !f.type || f.type === ProjectFileType.STARTER
+    f =>
+      isStartMode ||
+      !f.type ||
+      f.type === ProjectFileType.STARTER ||
+      f.type === ProjectFileType.LOCKED_STARTER
   );
 
   // Get the first active file, if no active file then the first open file,

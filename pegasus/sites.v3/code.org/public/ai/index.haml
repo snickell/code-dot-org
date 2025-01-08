@@ -54,6 +54,9 @@ theme: responsive_full_width
             %p.no-margin-bottom=hoc_s(:ai_intro_list_desc_03)
     .clear
 
+-# Show Generative AI Launch banner if 'gen-ai-launch' dcdo is true
+= view :gen_ai_launch_skinny_banner
+
 %section.bg-neutral-light
   .wrapper
     %h2=hoc_s(:ai_why_heading)
@@ -134,6 +137,7 @@ theme: responsive_full_width
       %img{src: "/images/avatars/fortive.png", alt: "Fortive logo", style: "max-width: 160px"}
       %img{src: "/images/avatars/amd.png", alt: "AMD logo", style: "max-width: 100px"}
       %img{src: "/images/avatars/cognizant.png", alt: "Cognizant logo", style: "max-width: 150px"}
+      %img{src: "/images/avatars/salesforce.png", alt: "Salesforce logo", style: "max-width: 80px"}
 
 = view :swiper_page_ai
 

@@ -4,15 +4,17 @@ import React, {useEffect, useMemo, useState} from 'react';
 import Alert from '@cdo/apps/componentLibrary/alert/Alert';
 import Checkbox from '@cdo/apps/componentLibrary/checkbox/Checkbox';
 import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
+import {BodyFourText} from '@cdo/apps/componentLibrary/typography';
 import {installFunctionBlocks} from '@cdo/apps/music/blockly/blockUtils';
 import {setUpBlocklyForMusicLab} from '@cdo/apps/music/blockly/setup';
 import {
   BlockMode,
+  DEFAULT_BPM,
   DEFAULT_LIBRARY,
   DEFAULT_PACK,
 } from '@cdo/apps/music/constants';
 import MusicRegistry from '@cdo/apps/music/MusicRegistry';
-import MusicLibrary from '@cdo/apps/music/player/MusicLibrary';
+import MusicLibrary, {Sounds} from '@cdo/apps/music/player/MusicLibrary';
 import MusicPlayer from '@cdo/apps/music/player/MusicPlayer';
 import {MusicLevelData} from '@cdo/apps/music/types';
 import CollapsibleSection from '@cdo/apps/templates/CollapsibleSection';
@@ -23,7 +25,7 @@ import RawJsonEditor from './RawJsonEditor';
 
 import moduleStyles from './edit-music-level-data.module.scss';
 
-const VALID_LIBRARIES = [DEFAULT_LIBRARY, 'launch2024'];
+const VALID_LIBRARIES = [DEFAULT_LIBRARY, 'launch2024', 'curriculum2024'];
 const RECOMMENDED_LIBRARY = 'launch2024';
 
 const JSON_FIELDS = [['startSources', 'Start Sources']] as const;
@@ -75,15 +77,31 @@ const EditMusicLevelData: React.FunctionComponent<EditMusicLevelDataProps> = ({
     [levelData.library, loadedLibraries]
   );
 
-  const restrictedPacks = useMemo(
+  const restrictedPackOptions = useMemo(
     () =>
       levelData.library &&
       loadedLibraries[levelData.library]
         ?.getRestrictedPacks()
-        ?.map(({name, id}) => ({value: id, text: name})),
+        // Sort by artist name, then by pack name if artists are the same
+        ?.sort((a, b) =>
+          a.artist && b.artist
+            ? a.artist.localeCompare(b.artist) || a.name.localeCompare(b.name)
+            : 0
+        )
+        ?.map(({name, id, artist, bpm, sounds}) => {
+          // Use the pack bpm if present, or the bpm of the first sound that has one.
+          const packTempo =
+            bpm || sounds?.find(sound => sound.bpm)?.bpm || DEFAULT_BPM;
+          return {
+            value: id,
+            text: `[${packTempo}] ${artist} - ${name}`,
+          };
+        }),
     [levelData.library, loadedLibraries]
   );
 
+  const restrictedPackKeys =
+    (restrictedPackOptions || []).map(pack => pack.value) || [];
   return (
     <div>
       <input
@@ -119,7 +137,7 @@ const EditMusicLevelData: React.FunctionComponent<EditMusicLevelDataProps> = ({
               }}
             />
           </div>
-          {hasRestrictedSounds && restrictedPacks && (
+          {hasRestrictedSounds && restrictedPackOptions && (
             <div>
               <SimpleDropdown
                 labelText="Selected Artist Pack"
@@ -127,8 +145,11 @@ const EditMusicLevelData: React.FunctionComponent<EditMusicLevelDataProps> = ({
                 size="s"
                 items={[
                   {value: 'none', text: '(none)'},
-                  {value: DEFAULT_PACK, text: 'Code.org (Default)'},
-                  ...restrictedPacks,
+                  {
+                    value: DEFAULT_PACK,
+                    text: `[${DEFAULT_BPM}] Code.org (Default)`,
+                  },
+                  ...restrictedPackOptions,
                 ]}
                 selectedValue={levelData.packId}
                 onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -136,9 +157,24 @@ const EditMusicLevelData: React.FunctionComponent<EditMusicLevelDataProps> = ({
                     event.target.value === 'none'
                       ? undefined
                       : event.target.value;
-                  setLevelData({...levelData, packId});
+                  // Reset selected sounds from previously selected packs.
+                  const previousSounds = levelData.sounds;
+                  const sounds = previousSounds
+                    ? Object.keys(previousSounds)
+                        .filter(
+                          soundKey => !restrictedPackKeys.includes(soundKey)
+                        )
+                        .reduce((newSounds: Sounds, key) => {
+                          newSounds[key] = previousSounds[key];
+                          return newSounds;
+                        }, {})
+                    : undefined;
+                  setLevelData({...levelData, packId, sounds});
                 }}
               />
+              <BodyFourText>
+                <i>Numbers in square brackets indicate the pack tempo (BPM).</i>
+              </BodyFourText>
             </div>
           )}
           {levelData.library && loadedLibraries[levelData.library] ? (
@@ -181,6 +217,18 @@ const EditMusicLevelData: React.FunctionComponent<EditMusicLevelDataProps> = ({
               setLevelData({
                 ...levelData,
                 showSoundFilters: event.target.checked,
+              });
+            }}
+            size="s"
+          />
+          <Checkbox
+            checked={!!levelData.allowChangeStartingPlayheadPosition}
+            name="allowChangeStartingPlayheadPosition"
+            label="Allow change starting playhead position"
+            onChange={event => {
+              setLevelData({
+                ...levelData,
+                allowChangeStartingPlayheadPosition: event.target.checked,
               });
             }}
             size="s"

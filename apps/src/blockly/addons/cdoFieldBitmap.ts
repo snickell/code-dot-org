@@ -1,12 +1,12 @@
 import {FieldBitmap} from '@blockly/field-bitmap';
-import * as Blockly from 'blockly/core';
+import * as GoogleBlockly from 'blockly/core';
 
 import {commonI18n} from '@cdo/apps/types/locale';
 
 // Use our translations for "Clear" button text.
-Blockly.Msg['BUTTON_LABEL_CLEAR'] = commonI18n.blocklyClear();
+GoogleBlockly.Msg['BUTTON_LABEL_CLEAR'] = commonI18n.blocklyClear();
 
-interface FieldBitmapFromJsonConfig extends Blockly.FieldConfig {
+interface FieldBitmapFromJsonConfig extends GoogleBlockly.FieldConfig {
   value?: number[][];
   width?: number;
   height?: number;
@@ -17,17 +17,17 @@ interface FieldBitmapFromJsonConfig extends Blockly.FieldConfig {
 export class CdoFieldBitmap extends FieldBitmap {
   /**
    * Constructs a new instance of CdoFieldBitmap.
-   * @param {number[][] | ypeof Blockly.Field.SKIP_SETUP} value - The initial value of the field, represented
+   * @param {number[][] | typeof Blockly.Field.SKIP_SETUP} value - The initial value of the field, represented
    * as a 2D array of any length, or undefined.
-   * @param {object | null} options - The options for the field, can be an object or null/undefined.
+   * @param {object | null} validator - A function that is called to validate a new field value or null/undefined.
    * @param {object | null} config - Additional configuration options, can be an object or null/undefined.
    */
   constructor(
-    value: number[][] | typeof Blockly.Field.SKIP_SETUP,
-    options?: Blockly.FieldValidator<number[][]>,
+    value: number[][] | typeof GoogleBlockly.Field.SKIP_SETUP,
+    validator?: GoogleBlockly.FieldValidator<number[][]>,
     config?: FieldBitmapFromJsonConfig
   ) {
-    super(value, options, config);
+    super(value, validator, config);
   }
 
   /**
@@ -38,7 +38,6 @@ export class CdoFieldBitmap extends FieldBitmap {
    * @param e Optional mouse event that triggered the field to open, or
    *    undefined if triggered programmatically.
    */
-  // eslint-disable-next-line
   protected showEditor_(this: typeof FieldBitmap, e?: Event) {
     super.showEditor_();
 
@@ -84,7 +83,7 @@ export class CdoFieldBitmap extends FieldBitmap {
     this.boundEvents.push(
       // In the base class, browserEvents.conditionalBind is used, which has
       // a side of effect of locking workspace events on touch devices.
-      Blockly.browserEvents.bind(element, eventName, this, callback)
+      GoogleBlockly.browserEvents.bind(element, eventName, this, callback)
     );
   }
 
