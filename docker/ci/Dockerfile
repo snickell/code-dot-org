@@ -59,7 +59,7 @@ USER ${USER}
 
 RUN mkdir -p "$(rbenv root)"/plugins && \
     git clone https://github.com/rbenv/ruby-build.git "$(rbenv root)"/plugins/ruby-build && \
-    rbenv install 3.3.4 && \
+    rbenv install 3.4.1 && \
     eval "$(rbenv init -)"
 
 #########################################################
