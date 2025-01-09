@@ -45,7 +45,8 @@ const WorkspaceAndOutput: React.FunctionComponent = () => {
     // is the editor panel, we are actually storing the size of the console below it.
     // That way, if the window resizes, the console stays the same height while the editor
     // changes in height.
-    const consoleDesiredHeight = columnHeight - desiredHeight;
+    const consoleDesiredHeight =
+      columnHeight - desiredHeight + globalStyleConstants['resize-bar-width'];
     normalizeConsoleHeight(consoleDesiredHeight);
   };
 
