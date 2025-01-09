@@ -16,6 +16,7 @@ Parameters:
 
 Conditions:
   CreateKnowledgeBase: !Equals [!Ref VectorIndexCreated, "true"]
+  AllowPublicAccessToCollection: !Equals [!Ref VectorIndexCreated, "false"]
 
 Resources:
   # Knowledge Base - Requres a vector index to be created manually in the OpenSearch Collection
@@ -25,7 +26,6 @@ Resources:
     Properties:
       Name: !Sub ai-diff-${Environment}
       Description: "Embedded lesson plans and supporting documents for contextual differentiation chat with AI Teaching assistant"
-      # TODO: define this role in code
       RoleArn: !GetAtt AiDiffKnowledgeBaseRole.Arn
       KnowledgeBaseConfiguration:
         Type: "VECTOR"
@@ -102,18 +102,34 @@ Resources:
     Properties:
       Name: !Sub ai-diff-${Environment}-network
       Type: network
-      Policy: !Sub |
-        [
-          {
-            "Rules": [
-              {
-                "ResourceType": "collection",
-                "Resource": ["collection/ai-diff-${Environment}"]
-              }
-            ],
-            "AllowFromPublic": true
-          }
-        ]
+      # On the first deployment, the collection must be public to allow for index creation
+      Policy: !If 
+        - AllowPublicAccessToCollection
+        - !Sub |
+          [
+            {
+              "Rules": [
+                {
+                  "ResourceType": "collection",
+                  "Resource": ["collection/ai-diff-${Environment}"]
+                }
+              ],
+              "AllowFromPublic": true
+            }
+          ]
+        - !Sub |
+          [
+            {
+              "Rules": [
+                {
+                  "ResourceType": "collection",
+                  "Resource": ["collection/ai-diff-${Environment}"]
+                }
+              ],
+              "AllowFromPublic": false,
+              "SourceServices": [ "bedrock.amazonaws.com" ]
+            }
+          ]
   DataPolicy:
     Type: 'AWS::OpenSearchServerless::AccessPolicy'
     Properties:
@@ -152,7 +168,8 @@ Resources:
             ],
             "Principal": [
               "${AiDiffKnowledgeBaseRole.Arn}",
-              "arn:aws:sts::${AWS::AccountId}:assumed-role/GoogleAdmin/*"
+              "arn:aws:sts::${AWS::AccountId}:assumed-role/GoogleAdmin/*",
+              "arn:aws:sts::${AWS::AccountId}:assumed-role/Engineering_FullAccess/*"
             ]
           }
         ]
@@ -328,3 +345,14 @@ Resources:
   #             #   Action:
   #             #     - "opensearch:ESHttpPut"
   #             #   Resource: "*"
+
+
+Outputs:
+  # TODO: maybe create a "stack secret" instead and load it into dashboard config.yml?
+  # What's the right way to get this id into dashboard and minimize downtime if the KB is recreated?
+  KnowledgeBaseId:
+    Description: "The ID of the AI Differentiation knowledge base"
+    Condition: CreateKnowledgeBase
+    Value: !Ref AiDiffKnowledgeBaseWithAoss
+    Export:
+      Name: !Sub "ai-diff-${Environment}-knowledge-base-id"
