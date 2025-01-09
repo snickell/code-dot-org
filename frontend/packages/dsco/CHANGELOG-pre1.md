@@ -28,6 +28,24 @@ component/entity. All of that Changelogs will be combined into one in this file 
 - component is now `Ready for Dev`
 - Initial release
 
+## `componentLibrary/breadcrumbs`
+
+## [0.2.1](https://github.com/code-dot-org/code-dot-org/pull/62813)
+
+- updated color variables to use primitiveColors.css
+
+## [0.2.0](https://github.com/code-dot-org/code-dot-org/pull/61009)
+
+- implemented component
+- added tests
+- added storybook
+- component is now `Ready for Dev`
+
+## [0.1.0](https://github.com/code-dot-org/code-dot-org/pull/60944)
+
+- created component's skeleton
+- Initial commit
+
 ## `componentLibrary/button`
 
 ## [0.6.1](https://github.com/code-dot-org/code-dot-org/pull/63021)
