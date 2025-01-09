@@ -7,12 +7,10 @@ function testImageAccess(
   timeoutMs = 5000,
   videoElement = false
 ) {
-  console.log('TESTING', url);
   var element;
   if (videoElement) {
     element = document.createElement('video');
   } else {
-    console.log('TESTING with image');
     element = new Image();
   }
   var called = false;
