@@ -237,8 +237,8 @@ class Api::V1::Pd::WorkshopEnrollmentsControllerTest < ActionController::TestCas
     end
   end
 
-  test 'sends cancel enrollment email to both the users email and alternate summer email if available' do
-    Pd::WorkshopMailer.expects(:teacher_cancel_receipt).twice.returns(stub(:deliver_now))
+  test 'sends cancel enrollment email to both the users email and alternate summer email if available and for a summer workshop' do
+    Pd::WorkshopMailer.expects(:teacher_cancel_receipt).returns(stub(:deliver_now)).times(2)
     Pd::WorkshopMailer.expects(:organizer_cancel_receipt).returns(stub(:deliver_now))
 
     @teacher = create :teacher
@@ -300,8 +300,8 @@ class Api::V1::Pd::WorkshopEnrollmentsControllerTest < ActionController::TestCas
     refute_nil Pd::Enrollment.find_by(pd_workshop_id: workshop.id)
   end
 
-  test 'sends enrollment receipt email to both the users email and alternate summer email if available' do
-    Pd::WorkshopMailer.expects(:teacher_enrollment_receipt).twice.returns(stub(:deliver_now))
+  test 'sends enrollment receipt email to both the users email and alternate summer email if available and for a summer workshop' do
+    Pd::WorkshopMailer.expects(:teacher_enrollment_receipt).returns(stub(:deliver_now)).times(2)
 
     @teacher = create :teacher
     sign_in @teacher
