@@ -330,6 +330,30 @@ class UserTest < ActiveSupport::TestCase
     assert_equal hashed_email, teacher.read_attribute(:hashed_email)
   end
 
+  test 'alternate_email returns nil if user has no latest accepted application' do
+    user = create :teacher
+    assert user.alternate_email.blank?
+  end
+
+  test 'alternate_email returns nil if users latest accepted application has no alternate email' do
+    user = create :teacher
+    application = create :pd_teacher_application, user: user, status: 'accepted'
+    application_form_data = application.form_data_hash
+    application_form_data['alternateEmail'] = ''
+    application.update!(form_data_hash: application_form_data)
+
+    assert application.form_data_hash['alternateEmail'].blank?
+    assert user.alternate_email.blank?
+  end
+
+  test 'alternate_email returns app alternate email if users latest accepted application has alternate email' do
+    user = create :teacher
+    application = create :pd_teacher_application, user: user, status: 'accepted'
+    app_alternate_email = application.form_data_hash['alternateEmail']
+
+    assert_equal user.alternate_email, app_alternate_email
+  end
+
   test "log in with password with pepper" do
     assert Devise.pepper
 

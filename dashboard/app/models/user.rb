@@ -444,6 +444,11 @@ class User < ApplicationRecord
     primary_contact_info.try(:hashed_email) || ''
   end
 
+  def alternate_email
+    latest_accepted_app = Pd::Application::TeacherApplication.where(user: self, status: 'accepted').order(application_year: :desc).first
+    latest_accepted_app&.sanitized_form_data_hash&.dig(:alternate_email)
+  end
+
   # assign a course to a facilitator that is qualified to teach it
   def course_as_facilitator=(course)
     courses_as_facilitator << courses_as_facilitator.find_or_create_by(facilitator_id: id, course: course)
@@ -2484,6 +2489,12 @@ class User < ApplicationRecord
     if teacher?
       Pd::Enrollment.where(email: email, user: nil).each do |enrollment|
         enrollment.update(user: self)
+      end
+
+      if alternate_email.present?
+        Pd::Enrollment.where(email: alternate_email, user: nil).each do |enrollment|
+          enrollment.update(user: self)
+        end
       end
     end
   end
