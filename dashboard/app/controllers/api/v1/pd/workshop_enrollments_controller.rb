@@ -19,6 +19,12 @@ class Api::V1::Pd::WorkshopEnrollmentsController < ApplicationController
     ERROR: "error".freeze
   }
 
+  SUMMER_SUBJECTS = [
+    Pd::Workshop::SUBJECT_CSA_SUMMER_WORKSHOP,
+    Pd::Workshop::SUBJECT_CSD_SUMMER_WORKSHOP,
+    Pd::Workshop::SUBJECT_CSP_SUMMER_WORKSHOP
+  ]
+
   # GET /api/v1/pd/workshops/1/enrollments
   def index
     respond_to do |format|
@@ -77,6 +83,12 @@ class Api::V1::Pd::WorkshopEnrollmentsController < ApplicationController
         Pd::WorkshopMailer.teacher_enrollment_receipt(enrollment).deliver_now
         Pd::WorkshopMailer.organizer_enrollment_receipt(enrollment).deliver_now
 
+        # Also send to the user's alternate summer email if they entered it in their application.
+        alt_summer_email = user&.alternate_email
+        if alt_summer_email.present? && (SUMMER_SUBJECTS.include? @workshop.subject)
+          Pd::WorkshopMailer.teacher_enrollment_receipt(enrollment, alt_summer_email).deliver_now
+        end
+
         render json: {
           workshop_enrollment_status: RESPONSE_MESSAGES[:SUCCESS],
           account_exists: user.present?,
@@ -112,6 +124,12 @@ class Api::V1::Pd::WorkshopEnrollmentsController < ApplicationController
     enrollment.destroy!
     Pd::WorkshopMailer.teacher_cancel_receipt(enrollment).deliver_now
     Pd::WorkshopMailer.organizer_cancel_receipt(enrollment).deliver_now
+
+    # Also send to the user's alternate summer email if they entered it in their application.
+    alt_summer_email = enrollment.user&.alternate_email
+    if alt_summer_email.present? && (SUMMER_SUBJECTS.include? enrollment.workshop&.subject)
+      Pd::WorkshopMailer.teacher_cancel_receipt(enrollment, alt_summer_email).deliver_now
+    end
   end
 
   # POST /api/v1/pd/enrollments/move
