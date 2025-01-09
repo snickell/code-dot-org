@@ -6,46 +6,60 @@ Parameters:
   Environment:
     Type: String
     Description: "Environment being deployed to (ex: production, test)"
+  VectorIndexCreated:
+    Type: String
+    Description: "Whether the vector index has been created"
+    Default: "false"
+    AllowedValues:
+      - "true"
+      - "false"
+
+Conditions:
+  CreateKnowledgeBase: !Equals [!Ref VectorIndexCreated, "true"]
 
 Resources:
-  # AiDiffKnowledgeBaseWithAoss:
-  #   Type: AWS::Bedrock::KnowledgeBase
-  #   # DependsOn: CreateVectorIndex
-  #   Properties:
-  #     Name: !Sub ai-diff-${Environment}
-  #     Description: "Embedded lesson plans and supporting documents for contextual differentiation chat with AI Teaching assistant"
-  #     # TODO: define this role in code
-  #     RoleArn: !GetAtt AiDiffKnowledgeBaseRole.Arn
-  #     KnowledgeBaseConfiguration:
-  #       Type: "VECTOR"
-  #       VectorKnowledgeBaseConfiguration:
-  #         EmbeddingModelArn: "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v2:0"
-  #         EmbeddingModelConfiguration:
-  #           BedrockEmbeddingModelConfiguration:
-  #             Dimensions: 1024
-  #     StorageConfiguration:
-  #       Type: "OPENSEARCH_SERVERLESS"
-  #       OpensearchServerlessConfiguration:
-  #         CollectionArn: !GetAtt AiDiffCollection.Arn
-  #         VectorIndexName: "ai-diff-index"
-  #         FieldMapping:
-  #           VectorField: "ai-diff-vector-field"
-  #           TextField: "text"
-  #           MetadataField: "metadata"
+  # Knowledge Base - Requres a vector index to be created manually in the OpenSearch Collection
+  AiDiffKnowledgeBaseWithAoss:
+    Type: AWS::Bedrock::KnowledgeBase
+    Condition: CreateKnowledgeBase
+    Properties:
+      Name: !Sub ai-diff-${Environment}
+      Description: "Embedded lesson plans and supporting documents for contextual differentiation chat with AI Teaching assistant"
+      # TODO: define this role in code
+      RoleArn: !GetAtt AiDiffKnowledgeBaseRole.Arn
+      KnowledgeBaseConfiguration:
+        Type: "VECTOR"
+        VectorKnowledgeBaseConfiguration:
+          EmbeddingModelArn: "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v2:0"
+          EmbeddingModelConfiguration:
+            BedrockEmbeddingModelConfiguration:
+              Dimensions: 1024
+      StorageConfiguration:
+        Type: "OPENSEARCH_SERVERLESS"
+        OpensearchServerlessConfiguration:
+          CollectionArn: !GetAtt AiDiffCollection.Arn
+          VectorIndexName: "ai-diff-index"
+          FieldMapping:
+            VectorField: "ai-diff-vector-field"
+            TextField: "text"
+            MetadataField: "metadata"
 
-  # AiDiffDataSource:
-  #   Type: AWS::Bedrock::DataSource
-  #   Properties:
-  #     KnowledgeBaseId: !Ref AiDiffKnowledgeBaseWithAoss
-  #     Name: "AI_Differentiation_data"
-  #     Description: "Lesson Plans and Supporting documents for code.org lessons"
-  #     DataDeletionPolicy: "RETAIN"
-  #     DataSourceConfiguration:
-  #       Type: "S3"
-  #       S3Configuration:
-  #         BucketArn: !GetAtt AiDiffS3Bucket.Arn
-  #         InclusionPrefixes: ["live/"]
+  AiDiffDataSource:
+    Type: AWS::Bedrock::DataSource
+    DependsOn: AiDiffKnowledgeBaseWithAoss
+    Condition: CreateKnowledgeBase
+    Properties:
+      KnowledgeBaseId: !Ref AiDiffKnowledgeBaseWithAoss
+      Name: "AI_Differentiation_data"
+      Description: "Lesson Plans and Supporting documents for code.org lessons"
+      DataDeletionPolicy: "RETAIN"
+      DataSourceConfiguration:
+        Type: "S3"
+        S3Configuration:
+          BucketArn: !GetAtt AiDiffS3Bucket.Arn
+          InclusionPrefixes: ["live/"]
 
+  # S3 bucket for AI Differentiation data
   AiDiffS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -57,6 +71,132 @@ Resources:
           - Id: "ExpireOldVersions"
             Status: Enabled
             NoncurrentVersionExpirationInDays: 365
+
+  # OpenSearch resources
+  AiDiffCollection:
+    Type: 'AWS::OpenSearchServerless::Collection'
+    Properties:
+      Name: !Sub ai-diff-${Environment}
+      Type: VECTORSEARCH
+      Description: AI Differentiation search collection
+    DependsOn:
+      - EncryptionPolicy
+  EncryptionPolicy:
+    Type: 'AWS::OpenSearchServerless::SecurityPolicy'
+    Properties:
+      # Note: The policy name has a max length of 32 characters
+      Name: !Sub ai-diff-${Environment}-encrypt
+      Type: encryption
+      Policy: !Sub |
+        {
+          "AWSOwnedKey": true,
+          "Rules": [
+            {
+              "ResourceType": "collection",
+              "Resource": ["collection/ai-diff-${Environment}"]
+            }
+          ]
+        }
+  NetworkPolicy:
+    Type: 'AWS::OpenSearchServerless::SecurityPolicy'
+    Properties:
+      Name: !Sub ai-diff-${Environment}-network
+      Type: network
+      Policy: !Sub |
+        [
+          {
+            "Rules": [
+              {
+                "ResourceType": "collection",
+                "Resource": ["collection/ai-diff-${Environment}"]
+              }
+            ],
+            "AllowFromPublic": true
+          }
+        ]
+  DataPolicy:
+    Type: 'AWS::OpenSearchServerless::AccessPolicy'
+    Properties:
+      Name: !Sub ai-diff-${Environment}-data
+      Type: data
+      Policy: !Sub |
+        [
+          {
+            "Rules": [
+              {
+                "ResourceType": "index",
+                "Resource": [
+                  "index/ai-diff-${Environment}/*"
+                ],
+                "Permission": [
+                  "aoss:*",
+                  "aoss:UpdateIndex",
+                  "aoss:DescribeIndex",
+                  "aoss:ReadDocument",
+                  "aoss:WriteDocument",
+                  "aoss:CreateIndex"
+                ]
+              },
+              {
+                "ResourceType": "collection",
+                "Resource": [
+                  "collection/ai-diff-${Environment}"
+                ],
+                "Permission": [
+                  "aoss:*",
+                  "aoss:DescribeCollectionItems",
+                  "aoss:CreateCollectionItems",
+                  "aoss:UpdateCollectionItems"
+                ]
+              }
+            ],
+            "Principal": [
+              "${AiDiffKnowledgeBaseRole.Arn}",
+              "arn:aws:sts::${AWS::AccountId}:assumed-role/GoogleAdmin/*"
+            ]
+          }
+        ]
+  AiDiffKnowledgeBaseRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "AiDiffKnowledgeBaseRole_${Environment}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: "bedrock.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: "AiDiffKnowledgeBasePolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:ListBucket"
+                Resource:
+                  - !GetAtt AiDiffS3Bucket.Arn
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                Resource:
+                  - !Sub "${AiDiffS3Bucket.Arn}/*"
+              - Effect: Allow
+                Action:
+                  - "aoss:APIAccessAll"
+                  - "bedrock:InvokeModel"
+                Resource:
+                  - !GetAtt AiDiffCollection.Arn
+                  - "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v2:0"
+
+  # -----------
+  # Custom Resource to create the vector index in the OpenSearch collection
+  # Work In Progress :(
+  # As an alternative, deploy this with VectorIndexCreated set to false, then
+  # manually create the index in the OpenSearch console, then redeploy with
+  # VectorIndexCreated set to true
+  # -----------
 
   # CreateVectorIndex:
   #   Type: Custom::CreateVectorIndex
@@ -188,120 +328,3 @@ Resources:
   #             #   Action:
   #             #     - "opensearch:ESHttpPut"
   #             #   Resource: "*"
-
-  AiDiffCollection:
-    Type: 'AWS::OpenSearchServerless::Collection'
-    Properties:
-      Name: !Sub ai-diff-${Environment}
-      Type: VECTORSEARCH
-      Description: AI Differentiation search collection
-    DependsOn:
-      - EncryptionPolicy
-  EncryptionPolicy:
-    Type: 'AWS::OpenSearchServerless::SecurityPolicy'
-    Properties:
-      # Note: The policy name has a max length of 32 characters
-      Name: !Sub ai-diff-${Environment}-encrypt
-      Type: encryption
-      Policy: !Sub |
-        {
-          "AWSOwnedKey": true,
-          "Rules": [
-            {
-              "ResourceType": "collection",
-              "Resource": ["collection/ai-diff-${Environment}"]
-            }
-          ]
-        }
-  NetworkPolicy:
-    Type: 'AWS::OpenSearchServerless::SecurityPolicy'
-    Properties:
-      Name: !Sub ai-diff-${Environment}-network
-      Type: network
-      Policy: !Sub |
-        [
-          {
-            "Rules": [
-              {
-                "ResourceType": "collection",
-                "Resource": ["collection/ai-diff-${Environment}"]
-              }
-            ],
-            "AllowFromPublic": true
-          }
-        ]
-  DataPolicy:
-    Type: 'AWS::OpenSearchServerless::AccessPolicy'
-    Properties:
-      Name: !Sub ai-diff-${Environment}-data
-      Type: data
-      Policy: !Sub |
-        [
-          {
-            "Rules": [
-              {
-                "ResourceType": "index",
-                "Resource": [
-                  "index/ai-diff-${Environment}/*"
-                ],
-                "Permission": [
-                  "aoss:*",
-                  "aoss:UpdateIndex",
-                  "aoss:DescribeIndex",
-                  "aoss:ReadDocument",
-                  "aoss:WriteDocument",
-                  "aoss:CreateIndex"
-                ]
-              },
-              {
-                "ResourceType": "collection",
-                "Resource": [
-                  "collection/ai-diff-${Environment}"
-                ],
-                "Permission": [
-                  "aoss:*",
-                  "aoss:DescribeCollectionItems",
-                  "aoss:CreateCollectionItems",
-                  "aoss:UpdateCollectionItems"
-                ]
-              }
-            ],
-            "Principal": [
-              "${AiDiffKnowledgeBaseRole.Arn}",
-              "arn:aws:sts::${AWS::AccountId}:assumed-role/GoogleAdmin/*"
-            ]
-          }
-        ]
-  AiDiffKnowledgeBaseRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: !Sub "AiDiffKnowledgeBaseRole_${Environment}"
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: "bedrock.amazonaws.com"
-            Action: "sts:AssumeRole"
-      Policies:
-        - PolicyName: "AiDiffKnowledgeBasePolicy"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "s3:ListBucket"
-                Resource:
-                  - !GetAtt AiDiffS3Bucket.Arn
-              - Effect: Allow
-                Action:
-                  - "s3:GetObject"
-                Resource:
-                  - !Sub "${AiDiffS3Bucket.Arn}/*"
-              - Effect: Allow
-                Action:
-                  - "aoss:APIAccessAll"
-                  - "bedrock:InvokeModel"
-                Resource:
-                  - !GetAtt AiDiffCollection.Arn
-                  - "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v2:0"
