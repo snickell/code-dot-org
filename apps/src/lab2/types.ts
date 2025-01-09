@@ -17,6 +17,14 @@ import {lab2EntryPoints} from '../../lab2EntryPoints';
 
 export {Theme};
 
+/// ------ USER APP OPTIONS ------ ///
+
+// Partial definition of the UserAppOptions structure, only defining the
+// pieces we need at the moment.
+export interface PartialUserAppOptions {
+  isInstructor: boolean;
+}
+
 /// ------ PROJECTS ------ ///
 
 /** Identifies a project. Corresponds to the "value" JSON column for the entry in the projects table. */
@@ -44,6 +52,7 @@ export interface ProjectAndSources {
   // When projects are loaded for the first time, sources may not be present
   sources?: ProjectSources;
   channel: Channel;
+  abuseScore?: number;
 }
 
 /// ------ SOURCES ------ ///
@@ -127,6 +136,7 @@ export enum ProjectFileType {
   STARTER = 'starter',
   SUPPORT = 'support',
   VALIDATION = 'validation',
+  LOCKED_STARTER = 'locked_starter',
 }
 
 export interface ProjectFolder {
@@ -176,8 +186,14 @@ export interface LevelProperties {
   submittable?: boolean;
   finishUrl?: string;
   finishDialog?: string;
-  offerTts?: boolean;
+  offerBrowserTts?: boolean;
+  useSecondaryFinishButton?: boolean;
+  // Python Lab/Codebridge specific properties
   validationFile?: ProjectFile;
+  enableMicroBit?: boolean;
+  miniApp?: string;
+  serializedMaze?: MazeCell[][];
+  startDirection?: number;
 }
 
 // Level configuration data used by project-backed labs that don't require
@@ -201,6 +217,13 @@ interface VideoData extends VideoLevelData {
   key?: string;
   enable_fallback?: boolean;
   autoplay?: boolean;
+}
+
+// Python Lab specific property
+export interface MazeCell {
+  tileType: number;
+  value: number;
+  assetId: number;
 }
 
 export enum OptionsToAvoid {
@@ -296,6 +319,7 @@ export interface Condition {
 export interface ConditionType {
   name: string;
   valueType?: 'string' | 'number';
+  description: string;
 }
 
 // Validation in the level.
@@ -333,6 +357,8 @@ export interface ExtraLinksProjectData {
     is_featured_project: boolean;
     featured_status: string;
     remix_ancestry: string[];
+    is_published_project: 'yes' | 'no';
+    abuse_score: number;
   };
   meesage?: string;
 }

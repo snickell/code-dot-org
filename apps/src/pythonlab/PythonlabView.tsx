@@ -6,16 +6,22 @@ import {python} from '@codemirror/lang-python';
 import {LanguageSupport} from '@codemirror/language';
 import React, {useContext, useEffect, useState} from 'react';
 
-import {sendPredictLevelReport} from '@cdo/apps/code-studio/progressRedux';
+import {
+  sendPredictLevelReport,
+  sendProgressReport,
+} from '@cdo/apps/code-studio/progressRedux';
+import {getCurrentLevel} from '@cdo/apps/code-studio/progressReduxSelectors';
+import {TestResults} from '@cdo/apps/constants';
 import {MAIN_PYTHON_FILE, START_SOURCES} from '@cdo/apps/lab2/constants';
+import useLifecycleNotifier from '@cdo/apps/lab2/hooks/useLifecycleNotifier';
+import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
 import {ProgressManagerContext} from '@cdo/apps/lab2/progress/ProgressContainer';
+import {getAppOptionsEditBlocks} from '@cdo/apps/lab2/projects/utils';
 import {isPredictAnswerLocked} from '@cdo/apps/lab2/redux/predictLevelRedux';
 import {MultiFileSource, ProjectSources} from '@cdo/apps/lab2/types';
 import {LifecycleEvent} from '@cdo/apps/lab2/utils/LifecycleNotifier';
 import {AppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
-
-import useLifecycleNotifier from '../lab2/hooks/useLifecycleNotifier';
-import {getAppOptionsEditBlocks} from '../lab2/projects/utils';
+import {LevelStatus} from '@cdo/generated-scripts/sharedConstants';
 
 import PythonValidationTracker from './progress/PythonValidationTracker';
 import PythonValidator from './progress/PythonValidator';
@@ -50,14 +56,14 @@ const labeledGridLayouts = {
     gridLayoutRows: '1fr',
     gridLayoutColumns: '340px minmax(0, 1fr)',
     gridLayout: `
-  "info-panel workspace-and-console"
+  "info-panel workspace-and-output"
   `,
   },
   vertical: {
     gridLayoutRows: '1fr',
     gridLayoutColumns: '340px minmax(0, 1fr) 400px',
     gridLayout: `
-    "info-panel workspace console"
+    "info-panel workspace output"
     `,
   },
 };
@@ -111,6 +117,8 @@ const PythonlabView: React.FunctionComponent = () => {
   const appName = useAppSelector(state => state.lab.levelProperties?.appName);
   const isStartMode = getAppOptionsEditBlocks() === START_SOURCES;
 
+  const currentLevel = useAppSelector(state => getCurrentLevel(state));
+
   useEffect(() => {
     if (progressManager && appName === 'pythonlab') {
       progressManager.setValidator(
@@ -130,6 +138,10 @@ const PythonlabView: React.FunctionComponent = () => {
     dispatch: AppDispatch,
     source: MultiFileSource | undefined
   ) => {
+    // Flush any pending saves if we have a project manager on run. The user will likely
+    // run their code before navigating away from the page, so switching pages
+    // will be faster if we flush save now.
+    Lab2Registry.getInstance().getProjectManager()?.flushSave();
     // We don't send the validation file to the runner if we are in start mode,
     // as we want to use the validation from the sources instead.
     await handleRunClick(
@@ -139,6 +151,15 @@ const PythonlabView: React.FunctionComponent = () => {
       progressManager,
       isStartMode ? undefined : validationFile
     );
+    if (
+      currentLevel &&
+      !isPredictLevel &&
+      currentLevel.status === LevelStatus.not_tried
+    ) {
+      // If this is not a predict level and the current status is not tried,
+      // send a level started progress report.
+      dispatch(sendProgressReport(appName || '', TestResults.LEVEL_STARTED));
+    }
     // Only send a predict level report if this is a predict level and the predict
     // answer was not locked.
     if (isPredictLevel && !predictAnswerLocked) {

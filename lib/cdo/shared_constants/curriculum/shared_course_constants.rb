@@ -55,6 +55,7 @@ module Curriculum
         CSD_self_paced_pl: 'CSD Self Paced PL',
         CSF_self_paced_pl: 'CSF Self Paced PL',
         CSC_self_paced_pl: 'CSC Self Paced PL',
+        CSC_k_5_self_paced_pl: 'CSC K-5 self-paced PL',
         student_self_paced: 'Student Self Paced Courses',
         pd_workshop_activity_csf: 'PD Workshop Activity CSF',
         pd_workshop_activity_csd: 'PD Workshop Activity CSD',
@@ -74,7 +75,9 @@ module Curriculum
         special_topics_curriculum_selfpaced_pl_6_8: '6-8 Special topics curriculum selfpaced pl',
         special_topics_curriculum_selfpaced_pl_9_12: '9-12 Special topics curriculum selfpaced pl',
         pedagogy_special_topics_selfpaced_pl: 'Pedagogy special topics selfpaced pl',
-        cs_basics_selfpaced_pl: 'CS Basics selfpaced pl'
+        cs_basics_selfpaced_pl: 'CS Basics selfpaced pl',
+        pd_for_facilitators: 'PD for Facilitators',
+        other: 'Other'
       }
     ).freeze
 
@@ -83,7 +86,26 @@ module Curriculum
       {
         ai: 'AI',
         maker: 'Maker',
-        music_lab: 'Music lab'
+        music_lab: 'Music lab',
+        survey: 'Survey',
+        data_science: 'Data Science'
+      }
+    ).freeze
+
+    # A list of all content area categories that can be set to units.
+    CURRICULUM_CONTENT_AREA = OpenStruct.new(
+      {
+        curriculum_k_5: 'K-5 Curriculum',
+        curriculum_6_8: '6-8 Curriculum',
+        curriculum_9_12: '9-12 Curriculum',
+        hoc: 'HOC',
+        pl_workshop_activities: 'PL Workshop activities',
+        self_paced_pl_k_5: 'K-5 self-paced PL',
+        self_paced_pl_6_8: '6-8 self-paced PL',
+        self_paced_pl_9_12: '9-12 self-paced PL',
+        skills_focused_self_paced_pl: 'Skills-focused self-paced PL',
+        pd_for_facilitators: 'PD for Facilitators',
+        other: 'Other'
       }
     ).freeze
 
