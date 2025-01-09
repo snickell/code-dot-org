@@ -82,7 +82,7 @@ docker login -u codedotorg
 Build a full image to your local machine
 
 ```
-docker build .
+docker build --platform=linux/amd64 .
 ```
 
 **Note:** We are moving to a new naming convention in order to use different docker images for different purposes. What was the `code-dot-org` image will become the `cdo-ci` image. For now, these docs advise publishing both names.
