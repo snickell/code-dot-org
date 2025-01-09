@@ -7,20 +7,24 @@ function testImageAccess(
   timeoutMs = 5000,
   videoElement = false
 ) {
+  console.log('TESTING', url);
   var element;
   if (videoElement) {
     element = document.createElement('video');
   } else {
+    console.log('TESTING with image');
     element = new Image();
   }
   var called = false;
   function finish(callback) {
-    return function () {
+    return function (event) {
+      console.log('finish callback', called, event);
       if (called) {
         return;
       }
       called = true;
       window.clearTimeout(timeout);
+      console.log('performing callback', called, event);
       callback();
     };
   }
