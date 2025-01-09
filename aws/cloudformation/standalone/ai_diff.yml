@@ -10,7 +10,7 @@ Parameters:
 Resources:
   # AiDiffKnowledgeBaseWithAoss:
   #   Type: AWS::Bedrock::KnowledgeBase
-  #   DependsOn: CreateVectorIndex
+  #   # DependsOn: CreateVectorIndex
   #   Properties:
   #     Name: !Sub ai-diff-${Environment}
   #     Description: "Embedded lesson plans and supporting documents for contextual differentiation chat with AI Teaching assistant"
@@ -58,136 +58,136 @@ Resources:
             Status: Enabled
             NoncurrentVersionExpirationInDays: 365
 
-  CreateVectorIndex:
-    Type: Custom::CreateVectorIndex
-    Properties:
-      ServiceTimeout: 20 
-      ServiceToken: !GetAtt CreateVectorIndexCustomResourceLambda.Arn
-      OpenSearchEndpoint: !GetAtt AiDiffCollection.CollectionEndpoint
-      VectorIndexName: ai-diff-index
-      VectorFieldName: ai-diff-vector-field
+  # CreateVectorIndex:
+  #   Type: Custom::CreateVectorIndex
+  #   Properties:
+  #     ServiceTimeout: 20 
+  #     ServiceToken: !GetAtt CreateVectorIndexCustomResourceLambda.Arn
+  #     OpenSearchEndpoint: !GetAtt AiDiffCollection.CollectionEndpoint
+  #     VectorIndexName: ai-diff-index
+  #     VectorFieldName: ai-diff-vector-field
 
-  CreateVectorIndexCustomResourceLambda:
-    Type: AWS::Lambda::Function
-    Properties:
-      Handler: index.handler
-      Role: !GetAtt CreateVectorIndexCustomResourceLambdaRole.Arn
-      Runtime: nodejs18.x
-      Timeout: 10
-      Code:
-        ZipFile: |
-          const https = require('https');
-          const response = require('cfn-response');
+  # CreateVectorIndexCustomResourceLambda:
+  #   Type: AWS::Lambda::Function
+  #   Properties:
+  #     Handler: index.handler
+  #     Role: !GetAtt CreateVectorIndexCustomResourceLambdaRole.Arn
+  #     Runtime: nodejs18.x
+  #     Timeout: 10
+  #     Code:
+  #       ZipFile: |
+  #         const https = require('https');
+  #         const response = require('cfn-response');
 
-          exports.handler = async function (event, context) {
-            try {
-              console.log('Received event:', JSON.stringify(event, null, 2));
+  #         exports.handler = async function (event, context) {
+  #           try {
+  #             console.log('Received event:', JSON.stringify(event, null, 2));
             
-              if (event.RequestType === 'Delete') {
-                console.log("DELETE is a no-op, exiting")
-                response.send(event, context, response.SUCCESS);
-              }
+  #             if (event.RequestType === 'Delete') {
+  #               console.log("DELETE is a no-op, exiting")
+  #               response.send(event, context, response.SUCCESS);
+  #             }
               
-              const openSearchEndpoint = event.ResourceProperties.OpenSearchEndpoint;
-              const vectorIndexName = event.ResourceProperties.VectorIndexName;
-              const vectorFieldName = event.ResourceProperties.VectorFieldName;
+  #             const openSearchEndpoint = event.ResourceProperties.OpenSearchEndpoint;
+  #             const vectorIndexName = event.ResourceProperties.VectorIndexName;
+  #             const vectorFieldName = event.ResourceProperties.VectorFieldName;
             
-              const requestBody = JSON.stringify({
-                settings: {
-                  index: { knn: true, "knn.algo_param.ef_search": 512 }
-                },
-                mappings: {
-                  properties: {
-                    [vectorFieldName]: {
-                      type: "knn_vector",
-                      dimension: 1024,
-                      method: {
-                        name: "hnsw",
-                        engine: "faiss",
-                        parameters: {},
-                        space_type: "l2"
-                      }
-                    },
-                    text: { type: "text", index: "true" },
-                    metadata: { type: "text", index: "false" }
-                  }
-                }
-              });
+  #             const requestBody = JSON.stringify({
+  #               settings: {
+  #                 index: { knn: true, "knn.algo_param.ef_search": 512 }
+  #               },
+  #               mappings: {
+  #                 properties: {
+  #                   [vectorFieldName]: {
+  #                     type: "knn_vector",
+  #                     dimension: 1024,
+  #                     method: {
+  #                       name: "hnsw",
+  #                       engine: "faiss",
+  #                       parameters: {},
+  #                       space_type: "l2"
+  #                     }
+  #                   },
+  #                   text: { type: "text", index: "true" },
+  #                   metadata: { type: "text", index: "false" }
+  #                 }
+  #               }
+  #             });
             
-              const options = {
-                hostname: openSearchEndpoint,
-                path: `/${vectorIndexName}`,
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Content-Length': Buffer.byteLength(requestBody)
-                }
-              };
+  #             const options = {
+  #               hostname: openSearchEndpoint,
+  #               path: `/${vectorIndexName}`,
+  #               method: 'PUT',
+  #               headers: {
+  #                 'Content-Type': 'application/json',
+  #                 'Content-Length': Buffer.byteLength(requestBody)
+  #               }
+  #             };
             
-              try {
-                const response = await sendRequest(options, requestBody);
-                console.log('Response:', response);
-                response.send(event, context, response.SUCCESS);
-              } catch (error) {
-                console.error('OpenSearch Error:', error);
-                response.send(event, context, response.FAILED, {Status: 'FAILED', Reason: `Error updating OpenSearch: ${error.message}`});
-              }
-            } catch (error) {
-              console.error('Lambda Error:', error);
-              response.send(event, context, response.FAILED, {Status: 'FAILED', Reason: `Error executing Custom Resource Lambda: ${error.message}`});
-            }
-          };
+  #             try {
+  #               const response = await sendRequest(options, requestBody);
+  #               console.log('Response:', response);
+  #               response.send(event, context, response.SUCCESS);
+  #             } catch (error) {
+  #               console.error('OpenSearch Error:', error);
+  #               response.send(event, context, response.FAILED, {Status: 'FAILED', Reason: `Error updating OpenSearch: ${error.message}`});
+  #             }
+  #           } catch (error) {
+  #             console.error('Lambda Error:', error);
+  #             response.send(event, context, response.FAILED, {Status: 'FAILED', Reason: `Error executing Custom Resource Lambda: ${error.message}`});
+  #           }
+  #         };
 
-          // Helper function to send HTTPS requests
-          const sendRequest = (options, body) => {
-            return new Promise((resolve, reject) => {
-              const req = https.request(options, (res) => {
-                let data = '';
+  #         // Helper function to send HTTPS requests
+  #         const sendRequest = (options, body) => {
+  #           return new Promise((resolve, reject) => {
+  #             const req = https.request(options, (res) => {
+  #               let data = '';
 
-                res.on('data', (chunk) => {
-                  data += chunk;
-                });
+  #               res.on('data', (chunk) => {
+  #                 data += chunk;
+  #               });
 
-                res.on('end', () => {
-                  if (res.statusCode >= 200 && res.statusCode < 300) {
-                    resolve(data);
-                  } else {
-                    reject(new Error(`Request failed with status code ${res.statusCode}: ${data}`));
-                  }
-                });
-              });
+  #               res.on('end', () => {
+  #                 if (res.statusCode >= 200 && res.statusCode < 300) {
+  #                   resolve(data);
+  #                 } else {
+  #                   reject(new Error(`Request failed with status code ${res.statusCode}: ${data}`));
+  #                 }
+  #               });
+  #             });
 
-              req.on('error', (error) => reject(error));
-              req.write(body);
-              req.end();
-            });
-          };
+  #             req.on('error', (error) => reject(error));
+  #             req.write(body);
+  #             req.end();
+  #           });
+  #         };
 
-  CreateVectorIndexCustomResourceLambdaRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              Service: "lambda.amazonaws.com"
-            Action: "sts:AssumeRole"
-      Policies:
-        - PolicyName: "CreateVectorIndexCustomResourceLambdaPolicy"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: "Allow"
-                Action:
-                  - "logs:CreateLogGroup"
-                  - "logs:CreateLogStream"
-                  - "logs:PutLogEvents"
-                Resource: "*"
-              # - Effect: "Allow"
-              #   Action:
-              #     - "opensearch:ESHttpPut"
-              #   Resource: "*"
+  # CreateVectorIndexCustomResourceLambdaRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     AssumeRolePolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: "Allow"
+  #           Principal:
+  #             Service: "lambda.amazonaws.com"
+  #           Action: "sts:AssumeRole"
+  #     Policies:
+  #       - PolicyName: "CreateVectorIndexCustomResourceLambdaPolicy"
+  #         PolicyDocument:
+  #           Version: "2012-10-17"
+  #           Statement:
+  #             - Effect: "Allow"
+  #               Action:
+  #                 - "logs:CreateLogGroup"
+  #                 - "logs:CreateLogStream"
+  #                 - "logs:PutLogEvents"
+  #               Resource: "*"
+  #             # - Effect: "Allow"
+  #             #   Action:
+  #             #     - "opensearch:ESHttpPut"
+  #             #   Resource: "*"
 
   AiDiffCollection:
     Type: 'AWS::OpenSearchServerless::Collection'
@@ -200,7 +200,8 @@ Resources:
   EncryptionPolicy:
     Type: 'AWS::OpenSearchServerless::SecurityPolicy'
     Properties:
-      Name: !Sub ai-diff-${Environment}-encryption-policy
+      # Note: The policy name has a max length of 32 characters
+      Name: !Sub ai-diff-${Environment}-encrypt
       Type: encryption
       Policy: !Sub |
         {
@@ -215,7 +216,7 @@ Resources:
   NetworkPolicy:
     Type: 'AWS::OpenSearchServerless::SecurityPolicy'
     Properties:
-      Name: !Sub ai-diff-${Environment}-network-policy
+      Name: !Sub ai-diff-${Environment}-network
       Type: network
       Policy: !Sub |
         [
@@ -232,7 +233,7 @@ Resources:
   DataPolicy:
     Type: 'AWS::OpenSearchServerless::AccessPolicy'
     Properties:
-      Name: !Sub ai-diff-${Environment}-data-policy
+      Name: !Sub ai-diff-${Environment}-data
       Type: data
       Policy: !Sub |
         [
@@ -289,11 +290,18 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - "s3:GetObject"
                   - "s3:ListBucket"
+                Resource:
+                  - !GetAtt AiDiffS3Bucket.Arn
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                Resource:
+                  - !Sub "${AiDiffS3Bucket.Arn}/*"
+              - Effect: Allow
+                Action:
                   - "aoss:APIAccessAll"
                   - "bedrock:InvokeModel"
                 Resource:
-                  - !GetAtt AiDiffS3Bucket.Arn
                   - !GetAtt AiDiffCollection.Arn
                   - "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v2:0"
