@@ -16,7 +16,7 @@ function testImageAccess(
   var called = false;
   function finish(callback) {
     return function (event) {
-      console.log('finish callback', called, event);
+      console.log('finish callback', called, event, callback);
       if (called) {
         return;
       }
@@ -26,7 +26,7 @@ function testImageAccess(
       callback();
     };
   }
-  var timeout = window.setTimeout(finish(failureCallback), timeoutMs);
+  var timeout = window.setTimeout(finish(failureCallback), timeoutMs, `timedout after ${timeoutMs}ms`);
   element.onerror = finish(failureCallback);
   if (videoElement) {
     element.ondurationchange = finish(successCallback);
