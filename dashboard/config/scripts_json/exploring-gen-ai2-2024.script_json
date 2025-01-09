@@ -20,7 +20,7 @@
     },
     "new_name": null,
     "family_name": null,
-    "serialized_at": "2025-01-07 22:44:04 UTC",
+    "serialized_at": "2025-01-08 22:44:25 UTC",
     "published_state": null,
     "instruction_type": null,
     "instructor_audience": null,
@@ -2208,7 +2208,7 @@
       "key": "78af9037-33ef-41a8-aa20-d45238394576",
       "position": 1,
       "properties": {
-        "description": "\n<table>\n  <tr>\n    <td style=\"width: 25%\">Slide</td>\n    <td style=\"width: 75%\">Lesson Guide</td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://docs.google.com/presentation/d/1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug/export/png?id=1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug&pageid=g2b5b268c506_0_173\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-comments\" aria-hidden=\"true\"></i> <strong>Discuss:</strong> Have you ever asked a question online and received outdated or incorrect information? How did that impact what you were trying to accomplish?\n\t\t<br />\n\t\t<br /><i class=\"fa fa-lightbulb-o\" aria-hidden=\"true\"></i> <strong>Discussion Goal:</strong> This question is similar to the warm-up yesterday, referencing the fact that chatbots don’t have current information. In this discussion, focus on real-world examples and the impact this misinformation could have on problems they are trying to solve. For example, having outdated weather information meant that you needed to cancel a party or buy additional supplies to handle the weather on a particular day. Focusing on the connection to students’ lived experiences and the impact will tie into the focus on user-stories and real-world scenarios in today’s lesson.\n    </td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://docs.google.com/presentation/d/1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug/export/png?id=1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug&pageid=g2b5b268c506_0_197\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-microphone\" aria-hidden=\"true\"></i> <strong>Say:</strong> We know retrieval can update what a chatbot knows and can respond with, but what are the situations where this is most valuable - or even necessary? Today we’ll explore several examples where retrieval is highly important, and why it can be a strong asset to a chatbot.\n\t\t<br />\n\t\t<br /><strong>Question of the Day:</strong> When is retrieval most useful in solving a problem?\n    </td>\n  </tr>\n\n</table>    \n    "
+        "description": "\n<table>\n  <tr>\n    <td style=\"width: 25%\">Slide</td>\n    <td style=\"width: 75%\">Lesson Guide</td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://images.code.org/69a6f694527d10fb1bc5d28408347a3c-Slide4.PNG\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-comments\" aria-hidden=\"true\"></i> <strong>Discuss:</strong> Have you ever asked a question online and received outdated or incorrect information? How did that impact what you were trying to accomplish?\n\t\t<br />\n\t\t<br /><i class=\"fa fa-lightbulb-o\" aria-hidden=\"true\"></i> <strong>Discussion Goal:</strong> This question is similar to the warm-up yesterday, referencing the fact that chatbots don’t have current information. In this discussion, focus on real-world examples and the impact this misinformation could have on problems they are trying to solve. For example, having outdated weather information meant that you needed to cancel a party or buy additional supplies to handle the weather on a particular day. Focusing on the connection to students’ lived experiences and the impact will tie into the focus on user-stories and real-world scenarios in today’s lesson.\n    </td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://images.code.org/f9dc34af514309e4d9d8f80c5f2e3a02-Slide5.PNG\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-microphone\" aria-hidden=\"true\"></i> <strong>Say:</strong> We know retrieval can update what a chatbot knows and can respond with, but what are the situations where this is most valuable - or even necessary? Today we’ll explore several examples where retrieval is highly important, and why it can be a strong asset to a chatbot.\n\t\t<br />\n\t\t<br /><strong>Question of the Day:</strong> When is retrieval most useful in solving a problem?\n    </td>\n  </tr>\n\n</table>    \n    "
       },
       "seeding_key": {
         "activity_section.key": "78af9037-33ef-41a8-aa20-d45238394576",
@@ -2308,7 +2308,7 @@
       "key": "0ab8fb98-4ca9-4493-a58b-946e7c47f5ea",
       "position": 9,
       "properties": {
-        "description": "\n<table>\n  <tr>\n    <td style=\"width: 25%\">Slide</td>\n    <td style=\"width: 75%\">Lesson Guide</td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://docs.google.com/presentation/d/1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug/export/png?id=1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug&pageid=g2db60c341fb_0_0\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-desktop\" aria-hidden=\"true\"></i> <strong>Navigate:</strong> Go to Lesson 7 Level 1. Students will complete levels 1-2, which emphasizes using retrieval for current up-to-date information.\n\t\t<br />\n\t\t<br /><i class=\"fa fa-check-square-o\" aria-hidden=\"true\"></i> <strong>Do This:</strong> Complete levels 1-3\n\t\t<br />\n\t\t<br /><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> <strong>Circulate:</strong> Check-in with students as they complete each level. If you notice multiple students struggling with this string of levels, consider regrouping and completing them as a class. Otherwise, continue to the next slides as the class progresses.\n\t\t<br />\n    </td>\n  </tr>\n\n</table>    \n    ",
+        "description": "\n<table>\n  <tr>\n    <td style=\"width: 25%\">Slide</td>\n    <td style=\"width: 75%\">Lesson Guide</td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://images.code.org/b54bd2b2963a33e9c558bd6fac90095a-Slide7.PNG\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-desktop\" aria-hidden=\"true\"></i> <strong>Navigate:</strong> Go to Lesson 7 Level 1. Students will complete levels 1-2, which emphasizes using retrieval for current up-to-date information.\n\t\t<br />\n\t\t<br /><i class=\"fa fa-check-square-o\" aria-hidden=\"true\"></i> <strong>Do This:</strong> Complete levels 1-2\n\t\t<br />\n\t\t<br /><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> <strong>Circulate:</strong> Check-in with students as they complete each level. If you notice multiple students struggling with this string of levels, consider regrouping and completing them as a class. Otherwise, continue to the next slides as the class progresses.\n\t\t<br />\n    </td>\n  </tr>\n\n</table>    \n    ",
         "name": "Teaching Guide",
         "tips": [
           {
@@ -2323,10 +2323,43 @@
       }
     },
     {
-      "key": "66186721-e2f0-4ef8-a75d-b39da65c71e0",
+      "key": "9ecedc0e-ebeb-475a-af14-991df70e6c6b",
       "position": 10,
       "properties": {
-        "description": "\n<table>\n  <tr>\n    <td style=\"width: 25%\">Slide</td>\n    <td style=\"width: 75%\">Lesson Guide</td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://docs.google.com/presentation/d/1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug/export/png?id=1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug&pageid=g2db60c341fb_0_200\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-desktop\" aria-hidden=\"true\"></i> <strong>Navigate:</strong> Go to Lesson 7 Level 3. Students will complete levels 3-4, which emphasizes using retrieval for specialized information\n\t\t<br />\n\t\t<br /><i class=\"fa fa-check-square-o\" aria-hidden=\"true\"></i> <strong>Do This:</strong> Complete levels 3-4\n\t\t<br />\n\t\t<br /><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> <strong>Circulate:</strong> Check-in with students as they complete each level. If you notice multiple students struggling with this string of levels, consider regrouping and completing them as a class. Otherwise, continue to the next slides as the class progresses.\n    </td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://docs.google.com/presentation/d/1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug/export/png?id=1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug&pageid=g2db60c341fb_0_237\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-desktop\" aria-hidden=\"true\"></i> <strong>Navigate:</strong> Go to Lesson 7 Level 5. Students will complete levels 5-7, which emphasizes using retrieval for accurate information to avoid bias or hallucinations.\n\t\t<br />\n\t\t<br /><i class=\"fa fa-check-square-o\" aria-hidden=\"true\"></i> <strong>Do This:</strong> Complete levels 5-7\n\t\t<br />\n\t\t<br /><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> <strong>Circulate:</strong> Check-in with students as they complete each level. If you notice multiple students struggling with this string of levels, consider regrouping and completing them as a class. Otherwise, continue to the next slides as the class progresses.\n    </td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://docs.google.com/presentation/d/1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug/export/png?id=1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug&pageid=g2db60c341fb_0_274\"></td>\n    <td style=\"width: 75%\">\n      <strong>Navigate:</strong> Go to Lesson 7 Level 8\n\t\t<br />\n\t\t<br /><i class=\"fa fa-check-square-o\" aria-hidden=\"true\"></i> <strong>Do This:</strong> Answer the check-in question, then continue to the practice levels\n\t\t<br />\n    </td>\n  </tr>\n\n</table>    \n    ",
+        "description": "\n<table>\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://images.code.org/fa8a1a9121757b040a1dc8de4fdc72ba-Slide8.PNG\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-desktop\" aria-hidden=\"true\"></i> <strong>Navigate:</strong> Go to Lesson 7 Level 3. Students will complete levels 3-4, which emphasizes using retrieval for specialized information\n\t\t<br />\n\t\t<br /><i class=\"fa fa-check-square-o\" aria-hidden=\"true\"></i> <strong>Do This:</strong> Complete levels 3-4\n\t\t<br />\n\t\t<br /><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> <strong>Circulate:</strong> Check-in with students as they complete each level. If you notice multiple students struggling with this string of levels, consider regrouping and completing them as a class. Otherwise, continue to the next slides as the class progresses.\n    </td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://images.code.org/8874f27d09f3bebeeb7583ab8b64d399-Slide9.PNG\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-desktop\" aria-hidden=\"true\"></i> <strong>Navigate:</strong> Go to Lesson 7 Level 5. Students will complete levels 5-7, which emphasizes using retrieval for accurate information to avoid bias or hallucinations.\n\t\t<br />\n\t\t<br /><i class=\"fa fa-check-square-o\" aria-hidden=\"true\"></i> <strong>Do This:</strong> Complete levels 5-7\n\t\t<br />\n\t\t<br /><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i> <strong>Circulate:</strong> Check-in with students as they complete each level. If you notice multiple students struggling with this string of levels, consider regrouping and completing them as a class. Otherwise, continue to the next slides as the class progresses.\n\t\t<br />\n    </td>\n  </tr>\n\n</table>    \n    ",
+        "tips": [
+          {
+            "type": "teachingTip",
+            "markdown": "**Teaching Tip: Connecting to Previous Lessons** - When teaching about hallucinations, one possible direction that discussions may have gone is \"misinformation\" and ensuring that accurate information is available when needed. One place where this conversation appears frequently is in the context of elections, which is the context of Lesson 7 in this lesson. If you and your students spent time discussing misinformation during previous lessons, consider highlighting the role of retrieval in helping to ensure accurate information from chatbot sources. If your class is interested in continuing to explore the intersection of AI and elections, consider exploring the <a href=\"https://raise.mit.edu/day-of-ai-launches-new-ai-and-elections-mini-curriculum/\" target=\"_blank\">AI and Elections lessons from Day of AI</a>"
+          }
+        ]
+      },
+      "seeding_key": {
+        "activity_section.key": "9ecedc0e-ebeb-475a-af14-991df70e6c6b",
+        "lesson_activity.key": "c381ab60-d721-4a84-9a7c-fefcc406ad64"
+      }
+    },
+    {
+      "key": "299f02fb-139c-4a70-b73e-3c4ce8f4f5cc",
+      "position": 11,
+      "properties": {
+        "tips": [
+          {
+            "type": "ethicsOpportunity",
+            "markdown": "**Ethics Opportunity: Real-World Connection** - Level 5 is framed a real-world scenario where an airline used a customer-service chatbot to answer questions and the chatbot gave incorrect information to a customer. This scenario has a relatively happy ending, since the customer was able to sue the airline to make sure they honored the chatbots response (<a href=\"https://arstechnica.com/tech-policy/2024/02/air-canada-must-honor-refund-policy-invented-by-airlines-chatbot/\" target=\"_blank\">you can read the article here</a>). However, consider asking students to imagine other scenarios where a chatbot could give incorrect information and imagine the consequences. Encourage students to consider how not every consequence has the same \"weight\" or impact - for example, a chatbot that tells you the wrong time for a movie may be less impactful than a chatbot that tells you the wrong time for an airline flight needed to attend an important event. A later lesson in this unit - Lesson 13: User Testing - will address these types of impacts more deeply and ask students to decide whether a chatbot should be used in certain situations at all."
+          }
+        ]
+      },
+      "seeding_key": {
+        "activity_section.key": "299f02fb-139c-4a70-b73e-3c4ce8f4f5cc",
+        "lesson_activity.key": "c381ab60-d721-4a84-9a7c-fefcc406ad64"
+      }
+    },
+    {
+      "key": "1cded71d-fefc-4b11-9d6c-e5fb7e5481c5",
+      "position": 12,
+      "properties": {
+        "description": "\n<table>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://images.code.org/974a310283d6c4238d5181fde93443cc-Slide10.PNG\"></td>\n    <td style=\"width: 75%\">\n      <strong>Navigate:</strong> Go to Lesson 7 Level 8\n\t\t<br />\n\t\t<br /><i class=\"fa fa-check-square-o\" aria-hidden=\"true\"></i> <strong>Do This:</strong> Answer the check-in question, then continue to the practice levels\n\t\t<br />\n    </td>\n  </tr>\n\n</table>    \n    ",
         "tips": [
           {
             "type": "assessmentOpportunity",
@@ -2335,15 +2368,15 @@
         ]
       },
       "seeding_key": {
-        "activity_section.key": "66186721-e2f0-4ef8-a75d-b39da65c71e0",
+        "activity_section.key": "1cded71d-fefc-4b11-9d6c-e5fb7e5481c5",
         "lesson_activity.key": "c381ab60-d721-4a84-9a7c-fefcc406ad64"
       }
     },
     {
-      "key": "ad74bb15-c8d1-4dd5-9e3f-79948d508739",
-      "position": 11,
+      "key": "f0d5854b-64a1-4451-bf03-504944a7e7eb",
+      "position": 13,
       "properties": {
-        "description": "\n<table>\n  <tr>\n    <td style=\"width: 25%\">Slide</td>\n    <td style=\"width: 75%\">Lesson Guide</td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://docs.google.com/presentation/d/1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug/export/png?id=1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug&pageid=g2db60c341fb_0_34\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-desktop\" aria-hidden=\"true\"></i> <strong>Navigate:</strong> Go to Lesson 7 Level 9. These choice levels let students continue developing their skills with less scaffolding in the levels.\n\t\t<br />\n\t\t<br /><i class=\"fa fa-check-square-o\" aria-hidden=\"true\"></i> <strong>Do This:</strong> \n\t\t<br />1) Choose at least 2 levels to practice.\n\t\t<br />2) Make sure to leave time to complete the next level (Assessment) before class ends\n    </td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://docs.google.com/presentation/d/1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug/export/png?id=1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug&pageid=g2db60c341fb_0_311\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-desktop\" aria-hidden=\"true\"></i> <strong>Navigate:</strong> Go to Lesson 7 Level 10.\n\t\t<br />\n\t\t<br /><i class=\"fa fa-check-square-o\" aria-hidden=\"true\"></i> <strong>Do This:</strong> Complete level 10\n\t\t<br />\n    </td>\n  </tr>\n\n</table>    \n    ",
+        "description": "\n<table>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://images.code.org/e518fc6d15d1c03f447824e9df1bc647-Slide11.PNG\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-desktop\" aria-hidden=\"true\"></i> <strong>Navigate:</strong> Go to Lesson 7 Level 9. These choice levels let students continue developing their skills with less scaffolding in the levels.\n\t\t<br />\n\t\t<br /><i class=\"fa fa-check-square-o\" aria-hidden=\"true\"></i> <strong>Do This:</strong> \n\t\t<br />1) Choose at least 2 levels to practice.\n\t\t<br />2) Make sure to leave time to complete the next level (Assessment) before class ends\n    </td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://images.code.org/dc1e6bc1a99d3854cc8dba89bd3842cb-Slide12.PNG\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-desktop\" aria-hidden=\"true\"></i> <strong>Navigate:</strong> Go to Lesson 7 Level 10.\n\t\t<br />\n\t\t<br /><i class=\"fa fa-check-square-o\" aria-hidden=\"true\"></i> <strong>Do This:</strong> Complete level 10\n\t\t<br />\n    </td>\n  </tr>\n\n</table>    \n    ",
         "tips": [
           {
             "type": "assessmentOpportunity",
@@ -2352,18 +2385,18 @@
         ]
       },
       "seeding_key": {
-        "activity_section.key": "ad74bb15-c8d1-4dd5-9e3f-79948d508739",
+        "activity_section.key": "f0d5854b-64a1-4451-bf03-504944a7e7eb",
         "lesson_activity.key": "c381ab60-d721-4a84-9a7c-fefcc406ad64"
       }
     },
     {
-      "key": "ffbc92a4-f3d6-4835-b283-655f8a3213ba",
-      "position": 12,
+      "key": "64d50aea-dd71-486e-bb23-3df241cbb766",
+      "position": 14,
       "properties": {
-        "description": "\n<table>\n  <tr>\n    <td style=\"width: 25%\">Slide</td>\n    <td style=\"width: 75%\">Lesson Guide</td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://docs.google.com/presentation/d/1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug/export/png?id=1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug&pageid=g2db60c341fb_0_348\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-desktop\" aria-hidden=\"true\"></i> <strong>Navigate:</strong> Go to Lesson 7 Level 11. These choice levels let students continue developing their skills with less scaffolding in the levels.\n\t\t<br />\n\t\t<br /><i class=\"fa fa-check-square-o\" aria-hidden=\"true\"></i> <strong>Do This:</strong> Complete as many of these as you have time for. They can be challenging!\n    </td>\n  </tr>\n\n</table>    \n    "
+        "description": "\n<table>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://images.code.org/d732310574227dc7fc4be72e72737267-Slide13.PNG\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-desktop\" aria-hidden=\"true\"></i> <strong>Navigate:</strong> Go to Lesson 7 Level 11. These choice levels let students continue developing their skills with less scaffolding in the levels.\n\t\t<br />\n\t\t<br /><i class=\"fa fa-check-square-o\" aria-hidden=\"true\"></i> <strong>Do This:</strong> Complete as many of these as you have time for. They can be challenging!\n    </td>\n  </tr>\n\n</table>    \n    "
       },
       "seeding_key": {
-        "activity_section.key": "ffbc92a4-f3d6-4835-b283-655f8a3213ba",
+        "activity_section.key": "64d50aea-dd71-486e-bb23-3df241cbb766",
         "lesson_activity.key": "c381ab60-d721-4a84-9a7c-fefcc406ad64"
       }
     },
@@ -2371,7 +2404,7 @@
       "key": "ceff7152-612d-4c35-9a08-77bdad18cafa",
       "position": 1,
       "properties": {
-        "description": "\n<table>\n  <tr>\n    <td style=\"width: 25%\">Slide</td>\n    <td style=\"width: 75%\">Lesson Guide</td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://docs.google.com/presentation/d/1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug/export/png?id=1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug&pageid=g1b0012b9552_0_972\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-comments\" aria-hidden=\"true\"></i> <strong>Discuss:</strong> Which chatbot level from today felt the most interesting and relevant to the things you or your community cares about? If there weren’t any levels like this: what’s something you wish was explored in a level today? \n\t\t<br />\n\t\t<br /><i class=\"fa fa-lightbulb-o\" aria-hidden=\"true\"></i> <strong>Discussion Goal:</strong> This can be discussed in small groups or written as a journal prompt and submitted. The goal is to connect the skills students are learning to a real-world interest they have, potentially seeing themselves or a community member as a “user-story” supplied in these levels. Encourage students to make connections with how these skills might help themselves in their personal or future professional lives, or how there may be gaps in what chatbots are being used for and they have an opportunity to change that.\n    </td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://docs.google.com/presentation/d/1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug/export/png?id=1WepfsQ4BqHORfYbIGsIuX3cTog436Ae5-n5JvfXqrug&pageid=g1b0012b9552_0_737\"></td>\n    <td style=\"width: 75%\">\n      <strong>Question of the Day:</strong> When is retrieval most useful in solving a problem?\n\t\t<br />\n\t\t<br />Pilot Survey Feedback: Please encourage students to submit feedback to the Code.org Curriculum Writers via the QR code on the slide. Alternatively, you can provide students with the pre-filled link\n    </td>\n  </tr>\n\n</table>    \n    "
+        "description": "\n<table>\n  <tr>\n    <td style=\"width: 25%\">Slide</td>\n    <td style=\"width: 75%\">Lesson Guide</td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://images.code.org/db5bfec4c850a6bbe85c6704f81d681f-Slide15.PNG\"></td>\n    <td style=\"width: 75%\">\n      <i class=\"fa fa-comments\" aria-hidden=\"true\"></i> <strong>Discuss:</strong> Which chatbot level from today felt the most interesting and relevant to the things you or your community cares about? If there weren’t any levels like this: what’s something you wish was explored in a level today? \n\t\t<br />\n\t\t<br /><i class=\"fa fa-lightbulb-o\" aria-hidden=\"true\"></i> <strong>Discussion Goal:</strong> This can be discussed in small groups or written as a journal prompt and submitted. The goal is to connect the skills students are learning to a real-world interest they have, potentially seeing themselves or a community member as a “user-story” supplied in these levels. Encourage students to make connections with how these skills might help themselves in their personal or future professional lives, or how there may be gaps in what chatbots are being used for and they have an opportunity to change that.\n    </td>\n  </tr>\n\n  <tr>\n    <td style=\"width: 25%\"><img src=\"https://images.code.org/775718ccb0f8127926535e62f0ff3e12-Slide16.PNG\"></td>\n    <td style=\"width: 75%\">\n      <strong>Question of the Day:</strong> When is retrieval most useful in solving a problem?\n    </td>\n  </tr>\n\n</table>    \n    "
       },
       "seeding_key": {
         "activity_section.key": "ceff7152-612d-4c35-9a08-77bdad18cafa",
