@@ -1,10 +1,6 @@
 import * as GoogleBlockly from 'blockly/core';
-import {Abstract} from 'blockly/core/events/events_abstract';
-import {BlockChange} from 'blockly/core/events/events_block_change';
-import {FlyoutItemInfoArray} from 'blockly/core/utils/toolbox';
 
 import BlockSvgFrame from '@cdo/apps/blockly/addons/blockSvgFrame';
-import {convertXmlToJson} from '@cdo/apps/blockly/addons/cdoSerializationHelpers';
 import {BLOCK_TYPES} from '@cdo/apps/blockly/constants';
 import {ExtendedBlockSvg, ProcedureBlock} from '@cdo/apps/blockly/types';
 import {commonI18n} from '@cdo/apps/types/locale';
@@ -235,7 +231,7 @@ export function flyoutCategory(
   workspace: GoogleBlockly.WorkspaceSvg,
   functionEditorOpen = false
 ) {
-  const blockList: FlyoutItemInfoArray = [];
+  const blockList: GoogleBlockly.utils.toolbox.FlyoutItemInfoArray = [];
 
   if (functionEditorOpen) {
     // No-op - cannot create new behaviors while the modal editor is open
@@ -245,19 +241,7 @@ export function flyoutCategory(
   }
 
   // Add blocks from the level toolbox XML, if present.
-  const levelToolboxBlocks = Blockly.cdoUtils.getLevelToolboxBlocks('Behavior');
-  if (!levelToolboxBlocks?.querySelector('xml')?.hasChildNodes()) {
-    return blockList;
-  }
-
-  // Blockly supports XML or JSON, but not a combination of both.
-  // We convert to JSON here because the behavior_get blocks are JSON.
-  const blocksConvertedJson = convertXmlToJson(
-    levelToolboxBlocks.documentElement
-  );
-  const blocksJson =
-    Blockly.cdoUtils.getSimplifiedStateForFlyout(blocksConvertedJson);
-  blockList.push(...blocksJson);
+  blockList.push(...Blockly.cdoUtils.getCategoryBlocksJson('Behavior'));
 
   // Workspaces to populate behaviors flyout category from
   const workspaces = [
@@ -319,11 +303,14 @@ const getNewBehaviorButtonWithCallback = (
 
 // Added as a change listener. If a behavior name changes, we need to update any
 // behavior picker blocks that have the old name currently selected.
-function onBehaviorDefChange(event: Abstract, block: ExtendedBlockSvg) {
+function onBehaviorDefChange(
+  event: GoogleBlockly.Events.Abstract,
+  block: ExtendedBlockSvg
+) {
   if (event.type !== Blockly.Events.CHANGE) {
     return;
   }
-  const changeEvent = event as BlockChange;
+  const changeEvent = event as GoogleBlockly.Events.BlockChange;
   if (
     block.id === changeEvent.blockId &&
     // Excludes changes to the description field.

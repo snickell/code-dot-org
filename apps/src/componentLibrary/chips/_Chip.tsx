@@ -1,11 +1,9 @@
 import classNames from 'classnames';
-import React, {useEffect, useRef, memo} from 'react';
+import React, {useEffect, useRef, memo, HTMLAttributes} from 'react';
 
 import moduleStyles from './chip.module.scss';
 
-const commonI18n = require('@cdo/locale');
-
-interface ChipProps {
+interface ChipProps extends HTMLAttributes<HTMLInputElement> {
   /** Chip label */
   label: string;
   /** Chip name*/
@@ -18,6 +16,8 @@ interface ChipProps {
   textThickness: 'thick' | 'thin';
   /** Chip required state */
   required: boolean;
+  /** Error to display if selection required and none made */
+  requiredMessageText?: string;
   /** Chip disabled state */
   disabled?: boolean;
   /** Chip onChange handler*/
@@ -30,9 +30,11 @@ const Chip: React.FunctionComponent<ChipProps> = ({
   value,
   checked,
   required,
+  requiredMessageText,
   textThickness,
   disabled,
   onCheckedChange,
+  ...HTMLAttributes
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -68,9 +70,10 @@ const Chip: React.FunctionComponent<ChipProps> = ({
           }}
           onInvalid={e => {
             (e.target as HTMLInputElement).setCustomValidity(
-              commonI18n.chooseAtLeastOne()
+              requiredMessageText || 'Please choose at least one option'
             );
           }}
+          {...HTMLAttributes}
         />
         {label}
       </label>

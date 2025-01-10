@@ -2,8 +2,6 @@ class Ability
   include CanCan::Ability
   include Pd::Application::ActiveApplicationModels
 
-  GENAI_PILOT = 'gen-ai-lab-v1'
-
   # Define abilities for the passed in user here. For more information, see the
   # wiki at https://github.com/ryanb/cancan/wiki/Defining-Abilities.
   def initialize(user)
@@ -97,6 +95,7 @@ class Ability
       can :create, Activity, user_id: user.id
       can :create, UserLevel, user_id: user.id
       can :update, UserLevel, user_id: user.id
+      can :create, UserLevelInteraction, user_id: user.id
       can :create, Follower, student_user_id: user.id
       can :destroy, Follower do |follower|
         follower.student_user_id == user.id && !user.student?
@@ -105,6 +104,14 @@ class Ability
       can [:show, :pull_review, :update], PeerReview, reviewer_id: user.id
       can :view_project_commits, User do |project_owner|
         project_owner.id == user.id || can?(:code_review, project_owner)
+      end
+
+      can :submission_status, Project do |project|
+        project.owner_id == user.id
+      end
+
+      can :submit, Project do |project|
+        project.owner_id == user.id && project.submission_status == SharedConstants::PROJECT_SUBMISSION_STATUS[:CAN_SUBMIT]
       end
 
       can :create, CodeReview do |code_review, project|
@@ -117,7 +124,7 @@ class Ability
         # 1) the user is the project owner
         # 2) the user is the teacher of the project owner
         # 3) the user and the project owner are in the same code reivew group
-        project.owner.id == user.id || can?(:code_review, project.owner)
+        project.owner&.id == user&.id || can?(:code_review, project.owner)
       end
 
       # A user can review the code of other_user if they are the other_user's teacher or if
@@ -155,6 +162,9 @@ class Ability
       can :list_projects, Section do |section|
         can?(:manage, section) || user.sections_as_student.include?(section)
       end
+
+      # all signed in users can get their level source
+      can :get_level_source, UserLevel
 
       if user.teacher?
         can :manage, Section do |s|
@@ -256,14 +266,8 @@ class Ability
         can :report_csv, :peer_review_submissions
       end
 
-      if user.has_ai_tutor_access?
-        can :chat_completion, :openai_chat
-        can :create, AiTutorInteraction, user_id: user.id
-        can :index, AiTutorInteraction
-      end
-
-      if user.can_view_student_ai_chat_messages?
-        can :index, AiTutorInteraction
+      if SingleUserExperiment.enabled?(user: user, experiment_name: 'ai-differentiation') && user.teacher?
+        can :chat_completion, :ai_diff
       end
     end
 
@@ -342,8 +346,12 @@ class Ability
     end
 
     # We allow loading extra links on non-levelbuilder environments (such as prod)
-    if user.persisted? && user.permission?(UserPermission::LEVELBUILDER)
+    if user.persisted? && (user.permission?(UserPermission::LEVELBUILDER) || user.permission?(UserPermission::PROJECT_VALIDATOR))
       can :extra_links, Level
+    end
+
+    if user.persisted? && user.permission?(UserPermission::PROJECT_VALIDATOR)
+      can :extra_links, ProjectsController
     end
 
     # In order to accommodate the possibility of there being no database, we
@@ -470,11 +478,27 @@ class Ability
         user.verified_instructor? || user.sections_as_student.any? {|s| s.assigned_csa? && s.teacher&.verified_instructor?}
       end
 
-      if user.has_pilot_experiment?(GENAI_PILOT) ||
-          (!user.teachers.empty? &&
-          user.teachers.any? {|teacher| teacher.has_pilot_experiment?(GENAI_PILOT)})
-        can :chat_completion, :aichat
+      can :index, AiTutorInteraction do
+        user.can_view_student_ai_chat_messages? || user.has_ai_tutor_access?
       end
+
+      can :create, AiTutorInteraction do
+        user.has_ai_tutor_access?
+      end
+
+      can :chat_completion, :openai_chat do
+        user.has_ai_tutor_access?
+      end
+
+      can [:log_chat_event, :start_chat_completion, :chat_request, :find_toxicity], :aichat do
+        user.teacher_can_access_ai_chat? || user.student_can_access_ai_chat?
+      end
+      # Additional logic that confirms that a given teacher should have access
+      # to a given student's chat history is in aichat_controller.
+      can :student_chat_history, :aichat do
+        user.teacher_can_access_ai_chat?
+      end
+      can :user_has_access, :aichat
     end
 
     if user.persisted? && user.permission?(UserPermission::PROJECT_VALIDATOR)

@@ -1,18 +1,21 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
 import classNames from 'classnames';
-import {getBaseAssetUrl} from '../appConfig';
-import styles from './soundsPanel.module.scss';
-import FontAwesome from '@cdo/apps/templates/FontAwesome';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import FocusLock from 'react-focus-lock';
+
 import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
+import SegmentedButtons from '@cdo/apps/componentLibrary/segmentedButtons';
+import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
+
+import {getBaseAssetUrl} from '../appConfig';
+import musicI18n from '../locale';
 import MusicLibrary, {
   SoundData,
   SoundFolder,
   SoundType,
 } from '../player/MusicLibrary';
 import SoundStyle from '../utils/SoundStyle';
-import FocusLock from 'react-focus-lock';
-import SegmentedButtons from '@cdo/apps/componentLibrary/segmentedButtons';
-import musicI18n from '../locale';
+
+import styles from './soundsPanel.module.scss';
 
 /*
  * Renders a UI for previewing and choosing samples. This is currently used within a
@@ -186,6 +189,7 @@ const SoundsPanelRow: React.FunctionComponent<SoundsPanelRowProps> = ({
             styles.typeIcon,
             SoundStyle[sound.type]?.classNameColor
           )}
+          iconStyle="regular"
         />
         <div
           className={classNames(
@@ -323,7 +327,11 @@ const SoundsPanel: React.FunctionComponent<SoundsPanelProps> = ({
       >
         <div id="hidden-item" tabIndex={0} role="button" />
         {showSoundFilters && (
-          <div id="sounds-panel-top" className={styles.soundsPanelTop}>
+          <div
+            id="sounds-panel-top"
+            className={styles.soundsPanelTop}
+            data-theme="Dark"
+          >
             <SegmentedButtons
               selectedButtonValue={mode}
               buttons={[
@@ -332,6 +340,7 @@ const SoundsPanel: React.FunctionComponent<SoundsPanelProps> = ({
               ]}
               onChange={value => onModeChange(value as Mode)}
               className={styles.segmentedButtons}
+              size="s"
             />
 
             <SegmentedButtons
@@ -339,6 +348,7 @@ const SoundsPanel: React.FunctionComponent<SoundsPanelProps> = ({
               buttons={filterButtons}
               onChange={value => onFilterChange(value as Filter)}
               className={styles.segmentedButtons}
+              size="s"
             />
           </div>
         )}

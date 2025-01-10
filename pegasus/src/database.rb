@@ -7,25 +7,23 @@ require 'active_support/core_ext/enumerable'
 require 'active_support/core_ext/object/deep_dup'
 
 class Tutorials
-  # This class uses data from two GSheets:
+  # This class uses data from one GSheet:
   #   GoogleDrive://Pegasus/v3/cdo-tutorials
-  #   GoogleDrive://Pegasus/v3/cdo-beyond-tutorials
-  # These sheets are in the "v3" Google Sheet format and use datatype suffixes on the column names,
+  # This sheet is in the "v3" Google Sheet format and use datatype suffixes on the column names,
   # and map to tables in the database to match the v3 convention:
   #   cdo_tutorials
-  #   cdo_beyond_tutorials
   # We alias the database columns with names that have the datatype suffixes stripped off for
   # backwards-compatibility with some existing tutorial pages
   # Note: A tutorial can be present in the sheet but hidden by giving it the "do-not-show" tag.
   def initialize(table, no_cache = false)
-    @table = "cdo_#{table}".to_sym
+    @table = :"cdo_#{table}"
 
     # create an alias for each column without the datatype suffix (alias "amidala_jarjar_s" as "amidala_jarjar")
     @column_aliases = CDO.cache.fetch("Tutorials/#{@table}/column_aliases", force: no_cache) do
       DB.schema(@table).map do |column|
         db_column_name = column[0].to_s
         column_alias = db_column_name.rindex('_').nil? ? db_column_name : db_column_name.rpartition('_')[0]
-        "#{db_column_name}___#{column_alias}".to_sym
+        :"#{db_column_name}___#{column_alias}"
       end
     end
 
@@ -64,17 +62,36 @@ class Tutorials
   end
 
   # return the first tutorial with a matching code
+  # The only column indexed on cdo_tutorials table is the id column so
+  # we're caching the mapping of code to id. However, we've seen errors in
+  # production with caching the entire CdoTutorials object, so we're relying on
+  # the fast DB query to get the tutorial data.
   def find_with_code(code)
-    by_code = CDO.cache.fetch("Tutorials/#{@table}/by_code") {@contents.index_by {|row| row[:code]}}
-    by_code[code]
+    ids_by_code = CDO.cache.fetch("CdoTutorials/#{@table}/ids_by_code") do
+      @contents.index_by {|row| row[:code]}.transform_values {|obj| obj[:id]}
+    end
+    id = ids_by_code[code]
+    return nil unless id
+    DB[@table].select(*@column_aliases).where(id: id).first
   end
 
   # return the first tutorial with a matching short code
+  # The only column indexed on cdo_tutorials table is the id column so
+  # we're caching the mapping of short_code to id. However, we've seen errors in
+  # production with caching the entire CdoTutorials object, so we're relying on
+  # the fast DB query to get the tutorial data.
   def find_with_short_code(short_code)
-    by_short_code = CDO.cache.fetch("Tutorials/#{@table}/by_short_code") {@contents.index_by {|row| row[:short_code]}}
-    by_short_code[short_code]
+    ids_by_short_code = CDO.cache.fetch("Tutorials/#{@table}/ids_by_short_code") do
+      @contents.index_by {|row| row[:short_code]}.transform_values {|obj| obj[:id]}
+    end
+    id = ids_by_short_code[short_code]
+    return nil unless id
+    DB[@table].select(*@column_aliases).where(id: id).first
   end
 
+  # As of HOC 2024 we are no longer using this as a sorting method,
+  # but will leave this here in case we need to revert back to it.
+  # See https://github.com/code-dot-org/code-dot-org/pull/60728.
   def self.sort_by_popularity?(site, hoc_mode)
     (hoc_mode == "post-hoc") || (site == 'code.org' && [false, 'pre-hoc'].include?(hoc_mode))
   end
@@ -117,34 +134,9 @@ def search_for_address(address)
   Geocoder.search(address).first
 end
 
-# Temporary helper method to help us determine which version of MySQL is
-# available in the local environment, so we can conditionally apply
-# version-specific logic as we transition from MySQL 5.7 to MySQL 8.
-#
-# TODO infra: remove this once we've updated everything to MySQL 8.
-def current_mysql_version
-  $current_mysql_version ||= begin
-    raw_version = DB.fetch('SELECT VERSION()').first[:'VERSION()']
-    case raw_version
-    when /^8.0.\d+/
-      8.0
-    when /^5.7.\d+/
-      5.7
-    else
-      raise "cannot parse MySQL version #{raw_version.inspect}"
-    end
-  end
-end
-
 def geocode_address(address)
   location = search_for_address(address)
   return nil unless location
   return nil unless location.latitude && location.longitude
-  # TODO infra: once we've updated everything to MySQL 8+, we can reduce this
-  # back to a single case.
-  if current_mysql_version < 8
-    "#{location.latitude},#{location.longitude}"
-  else
-    "#{location.longitude},#{location.latitude}"
-  end
+  return "#{location.longitude},#{location.latitude}"
 end

@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import LessonProgressColumnHeader from './LessonProgressColumnHeader';
 
 import styles from './progress-table-v2.module.scss';
-import skeletonizeContent from '@cdo/apps/componentLibrary/skeletonize-content.module.scss';
+import skeletonizeContent from '@cdo/apps/sharedComponents/skeletonize-content.module.scss';
 
 const getId = (student, lesson) => student.id + '.' + lesson.id;
 
@@ -23,6 +23,7 @@ const getSkeletonCell = (id, key = undefined) => (
   <div
     className={classNames(styles.gridBox, styles.gridBoxLesson)}
     key={key}
+    // eslint-disable-next-line react/forbid-dom-props
     data-testid={'lesson-skeleton-cell-' + id}
   >
     {skeletonContent}
@@ -34,12 +35,14 @@ const getMetadataExpandedSkeletonCell = id => (
     {getSkeletonCell(id)}
     <div
       className={classNames(styles.gridBox, styles.gridBoxMetadata)}
+      // eslint-disable-next-line react/forbid-dom-props
       data-testid={'lesson-skeleton-cell-' + id + '-time-spent'}
     >
       {skeletonContent}
     </div>
     <div
       className={classNames(styles.gridBox, styles.gridBoxMetadata)}
+      // eslint-disable-next-line react/forbid-dom-props
       data-testid={'lesson-skeleton-cell-' + id + '-last-updated'}
     >
       {skeletonContent}
@@ -53,7 +56,7 @@ function SkeletonProgressDataColumn({
   expandedMetadataStudentIds,
 }) {
   return (
-    <div className={styles.lessonColumn}>
+    <div className={styles.lessonColumn} id="ui-test-skeleton-progress-column">
       <LessonProgressColumnHeader
         lesson={lesson}
         addExpandedLesson={() => {}}
@@ -74,8 +77,6 @@ SkeletonProgressDataColumn.propTypes = {
   lesson: PropTypes.object.isRequired,
   expandedMetadataStudentIds: PropTypes.array.isRequired,
 };
-
-export const UnconnectedSkeletonProgressDataColumn = SkeletonProgressDataColumn;
 
 export default connect(state => ({
   expandedMetadataStudentIds: state.sectionProgress.expandedMetadataStudentIds,

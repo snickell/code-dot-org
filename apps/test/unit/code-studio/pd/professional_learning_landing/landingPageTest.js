@@ -1,4 +1,5 @@
-import {fireEvent, render, screen} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import '@testing-library/jest-dom';
 import React from 'react';
 import {Provider} from 'react-redux';
 
@@ -14,7 +15,9 @@ import {
 import teacherSections from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
 import i18n from '@cdo/locale';
 
-import {expect} from '../../../../util/reconfiguredChai';
+jest.mock('@cdo/apps/util/AuthenticityTokenStore', () => ({
+  getAuthenticityToken: jest.fn().mockResolvedValue('authToken'),
+}));
 
 const TEST_WORKSHOP = {
   id: 1,
@@ -39,12 +42,9 @@ const TEST_WORKSHOP = {
 const DEFAULT_PROPS = {
   lastWorkshopSurveyUrl: 'url',
   lastWorkshopSurveyCourse: 'CS Fundamentals',
-  deeperLearningCourseData: [{data: 'oh yeah'}],
+  showDeeperLearning: true,
   currentYearApplicationId: 2024,
   hasEnrorolledInWorkshop: true,
-  workshopsAsFacilitator: [],
-  workshopsAsOrganizer: [],
-  workshopsAsRegionalPartner: [],
   plCoursesStarted: selfPacedCourseConstants,
   userPermissions: [],
   joinedStudentSections: [],
@@ -85,57 +85,69 @@ describe('LandingPage', () => {
       plCoursesStarted: [],
     });
     screen.getByText(i18n.plLandingGettingStartedHeading());
-    expect(screen.queryByText(i18n.plLandingStartSurvey())).to.not.exist;
-    screen.getByTestId('enrolled-workshops-loader');
-    expect(screen.queryByText(i18n.plLandingSelfPacedProgressHeading())).to.not
-      .exist;
+    expect(screen.queryByText(i18n.plLandingStartSurvey())).toBeFalsy();
+    expect(
+      screen.queryByText(i18n.plLandingSelfPacedProgressHeading())
+    ).toBeFalsy();
     screen.getByText(i18n.plLandingStaticPLMidHighHeading());
   });
 
   it('page shows a survey banner for a teacher with a pending survey', () => {
     renderDefault();
-    expect(screen.queryByText(i18n.plLandingGettingStartedHeading())).to.not
-      .exist;
+    expect(
+      screen.queryByText(i18n.plLandingGettingStartedHeading())
+    ).toBeFalsy();
     screen.getByText(i18n.plLandingStartSurvey());
-    screen.getByTestId('enrolled-workshops-loader');
     screen.getByText(i18n.plLandingSelfPacedProgressHeading());
     screen.getByText(i18n.plLandingStaticPLMidHighHeading());
   });
 
   it('page shows a survey banner for a CSD/CSP teacher with a pending survey', () => {
     renderDefault();
-    expect(screen.queryByText(i18n.plLandingGettingStartedHeading())).to.not
-      .exist;
+    expect(
+      screen.queryByText(i18n.plLandingGettingStartedHeading())
+    ).toBeFalsy();
     screen.getByText(i18n.plLandingStartSurvey());
-    screen.getByTestId('enrolled-workshops-loader');
     screen.getByText(i18n.plLandingSelfPacedProgressHeading());
     screen.getByText(i18n.plLandingStaticPLMidHighHeading());
   });
 
-  it('page shows upcoming workshops, self-paced courses, and plc enrollments but no survey banner if no pending survey exists', () => {
+  it('page shows upcoming workshops, self-paced courses, and plc enrollments but no survey banner if no pending survey exists', async () => {
+    const fetchStub = jest.spyOn(window, 'fetch').mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve([TEST_WORKSHOP]),
+    });
+
     renderDefault({
       lastWorkshopSurveyUrl: null,
       lastWorkshopSurveyCourse: null,
     });
-    expect(screen.queryByText(i18n.plLandingGettingStartedHeading())).to.not
-      .exist;
-    expect(screen.queryByText(i18n.plLandingStartSurvey())).to.not.exist;
-    screen.getByTestId('enrolled-workshops-loader');
-    screen.getByText(i18n.plLandingSelfPacedProgressHeading());
-    screen.getByText(i18n.plLandingStaticPLMidHighHeading());
+    expect(
+      screen.queryByText(i18n.plLandingGettingStartedHeading())
+    ).toBeFalsy();
+    expect(screen.queryByText(i18n.plLandingStartSurvey())).toBeFalsy();
+    await waitFor(() => {
+      screen.getByText(i18n.myWorkshops());
+      screen.getByText(TEST_WORKSHOP.location_address);
+      screen.getByText(i18n.plLandingSelfPacedProgressHeading());
+      screen.getByText(i18n.plLandingStaticPLMidHighHeading());
+    });
+
+    fetchStub.mockRestore();
   });
 
   it('page shows self-paced progress table if enrolled in self-paced courses', () => {
     renderDefault();
     screen.getByText(i18n.plLandingSelfPacedProgressHeading());
-    expect(screen.getAllByTestId('progress-bar').length).to.equal(2);
+    // eslint-disable-next-line no-restricted-properties
+    expect(screen.getAllByTestId('progress-bar').length).toBe(2);
     expect(screen.getByText(i18n.selfPacedPlCompleted()));
-    expect(
-      screen.getAllByText(i18n.selfPacedPlContinueCourse()).length
-    ).to.equal(2);
+    expect(screen.getAllByText(i18n.selfPacedPlContinueCourse()).length).toBe(
+      2
+    );
     expect(
       screen.getAllByText(i18n.selfPacedPlPrintCertificates()).length
-    ).to.equal(2);
+    ).toBe(2);
   });
 
   it('page shows joined PL sections table', () => {
@@ -144,24 +156,35 @@ describe('LandingPage', () => {
     screen.getByText(i18n.joinedProfessionalLearningSectionsHomepageTitle());
   });
 
-  it('page shows enrolled workshops table', () => {
+  it('page shows enrolled workshops table', async () => {
+    const fetchStub = jest
+      .spyOn(window, 'fetch')
+      .mockClear()
+      .mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve([TEST_WORKSHOP]),
+      });
+
     renderDefault();
 
-    screen.getByTestId('enrolled-workshops-loader');
+    await waitFor(() => {
+      screen.getByText(i18n.myWorkshops());
+      screen.getByText(TEST_WORKSHOP.location_address);
+    });
+    fetchStub.mockRestore();
   });
 
   it('page shows no tabs for teacher with no relevant permissions', () => {
     renderDefault();
 
     // Should only see the banner header labeled "Professional Learning" but not the tab of the same name
-    expect(screen.queryAllByText(i18n.professionalLearning())).to.have.lengthOf(
-      1
-    );
-    expect(screen.queryByText(i18n.plLandingTabFacilitatorCenter())).to.be.null;
-    expect(screen.queryByText(i18n.plLandingTabInstructorCenter())).to.be.null;
-    expect(screen.queryByText(i18n.plLandingTabRPCenter())).to.be.null;
-    expect(screen.queryByText(i18n.plLandingTabWorkshopOrganizerCenter())).to.be
-      .null;
+    expect(screen.queryAllByText(i18n.professionalLearning())).toHaveLength(1);
+    expect(screen.queryByText(i18n.plLandingTabFacilitatorCenter())).toBeNull();
+    expect(screen.queryByText(i18n.plLandingTabInstructorCenter())).toBeNull();
+    expect(screen.queryByText(i18n.plLandingTabRPCenter())).toBeNull();
+    expect(
+      screen.queryByText(i18n.plLandingTabWorkshopOrganizerCenter())
+    ).toBeNull();
   });
 
   it('page only shows Professional Learning and Facilitator Center tabs for facilitator', () => {
@@ -169,14 +192,13 @@ describe('LandingPage', () => {
       userPermissions: ['facilitator'],
     });
 
-    expect(screen.queryAllByText(i18n.professionalLearning())).to.have.lengthOf(
-      2
-    );
+    expect(screen.queryAllByText(i18n.professionalLearning())).toHaveLength(2);
     screen.getByText(i18n.plLandingTabFacilitatorCenter());
-    expect(screen.queryByText(i18n.plLandingTabInstructorCenter())).to.be.null;
-    expect(screen.queryByText(i18n.plLandingTabRPCenter())).to.be.null;
-    expect(screen.queryByText(i18n.plLandingTabWorkshopOrganizerCenter())).to.be
-      .null;
+    expect(screen.queryByText(i18n.plLandingTabInstructorCenter())).toBeNull();
+    expect(screen.queryByText(i18n.plLandingTabRPCenter())).toBeNull();
+    expect(
+      screen.queryByText(i18n.plLandingTabWorkshopOrganizerCenter())
+    ).toBeNull();
   });
 
   it('page only shows Professional Learning and Facilitator Center tabs for users with facilitator and (universal instructor or peer reviewer) permissions', () => {
@@ -184,14 +206,13 @@ describe('LandingPage', () => {
       userPermissions: ['facilitator', 'universal_instructor', 'plc_reviewer'],
     });
 
-    expect(screen.queryAllByText(i18n.professionalLearning())).to.have.lengthOf(
-      2
-    );
+    expect(screen.queryAllByText(i18n.professionalLearning())).toHaveLength(2);
     screen.getByText(i18n.plLandingTabFacilitatorCenter());
-    expect(screen.queryByText(i18n.plLandingTabInstructorCenter())).to.be.null;
-    expect(screen.queryByText(i18n.plLandingTabRPCenter())).to.be.null;
-    expect(screen.queryByText(i18n.plLandingTabWorkshopOrganizerCenter())).to.be
-      .null;
+    expect(screen.queryByText(i18n.plLandingTabInstructorCenter())).toBeNull();
+    expect(screen.queryByText(i18n.plLandingTabRPCenter())).toBeNull();
+    expect(
+      screen.queryByText(i18n.plLandingTabWorkshopOrganizerCenter())
+    ).toBeNull();
   });
 
   it('page only shows Professional Learning and Instructor Center tabs for universal instructors', () => {
@@ -199,14 +220,13 @@ describe('LandingPage', () => {
       userPermissions: ['universal_instructor'],
     });
 
-    expect(screen.queryAllByText(i18n.professionalLearning())).to.have.lengthOf(
-      2
-    );
-    expect(screen.queryByText(i18n.plLandingTabFacilitatorCenter())).to.be.null;
+    expect(screen.queryAllByText(i18n.professionalLearning())).toHaveLength(2);
+    expect(screen.queryByText(i18n.plLandingTabFacilitatorCenter())).toBeNull();
     screen.getByText(i18n.plLandingTabInstructorCenter());
-    expect(screen.queryByText(i18n.plLandingTabRPCenter())).to.be.null;
-    expect(screen.queryByText(i18n.plLandingTabWorkshopOrganizerCenter())).to.be
-      .null;
+    expect(screen.queryByText(i18n.plLandingTabRPCenter())).toBeNull();
+    expect(
+      screen.queryByText(i18n.plLandingTabWorkshopOrganizerCenter())
+    ).toBeNull();
   });
 
   it('page only shows Professional Learning and Instructor Center tabs for peer reviewers', () => {
@@ -214,14 +234,13 @@ describe('LandingPage', () => {
       userPermissions: ['plc_reviewer'],
     });
 
-    expect(screen.queryAllByText(i18n.professionalLearning())).to.have.lengthOf(
-      2
-    );
-    expect(screen.queryByText(i18n.plLandingTabFacilitatorCenter())).to.be.null;
+    expect(screen.queryAllByText(i18n.professionalLearning())).toHaveLength(2);
+    expect(screen.queryByText(i18n.plLandingTabFacilitatorCenter())).toBeNull();
     screen.getByText(i18n.plLandingTabInstructorCenter());
-    expect(screen.queryByText(i18n.plLandingTabRPCenter())).to.be.null;
-    expect(screen.queryByText(i18n.plLandingTabWorkshopOrganizerCenter())).to.be
-      .null;
+    expect(screen.queryByText(i18n.plLandingTabRPCenter())).toBeNull();
+    expect(
+      screen.queryByText(i18n.plLandingTabWorkshopOrganizerCenter())
+    ).toBeNull();
   });
 
   it('page only shows Professional Learning and Regional Partner Center tabs for program managers', () => {
@@ -229,14 +248,13 @@ describe('LandingPage', () => {
       userPermissions: ['program_manager'],
     });
 
-    expect(screen.queryAllByText(i18n.professionalLearning())).to.have.lengthOf(
-      2
-    );
-    expect(screen.queryByText(i18n.plLandingTabFacilitatorCenter())).to.be.null;
-    expect(screen.queryByText(i18n.plLandingTabInstructorCenter())).to.be.null;
+    expect(screen.queryAllByText(i18n.professionalLearning())).toHaveLength(2);
+    expect(screen.queryByText(i18n.plLandingTabFacilitatorCenter())).toBeNull();
+    expect(screen.queryByText(i18n.plLandingTabInstructorCenter())).toBeNull();
     screen.getByText(i18n.plLandingTabRPCenter());
-    expect(screen.queryByText(i18n.plLandingTabWorkshopOrganizerCenter())).to.be
-      .null;
+    expect(
+      screen.queryByText(i18n.plLandingTabWorkshopOrganizerCenter())
+    ).toBeNull();
   });
 
   it('page only shows Professional Learning and Workshop Organizer Center tabs for workshop organizers', () => {
@@ -244,20 +262,35 @@ describe('LandingPage', () => {
       userPermissions: ['workshop_organizer'],
     });
 
-    expect(screen.queryAllByText(i18n.professionalLearning())).to.have.lengthOf(
-      2
-    );
-    expect(screen.queryByText(i18n.plLandingTabFacilitatorCenter())).to.be.null;
-    expect(screen.queryByText(i18n.plLandingTabInstructorCenter())).to.be.null;
-    expect(screen.queryByText(i18n.plLandingTabRPCenter())).to.be.null;
+    expect(screen.queryAllByText(i18n.professionalLearning())).toHaveLength(2);
+    expect(screen.queryByText(i18n.plLandingTabFacilitatorCenter())).toBeNull();
+    expect(screen.queryByText(i18n.plLandingTabInstructorCenter())).toBeNull();
+    expect(screen.queryByText(i18n.plLandingTabRPCenter())).toBeNull();
     screen.getByText(i18n.plLandingTabWorkshopOrganizerCenter());
   });
 
-  it('page shows expected sections in Facilitator Center tab', () => {
-    renderDefault({
-      userPermissions: ['facilitator'],
-      workshopsAsFacilitator: [TEST_WORKSHOP],
-      coursesAsFacilitator: ['CS Discoveries', 'Computer Science A'],
+  it('page shows expected sections in Facilitator Center tab', async () => {
+    const fetchStub = jest
+      .spyOn(window, 'fetch')
+      .mockClear()
+      .mockImplementation(args => {
+        if (args.includes('workshops_user_enrolled_in')) {
+          return Promise.resolve({ok: true, json: () => []});
+        } else if (args.includes('workshops_as_facilitator_for_pl_page')) {
+          return Promise.resolve({
+            ok: true,
+            json: () => {
+              return {workshops_as_facilitator: [TEST_WORKSHOP]};
+            },
+          });
+        }
+      });
+
+    await waitFor(() => {
+      renderDefault({
+        userPermissions: ['facilitator'],
+        coursesAsFacilitator: ['CS Discoveries', 'Computer Science A'],
+      });
     });
     fireEvent.click(screen.getByText(i18n.plLandingTabFacilitatorCenter()));
 
@@ -282,7 +315,9 @@ describe('LandingPage', () => {
     screen.getByText(i18n.plSectionsInstructorTitle());
 
     // Facilitated workshop table
-    screen.getByText('In Progress and Upcoming Workshops');
+    screen.getByText(i18n.inProgressAndUpcomingWorkshops());
+
+    fetchStub.mockRestore();
   });
 
   it('page shows expected sections in Instructor Center tab (for universal instructor)', () => {
@@ -307,10 +342,27 @@ describe('LandingPage', () => {
     screen.getByText(i18n.plSectionsInstructorTitle());
   });
 
-  it('page shows expected sections in Regional Partner Center tab', () => {
-    renderDefault({
-      userPermissions: ['program_manager'],
-      workshopsAsRegionalPartner: [TEST_WORKSHOP],
+  it('page shows expected sections in Regional Partner Center tab', async () => {
+    const fetchStub = jest
+      .spyOn(window, 'fetch')
+      .mockClear()
+      .mockImplementation(args => {
+        if (args.includes('workshops_user_enrolled_in')) {
+          return Promise.resolve({ok: true, json: () => []});
+        } else if (args.includes('workshops_as_program_manager_for_pl_page')) {
+          return Promise.resolve({
+            ok: true,
+            json: () => {
+              return {workshops_as_program_manager: [TEST_WORKSHOP]};
+            },
+          });
+        }
+      });
+
+    await waitFor(() => {
+      renderDefault({
+        userPermissions: ['program_manager'],
+      });
     });
     fireEvent.click(screen.getByText(i18n.plLandingTabRPCenter()));
 
@@ -320,22 +372,81 @@ describe('LandingPage', () => {
     screen.getByText(i18n.plSectionsRegionalPartnerPlaybookTitle());
 
     // Regional Partner workshop table
-    screen.getByText('In Progress and Upcoming Workshops');
+    screen.getByText(i18n.inProgressAndUpcomingWorkshops());
+
+    fetchStub.mockRestore();
   });
 
-  it('page shows expected sections in Workshop Organizer Center tab', () => {
+  it('page shows expected sections in Workshop Organizer Center tab', async () => {
+    const fetchStub = jest
+      .spyOn(window, 'fetch')
+      .mockClear()
+      .mockImplementation(args => {
+        if (args.includes('workshops_user_enrolled_in')) {
+          return Promise.resolve({ok: true, json: () => []});
+        } else if (args.includes('workshops_as_organizer_for_pl_page')) {
+          return Promise.resolve({
+            ok: true,
+            json: () => {
+              return {workshops_as_organizer: [TEST_WORKSHOP]};
+            },
+          });
+        }
+      });
     renderDefault({
       userPermissions: ['workshop_organizer'],
-      workshopsAsOrganizer: [TEST_WORKSHOP],
+    });
+    await waitFor(() => {
+      screen.getByText(i18n.plLandingTabWorkshopOrganizerCenter());
     });
     fireEvent.click(
-      screen.getAllByText(i18n.plLandingTabWorkshopOrganizerCenter())[0]
+      screen.getByText(i18n.plLandingTabWorkshopOrganizerCenter())
     );
 
     // Workshop Organizer Resources
     screen.getByText(i18n.plSectionsWorkshopResources());
 
-    // Workshop Organizer workshop table
-    screen.getByText('In Progress and Upcoming Workshops');
+    await waitFor(() => {
+      // Workshop Organizer workshop table
+      screen.getByText(i18n.inProgressAndUpcomingWorkshops());
+    });
+
+    fetchStub.mockRestore();
+  });
+
+  it('page does not show success dialog when not redirected here from successful enrollment', () => {
+    renderDefault();
+
+    expect(screen.queryByText(i18n.enrollmentCelebrationTitle())).toBeNull();
+  });
+
+  it('page shows success dialog stating workshop course when redirected here from successful non-BYOW enrollment', () => {
+    const workshopCourse = 'TEST COURSE';
+    sessionStorage.setItem('workshopCourse', workshopCourse);
+
+    renderDefault();
+
+    screen.getByText(i18n.enrollmentCelebrationTitle());
+    screen.getByText(
+      i18n.enrollmentCelebrationBody({workshopName: workshopCourse})
+    );
+
+    sessionStorage.clear();
+  });
+
+  it('page shows success dialog stating workshop name when redirected here from successful BYOW enrollment', () => {
+    const workshopCourse = 'TEST COURSE';
+    const workshopName = 'TEST NAME';
+    sessionStorage.setItem('workshopCourse', workshopCourse);
+    sessionStorage.setItem('workshopName', workshopName);
+
+    renderDefault();
+
+    screen.getByText(i18n.enrollmentCelebrationTitle());
+    screen.getByText(
+      i18n.enrollmentCelebrationBody({workshopName: workshopName})
+    );
+
+    sessionStorage.clear();
   });
 });

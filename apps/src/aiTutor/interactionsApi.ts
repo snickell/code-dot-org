@@ -1,5 +1,5 @@
-import {MetricEvent} from '@cdo/apps/lib/metrics/events';
-import MetricsReporter from '@cdo/apps/lib/metrics/MetricsReporter';
+import {MetricEvent} from '@cdo/apps/metrics/events';
+import MetricsReporter from '@cdo/apps/metrics/MetricsReporter';
 import {getAuthenticityToken} from '@cdo/apps/util/AuthenticityTokenStore';
 
 import {AITutorInteraction} from './types';
@@ -78,6 +78,7 @@ export const fetchAITutorInteractions = async (
 export interface FeedbackData {
   thumbsUp?: boolean | null;
   thumbsDown?: boolean | null;
+  details?: string | null;
 }
 
 export async function saveFeedback(

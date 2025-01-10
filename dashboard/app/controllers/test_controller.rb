@@ -75,8 +75,8 @@ class TestController < ApplicationController
     return unless (user = current_user)
     script = Unit.find_by_name(params.require(:script_name))
 
-    Section.create!(name: "New Section", user: user, script: script, participant_type: Curriculum::SharedCourseConstants::PARTICIPANT_AUDIENCE.student)
-    head :ok
+    section = Section.create!(name: "New Section", user: user, script: script, participant_type: Curriculum::SharedCourseConstants::PARTICIPANT_AUDIENCE.student)
+    render json: {section_code: section.code}
   end
 
   def create_student_section_with_name
@@ -90,19 +90,24 @@ class TestController < ApplicationController
     script = Unit.find_by_name(params.require(:script_name))
     course = UnitGroup.find_by_name(params.require(:course_name))
 
-    name = "Fake User"
-    email = "user#{Time.now.to_i}_#{rand(1_000_000)}@test.xx"
-    password = name + "password"
-    attributes = {
-      name: name,
-      email: email,
-      password: password,
-      user_type: "teacher",
-      age: "21+"
-    }
-    fake_user = User.create!(attributes)
+    teacher_email = params[:teacher_email]
+    if teacher_email
+      teacher_user = User.find_by_email(teacher_email)
+    else
+      name = "Fake User"
+      email = "user#{Time.now.to_i}_#{rand(1_000_000)}@test.xx"
+      password = name + "password"
+      attributes = {
+        name: name,
+        email: email,
+        password: password,
+        user_type: "teacher",
+        age: "21+"
+      }
+      teacher_user = User.create!(attributes)
+    end
 
-    section = Section.create(name: "New Section", user: fake_user, script_id: script.id, course_id: course.id, participant_type: Curriculum::SharedCourseConstants::PARTICIPANT_AUDIENCE.student)
+    section = Section.create(name: "New Section", user: teacher_user, script_id: script.id, course_id: course.id, participant_type: Curriculum::SharedCourseConstants::PARTICIPANT_AUDIENCE.student)
     section.students << user
     section.save!
     head :ok
@@ -112,19 +117,24 @@ class TestController < ApplicationController
     return unless (user = current_user)
     script = Unit.find_by_name(params.require(:script_name))
 
-    name = "Fake User"
-    email = "user#{Time.now.to_i}_#{rand(1_000_000)}@test.xx"
-    password = name + "password"
-    attributes = {
-      name: name,
-      email: email,
-      password: password,
-      user_type: "teacher",
-      age: "21+"
-    }
-    fake_user = User.create!(attributes)
+    teacher_email = params[:teacher_email]
+    if teacher_email
+      teacher_user = User.find_by_email(teacher_email)
+    else
+      name = "Fake User"
+      email = "user#{Time.now.to_i}_#{rand(1_000_000)}@test.xx"
+      password = name + "password"
+      attributes = {
+        name: name,
+        email: email,
+        password: password,
+        user_type: "teacher",
+        age: "21+"
+      }
+      teacher_user = User.create!(attributes)
+    end
 
-    section = Section.create(name: "New Section", user: fake_user, script: script, participant_type: Curriculum::SharedCourseConstants::PARTICIPANT_AUDIENCE.student)
+    section = Section.create(name: "New Section", user: teacher_user, script: script, participant_type: Curriculum::SharedCourseConstants::PARTICIPANT_AUDIENCE.student)
     section.students << user
     section.save!
     head :ok
@@ -282,7 +292,7 @@ class TestController < ApplicationController
 
   def create_applications
     %w(csd csp csa).each do |course|
-      (Pd::Application::TeacherApplication.statuses).each do |status|
+      Pd::Application::TeacherApplication.statuses.each do |status|
         teacher_email = "#{course}_#{status}@code.org"
         teacher = User.find_or_create_teacher(
           {name: "#{course} #{status}", email: teacher_email}, nil, nil
@@ -327,6 +337,11 @@ class TestController < ApplicationController
     head :ok
   end
 
+  def delete_workshop
+    Pd::Workshop.find_by_id(params[:workshop_id]).destroy
+    head :ok
+  end
+
   def create_pilot
     name = params.require(:pilot_name)
     Pilot.create_with(allow_joining_via_url: true, display_name: name).find_or_create_by(name: name)
@@ -364,7 +379,8 @@ class TestController < ApplicationController
 
   # Creates the user and signs them in.
   def create_user
-    user_opts = params.require(:user).permit(
+    user_params = params.require(:user)
+    user_opts = user_params.permit(
       :user_type,
       :email,
       :password,
@@ -379,6 +395,7 @@ class TestController < ApplicationController
       :parent_email_preference_email,
       :parent_email_preference_request_ip,
       :parent_email_preference_source,
+      :provider,
       :email_preference_opt_in,
       :email_preference_form_kind,
       :email_preference_request_ip,
@@ -393,8 +410,21 @@ class TestController < ApplicationController
       :data_transfer_agreement_source,
       :data_transfer_agreement_at,
     )
-    user = User.create!(**user_opts)
+    if user_params[:sso]
+      user = User.new(**user_opts)
+      User.initialize_new_oauth_user(user, OmniAuth::AuthHash.new({provider: user_params[:sso], uid: user_params[:uid], info: {name: user_params[:name]}}), user_params)
+      user.save!
+    else
+      user = User.create!(**user_opts)
+    end
     sign_in user
+    head :ok
+  end
+
+  # Accepts a parental request that was submitted by the current user
+  def accept_parental_request
+    permission_request = ParentalPermissionRequest.find_by(user: current_user)
+    Services::ChildAccount.grant_permission_request!(permission_request)
     head :ok
   end
 end

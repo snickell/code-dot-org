@@ -18,7 +18,7 @@ import teacherSections, {
 } from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
 import i18n from '@cdo/locale';
 
-import {expect} from '../../util/reconfiguredChai';
+import {expect} from '../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
 
 describe('AgeGatedStudentsModal', () => {
   const fakeStudent = {
@@ -31,7 +31,7 @@ describe('AgeGatedStudentsModal', () => {
     loginType: 'google_oauth2',
     rowType: RowType.STUDENT,
     age: 10,
-    atRiskAgeGatedStudent: true,
+    atRiskAgeGatedDate: new Date('2025/01/01'),
     childAccountComplianceState: 'l',
   };
   const fakeStudents = {
@@ -53,6 +53,7 @@ describe('AgeGatedStudentsModal', () => {
     studentCount: 1,
     students: Object.values(fakeStudents),
     hidden: false,
+    isAssignedStandaloneCourse: false,
   };
   beforeEach(() => {
     const store = getStore();

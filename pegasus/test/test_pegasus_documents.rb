@@ -1,6 +1,7 @@
 require_relative './test_helper'
 require_relative '../router'
 require 'cdo/rack/request'
+require 'varnish_environment'
 require 'shared_resources'
 require 'parallel'
 require 'open3'
@@ -23,7 +24,7 @@ class PegasusTest < Minitest::Test
       "#{page[:site]}#{page[:uri]}"
     end
     CDO.log.info "Found #{documents.length} Pegasus documents."
-    assert_operator documents.length, :>, 1500
+    assert_operator documents.length, :>, 100
   end
 
   # All documents expected to return 200 status-codes, with the following exceptions:
@@ -33,12 +34,13 @@ class PegasusTest < Minitest::Test
       code.org/congrats
       code.org/educate
       code.org/educate/weblab-test
-      code.org/review-hociyskvuwa
       code.org/teach
       code.org/student
     ],
     301 => %w[
-      csedweek.org/resource_kit
+      code.org/dance
+      code.org/minecraft
+      code.org/naipi
     ]
   }
 
@@ -47,7 +49,6 @@ class PegasusTest < Minitest::Test
     'text/plain' => %w[
       code.org/health_check
       code.org/robots.txt
-      advocacy.code.org/health_check
       hourofcode.com/us/health_check
     ]
   }
@@ -58,19 +59,15 @@ class PegasusTest < Minitest::Test
     code.org
     code.org/about
     code.org/about/jobs
-    code.org/athletes
     code.org/congrats
     code.org/educate/curriculum/elementary-school
     code.org/educate/curriculum/high-school
     code.org/educate/curriculum/middle-school
-    code.org/educate/resources/inspire
     code.org/educate/resources/videos
     code.org/learn/robotics
     code.org/minecraft
-    code.org/playlab
     code.org/promote
     code.org/starwars
-    code.org/leaderboards
     code.org/page_mode
   ]
 

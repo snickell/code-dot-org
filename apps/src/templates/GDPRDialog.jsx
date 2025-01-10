@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 
+import Button, {buttonColors} from '@cdo/apps/componentLibrary/button/Button';
 import {pegasus} from '@cdo/apps/lib/util/urlHelpers';
 import i18n from '@cdo/locale';
 
 import BaseDialog from './BaseDialog';
-import Button from './Button';
 import DialogFooter from './teacherDashboard/DialogFooter';
 
 export default class GDPRDialog extends Component {
@@ -22,8 +22,13 @@ export default class GDPRDialog extends Component {
 
   handleYesClick = () => {
     this.setState({isDialogOpen: false});
-    $.post(`/dashboardapi/v1/users/accept_data_transfer_agreement`, {
+    $.post('/dashboardapi/v1/users/accept_data_transfer_agreement', {
       user_id: this.props.currentUserId,
+    }).then(() => {
+      const gdprDataScript = document.querySelector('script[data-gdpr]');
+      const gdprData = JSON.parse(gdprDataScript.dataset['gdpr']);
+      gdprData.show_gdpr_dialog = false;
+      gdprDataScript.dataset['gdpr'] = JSON.stringify(gdprData);
     });
   };
 
@@ -56,18 +61,18 @@ export default class GDPRDialog extends Component {
         </div>
         <DialogFooter>
           <Button
-            __useDeprecatedTag
-            text={i18n.gdprDialogLogout()}
-            href={logOutUrl}
-            color={Button.ButtonColor.gray}
             className="ui-test-gdpr-dialog-logout"
+            text={i18n.gdprDialogLogout()}
+            useAsLink={true}
+            href={logOutUrl}
+            color={buttonColors.gray}
+            type="secondary"
+            size="m"
           />
           <Button
-            __useDeprecatedTag
+            className="ui-test-gdpr-dialog-accept"
             text={i18n.gdprDialogYes()}
             onClick={this.handleYesClick}
-            color={Button.ButtonColor.brandSecondaryDefault}
-            className="ui-test-gdpr-dialog-accept"
           />
         </DialogFooter>
       </BaseDialog>

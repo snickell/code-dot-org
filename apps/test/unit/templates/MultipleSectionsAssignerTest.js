@@ -1,6 +1,6 @@
 import {shallow} from 'enzyme'; // eslint-disable-line no-restricted-imports
 import React from 'react';
-import sinon from 'sinon';
+import sinon from 'sinon'; // eslint-disable-line no-restricted-imports
 
 import {updateHiddenScript} from '@cdo/apps/code-studio/hiddenLessonRedux';
 import {UnconnectedMultipleSectionsAssigner as MultipleSectionsAssigner} from '@cdo/apps/templates/MultipleSectionsAssigner';
@@ -8,9 +8,10 @@ import {fakeTeacherSectionsForDropdown} from '@cdo/apps/templates/teacherDashboa
 import {
   assignToSection,
   unassignSection,
+  sectionHasNewData,
 } from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
 
-import {expect} from '../../util/reconfiguredChai';
+import {expect} from '../../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
 
 describe('MultipleSectionsAssigner', () => {
   const assigedStandaloneUnitSection = fakeTeacherSectionsForDropdown[3];
@@ -27,6 +28,7 @@ describe('MultipleSectionsAssigner', () => {
     updateHiddenScript: updateHiddenScript,
     participantAudience: 'student',
     isAssigningCourse: true,
+    sectionHasNewData: sectionHasNewData,
   };
   const setUp = (overrideProps = {}) => {
     const props = {...defaultProps, ...overrideProps};

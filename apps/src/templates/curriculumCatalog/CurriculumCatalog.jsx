@@ -1,22 +1,36 @@
-import React, {useState, useEffect} from 'react';
-import PropTypes from 'prop-types';
-import {curriculumDataShape} from './curriculumCatalogConstants';
-import i18n from '@cdo/locale';
-import style from '../../../style/code-studio/curriculum_catalog_container.module.scss';
+// The following styles are imported in a very specific order to preserve UI consistency.
+// `HeaderBanner` imports `typography.scss`
+// `CurriculumCatalogCard` imports `2022-rebrand-update.scss`
+// `typography.scss` has conflicting styles with `2022-rebrand-update.scss` (specifically for `h4` and `p` elements)
+// We are importing them in the specific order they were imported before adding import/order in order to preserve the UI.
+// These are very small changes so this can likely be removed with no issues.
+/* eslint-disable import/order */
 import HeaderBanner from '../HeaderBanner';
-import CourseCatalogBannerBackground from '../../../static/curriculum_catalog/course-catalog-banner-bg.png';
-import CourseCatalogIllustration01 from '../../../static/curriculum_catalog/course-catalog-illustration-01.png';
-import CourseCatalogNoSearchResultPenguin from '../../../static/curriculum_catalog/course-catalog-no-search-result-penguin.png';
-import {Heading5, BodyTwoText} from '@cdo/apps/componentLibrary/typography';
-import CurriculumCatalogFilters from './CurriculumCatalogFilters';
 import CurriculumCatalogCard from '@cdo/apps/templates/curriculumCatalog/CurriculumCatalogCard';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
-import {EVENTS} from '@cdo/apps/lib/util/AnalyticsConstants';
+/* eslint-enable import/order */
+
+import PropTypes from 'prop-types';
+import React, {useState, useEffect} from 'react';
+
+import {Heading5, BodyTwoText} from '@cdo/apps/componentLibrary/typography';
+import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import GlobalEditionWrapper from '@cdo/apps/templates/GlobalEditionWrapper';
 import {
   getSimilarRecommendations,
   getStretchRecommendations,
 } from '@cdo/apps/util/curriculumRecommender/curriculumRecommender';
 import {tryGetSessionStorage, trySetSessionStorage} from '@cdo/apps/utils';
+import i18n from '@cdo/locale';
+
+import CourseCatalogBannerBackground from '../../../static/curriculum_catalog/course-catalog-banner-bg.png';
+import CourseCatalogIllustration01 from '../../../static/curriculum_catalog/course-catalog-illustration-01.png';
+import CourseCatalogNoSearchResultPenguin from '../../../static/curriculum_catalog/course-catalog-no-search-result-penguin.png';
+
+import {curriculumDataShape} from './curriculumCatalogConstants';
+import CurriculumCatalogFilters from './CurriculumCatalogFilters';
+
+import style from '../../../style/code-studio/curriculum_catalog_container.module.scss';
 
 const CurriculumCatalog = ({
   curriculaData,
@@ -26,6 +40,7 @@ const CurriculumCatalog = ({
   isSignedOut,
   isTeacher,
   curriculaTaught,
+  forceTranslated,
   ...props
 }) => {
   const [filteredCurricula, setFilteredCurricula] = useState(curriculaData);
@@ -62,7 +77,8 @@ const CurriculumCatalog = ({
       EVENTS.CURRICULUM_CATALOG_ASSIGN_COMPLETED_EVENT,
       {
         curriculum_offering: assignmentData.assignedTitle,
-      }
+      },
+      PLATFORMS.BOTH
     );
   };
 
@@ -295,6 +311,7 @@ const CurriculumCatalog = ({
         filteredCurricula={filteredCurricula}
         setFilteredCurricula={setFilteredCurricula}
         isEnglish={isEnglish}
+        forceTranslated={forceTranslated}
         languageNativeName={languageNativeName}
       />
       <div className={style.catalogContentContainer}>
@@ -312,6 +329,32 @@ CurriculumCatalog.propTypes = {
   isSignedOut: PropTypes.bool.isRequired,
   isTeacher: PropTypes.bool.isRequired,
   curriculaTaught: PropTypes.arrayOf(PropTypes.number),
+  forceTranslated: PropTypes.bool,
 };
 
-export default CurriculumCatalog;
+/**
+ * This is a version of the curriculum catalog that is overridable by a regional
+ * configuration.
+ *
+ * This is done via a configuration in, for instance, /config/global_editions/fa.yml
+ * via a paths rule such as:
+ *
+ * ```
+ * pages:
+ *   # Home dashboards
+ *   - path: /
+ *     components:
+ *       LtiFeedbackBanner: false
+ *       CurriculumCatalog:
+ *         forceTranslated: true
+ * ```
+ */
+const RegionalCurriculumCatalog = props => (
+  <GlobalEditionWrapper
+    component={CurriculumCatalog}
+    componentId="CurriculumCatalog"
+    props={props}
+  />
+);
+
+export default RegionalCurriculumCatalog;

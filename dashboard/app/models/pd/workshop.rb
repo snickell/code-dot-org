@@ -2,28 +2,30 @@
 #
 # Table name: pd_workshops
 #
-#  id                  :integer          not null, primary key
-#  organizer_id        :integer          not null
-#  location_name       :string(255)
-#  location_address    :string(255)
-#  processed_location  :text(65535)
-#  course              :string(255)      not null
-#  subject             :string(255)
-#  capacity            :integer          not null
-#  notes               :text(65535)
-#  section_id          :integer
-#  started_at          :datetime
-#  ended_at            :datetime
-#  created_at          :datetime
-#  updated_at          :datetime
-#  processed_at        :datetime
-#  deleted_at          :datetime
-#  regional_partner_id :integer
-#  on_map              :boolean
-#  funded              :boolean
-#  funding_type        :string(255)
-#  properties          :text(65535)
-#  module              :string(255)
+#  id                     :integer          not null, primary key
+#  organizer_id           :integer          not null
+#  location_name          :string(255)
+#  location_address       :string(255)
+#  processed_location     :text(65535)
+#  course                 :string(255)      not null
+#  subject                :string(255)
+#  capacity               :integer          not null
+#  notes                  :text(65535)
+#  section_id             :integer
+#  started_at             :datetime
+#  ended_at               :datetime
+#  created_at             :datetime
+#  updated_at             :datetime
+#  processed_at           :datetime
+#  deleted_at             :datetime
+#  regional_partner_id    :integer
+#  on_map                 :boolean
+#  funded                 :boolean
+#  funding_type           :string(255)
+#  properties             :text(65535)
+#  module                 :string(255)
+#  name                   :string(255)
+#  participant_group_type :string(255)
 #
 # Indexes
 #
@@ -48,6 +50,8 @@ class Pd::Workshop < ApplicationRecord
   belongs_to :regional_partner, optional: true
 
   has_many :regional_partner_program_managers, source: :program_managers, through: :regional_partner
+
+  has_and_belongs_to_many :course_offerings, join_table: :course_offerings_pd_workshops, foreign_key: 'pd_workshop_id'
 
   serialized_attrs [
     'fee',
@@ -201,10 +205,12 @@ class Pd::Workshop < ApplicationRecord
     joins(:sessions).group_by_id.having('(DATE(MIN(start)) >= ?)', date)
   end
 
-  scope :in_year, ->(year) do
-    scheduled_start_on_or_after(Date.new(year)).
-      scheduled_start_on_or_before(Date.new(year + 1))
-  end
+  scope(
+    :in_year, lambda do |year|
+      scheduled_start_on_or_after(Date.new(year)).
+        scheduled_start_on_or_before(Date.new(year + 1))
+    end
+   )
 
   # Filters to workshops that are scheduled on or after today and have not yet ended
   scope :future, -> {scheduled_start_on_or_after(Time.zone.today).where(ended_at: nil)}
@@ -579,7 +585,7 @@ class Pd::Workshop < ApplicationRecord
 
   # Send Post-surveys to facilitators of CSD and CSP workshops
   def send_facilitator_post_surveys
-    if course == COURSE_CSD || course == COURSE_CSP || course == COURSE_CSA || course == COURSE_CSF
+    if course == COURSE_CSD || course == COURSE_CSP || course == COURSE_CSA || course == COURSE_CSF || course == COURSE_BUILD_YOUR_OWN
       facilitators.each do |facilitator|
         next unless facilitator.email
 
@@ -934,6 +940,7 @@ class Pd::Workshop < ApplicationRecord
       organizer: organizer,
       enrollment_code: enrollments&.first&.code,
       status: state,
+      course_offerings: course_offerings,
     }
   end
 end

@@ -22,6 +22,7 @@
 #  index_levels_on_game_id    (game_id)
 #  index_levels_on_level_num  (level_num)
 #  index_levels_on_name       (name)
+#  index_levels_on_type       (type)
 #
 
 require 'cdo/shared_constants'
@@ -94,6 +95,9 @@ class Level < ApplicationRecord
     thumbnail_url
     start_libraries
     ai_tutor_available
+    offer_browser_tts
+    use_secondary_finish_button
+    skip_url
   )
 
   # Fix STI routing http://stackoverflow.com/a/9463495
@@ -256,7 +260,7 @@ class Level < ApplicationRecord
       end
     end
 
-    !(current_parent&.type == "LevelGroup")
+    current_parent&.type != "LevelGroup"
   end
 
   def to_xml(options = {})
@@ -734,7 +738,7 @@ class Level < ApplicationRecord
 
   def localized_validations
     if should_localize?
-      validations_clone = validations.map(&:clone)
+      validations_clone = get_validations.map(&:clone)
       validations_clone.each do |validation|
         validation['message'] = I18n.t(
           validation["key"],
@@ -745,7 +749,7 @@ class Level < ApplicationRecord
       end
       validations_clone
     else
-      validations
+      get_validations
     end
   end
 
@@ -775,6 +779,14 @@ class Level < ApplicationRecord
         default: nil,
         smart: true
       )
+    end
+  end
+
+  def localized_properties
+    return properties unless should_localize?
+
+    properties.each_with_object({}) do |(key, value), i18n|
+      i18n[key] = try(:localized_property, key) || get_localized_property(key) || value
     end
   end
 
@@ -840,16 +852,18 @@ class Level < ApplicationRecord
     properties_camelized = properties.camelize_keys
     properties_camelized[:id] = id
     properties_camelized[:levelData] = video if video
+    properties_camelized[:helpVideos] = related_videos.map(&:summarize)
     properties_camelized[:type] = type
     properties_camelized[:appName] = game&.app
     properties_camelized[:useRestrictedSongs] = game.use_restricted_songs?
     properties_camelized[:usesProjects] = try(:is_project_level) || channel_backed?
-    if try(:project_template_level).try(:source) || try(:source)
-      # Override start sources with project template level sources if they exist
-      properties_camelized['source'] = try(:project_template_level).try(:source) || try(:source)
+    properties_camelized[:finishUrl] = script_level.next_level_or_redirect_path_for_user(current_user) if script_level
+
+    if try(:project_template_level).try(:start_sources)
+      properties_camelized['templateSources'] = try(:project_template_level).try(:start_sources)
     end
     # Localized properties
-    properties_camelized["validations"] = localized_validations if properties_camelized["validations"]
+    properties_camelized["validations"] = localized_validations if get_validations
     properties_camelized["panels"] = localized_panels if properties_camelized["panels"]
     properties_camelized["longInstructions"] = (get_localized_property("long_instructions") || long_instructions) if properties_camelized["longInstructions"]
     if script_level
@@ -859,6 +873,10 @@ class Level < ApplicationRecord
       # Verified instructors can view exemplars and levelbuilders can edit them, so we include them in the properties
       # for these users.
       properties_camelized[:exemplarSources] = try(:exemplar_sources)
+    else
+      # Users who are not verified teachers or levelbuilders should not be able to see predict level solutions
+      properties_camelized["predictSettings"]&.delete("solution")
+      properties_camelized["predictSettings"]&.delete("multipleChoiceAnswers")
     end
     properties_camelized
   end
@@ -870,9 +888,18 @@ class Level < ApplicationRecord
   # Whether this level has validation for the completion of student work.
   def validated?
     if uses_lab2?
-      return properties.dig('level_data', 'validations').present?
+      return get_validations.present?
     end
     properties['validation_code'].present? || properties['success_condition'].present?
+  end
+
+  def predict_level?
+    return properties.dig('predict_settings', 'isPredictLevel').present?
+  end
+
+  # Wrapper around validations property. Some labs override this with derived validations.
+  def get_validations
+    properties['validations']
   end
 
   # Returns the level name, removing the name_suffix first (if present), and
@@ -880,10 +907,6 @@ class Level < ApplicationRecord
   # represent a version year.
   private def base_name
     base_name = name
-    if name_suffix
-      strip_suffix_regex = /^(.*)#{Regexp.escape(name_suffix)}$/
-      base_name = name[strip_suffix_regex, 1] || name
-    end
     base_name = strip_version_year_suffixes(base_name)
     base_name
   end

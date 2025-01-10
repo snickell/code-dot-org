@@ -45,6 +45,9 @@ class UnitTest < ActiveSupport::TestCase
     # We also want to test level_concept_difficulties, so make sure to give it
     # one.
     @cacheable_level = create(:level, :with_script, level_concept_difficulty: create(:level_concept_difficulty))
+
+    @foundations_of_cs_unit = create :foundations_of_cs_script, name: 'foundations-of-cs-1'
+    @foundations_of_programming_unit = create :foundations_of_programming_script, name: 'foundations-of-programming-1'
   end
 
   setup do
@@ -1079,9 +1082,9 @@ class UnitTest < ActiveSupport::TestCase
 
     [foo16, foo17, foo18, foo19].each do |s|
       summary = s.summarize_course_versions(create(:teacher))
-      assert_equal(["foo-2016", "foo-2017", "foo-2018"], summary.values.map {|h| h[:name]})
-      assert_equal([true, true, false], summary.values.map {|h| h[:is_stable]})
-      assert_equal([false, true, false], summary.values.map {|h| h[:is_recommended]})
+      assert_equal(["foo-2016", "foo-2017", "foo-2018"], summary.values.pluck(:name))
+      assert_equal([true, true, false], summary.values.pluck(:is_stable))
+      assert_equal([false, true, false], summary.values.pluck(:is_recommended))
     end
   end
 
@@ -1109,9 +1112,9 @@ class UnitTest < ActiveSupport::TestCase
 
     [foo17, foo18, foo19].each do |s|
       summary = s.summarize_course_versions(create(:student))
-      assert_equal(["foo-2017"], summary.values.map {|h| h[:name]})
-      assert_equal([true], summary.values.map {|h| h[:is_stable]})
-      assert_equal([true], summary.values.map {|h| h[:is_recommended]})
+      assert_equal(["foo-2017"], summary.values.pluck(:name))
+      assert_equal([true], summary.values.pluck(:is_stable))
+      assert_equal([true], summary.values.pluck(:is_recommended))
     end
   end
 
@@ -1532,6 +1535,35 @@ class UnitTest < ActiveSupport::TestCase
     assert_empty unit.text_response_levels
   end
 
+  test 'predict free response level is listed in text_response_levels' do
+    unit = create :script
+    lesson_group = create :lesson_group, script: unit
+    lesson = create :lesson, script: unit, lesson_group: lesson_group
+    level = create :pythonlab, properties: {
+      predict_settings: {isPredictLevel: true, questionType: 'freeResponse'}
+    }
+    create :script_level, script: unit, lesson: lesson, levels: [level]
+
+    assert_equal level, unit.text_response_levels.first[:levels].first
+  end
+
+  test 'predict multiple choice level is listed in text_response_levels' do
+    unit = create :script
+    lesson_group = create :lesson_group, script: unit
+    lesson = create :lesson, script: unit, lesson_group: lesson_group
+    level = create :pythonlab, properties: {
+      predict_settings: {
+        isPredictLevel: true,
+        questionType: 'multipleChoice',
+        multipleChoiceOptions: ['a', 'b', 'c'],
+        solution: 'a'
+      }
+    }
+    create :script_level, script: unit, lesson: lesson, levels: [level]
+
+    assert_empty unit.text_response_levels
+  end
+
   test "course_link retuns nil if unit is in no courses" do
     unit = create :script
     create :unit_group, name: 'csp'
@@ -1724,6 +1756,17 @@ class UnitTest < ActiveSupport::TestCase
 
     unit.supported_locales = ['fr-fr']
     assert_equal ['English', 'fr-fr'], unit.supported_locale_names
+  end
+
+  test 'initiative mapping fields' do
+    unit_init_fields = create(:script, content_area: 'k-5')
+    assert_equal "k-5", unit_init_fields.content_area
+
+    unit_init_fields.topic_tags = ['ai']
+    assert_equal ['ai'], unit_init_fields.topic_tags
+
+    unit_init_fields.topic_tags += ['maker']
+    assert_equal ['ai', 'maker'], unit_init_fields.topic_tags
   end
 
   test 'section_hidden_unit_info' do
@@ -1945,6 +1988,8 @@ class UnitTest < ActiveSupport::TestCase
     assert @csd_unit.middle_high?
     assert @csp_unit.middle_high?
     assert @csa_unit.middle_high?
+    assert @foundations_of_cs_unit.middle_high?
+    assert @foundations_of_programming_unit.middle_high?
 
     refute @csf_unit.middle_high?
     refute @csc_unit.middle_high?
@@ -2134,7 +2179,7 @@ class UnitTest < ActiveSupport::TestCase
       Unit.any_instance.stubs(:write_script_json)
       Unit.stubs(:merge_and_write_i18n)
 
-      @standalone_unit = create :script, is_migrated: true, is_course: true, version_year: '2021', family_name: 'csf', name: 'standalone-2021'
+      @standalone_unit = create :script, is_migrated: true, is_course: true, version_year: '2021', family_name: 'csf', name: 'standalone-2021', content_area: 'k-5', topic_tags: ['ai', 'maker']
       create :course_version, content_root: @standalone_unit
 
       @deeper_learning_unit = create :script, participant_audience: Curriculum::SharedCourseConstants::PARTICIPANT_AUDIENCE.facilitator, instructor_audience: Curriculum::SharedCourseConstants::INSTRUCTOR_AUDIENCE.plc_reviewer, professional_learning_course: 'DLP 2021'
@@ -2177,6 +2222,8 @@ class UnitTest < ActiveSupport::TestCase
       assert_equal cloned_unit.instruction_type, @standalone_unit.instruction_type
       assert_equal cloned_unit.instructor_audience, @standalone_unit.instructor_audience
       assert_equal cloned_unit.participant_audience, @standalone_unit.participant_audience
+      assert_equal cloned_unit.content_area, 'k-5'
+      assert_equal cloned_unit.topic_tags, ['ai', 'maker']
     end
 
     test 'can update markdown on clone' do
@@ -2448,7 +2495,119 @@ class UnitTest < ActiveSupport::TestCase
     assert unit.finish_url.include?(unit.name)
   end
 
+  test 'deleting standalone unit deletes corresponding dependencies' do
+    standalone_unit = create :script, is_migrated: true, is_course: true, version_year: '2021', family_name: 'csf', name: 'standalone-2021'
+    course_version = create :course_version, content_root: standalone_unit
+    CourseOffering.add_course_offering(standalone_unit)
+    lesson = create :lesson, script: standalone_unit
+    lesson_gp = create :lesson_group, script: standalone_unit, lessons: [lesson]
+
+    # delete standalone unit
+    unit_id = standalone_unit.id
+    standalone_unit.destroy
+
+    assert Unit.find_by(id: unit_id).nil?
+    assert CourseVersion.find_by(id: course_version.id).nil?
+    assert Lesson.find_by(id: lesson.id).nil?
+    assert LessonGroup.find_by(id: lesson_gp.id).nil?
+  end
+
+  test 'deleting unit in unit group deletes corresponding dependencies' do
+    unit_in_course = create :script, is_migrated: true, name: 'coursename1-2021'
+    unit_group = create(:unit_group)
+    unit_gp_unit = create :unit_group_unit, unit_group: @unit_group, script: unit_in_course, position: 1
+    CourseOffering.add_course_offering(unit_group)
+
+    unit_group.reload
+    unit_in_course.reload
+    course_version = unit_group.course_version
+    assert UnitGroupUnit.find_by(id: unit_gp_unit.id)
+
+    # delete unit in unit group
+    unit_id = unit_in_course.id
+    unit_in_course.destroy
+
+    assert Unit.find_by(id: unit_id).nil?
+    assert UnitGroup.find_by(id: unit_group.id)
+
+    # Course version is associated to unit group and shouldn't be deleted
+    assert CourseVersion.find_by(id: course_version.id)
+    assert UnitGroupUnit.find_by(id: unit_gp_unit.id).nil?
+  end
+
+  test 'deleting unit in unit group updates course json' do
+    Rails.application.config.stubs(:levelbuilder_mode).returns true
+    unit_in_course = create :script, is_migrated: true, name: 'coursename1-2021'
+    course_unit_group = create(:unit_group)
+    unit_gp_unit = create :unit_group_unit, unit_group: course_unit_group, script: unit_in_course, position: 1
+    CourseOffering.add_course_offering(course_unit_group)
+
+    File.stubs(:write)
+    UnitGroup.any_instance.expects(:write_serialization).once
+
+    course_unit_group.reload
+    unit_in_course.reload
+    assert UnitGroupUnit.find_by(id: unit_gp_unit.id)
+
+    # delete unit in unit group
+    unit_id = unit_in_course.id
+    unit_in_course.destroy
+
+    assert Unit.find_by(id: unit_id).nil?
+    assert UnitGroupUnit.find_by(id: unit_gp_unit.id).nil?
+  end
+
+  test 'deleting unit after unit group deletion' do
+    Rails.application.config.stubs(:levelbuilder_mode).returns true
+    unit_in_course = create :script, is_migrated: true, name: 'coursename1-2021'
+    course_unit_group = create(:unit_group)
+    unit_gp_unit = create :unit_group_unit, unit_group: course_unit_group, script: unit_in_course, position: 1
+    CourseOffering.add_course_offering(course_unit_group)
+
+    UnitGroup.any_instance.expects(:write_serialization).never
+
+    course_unit_group.reload
+    unit_in_course.reload
+    assert UnitGroupUnit.find_by(id: unit_gp_unit.id)
+
+    # delete unit group
+    course_unit_group.destroy
+    assert UnitGroupUnit.find_by(id: unit_gp_unit.course_id).nil?
+
+    # delete unit in unit group
+    unit_id = unit_in_course.id
+    unit_in_course.destroy
+
+    assert Unit.find_by(id: unit_id).nil?
+    assert UnitGroupUnit.find_by(id: unit_gp_unit.id).nil?
+  end
+
+  test 'is ai assessment enabled' do
+    LearningGoal.any_instance.stubs(:validate_ai_config).returns(true)
+
+    unit_without_rubrics = create :unit, :with_levels
+
+    unit_with_non_ai_rubric = create :unit, :with_levels
+    add_rubric_with_learning_goals(unit_with_non_ai_rubric)
+    unit_with_non_ai_rubric.reload
+
+    unit_with_ai_rubric = create :unit, :with_levels
+    rubric = add_rubric_with_learning_goals(unit_with_ai_rubric)
+    rubric.learning_goals.first.update!(ai_enabled: true)
+    unit_with_ai_rubric.reload
+
+    refute unit_without_rubrics.ai_assessment_enabled?
+    refute unit_with_non_ai_rubric.ai_assessment_enabled?
+    assert unit_with_ai_rubric.ai_assessment_enabled?
+  end
+
   private def has_unlaunched_unit?(units)
     units.any? {|u| !u.launched?}
+  end
+
+  private def add_rubric_with_learning_goals(unit)
+    lesson = unit.lessons.first
+    level = lesson.levels.first
+    create :rubric, :with_learning_goals, lesson: lesson, level: level
   end
 end

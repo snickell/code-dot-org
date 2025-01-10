@@ -1,20 +1,30 @@
-import CustomMarshalingInterpreter from '../../lib/tools/jsinterpreter/CustomMarshalingInterpreter';
-import {BlockTypes} from './blockTypes';
+import * as GoogleBlockly from 'blockly/core';
+
+import {BLOCK_TYPES, Renderers} from '@cdo/apps/blockly/constants';
 import CdoDarkTheme from '@cdo/apps/blockly/themes/cdoDark';
-import {getToolbox} from './toolbox';
-import {getBlockMode} from '../appConfig';
+import {ProcedureBlock, ExtendedBlock} from '@cdo/apps/blockly/types';
+import {disableOrphanBlocks} from '@cdo/apps/blockly/utils';
+import LabMetricsReporter from '@cdo/apps/lab2/Lab2MetricsReporter';
+import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
+import {getAppOptionsEditBlocks} from '@cdo/apps/lab2/projects/utils';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import {ValueOf} from '@cdo/apps/types/utils';
+import {nameComparator} from '@cdo/apps/util/sort';
+
+import CustomMarshalingInterpreter from '../../lib/tools/jsinterpreter/CustomMarshalingInterpreter';
 import {BlockMode, Triggers} from '../constants';
+import musicI18n from '../locale';
+
+import {BlockTypes} from './blockTypes';
 import {
   FIELD_TRIGGER_START_NAME,
   TriggerStart,
   TRIGGER_FIELD,
 } from './constants';
-import {GeneratorHelpersSimple2} from './blocks/simple2';
-import {Renderers} from '@cdo/apps/blockly/constants';
-import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
-import {BlocklyOptions, Workspace, WorkspaceSvg} from 'blockly';
-import LabMetricsReporter from '@cdo/apps/lab2/Lab2MetricsReporter';
-import {Abstract} from 'blockly/core/events/events_abstract';
+import {setUpBlocklyForMusicLab} from './setup';
+import {getToolbox} from './toolbox';
+import {ToolboxData} from './toolbox/types';
+
 const experiments = require('@cdo/apps/util/experiments');
 
 const triggerIdToEvent = (id: string) => `triggeredAtButton-${id}`;
@@ -26,13 +36,35 @@ type CompiledEvents = {[key: string]: {code: string; args?: string[]}};
  * workspace view, execute code, and save/load projects.
  */
 export default class MusicBlocklyWorkspace {
-  private workspace: WorkspaceSvg | Workspace | null;
+  private static isBlocklyEnvironmentSetup = false;
+
+  // Setup the global Blockly environment for Music Lab.
+  // This should only happen once per page load.
+  public static setupBlocklyEnvironment(blockMode: ValueOf<typeof BlockMode>) {
+    if (this.isBlocklyEnvironmentSetup) {
+      return;
+    }
+    setUpBlocklyForMusicLab();
+
+    if (blockMode !== BlockMode.SIMPLE2) {
+      Blockly.setInfiniteLoopTrap();
+    }
+
+    this.isBlocklyEnvironmentSetup = true;
+  }
+
+  private workspace:
+    | GoogleBlockly.WorkspaceSvg
+    | GoogleBlockly.Workspace
+    | null;
   private container: HTMLElement | null;
   private codeHooks: {[key: string]: (...args: unknown[]) => void};
   private compiledEvents: CompiledEvents;
   private lastExecutedEvents: CompiledEvents;
   private triggerIdToStartType: {[id: string]: string};
   private headlessMode: boolean;
+  private toolbox?: ToolboxData;
+  private blockMode?: ValueOf<typeof BlockMode>;
 
   constructor(
     private readonly metricsReporter: LabMetricsReporter = Lab2Registry.getInstance().getMetricsReporter()
@@ -44,6 +76,8 @@ export default class MusicBlocklyWorkspace {
     this.triggerIdToStartType = {};
     this.lastExecutedEvents = {};
     this.headlessMode = false;
+    this.toolbox = undefined;
+    this.blockMode = undefined;
   }
 
   /**
@@ -56,10 +90,11 @@ export default class MusicBlocklyWorkspace {
    */
   init(
     container: HTMLElement,
-    onBlockSpaceChange: (e: Abstract) => void,
+    onBlockSpaceChange: (e: GoogleBlockly.Events.Abstract) => void,
     isReadOnlyWorkspace: boolean,
-    toolbox: {[key: string]: string[]},
-    isRtl: boolean
+    toolbox: ToolboxData | undefined,
+    isRtl: boolean,
+    blockMode: ValueOf<typeof BlockMode>
   ) {
     if (this.workspace) {
       this.workspace.dispose();
@@ -67,7 +102,23 @@ export default class MusicBlocklyWorkspace {
 
     this.container = container;
 
-    const toolboxBlocks = getToolbox(toolbox);
+    this.toolbox = toolbox;
+    this.blockMode = blockMode;
+
+    const toolboxBlocks = getToolbox(blockMode, toolbox);
+
+    // This dialog is used for naming variables, which are only present in advanced mode.
+    const customSimpleDialog = function (options: {
+      bodyText: string;
+      promptPrefill: string;
+      onCancel: (p1: string | null) => void;
+    }) {
+      Blockly.dialog.prompt(
+        options.bodyText,
+        options.promptPrefill,
+        options.onCancel
+      );
+    };
 
     this.workspace = Blockly.inject(container, {
       toolbox: toolboxBlocks,
@@ -84,7 +135,13 @@ export default class MusicBlocklyWorkspace {
       readOnly: isReadOnlyWorkspace,
       useBlocklyDynamicCategories: true,
       rtl: isRtl,
-    } as BlocklyOptions);
+      editBlocks: getAppOptionsEditBlocks(),
+      customSimpleDialog,
+      comments: true,
+      analyticsData: {
+        appType: EVENTS.BLOCKLY_APP_TYPE_MUSIC,
+      },
+    } as GoogleBlockly.BlocklyOptions);
 
     this.resizeBlockly();
 
@@ -101,7 +158,7 @@ export default class MusicBlocklyWorkspace {
     if (this.workspace) {
       this.workspace.dispose();
     }
-    this.workspace = new Workspace();
+    this.workspace = new GoogleBlockly.Workspace();
     this.headlessMode = true;
   }
 
@@ -112,7 +169,7 @@ export default class MusicBlocklyWorkspace {
 
     this.container.style.width = '100%';
     this.container.style.height = '100%';
-    Blockly.svgResize(this.workspace as WorkspaceSvg);
+    Blockly.svgResize(this.workspace as GoogleBlockly.WorkspaceSvg);
   }
 
   dispose() {
@@ -125,86 +182,66 @@ export default class MusicBlocklyWorkspace {
   }
 
   /**
+   * Hide any custom fields that are showing.
+   */
+  hideChaff() {
+    if (this.headlessMode) {
+      return;
+    }
+    (this.workspace as GoogleBlockly.WorkspaceSvg)?.hideChaff();
+  }
+
+  /**
    * Generates executable JavaScript code for all blocks in the workspace.
    *
    * @param scope Global scope to provide the execution runtime
+   * @param blockMode Current block mode, such as "simple2" or "advanced"
    */
-  compileSong(scope: object) {
-    if (!this.workspace) {
+  compileSong(scope: object, blockMode: ValueOf<typeof BlockMode>) {
+    const workspace = this.workspace;
+    if (!workspace) {
       this.metricsReporter.logWarning(
         'compileSong called before workspace initialized.'
       );
       return;
     }
-    Blockly.getGenerator().init(this.workspace);
+    Blockly.getGenerator().init(workspace);
 
     this.compiledEvents = {};
     this.triggerIdToStartType = {};
 
-    const topBlocks = this.workspace.getTopBlocks();
+    const topBlocks = workspace.getTopBlocks();
 
-    // These are both used for BlockMode.SIMPLE2.
-    let functionCallsCode = '';
-    let functionImplementationsCode = '';
-
-    if (getBlockMode() === BlockMode.SIMPLE2) {
-      // Go through all blocks, specifically looking for functions.
-      // As they are found, accumulate one set of code to call all of them,
-      // and a second set of code that has their implementations.
-      // We'll use the calls only when simulating tracks mode, and the
-      // implementations will become part of the runtime code for both when_run,
-      // as well as for each new trigger handler.
-      topBlocks.forEach(functionBlock => {
-        if (functionBlock.type === 'procedures_defnoreturn') {
-          // Accumulate some custom code that calls all the functions
-          // together, simulating tracks mode.
-          const actualFunctionName =
-            GeneratorHelpersSimple2.getSafeFunctionName(
-              functionBlock.getFieldValue('NAME')
-            );
-          functionCallsCode += `${actualFunctionName}();
-          `;
-
-          // Accumulate some code that has all of the function implementations.
-          const functionCode = Blockly.JavaScript.blockToCode(
-            functionBlock.getChildren(false)[0]
-          );
-          functionImplementationsCode +=
-            GeneratorHelpersSimple2.getFunctionImplementation(
-              functionBlock.getFieldValue('NAME'),
-              functionCode
-            );
+    // Make sure that simple2 top-level blocks only generate their code once.
+    if (blockMode === BlockMode.SIMPLE2) {
+      topBlocks.forEach(block => {
+        if (
+          block.type === BlockTypes.WHEN_RUN_SIMPLE2 ||
+          block.type === BlockTypes.TRIGGERED_AT_SIMPLE2
+        ) {
+          (block as ExtendedBlock).skipNextBlockGeneration = true;
         }
       });
-
-      // If there's no when_run block, then we'll generate
-      // some custom code that first initializes things, and then calls all
-      // the functions together, simulating tracks mode.
-      if (
-        !topBlocks.some(block => block.type === BlockTypes.WHEN_RUN_SIMPLE2)
-      ) {
-        this.compiledEvents.whenRunButton = {
-          code: GeneratorHelpersSimple2.getDefaultWhenRunImplementation(
-            functionCallsCode,
-            functionImplementationsCode
-          ),
-        };
-      }
     }
 
     topBlocks.forEach(block => {
-      if (getBlockMode() !== BlockMode.SIMPLE2) {
+      if (blockMode !== BlockMode.SIMPLE2) {
         if (block.type === BlockTypes.WHEN_RUN) {
           this.compiledEvents.whenRunButton = {
-            code: Blockly.JavaScript.blockToCode(block),
+            code:
+              'var __context = "when_run";\n' +
+              Blockly.JavaScript.workspaceToCode(workspace),
+            args: ['startPosition'],
           };
         }
       } else {
         if (block.type === BlockTypes.WHEN_RUN_SIMPLE2) {
           this.compiledEvents.whenRunButton = {
             code:
-              Blockly.JavaScript.blockToCode(block) +
-              functionImplementationsCode,
+              'var __context = "when_run";\n' +
+              'var __functionCallsCount = 0;\n' +
+              'var __loopIterationsCount = 0;\n' +
+              Blockly.JavaScript.workspaceToCode(workspace),
           };
         }
       }
@@ -235,16 +272,22 @@ export default class MusicBlocklyWorkspace {
         ).includes(block.type)
       ) {
         const id = block.getFieldValue(TRIGGER_FIELD);
+        let code = `var __context = "${id}";\n`;
+        if (block.type === BlockTypes.TRIGGERED_AT_SIMPLE2) {
+          code +=
+            'var __functionCallsCount = 0;\n' +
+            'var __loopIterationsCount = 0;\n';
+        }
         this.compiledEvents[triggerIdToEvent(id)] = {
-          code:
-            Blockly.JavaScript.blockToCode(block) + functionImplementationsCode,
+          code: code + Blockly.JavaScript.workspaceToCode(workspace),
           args: ['startPosition'],
         };
         // Also save the value of the trigger start field at compile time so we can
-        // compute the correct start time at each invocation.
-        this.triggerIdToStartType[triggerIdToEvent(id)] = block.getFieldValue(
-          FIELD_TRIGGER_START_NAME
-        );
+        // compute the correct start time at each invocation. For blocks without this
+        // field, such as in advanced mode, the start time is immediately.
+        this.triggerIdToStartType[triggerIdToEvent(id)] =
+          block.getFieldValue(FIELD_TRIGGER_START_NAME) ||
+          TriggerStart.IMMEDIATELY;
       }
     });
 
@@ -290,10 +333,11 @@ export default class MusicBlocklyWorkspace {
       return;
     }
 
+    const startTime = Date.now();
     console.log('Executing compiled song.');
 
     if (this.codeHooks.whenRunButton) {
-      this.callUserGeneratedCode(this.codeHooks.whenRunButton);
+      this.callUserGeneratedCode(this.codeHooks.whenRunButton, [0]);
     }
 
     if (this.codeHooks.tracks) {
@@ -305,6 +349,8 @@ export default class MusicBlocklyWorkspace {
     });
 
     this.lastExecutedEvents = this.compiledEvents;
+
+    console.log('Execution time: ', Date.now() - startTime);
   }
 
   /**
@@ -342,10 +388,6 @@ export default class MusicBlocklyWorkspace {
    */
   getTriggerStartPosition(id: string, currentPosition: number) {
     const triggerStart = this.triggerIdToStartType[triggerIdToEvent(id)];
-
-    if (getBlockMode() === BlockMode.ADVANCED) {
-      return currentPosition;
-    }
 
     if (!triggerStart) {
       console.warn('No compiled trigger with ID: ' + id);
@@ -394,11 +436,17 @@ export default class MusicBlocklyWorkspace {
     }
     // Clear all highlights.
     for (const block of this.workspace.getAllBlocks()) {
-      (this.workspace as WorkspaceSvg).highlightBlock(block.id, false);
+      (this.workspace as GoogleBlockly.WorkspaceSvg).highlightBlock(
+        block.id,
+        false
+      );
     }
     // Highlight playing blocks.
     for (const blockId of playingBlockIds) {
-      (this.workspace as WorkspaceSvg).highlightBlock(blockId, true);
+      (this.workspace as GoogleBlockly.WorkspaceSvg).highlightBlock(
+        blockId,
+        true
+      );
     }
   }
 
@@ -413,11 +461,15 @@ export default class MusicBlocklyWorkspace {
     }
 
     if (blockId) {
-      (this.workspace as WorkspaceSvg).getBlockById(blockId)?.select();
+      (this.workspace as GoogleBlockly.WorkspaceSvg)
+        .getBlockById(blockId)
+        ?.select();
     } else {
-      (this.workspace as WorkspaceSvg).getAllBlocks().forEach(block => {
-        block.unselect();
-      });
+      (this.workspace as GoogleBlockly.WorkspaceSvg)
+        .getAllBlocks()
+        .forEach(block => {
+          block.unselect();
+        });
     }
   }
 
@@ -442,7 +494,7 @@ export default class MusicBlocklyWorkspace {
   }
 
   // Load the workspace with the given code.
-  loadCode(code: string) {
+  loadCode(code: object) {
     if (!this.workspace) {
       this.metricsReporter.logWarning(
         'loadCode called before workspace initialized.'
@@ -451,10 +503,105 @@ export default class MusicBlocklyWorkspace {
     }
     this.workspace.clearUndo();
 
+    // Clear the record of the last executed code so that if the new code
+    // happens to match it, we actually execute it.
+    this.lastExecutedEvents = {};
+
     // Ensure that we have an extensible object for Blockly.
     const codeCopy = JSON.parse(JSON.stringify(code));
 
     Blockly.serialization.workspaces.load(codeCopy, this.workspace);
+
+    disableOrphanBlocks(this.workspace);
+  }
+
+  // For each function body in the current workspace, add a function call
+  // block to the toolbox. Also add a function defintion block, if required.
+  generateFunctionBlocks() {
+    const blockList: GoogleBlockly.utils.toolbox.ToolboxItemInfo[] = [];
+
+    if (this.toolbox?.addFunctionDefinition) {
+      blockList.push({
+        kind: 'block',
+        type: BLOCK_TYPES.procedureDefinition,
+        fields: {
+          NAME: musicI18n.blockly_functionNamePlaceholder(),
+        },
+      });
+    }
+
+    const allFunctions: GoogleBlockly.serialization.procedures.State[] = [];
+
+    (
+      this.workspace?.getTopBlocks(
+        this.toolbox?.addFunctionCallsSortByPosition
+      ) as ProcedureBlock[]
+    )
+      .filter(
+        // When a block is dragged from the toolbox, an insertion marker is
+        // created with the same type. Insertion markers just provide a
+        // visual indication of where the actual block will go. They should
+        // not be counted here or we could end up with duplicate call blocks.
+        block =>
+          block.type === BLOCK_TYPES.procedureDefinition &&
+          !block.isInsertionMarker()
+      )
+      .forEach(block => {
+        allFunctions.push(
+          Blockly.serialization.procedures.saveProcedure(
+            block.getProcedureModel()
+          )
+        );
+      });
+
+    const compareFunction = this.toolbox?.addFunctionCallsSortByPosition
+      ? () => 0
+      : nameComparator;
+
+    allFunctions.sort(compareFunction).forEach(({name, id, parameters}) => {
+      blockList.push({
+        kind: 'block',
+        type: BLOCK_TYPES.procedureCall,
+        extraState: {
+          name,
+          id,
+          params: parameters?.map(param => param.name),
+        },
+      });
+    });
+
+    if (this.blockMode) {
+      const existingToolbox = getToolbox(this.blockMode, this.toolbox);
+      existingToolbox.contents = existingToolbox.contents.concat(blockList);
+      const workspace = this.workspace as GoogleBlockly.WorkspaceSvg;
+      workspace.updateToolbox(existingToolbox);
+
+      if (workspace.RTL) {
+        // When the flyout is dynamically populated, the flyout width can increase,
+        // thereby overlapping start blocks in RTL. If this happens, we move the
+        // blocks back to the left
+        // Relates to https://github.com/google/blockly/issues/8637
+        const flyout = workspace.getFlyout();
+        const metricsManager = workspace.getMetricsManager();
+        const flyoutWidth = flyout?.getWidth() || 0;
+
+        if (flyoutWidth) {
+          const {left: contentLeft, width: contentWidth} =
+            metricsManager.getContentMetrics();
+          const viewWidth = metricsManager.getViewMetrics().width;
+
+          const contentRight = contentLeft + contentWidth;
+          const expectedMargin = 20; // Add space between right-most block and flyout
+          const overlapAmount = contentRight - viewWidth + expectedMargin;
+
+          if (overlapAmount > 0) {
+            workspace
+              .getTopBlocks()
+              .forEach(block => block.moveBy(-overlapAmount, 0));
+          }
+        }
+      }
+    }
   }
 
   private callUserGeneratedCode(

@@ -1,4 +1,7 @@
 require 'test_reporter'
+require 'faker'
+
+require_relative '../../lib/cdo/ci_utils'
 
 if defined? ActiveRecord
   ActiveRecord::Migration&.check_pending!
@@ -10,8 +13,8 @@ Minitest.extensions.delete('rails')
 Minitest.extensions.unshift('rails')
 
 reporters = [CowReporter.new]
-if ENV['CIRCLECI']
-  reporters << Minitest::Reporters::JUnitReporter.new("#{ENV['CIRCLE_TEST_REPORTS']}/dashboard")
+if CI::Utils.ci_job_ui_tests?
+  reporters << Minitest::Reporters::JUnitReporter.new("#{ENV.fetch('CI_TEST_REPORTS', nil)}/dashboard")
 end
 # Skip this if the tests are run in RubyMine
 Minitest::Reporters.use! reporters unless ENV['RM_INFO']
@@ -54,6 +57,7 @@ require 'testing/lock_thread'
 require 'testing/transactional_test_case'
 require 'testing/spec_syntax'
 require 'testing/capture_queries'
+require 'testing/rspec_mocks'
 
 require 'parallel_tests/test/runtime_logger'
 
@@ -100,6 +104,13 @@ class ActiveSupport::TestCase
     set_env :test
   end
 
+  def after_teardown
+    super
+  ensure
+    # Ensures the time for the next tests is unfrozen.
+    Timecop.return if Timecop.frozen?
+  end
+
   def panda_panda
     # this is the panda face emoji which is a 4 byte utf8 character
     # (some of our db tables can't handle these)
@@ -125,6 +136,18 @@ class ActiveSupport::TestCase
   def expect_no_s3_upload
     CDO.stubs(disable_s3_image_uploads: false)
     AWS::S3.expects(:upload_to_bucket).never
+  end
+
+  # helper method to stub out the source data for a project when we don't want to look in s3
+  def stub_project_source_data(channel_id, code: 'fake-code', version_id: 'fake-version-id')
+    fake_main_json = {source: code}.to_json
+    fake_source_data = {
+      status: 'FOUND',
+      body: StringIO.new(fake_main_json),
+      version_id: version_id,
+      last_modified: DateTime.now
+    }
+    SourceBucket.any_instance.stubs(:get).with(channel_id, "main.json").returns(fake_source_data)
   end
 
   # Add more helper methods to be used by all tests here...
@@ -252,6 +275,10 @@ class ActiveSupport::TestCase
     end
   end
 
+  def set_request_locale(locale)
+    request.env['cdo.locale'] = locale
+  end
+
   def with_default_locale(locale)
     original_locale = I18n.default_locale
     request.env['cdo.locale'] = I18n.default_locale = locale
@@ -267,7 +294,7 @@ class ActiveSupport::TestCase
 
     exps = expressions.map do |e|
       # rubocop:disable Security/Eval
-      e.respond_to?(:call) ? e : lambda {eval(e, block.binding)}
+      e.respond_to?(:call) ? e : -> {eval(e, block.binding)}
       # rubocop:enable Security/Eval
     end
     before = exps.map(&:call)
@@ -288,7 +315,7 @@ class ActiveSupport::TestCase
 
     exps = expressions.map do |e|
       # rubocop:disable Security/Eval
-      e.respond_to?(:call) ? e : lambda {eval(e, block.binding)}
+      e.respond_to?(:call) ? e : -> {eval(e, block.binding)}
       # rubocop:enable Security/Eval
     end
     before = exps.map(&:call)

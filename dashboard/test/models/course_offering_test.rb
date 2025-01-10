@@ -91,7 +91,7 @@ class CourseOfferingTest < ActiveSupport::TestCase
     end
 
     test "add_course_offering updates existing CourseOffering and CourseVersion for #{content_root_type}" do
-      offering = course_offering_with_versions(1, "with_#{content_root_type}".to_sym)
+      offering = course_offering_with_versions(1, :"with_#{content_root_type}")
       content_root = offering.course_versions.first.content_root
       old_offering_key = offering.key
       old_version_year = offering.course_versions.first.key
@@ -109,7 +109,7 @@ class CourseOfferingTest < ActiveSupport::TestCase
     end
 
     test "add_course_offering updates existing CourseOffering with multiple CourseVersion for #{content_root_type}" do
-      offering = course_offering_with_versions(2, "with_#{content_root_type}".to_sym)
+      offering = course_offering_with_versions(2, :"with_#{content_root_type}")
       content_root = offering.course_versions.first.content_root
       old_offering_key = offering.key
       old_version_year = offering.course_versions.first.key
@@ -127,7 +127,7 @@ class CourseOfferingTest < ActiveSupport::TestCase
     end
 
     test "add_course_version deletes CourseOffering and CourseVersion if is_course is changed to false for #{content_root_type}" do
-      offering = course_offering_with_versions(1, "with_#{content_root_type}".to_sym)
+      offering = course_offering_with_versions(1, :"with_#{content_root_type}")
       content_root = offering.course_versions.first.content_root
       old_offering_key = offering.key
       old_version_year = offering.course_versions.first.key
@@ -144,7 +144,7 @@ class CourseOfferingTest < ActiveSupport::TestCase
     end
 
     test "add_course_version deletes CourseVersion but not CourseOffering if is_course is changed to false for #{content_root_type} but other versions remain" do
-      offering = course_offering_with_versions(2, "with_#{content_root_type}".to_sym)
+      offering = course_offering_with_versions(2, :"with_#{content_root_type}")
       content_root = offering.course_versions.first.content_root
       old_offering_key = offering.key
       old_version_year = offering.course_versions.first.key
@@ -587,7 +587,7 @@ class CourseOfferingTest < ActiveSupport::TestCase
       @unit_facilitator_to_teacher.course_version.course_offering.display_name
     ].sort
 
-    assignable_course_offering_names = CourseOffering.assignable_course_offerings_info(@levelbuilder).values.map {|co| co[:display_name]}
+    assignable_course_offering_names = CourseOffering.assignable_course_offerings_info(@levelbuilder).values.pluck(:display_name)
     expected_course_offering_names.each {|name| assert_includes(assignable_course_offering_names, name)}
   end
 
@@ -804,6 +804,19 @@ class CourseOfferingTest < ActiveSupport::TestCase
     new_course_offering = CourseOffering.find_by(key: course_offering.key)
     assert_equal new_course_offering.self_paced_pl_course_offering_id,
       self_paced_pl_course.id
+  end
+
+  test "can seed ai_teaching_assistant_available" do
+    course_offering = create :course_offering, key: 'course-offering-1'
+    refute course_offering.ai_teaching_assistant_available
+    serialization = course_offering.serialize
+    serialization[:ai_teaching_assistant_available] = true
+
+    File.stubs(:read).returns(serialization.to_json)
+
+    CourseOffering.seed_record("config/course_offerings/course-offering-1.json")
+    new_course_offering = CourseOffering.find_by(key: course_offering.key)
+    assert new_course_offering.ai_teaching_assistant_available
   end
 
   test "validates grade_levels" do

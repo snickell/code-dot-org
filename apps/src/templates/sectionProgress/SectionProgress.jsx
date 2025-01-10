@@ -2,19 +2,20 @@ import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
-import {EVENTS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import logToCloud from '@cdo/apps/logToCloud';
+import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {setScriptId} from '@cdo/apps/redux/unitSelectionRedux';
-import FontAwesome from '@cdo/apps/templates/FontAwesome';
 import ProgressTableView from '@cdo/apps/templates/sectionProgress/progressTables/ProgressTableView';
 import SectionProgressToggle from '@cdo/apps/templates/sectionProgress/SectionProgressToggle';
 import StandardsView from '@cdo/apps/templates/sectionProgress/standards/StandardsView';
 import SortByNameDropdown from '@cdo/apps/templates/SortByNameDropdown';
 import i18n from '@cdo/locale';
 
-import {h3Style} from '../../lib/ui/Headings';
-import firehoseClient from '../../lib/util/firehose';
+import {h3Style} from '../../legacySharedComponents/Headings';
+import firehoseClient from '../../metrics/firehose';
+import {showV2TeacherDashboard} from '../teacherNavigation/TeacherNavFlagUtils';
 
 import LessonSelector from './LessonSelector';
 import ProgressViewHeader from './ProgressViewHeader';
@@ -29,6 +30,7 @@ import UnitSelector from './UnitSelector';
 
 import styleConstants from './progressTables/progress-table-constants.module.scss';
 import dashboardStyles from '@cdo/apps/templates/teacherDashboard/teacher-dashboard.module.scss';
+import navigationStyles from '@cdo/apps/templates/teacherNavigation/teacher-navigation.module.scss';
 
 const SECTION_PROGRESS = 'SectionProgress';
 
@@ -43,7 +45,6 @@ class SectionProgress extends Component {
     //Provided by redux
     scriptId: PropTypes.number,
     sectionId: PropTypes.number,
-    coursesWithProgress: PropTypes.array.isRequired,
     currentView: PropTypes.oneOf(Object.values(ViewType)),
     setCurrentView: PropTypes.func.isRequired,
     scriptData: unitDataPropType,
@@ -59,14 +60,34 @@ class SectionProgress extends Component {
 
     this.state = {
       reportedInitialRender: false,
+      loadedSectionId: null,
     };
   }
 
   componentDidMount() {
-    loadUnitProgress(this.props.scriptId, this.props.sectionId);
+    if (this.props.scriptId) {
+      loadUnitProgress(this.props.scriptId, this.props.sectionId)?.then(() => {
+        this.setState(state => ({
+          ...state,
+          loadedSectionId: this.props.sectionId,
+        }));
+      });
+    }
   }
 
   componentDidUpdate(prevProps) {
+    if (
+      prevProps.scriptId !== this.props.scriptId ||
+      prevProps.sectionId !== this.props.sectionId
+    ) {
+      loadUnitProgress(this.props.scriptId, this.props.sectionId)?.then(() => {
+        this.setState(state => ({
+          ...state,
+          loadedSectionId: this.props.sectionId,
+        }));
+      });
+    }
+
     if (this.levelDataInitialized() && !this.state.reportedInitialRender) {
       logToCloud.addPageAction(
         logToCloud.PageAction.SectionProgressRenderedWithData,
@@ -75,7 +96,10 @@ class SectionProgress extends Component {
           scriptId: this.props.scriptId,
         }
       );
-      this.setState({reportedInitialRender: true});
+      this.setState(state => ({
+        ...state,
+        reportedInitialRender: true,
+      }));
     }
 
     if (
@@ -86,29 +110,36 @@ class SectionProgress extends Component {
       !this.props.isLoadingProgress &&
       !this.props.isRefreshingProgress
     ) {
-      analyticsReporter.sendEvent(EVENTS.PROGRESS_VIEWED_FIXED, {
-        sectionId: this.props.sectionId,
-        unitId: this.props.scriptId,
-        windowWidth: window.innerWidth,
-        windowHeight: window.innerHeight,
-      });
+      analyticsReporter.sendEvent(
+        EVENTS.PROGRESS_VIEWED_FIXED,
+        {
+          sectionId: this.props.sectionId,
+          unitId: this.props.scriptId,
+          windowWidth: window.innerWidth,
+          windowHeight: window.innerHeight,
+        },
+        PLATFORMS.BOTH
+      );
     }
   }
 
   onChangeScript = scriptId => {
     this.props.setScriptId(scriptId);
-    loadUnitProgress(scriptId, this.props.sectionId);
 
     this.recordEvent('change_script', {
       old_script_id: this.props.scriptId,
       new_script_id: scriptId,
     });
 
-    analyticsReporter.sendEvent(EVENTS.PROGRESS_CHANGE_UNIT, {
-      sectionId: this.props.sectionId,
-      oldUnitId: this.props.scriptId,
-      unitId: scriptId,
-    });
+    analyticsReporter.sendEvent(
+      EVENTS.PROGRESS_CHANGE_UNIT,
+      {
+        sectionId: this.props.sectionId,
+        oldUnitId: this.props.scriptId,
+        unitId: scriptId,
+      },
+      PLATFORMS.BOTH
+    );
   };
 
   onChangeLevel = lessonOfInterest => {
@@ -146,13 +177,25 @@ class SectionProgress extends Component {
   };
 
   levelDataInitialized = () => {
-    const {scriptData, isLoadingProgress, isRefreshingProgress} = this.props;
-    return scriptData && !isLoadingProgress && !isRefreshingProgress;
+    const {
+      scriptData,
+      isLoadingProgress,
+      isRefreshingProgress,
+      sectionId,
+      scriptId,
+    } = this.props;
+    const {loadedSectionId} = this.state;
+    return (
+      scriptData &&
+      !isLoadingProgress &&
+      !isRefreshingProgress &&
+      sectionId === loadedSectionId &&
+      scriptData.id === scriptId
+    );
   };
 
   render() {
     const {
-      coursesWithProgress,
       currentView,
       scriptId,
       scriptData,
@@ -171,7 +214,12 @@ class SectionProgress extends Component {
 
     return (
       <div
-        className={dashboardStyles.dashboardPage}
+        className={
+          showV2TeacherDashboard()
+            ? navigationStyles.widthLockedPage
+            : dashboardStyles.dashboardPage
+        }
+        // eslint-disable-next-line react/forbid-dom-props
         data-testid="section-progress-v1"
       >
         <div style={styles.topRowContainer}>
@@ -179,11 +227,7 @@ class SectionProgress extends Component {
             <div style={{...h3Style, ...styles.heading}}>
               {i18n.selectACourse()}
             </div>
-            <UnitSelector
-              coursesWithProgress={coursesWithProgress}
-              scriptId={scriptId}
-              onChange={this.onChangeScript}
-            />
+            <UnitSelector scriptId={scriptId} onChange={this.onChangeScript} />
           </div>
           {levelDataInitialized && (
             <div style={styles.toggle}>
@@ -278,7 +322,6 @@ export default connect(
   state => ({
     scriptId: state.unitSelection.scriptId,
     sectionId: state.teacherSections.selectedSectionId,
-    coursesWithProgress: state.unitSelection.coursesWithProgress,
     currentView: state.sectionProgress.currentView,
     scriptData: getCurrentUnitData(state),
     isLoadingProgress: state.sectionProgress.isLoadingProgress,

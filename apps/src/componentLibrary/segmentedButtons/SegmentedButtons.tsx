@@ -22,6 +22,8 @@ export interface SegmentedButtonsProps {
    * 'number' - we can not render any icons at all.
    * */
   type?: SegmentButtonType;
+  /** Segmented Buttons color */
+  color?: 'primary' | 'strong';
   /** Segmented Buttons selected button unique value */
   selectedButtonValue: string;
   /** Segmented Buttons onChange handler */
@@ -47,6 +49,7 @@ const SegmentedButtons: React.FunctionComponent<SegmentedButtonsProps> = ({
   selectedButtonValue,
   onChange,
   className,
+  color = 'primary',
   size = 'm',
   type = 'withLabel',
 }) => {
@@ -54,24 +57,28 @@ const SegmentedButtons: React.FunctionComponent<SegmentedButtonsProps> = ({
     <div
       className={classnames(
         moduleStyles.segmentedButtons,
+        moduleStyles[`segmentedButtons-${color}`],
         moduleStyles[`segmentedButtons-${size}`],
         className
       )}
     >
-      {buttons.map(({label, disabled, iconLeft, iconRight, icon, value}) => (
-        <SegmentedButton
-          key={label}
-          selected={selectedButtonValue === value}
-          label={label}
-          onChange={onChange}
-          disabled={disabled}
-          iconLeft={iconLeft}
-          iconRight={iconRight}
-          icon={icon}
-          buttonType={type}
-          value={value}
-        />
-      ))}
+      {buttons.map(
+        ({label, disabled, iconLeft, iconRight, icon, value, id}) => (
+          <SegmentedButton
+            key={label}
+            selected={selectedButtonValue === value}
+            label={label}
+            onChange={onChange}
+            disabled={disabled}
+            iconLeft={iconLeft}
+            iconRight={iconRight}
+            icon={icon}
+            buttonType={type}
+            value={value}
+            id={id}
+          />
+        )
+      )}
     </div>
   );
 };

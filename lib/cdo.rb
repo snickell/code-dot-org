@@ -64,7 +64,7 @@ module Cdo
 
       # our HTTPS wildcard certificate only supports *.code.org
       # 'env', 'studio.code.org' over https must resolve to 'env-studio.code.org' for non-prod environments
-      sep = (domain.include?('.code.org')) ? '-' : '.'
+      sep = domain.include?('.code.org') ? '-' : '.'
       # developers and CI servers use localhost
       return "localhost#{sep}#{domain}" if rack_env?(:development) || ci_webserver?
       return "translate#{sep}#{domain}" if name == 'crowdin'
@@ -81,10 +81,6 @@ module Cdo
 
     def hourofcode_hostname
       canonical_hostname('hourofcode.com')
-    end
-
-    def advocacy_hostname
-      canonical_hostname('advocacy.code.org')
     end
 
     def codeprojects_hostname
@@ -104,7 +100,7 @@ module Cdo
     def site_host(domain)
       host = canonical_hostname(domain)
       if (rack_env?(:development) && !https_development) ||
-          (ENV['CI'] && host.include?('localhost'))
+          (ENV.fetch('CI', nil) && host.include?('localhost'))
         port = ['studio.code.org'].include?(domain) ? dashboard_port : pegasus_port
         host += ":#{port}"
       end
@@ -132,10 +128,6 @@ module Cdo
       site_url('code.org', path, scheme)
     end
 
-    def advocacy_url(path = '', scheme = '')
-      site_url('advocacy.code.org', path, scheme)
-    end
-
     def hourofcode_url(path = '', scheme = '')
       site_url('hourofcode.com', path, scheme)
     end
@@ -152,8 +144,8 @@ module Cdo
         # deployed development instance of Javabuilder, set
         # 'local_javabuilder_stack_name: "your stack name"' in your locals.yml.
         return 'ws://localhost:8080/javabuilder' if CDO.use_localhost_javabuilder
-        stack_name = CDO.local_javabuilder_stack_name || 'javabuilder-test'
-        "wss://#{stack_name}.code.org"
+        javabuilder_stack_name = CDO.local_javabuilder_stack_name || 'javabuilder-test'
+        "wss://#{javabuilder_stack_name}.code.org"
       else
         DCDO.get("javabuilder_websocket_url", 'wss://javabuilder.code.org')
       end
@@ -167,8 +159,8 @@ module Cdo
         # deployed development instance of Javabuilder, set
         # 'local_javabuilder_stack_name: "your stack name"' in your locals.yml.
         return 'http://localhost:8080/javabuilderfiles/seedsources' if CDO.use_localhost_javabuilder
-        stack_name = CDO.local_javabuilder_stack_name || 'javabuilder-test'
-        "https://#{stack_name}-http.code.org/seedsources/sources.json"
+        javabuilder_stack_name = CDO.local_javabuilder_stack_name || 'javabuilder-test'
+        "https://#{javabuilder_stack_name}-http.code.org/seedsources/sources.json"
       else
         http_url = DCDO.get("javabuilder_http_url", 'https://javabuilder-http.code.org')
         http_url + "/seedsources/sources.json"
@@ -269,7 +261,7 @@ module Cdo
     end
 
     # Identify whether we are executing on the managed test system (test.code.org / test-studio.code.org)
-    # to ensure that other systems (such as staging-next or Continuous Integration builds) that are operating
+    # to ensure that other systems (such as Continuous Integration builds) that are operating
     # with RACK_ENV=test do not carry out actions on behalf of the managed test system.
     def test_system?
       rack_env?(:test) && pegasus_hostname == 'test.code.org'
@@ -287,7 +279,7 @@ module Cdo
     # Is this code running in a webserver as part of our Continuous Integration
     # builds?
     def ci_webserver?
-      running_web_application? && ENV['CI']
+      running_web_application? && ENV.fetch('CI', nil)
     end
 
     def shared_image_url(path)

@@ -3,23 +3,14 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import WorkshopDetails from './workshop_details';
-import FacilitatorBio from './facilitator_bio';
+
+import {navigateToHref} from '@cdo/apps/utils';
+
+import {SUBMISSION_STATUSES} from './constants';
 import EnrollForm from './enroll_form';
 import {WorkshopPropType, FacilitatorPropType} from './enrollmentConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
-import {EVENTS} from '@cdo/apps/lib/util/AnalyticsConstants';
-
-const SUBMISSION_STATUSES = {
-  UNSUBMITTED: 'unsubmitted',
-  DUPLICATE: 'duplicate',
-  OWN: 'own',
-  CLOSED: 'closed',
-  FULL: 'full',
-  NOT_FOUND: 'not found',
-  SUCCESS: 'success',
-  UNKNOWN_ERROR: 'error',
-};
+import FacilitatorBio from './facilitator_bio';
+import WorkshopDetails from './workshop_details';
 
 export default class WorkshopEnroll extends React.Component {
   static propTypes = {
@@ -29,11 +20,19 @@ export default class WorkshopEnroll extends React.Component {
     enrollment: PropTypes.shape({
       email: PropTypes.string,
       first_name: PropTypes.string,
+      last_name: PropTypes.string,
     }),
     facilitators: PropTypes.arrayOf(FacilitatorPropType),
     workshop_enrollment_status: PropTypes.string,
     previous_courses: PropTypes.arrayOf(PropTypes.string).isRequired,
     collect_demographics: PropTypes.bool,
+    school_info: PropTypes.shape({
+      country: PropTypes.string,
+      school_id: PropTypes.string,
+      school_name: PropTypes.string,
+      school_type: PropTypes.string,
+      school_zip: PropTypes.string,
+    }),
   };
 
   constructor(props) {
@@ -47,14 +46,13 @@ export default class WorkshopEnroll extends React.Component {
   }
 
   onSubmissionComplete = result => {
-    if (result.responseJSON) {
+    if (result) {
       this.setState({
-        workshopEnrollmentStatus:
-          result.responseJSON.workshop_enrollment_status,
-        cancelUrl: result.responseJSON.cancel_url,
-        accountExists: result.responseJSON.account_exists,
-        signUpUrl: result.responseJSON.sign_up_url,
-        workshopUrl: result.responseJSON.workshop_url,
+        workshopEnrollmentStatus: result.workshop_enrollment_status,
+        cancelUrl: result.cancel_url,
+        accountExists: result.account_exists,
+        signUpUrl: result.sign_up_url,
+        workshopUrl: result.workshop_url,
       });
     } else {
       this.setState({
@@ -127,44 +125,20 @@ export default class WorkshopEnroll extends React.Component {
   }
 
   renderSuccess() {
-    analyticsReporter.sendEvent(EVENTS.WORKSHOP_ENROLLMENT_COMPLETED_EVENT, {
-      'regional partner': this.props.workshop.regional_partner?.name,
-      'workshop course': this.props.workshop.course,
-      'workshop subject': this.props.workshop.subject,
-    });
-    return (
-      <div>
-        <h1>Thank you for registering</h1>
-        <p>
-          You will receive a confirmation email. If you have any questions or
-          need to request special accommodations, please reach out directly to
-          the workshop organizer: {this.props.workshop.organizer.name} at{' '}
-          {this.props.workshop.organizer.email}.
-        </p>
-        <p>
-          If you need to cancel, click <a href={this.state.cancelUrl}>here</a>.
-        </p>
-        <br />
-        {!this.state.accountExists && (
-          <div>
-            <h1>Get a Head Start: Create Your Code.org Account</h1>
-            <p>
-              If you don’t have a Code.org account yet, click below to create
-              one. You'll need a Code.org account on the day of the workshop.
-              You'll use this account to manage your students and view their
-              progress when you start teaching, so be sure to use the email
-              you'll use when you teach.
-            </p>
-
-            <a href={this.state.signUpUrl}>
-              <button type="button" className="primary">
-                Create account now
-              </button>
-            </a>
-          </div>
-        )}
-      </div>
+    // Redirect to My PL landing page. The WORKSHOP_ENROLLMENT_COMPLETED_EVENT event will be logged
+    // on that page since event logs immediately followed by redirects sometimes do not fire.
+    sessionStorage.setItem(
+      'rpName',
+      this.props.workshop.regional_partner?.name || ''
     );
+    sessionStorage.setItem('workshopCourse', this.props.workshop.course);
+    sessionStorage.setItem(
+      'workshopSubject',
+      this.props.workshop.subject || ''
+    );
+    sessionStorage.setItem('workshopName', this.props.workshop.name || '');
+
+    navigateToHref('/my-professional-learning');
   }
 
   render() {
@@ -221,6 +195,7 @@ export default class WorkshopEnroll extends React.Component {
                         workshop_subject={this.props.workshop.subject}
                         previous_courses={this.props.previous_courses}
                         collect_demographics={this.props.collect_demographics}
+                        school_info={this.props.school_info}
                       />
                     </div>
                   </div>

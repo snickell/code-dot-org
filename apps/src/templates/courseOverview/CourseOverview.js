@@ -8,19 +8,20 @@ import Announcements from '@cdo/apps/code-studio/components/progress/Announcemen
 import RedirectDialog from '@cdo/apps/code-studio/components/RedirectDialog';
 import {ViewType} from '@cdo/apps/code-studio/viewAsRedux';
 import fontConstants from '@cdo/apps/fontConstants';
-import {resourceShape} from '@cdo/apps/lib/levelbuilder/shapes';
-import {EVENTS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import {resourceShape} from '@cdo/apps/levelbuilder/shapes';
+import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import Notification, {
+  NotificationType,
+} from '@cdo/apps/sharedComponents/Notification';
 import styleConstants from '@cdo/apps/styleConstants';
 import {SignInState} from '@cdo/apps/templates/currentUserRedux';
 import ParticipantFeedbackNotification from '@cdo/apps/templates/feedback/ParticipantFeedbackNotification';
-import Notification, {NotificationType} from '@cdo/apps/templates/Notification';
-import AssignmentVersionSelector from '@cdo/apps/templates/teacherDashboard/AssignmentVersionSelector';
 import {
   assignmentCourseVersionShape,
   sectionForDropdownShape,
 } from '@cdo/apps/templates/teacherDashboard/shapes';
-import {sectionsForDropdown} from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
+import {sectionsForDropdown} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
 import color from '@cdo/apps/util/color';
 import {
   onDismissRedirectDialog,
@@ -30,10 +31,9 @@ import {
 } from '@cdo/apps/util/dismissVersionRedirect';
 import i18n from '@cdo/locale';
 
-import {queryParams} from '../../code-studio/utils';
-import * as utils from '../../utils';
 import SafeMarkdown from '../SafeMarkdown';
 
+import CourseOverviewActionRow from './CourseOverviewActionRow';
 import CourseOverviewTopRow from './CourseOverviewTopRow';
 import CourseScript from './CourseScript';
 import VerifiedResourcesNotification from './VerifiedResourcesNotification';
@@ -85,19 +85,11 @@ class CourseOverview extends Component {
         EVENTS.COURSE_OVERVIEW_PAGE_VISITED_BY_TEACHER_EVENT,
         {
           'unit group name': props.name,
-        }
+        },
+        PLATFORMS.BOTH
       );
     }
   }
-
-  onChangeVersion = versionId => {
-    const version = this.props.versions[versionId];
-    if (versionId !== this.props.id && version) {
-      const sectionId = queryParams('section_id');
-      const queryString = sectionId ? `?section_id=${sectionId}` : '';
-      utils.navigateToHref(`${version.path}${queryString}`);
-    }
-  };
 
   onDismissVersionWarning = () => {
     if (!this.props.scripts[0]) {
@@ -203,15 +195,19 @@ class CourseOverview extends Component {
         {showNotification && <VerifiedResourcesNotification />}
         <div style={styles.titleWrapper}>
           <h1 style={styles.title}>{assignmentFamilyTitle}</h1>
-          {Object.values(versions).length > 1 && (
-            <AssignmentVersionSelector
-              onChangeVersion={this.onChangeVersion}
-              courseVersions={versions}
-              rightJustifiedPopupMenu={true}
-              selectedCourseVersionId={this.props.courseVersionId}
-            />
-          )}
         </div>
+        <CourseOverviewActionRow
+          courseVersionId={courseVersionId}
+          courseId={id}
+          versions={versions}
+          teacherResources={teacherResources}
+          studentResources={studentResources}
+          isInstructor={true}
+          viewAs={viewAs}
+          showAssignButton={showAssignButton}
+          title={title}
+          participantAudience={participantAudience}
+        />
         <SafeMarkdown
           style={styles.description}
           openExternalLinksInNewTab={true}
@@ -229,8 +225,6 @@ class CourseOverview extends Component {
             courseVersionId={courseVersionId}
             id={id}
             courseName={title}
-            teacherResources={teacherResources}
-            studentResources={studentResources}
             showAssignButton={showAssignButton}
             isInstructor={viewAs === ViewType.Instructor}
             participantAudience={participantAudience}
@@ -248,6 +242,7 @@ class CourseOverview extends Component {
             courseOfferingId={courseOfferingId}
             courseVersionId={courseVersionId}
             showAssignButton={showAssignButton}
+            participantAudience={participantAudience}
           />
         ))}
       </div>

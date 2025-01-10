@@ -33,32 +33,6 @@ class ReportAbuseController < ApplicationController
     project_owner.permission?(UserPermission::PROJECT_VALIDATOR)
   end
 
-  def report_abuse_pop_up
-    unless protected_project?
-      unless verify_recaptcha || !require_captcha?
-        flash[:alert] = I18n.t('project.abuse.report_abuse_form.validation.captcha')
-        return head :forbidden
-      end
-
-      name = current_user&.name || ''
-      email = current_user&.email
-      age = current_user&.age
-      username = current_user&.username
-      abuse_url = CDO.studio_url(params[:abuse_url], CDO.default_scheme)
-
-      # submit abuse reports from
-      # signed out users (nil) and student accounts (blank string)
-      # under generic email
-      if email.nil? || email == ''
-        email = UNKNOWN_ACCOUNT_ZENDESK_REPORT_EMAIL
-      end
-      send_abuse_report(name, email, age, abuse_url, username)
-      update_abuse_score
-
-      return head :ok
-    end
-  end
-
   def report_abuse
     unless protected_project?
       unless verify_recaptcha || !require_captcha?
@@ -103,14 +77,12 @@ class ReportAbuseController < ApplicationController
 
   # DELETE /v3/channels/:channel_id/abuse
   # POST /v3/channels/:channel_id/abuse/delete
-  # Clear an abuse score. Requires project_validator permission
+  # Clear an abuse score, i.e., set abuse score to 0. Requires project_validator permission
   def reset_abuse
     return head :unauthorized unless can?(:destroy_abuse, nil)
 
-    channel_id = params[:channel_id]
-
     begin
-      value = Projects.new(get_storage_id).reset_abuse(channel_id)
+      value = Projects.new(get_storage_id).reset_abuse(params[:channel_id])
     rescue ArgumentError, OpenSSL::Cipher::CipherError
       raise ActionController::BadRequest.new, "Bad channel_id"
     end
@@ -136,20 +108,17 @@ class ReportAbuseController < ApplicationController
     # Reports of abuse from verified teachers are more reliable than reports
     # from students so we increase the abuse score enough to block the project
     # with only one report from a verified teacher.
-    #
-    # Temporarily ignore anonymous reports and only allow verified teachers
-    # and signed in users to report.
-    restrict_reporting_to_verified_users = DCDO.get('restrict-abuse-reporting-to-verified', true)
     amount =
-      if current_user&.verified_teacher?
+      if current_user&.verified_teacher? || current_user&.project_validator?
         20
-      elsif current_user && !restrict_reporting_to_verified_users
+      elsif current_user && !restrict_reporting_to_verified_teachers
         10
       else
         0
       end
     begin
-      value = Projects.new(get_storage_id).increment_abuse(channel_id, amount)
+      # Project validators can update the abuse score on frozen projects while other users cannot.
+      value = Projects.new(get_storage_id).increment_abuse(channel_id, amount, current_user&.project_validator?)
     rescue ArgumentError, OpenSSL::Cipher::CipherError
       raise ActionController::BadRequest.new, "Bad channel_id"
     end
@@ -174,6 +143,11 @@ class ReportAbuseController < ApplicationController
     end
 
     abuse_score
+  end
+
+  def restrict_reporting_to_verified_teachers
+    # If DCDO flag is set to true, only allow verified teacher users to report abuse.
+    DCDO.get('restrict-abuse-reporting-to-verified', false)
   end
 
   private def send_abuse_report(name, email, age, abuse_url, username)

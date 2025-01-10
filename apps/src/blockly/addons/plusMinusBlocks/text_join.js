@@ -14,7 +14,7 @@
  * @fileoverview Changes the text_join block to use a +/- mutator UI.
  */
 
-import GoogleBlockly from 'blockly/core';
+import * as GoogleBlockly from 'blockly/core';
 
 import {createMinusField} from './field_minus';
 import {createPlusField} from './field_plus';
@@ -190,12 +190,13 @@ const textJoinHelper = function () {
   }
   this.updateShape_(MINIMUM_INPUTS);
 };
-
-if (GoogleBlockly.Extensions.isRegistered('text_join_mutator')) {
-  GoogleBlockly.Extensions.unregister('text_join_mutator');
+export default function registerMutator() {
+  if (GoogleBlockly.Extensions.isRegistered('text_join_mutator')) {
+    GoogleBlockly.Extensions.unregister('text_join_mutator');
+  }
+  GoogleBlockly.Extensions.registerMutator(
+    'text_join_mutator',
+    textJoinMutator,
+    textJoinHelper
+  );
 }
-GoogleBlockly.Extensions.registerMutator(
-  'text_join_mutator',
-  textJoinMutator,
-  textJoinHelper
-);

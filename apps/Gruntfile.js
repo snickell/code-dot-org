@@ -363,6 +363,8 @@ module.exports = function (grunt) {
   config.exec = {
     convertScssVars: './script/convert-scss-variables.js',
     generateSharedConstants: 'bundle exec ./script/generateSharedConstants.rb',
+    generateRegionConfigurations:
+      'bundle exec ./script/generateRegionConfigurations.rb',
   };
 
   grunt.registerTask('karma', ['preconcatForKarma', 'karma start']);
@@ -386,6 +388,7 @@ module.exports = function (grunt) {
     'newer:messages',
     'exec:convertScssVars',
     'exec:generateSharedConstants',
+    'exec:generateRegionConfigurations',
     'newer:copy:static',
   ]);
 
@@ -540,6 +543,7 @@ module.exports = function (grunt) {
     'newer:messages',
     'exec:convertScssVars',
     'exec:generateSharedConstants',
+    'exec:generateRegionConfigurations',
     'newer:copy:src',
     'newer:copy:lib',
     'locales',
@@ -591,24 +595,7 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('compile-firebase-rules', function () {
-    if (process.env.RACK_ENV === 'production') {
-      throw new Error(
-        'Cannot compile firebase security rules on production.\n' +
-          'Instead, upload security rules from the apps package which was downloaded from s3.'
-      );
-    }
-    child_process.execSync('mkdir -p ./build/package/firebase');
-    child_process.execSync(
-      'yarn run firebase-bolt < ./firebase/rules.bolt > ./build/package/firebase/rules.json'
-    );
-  });
-
-  grunt.registerTask('postbuild', [
-    'newer:copy:static',
-    'newer:sass',
-    'compile-firebase-rules',
-  ]);
+  grunt.registerTask('postbuild', ['newer:copy:static', 'newer:sass']);
 
   grunt.registerTask('build', [
     'prebuild',

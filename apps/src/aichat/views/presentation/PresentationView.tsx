@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import React, {useMemo} from 'react';
 
 import {
@@ -8,6 +9,7 @@ import {Heading4} from '@cdo/apps/componentLibrary/typography';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 import {modelDescriptions} from '../../constants';
+import aichatI18n from '../../locale';
 
 import ModelCardRow from './ModelCardRow';
 
@@ -58,29 +60,41 @@ const PresentationView: React.FunctionComponent = () => {
   ]);
 
   return (
-    <div className={styles.verticalFlexContainer}>
-      <div>
-        <Heading4 className={moduleStyles.modelCardTitle}>
-          {modelCardInfo['botName']}
-        </Heading4>
-        {MODEL_CARD_FIELDS_LABELS_ICONS.map(([property, label, iconName]) => {
-          if (property === 'botName' || property === 'isPublished') {
-            return null;
+    <div
+      className={classNames(
+        styles.verticalFlexContainer,
+        moduleStyles.container
+      )}
+    >
+      <Heading4
+        id="uitest-presentation-view-header"
+        className={moduleStyles.modelCardTitle}
+      >
+        {modelCardInfo['botName']}
+      </Heading4>
+      <div className={moduleStyles.modelCardFields}>
+        {MODEL_CARD_FIELDS_LABELS_ICONS.map(
+          ({property, label, icon, displayTooltip}) => {
+            if (property === 'botName' || property === 'isPublished') {
+              return null;
+            }
+            return (
+              <ModelCardRow
+                title={label}
+                titleIcon={icon}
+                expandedContent={modelCardInfo[property]}
+                key={property}
+                tooltipText={displayTooltip}
+              />
+            );
           }
-          return (
-            <ModelCardRow
-              title={label}
-              titleIcon={iconName}
-              expandedContent={modelCardInfo[property]}
-              key={property}
-            />
-          );
-        })}
+        )}
         <ModelCardRow
-          title="Technical Info"
+          title={aichatI18n.technicalInfoHeader()}
           titleIcon="screwdriver-wrench"
           expandedContent={technicalInfo}
           key="technicalInfo"
+          tooltipText={aichatI18n.technicalInfoHeader_tooltipText()}
         />
       </div>
     </div>

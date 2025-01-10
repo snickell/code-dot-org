@@ -8,7 +8,7 @@ module BlocklyHelpers
 
   def generate_drag_code(from, to, target_dx, target_dy)
     id_selector = get_id_selector
-    generate_selector_drag_code "[#{id_selector}='#{from}']", "[#{id_selector}='#{to}']", target_dx, target_dy
+    generate_selector_drag_code "[#{id_selector}='#{from}']:last", "[#{id_selector}='#{to}']", target_dx, target_dy
   end
 
   def generate_selector_drag_code(from, to, target_dx, target_dy)
@@ -88,11 +88,11 @@ module BlocklyHelpers
   end
 
   def get_block_workspace_left(block_id)
-    @browser.execute_script("return Blockly.mainBlockSpace.getBlockById(#{block_id}).getRelativeToSurfaceXY().x;")
+    @browser.execute_script("return Blockly.mainBlockSpace.getBlockById('#{block_id}').getRelativeToSurfaceXY().x;")
   end
 
   def get_block_workspace_top(block_id)
-    @browser.execute_script("return Blockly.mainBlockSpace.getBlockById(#{block_id}).getRelativeToSurfaceXY().y;")
+    @browser.execute_script("return Blockly.mainBlockSpace.getBlockById('#{block_id}').getRelativeToSurfaceXY().y;")
   end
 
   def modal_dialog_visible
@@ -107,6 +107,32 @@ end
 # Google Blockly encodes the id in the DOM element as the "data-id", CDO Blockly calls it the "block-id"
 def get_id_selector
   google_blockly? ? 'data-id' : 'block-id'
+end
+
+def connect_block(from, to)
+  "var workspace = Blockly.getMainWorkspace();" \
+  "var blockToMove = workspace.getBlockById('#{from}');" \
+  "var targetBlock = workspace.getBlockById('#{to}');" \
+  "targetBlock.nextConnection.connect(blockToMove.previousConnection);"
+end
+
+def connect_block_statement(from, to)
+  "var workspace = Blockly.getMainWorkspace();" \
+  "var blockToMove = workspace.getBlockById('#{from}');" \
+  "var targetBlock = workspace.getBlockById('#{to}');" \
+  "targetBlock.inputList[1].connection.connect(blockToMove.previousConnection);"
+end
+
+def delete_block(id)
+  "var workspace = Blockly.getMainWorkspace();" \
+  "var blockToDelete = workspace.getBlockById('#{id}');" \
+  "blockToDelete.dispose();"
+end
+
+def move_block_to_jigsaw_ghost(id)
+  "var workspace = Blockly.getMainWorkspace();" \
+  "var blockToMove = workspace.getBlockById('#{id}');" \
+  "blockToMove.moveTo(appOptions.level.ghost);"
 end
 
 World(BlocklyHelpers)

@@ -2,20 +2,11 @@
  * Workshop Filter.
  * Route: /workshops/filter
  */
-import PropTypes from 'prop-types';
-
-import React from 'react';
-import {connect} from 'react-redux';
 import $ from 'jquery';
 import _ from 'lodash';
-import Select from 'react-select';
-import 'react-select/dist/react-select.css';
-import {SelectStyleProps} from '../constants';
-import ServerSortWorkshopTable from './components/server_sort_workshop_table';
-import DatePicker from './components/date_picker';
-import {DATE_FORMAT} from './workshopConstants';
-import {PermissionPropType, WorkshopAdmin} from './permission';
 import moment from 'moment';
+import PropTypes from 'prop-types';
+import React from 'react';
 /* eslint-disable no-restricted-imports */
 import {
   Grid,
@@ -31,15 +22,26 @@ import {
   Clearfix,
 } from 'react-bootstrap';
 /* eslint-enable no-restricted-imports */
+import {connect} from 'react-redux';
+import Select from 'react-select';
+
+import 'react-select/dist/react-select.css';
 import {
   Courses,
   Subjects,
   LegacySubjects,
   States,
 } from '@cdo/apps/generated/pd/sharedWorkshopConstants';
+
 import RegionalPartnerDropdown, {
   RegionalPartnerPropType,
 } from '../components/regional_partner_dropdown';
+import {SelectStyleProps, DATE_ORDER_ASC, DATE_ORDER_DESC} from '../constants';
+
+import DatePicker from './components/date_picker';
+import ServerSortWorkshopTable from './components/server_sort_workshop_table';
+import {PermissionPropType, WorkshopAdmin} from './permission';
+import {DATE_FORMAT} from './workshopConstants';
 
 const limitOptions = [
   {value: 25, text: 'first 25'},
@@ -294,6 +296,11 @@ export class WorkshopFilter extends React.Component {
     )}`;
   }
 
+  getDefaultOrderBy() {
+    const workshopState = this.getFiltersFromUrlParams().state;
+    return workshopState === 'Not Started' ? DATE_ORDER_ASC : DATE_ORDER_DESC;
+  }
+
   // Updates the URL with the new query params so it can be shared.
   // This will trigger React-Router to pass new props and re-render with the new filters.
   updateLocationAndSetFilters(newFilters) {
@@ -529,6 +536,7 @@ export class WorkshopFilter extends React.Component {
             showStatus
             showOrganizer={this.props.permission.has(WorkshopAdmin)}
             generateCaptionFromWorkshops={this.generateCaptionFromWorkshops}
+            initialOrderBy={this.getDefaultOrderBy()}
           />
         </Row>
       </Grid>
@@ -542,3 +550,5 @@ export default connect(state => ({
   showRegionalPartnerDropdown:
     state.regionalPartners.regionalPartners.length > 1,
 }))(WorkshopFilter);
+
+export {WorkshopFilter as UnconnectedWorkshopFilter};

@@ -4,14 +4,17 @@
     "wrapup_video_id": null,
     "login_required": true,
     "properties": {
+      "content_area": "pl_workshop_activities",
       "curriculum_umbrella": "PD Workshop Activity CSP",
       "hideable_lessons": true,
       "is_migrated": true,
-      "student_detail_progress_view": true
+      "student_detail_progress_view": true,
+      "tts": true,
+      "version_year": "2024"
     },
     "new_name": null,
     "family_name": null,
-    "serialized_at": "2024-03-25 22:54:17 UTC",
+    "serialized_at": "2024-11-19 01:19:57 UTC",
     "published_state": null,
     "instruction_type": null,
     "instructor_audience": null,
@@ -130,6 +133,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSP-PL Module 8 - Workshop Overview_2023.1_2024"
+        ],
         "progression": "Module 8 Overview (~5 minutes)"
       },
       "bonus": false,
@@ -152,6 +158,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSP-PL M8 - Unit 10 Exploration_2024"
+        ],
         "progression": "Unit 10 Exploration (~30 minutes)"
       },
       "bonus": false,
@@ -174,6 +183,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSP-PL M8 - Reflection_2024"
+        ],
         "progression": "Reflection (~15 minutes)"
       },
       "bonus": false,
@@ -196,6 +208,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSP-PL M8 - Community 1_2024"
+        ],
         "progression": "Connecting to the CS Community (~15 minutes)"
       },
       "bonus": false,
@@ -218,6 +233,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSP-PL M8 - Community 2_2024"
+        ],
         "progression": "Connecting to the CS Community (~15 minutes)"
       },
       "bonus": false,
@@ -240,6 +258,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSP - Module 8 Wrap Up_2023.1_2024"
+        ],
         "progression": "Module 8 Asynchronous Wrap Up (~10 minutes)"
       },
       "bonus": false,

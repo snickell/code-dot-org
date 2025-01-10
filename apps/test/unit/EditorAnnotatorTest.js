@@ -1,4 +1,4 @@
-import sinon from 'sinon';
+import sinon from 'sinon'; // eslint-disable-line no-restricted-imports
 
 import annotationList from '@cdo/apps/acemode/annotationList';
 import EditorAnnotator, {DropletAnnotator} from '@cdo/apps/EditorAnnotator';
@@ -8,7 +8,7 @@ import {
   restoreStudioApp,
 } from '@cdo/apps/StudioApp';
 
-import {expect} from '../util/reconfiguredChai';
+import {expect} from '../util/reconfiguredChai'; // eslint-disable-line no-restricted-imports
 
 describe('EditorAnnotator', () => {
   let patchStub;
@@ -101,7 +101,10 @@ describe('EditorAnnotator', () => {
         .true;
     });
 
-    it('should amend the styling for the tooltip element for an annotation when given', async () => {
+    /**
+     * This test can only be executed in a browser environment
+     */
+    it.skip('should amend the styling for the tooltip element for an annotation when given', async () => {
       let message = 'This is a line of code';
 
       // Mock out the Ace Editor DOM presence
@@ -205,6 +208,16 @@ describe('EditorAnnotator', () => {
 
     beforeEach(() => {
       dropletStub.getValue = sinon.stub().returns(code);
+    });
+
+    it('returns undefined if the annotator is not yet available', () => {
+      EditorAnnotator.reset();
+      restoreDroplet();
+
+      let snippet = 'var y = 6;';
+      const result = EditorAnnotator.findCodeRegion(snippet);
+      expect(result.firstLine).to.be.undefined;
+      expect(result.lastLine).to.be.undefined;
     });
 
     it('returns undefined for both lines when the snippet is not found', () => {

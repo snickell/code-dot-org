@@ -3,7 +3,6 @@ import $ from 'jquery';
 import _ from 'lodash';
 import React from 'react';
 import {Provider} from 'react-redux';
-import sinon from 'sinon';
 
 import DCDO from '@cdo/apps/dcdo';
 import {
@@ -25,14 +24,14 @@ import SectionProgressSelector from '@cdo/apps/templates/sectionProgressV2/Secti
 import teacherSections from '@cdo/apps/templates/teacherDashboard/teacherSectionsRedux';
 import i18n from '@cdo/locale';
 
-import {expect} from '../../../util/reconfiguredChai';
-
 const V1_PAGE_LINK_TEXT = 'Try out new progress view (beta)';
 const V2_PAGE_LINK_TEXT = 'Switch to old progress view';
 const V1_TEST_ID = 'section-progress-v1';
 const V2_TEST_ID = 'section-progress-v2';
 
-const DEFAULT_PROPS = {};
+const DEFAULT_PROPS = {isInV1Navigaton: true};
+
+jest.mock('@cdo/apps/templates/sectionProgress/sectionProgressLoader');
 
 describe('SectionProgressSelector', () => {
   let store;
@@ -57,17 +56,20 @@ describe('SectionProgressSelector', () => {
     DCDO.set('progress-table-v2-default-v2', false);
     DCDO.set('progress-table-v2-closed-beta-enabled', false);
 
-    postStub = sinon.stub($, 'post');
-    postStub.returns(Promise.resolve());
+    postStub = jest.spyOn($, 'post').mockClear().mockImplementation();
+    postStub.mockReturnValue(Promise.resolve());
 
-    sinon.stub(_, 'debounce').callsFake(fn => fn);
+    jest
+      .spyOn(_, 'debounce')
+      .mockClear()
+      .mockImplementation(fn => fn);
   });
 
   afterEach(() => {
     restoreRedux();
 
-    postStub.restore();
-    sinon.restore();
+    postStub.mockRestore();
+    jest.restoreAllMocks();
   });
 
   function renderDefault(propOverrides = {}) {
@@ -83,8 +85,8 @@ describe('SectionProgressSelector', () => {
     renderDefault();
     store.dispatch(setShowProgressTableV2(true));
 
-    expect(screen.queryByText(V1_PAGE_LINK_TEXT)).to.not.exist;
-    expect(screen.queryByText(V2_PAGE_LINK_TEXT)).to.not.exist;
+    expect(screen.queryByText(V1_PAGE_LINK_TEXT)).toBeFalsy();
+    expect(screen.queryByText(V2_PAGE_LINK_TEXT)).toBeFalsy();
   });
 
   it('shows v1 if disabled', () => {
@@ -92,19 +94,22 @@ describe('SectionProgressSelector', () => {
     renderDefault();
     store.dispatch(setShowProgressTableV2(true));
 
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
-
-    expect(screen.queryByTestId(V2_TEST_ID)).to.not.exist;
+    // eslint-disable-next-line no-restricted-properties
+    expect(screen.queryByTestId(V2_TEST_ID)).toBeFalsy();
   });
 
   it('shows v1', () => {
     renderDefault();
 
     screen.getByText(V1_PAGE_LINK_TEXT);
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
 
-    expect(screen.queryByText(V2_PAGE_LINK_TEXT)).to.not.exist;
-    expect(screen.queryByTestId(V2_TEST_ID)).to.not.exist;
+    expect(screen.queryByText(V2_PAGE_LINK_TEXT)).toBeFalsy();
+    // eslint-disable-next-line no-restricted-properties
+    expect(screen.queryByTestId(V2_TEST_ID)).toBeFalsy();
   });
 
   it('shows v2', () => {
@@ -112,10 +117,12 @@ describe('SectionProgressSelector', () => {
     store.dispatch(setShowProgressTableV2(true));
 
     screen.getByText(V2_PAGE_LINK_TEXT);
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V2_TEST_ID);
 
-    expect(screen.queryByText(V1_PAGE_LINK_TEXT)).to.not.exist;
-    expect(screen.queryByTestId(V1_TEST_ID)).to.not.exist;
+    expect(screen.queryByText(V1_PAGE_LINK_TEXT)).toBeFalsy();
+    // eslint-disable-next-line no-restricted-properties
+    expect(screen.queryByTestId(V1_TEST_ID)).toBeFalsy();
   });
 
   it('shows default v1 if no user preference', () => {
@@ -123,10 +130,12 @@ describe('SectionProgressSelector', () => {
     store.dispatch(setShowProgressTableV2(undefined));
 
     screen.getByText(V1_PAGE_LINK_TEXT);
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
 
-    expect(screen.queryByText(V2_PAGE_LINK_TEXT)).to.not.exist;
-    expect(screen.queryByTestId(V2_TEST_ID)).to.not.exist;
+    expect(screen.queryByText(V2_PAGE_LINK_TEXT)).toBeFalsy();
+    // eslint-disable-next-line no-restricted-properties
+    expect(screen.queryByTestId(V2_TEST_ID)).toBeFalsy();
   });
 
   it('shows default v2 if no user preference', () => {
@@ -135,10 +144,12 @@ describe('SectionProgressSelector', () => {
     renderDefault();
 
     screen.getByText(V2_PAGE_LINK_TEXT);
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V2_TEST_ID);
 
-    expect(screen.queryByText(V1_PAGE_LINK_TEXT)).to.not.exist;
-    expect(screen.queryByTestId(V1_TEST_ID)).to.not.exist;
+    expect(screen.queryByText(V1_PAGE_LINK_TEXT)).toBeFalsy();
+    // eslint-disable-next-line no-restricted-properties
+    expect(screen.queryByTestId(V1_TEST_ID)).toBeFalsy();
   });
 
   it('sets user preference when link clicked', () => {
@@ -147,7 +158,7 @@ describe('SectionProgressSelector', () => {
     const link = screen.getByText(V1_PAGE_LINK_TEXT);
     fireEvent.click(link);
 
-    expect(postStub).to.have.been.calledWith(
+    expect(postStub).toHaveBeenCalledWith(
       '/api/v1/users/show_progress_table_v2',
       {
         show_progress_table_v2: true,
@@ -160,11 +171,13 @@ describe('SectionProgressSelector', () => {
     DCDO.set('progress-table-v2-closed-beta-enabled', true);
     renderDefault();
 
-    expect(screen.queryByText(V1_PAGE_LINK_TEXT)).to.not.exist;
-    expect(screen.queryByText(V2_PAGE_LINK_TEXT)).to.not.exist;
+    expect(screen.queryByText(V1_PAGE_LINK_TEXT)).toBeFalsy();
+    expect(screen.queryByText(V2_PAGE_LINK_TEXT)).toBeFalsy();
 
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
-    expect(screen.queryByTestId(V2_TEST_ID)).to.not.exist;
+    // eslint-disable-next-line no-restricted-properties
+    expect(screen.queryByTestId(V2_TEST_ID)).toBeFalsy();
   });
 
   it('shows toggle if user is in closed beta', () => {
@@ -175,8 +188,10 @@ describe('SectionProgressSelector', () => {
 
     screen.getByText(V1_PAGE_LINK_TEXT);
 
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
-    expect(screen.queryByTestId(V2_TEST_ID)).to.not.exist;
+    // eslint-disable-next-line no-restricted-properties
+    expect(screen.queryByTestId(V2_TEST_ID)).toBeFalsy();
   });
 
   it('shows toggle if user not in closed beta, but v2 enabled', () => {
@@ -185,13 +200,15 @@ describe('SectionProgressSelector', () => {
     renderDefault();
 
     screen.getByText(V1_PAGE_LINK_TEXT);
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
 
-    expect(screen.queryByText(V2_PAGE_LINK_TEXT)).to.not.exist;
-    expect(screen.queryByTestId(V2_TEST_ID)).to.not.exist;
+    expect(screen.queryByText(V2_PAGE_LINK_TEXT)).toBeFalsy();
+    // eslint-disable-next-line no-restricted-properties
+    expect(screen.queryByTestId(V2_TEST_ID)).toBeFalsy();
   });
 
-  it('shows modal if modal is available', () => {
+  it('shows modal if modal is enabled and the user has not seen the invite before', () => {
     DCDO.set('progress-table-v2-enabled', true);
     DCDO.set('progress-table-v2-closed-beta-enabled', true);
     DCDO.set('disable-try-new-progress-view-modal', false);
@@ -204,7 +221,7 @@ describe('SectionProgressSelector', () => {
     screen.getByText(i18n.progressTrackingAnnouncement());
   });
 
-  it('does not show modal if modal is not available', () => {
+  it('does not show modal if modal is disabled', () => {
     DCDO.set('progress-table-v2-enabled', true);
     DCDO.set('progress-table-v2-closed-beta-enabled', true);
     DCDO.set('disable-try-new-progress-view-modal', true);
@@ -215,9 +232,32 @@ describe('SectionProgressSelector', () => {
     renderDefault();
 
     screen.getByText(V1_PAGE_LINK_TEXT);
+    // eslint-disable-next-line no-restricted-properties
     screen.getByTestId(V1_TEST_ID);
 
-    expect(screen.queryByText(i18n.progressTrackingAnnouncement())).to.not
-      .exist;
+    expect(screen.queryByText(i18n.progressTrackingAnnouncement())).toBeFalsy();
+  });
+
+  it('does not show modal if the user has just switched from V1', () => {
+    DCDO.set('progress-table-v2-enabled', true);
+    DCDO.set('progress-table-v2-closed-beta-enabled', true);
+    DCDO.set('disable-try-new-progress-view-modal', false);
+
+    store.dispatch(setDateProgressTableInvitationDelayed(''));
+    store.dispatch(setHasSeenProgressTableInvite(false));
+
+    renderDefault();
+    store.dispatch(setShowProgressTableV2(true));
+
+    // Click the link to switch to V1
+    const link = screen.getByText(V2_PAGE_LINK_TEXT);
+    fireEvent.click(link);
+
+    // Check that the modal is not shown.
+    screen.getByText(V1_PAGE_LINK_TEXT);
+    // eslint-disable-next-line no-restricted-properties
+    screen.getByTestId(V1_TEST_ID);
+
+    expect(screen.queryByText(i18n.progressTrackingAnnouncement())).toBeFalsy();
   });
 });

@@ -1,60 +1,87 @@
+import moment from 'moment';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import moment from 'moment';
+import {Provider, useSelector} from 'react-redux';
 
-import {tryGetLocalStorage, trySetLocalStorage} from '@cdo/apps/utils';
-import getScriptData from '@cdo/apps/util/getScriptData';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import {getStore} from '@cdo/apps/redux';
 import ParentalPermissionModal from '@cdo/apps/templates/policy_compliance/ParentalPermissionModal';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
-import {EVENTS, PLATFORMS} from '@cdo/apps/lib/util/AnalyticsConstants';
+import getScriptData from '@cdo/apps/util/getScriptData';
+import {tryGetLocalStorage, trySetLocalStorage} from '@cdo/apps/utils';
 
 const SHOW_DELAY = 86400; // 1 day
 
 document.addEventListener('DOMContentLoaded', () => {
   const renderModal = () => {
-    const inSection = getScriptData('inSection');
+    // eslint-disable-next-line react/prop-types
+    const Modal = ({lockoutDate, inSection}) => {
+      const currentUser = useSelector(state => state.currentUser);
+      if (!currentUser?.userId) return null;
 
-    const reportEvent = (eventName, payload = {}) => {
-      payload.inSection = inSection;
-      analyticsReporter.sendEvent(eventName, payload, PLATFORMS.AMPLITUDE);
-    };
-
-    const handleClose = () => {
-      reportEvent(EVENTS.CAP_PARENT_EMAIL_MODAL_CLOSED);
-    };
-
-    const handleSubmit = parentalPermissionRequest => {
-      reportEvent(EVENTS.CAP_PARENT_EMAIL_MODAL_SUBMITTED, {
-        consentStatus: parentalPermissionRequest.consent_status,
+      const defaultEventParams = (parentalPermissionRequest = {}) => ({
+        consentStatus: parentalPermissionRequest?.consent_status,
+        us_state: currentUser?.usStateCode,
       });
-    };
 
-    const handleResend = (prevPPR, PPR) => {
-      reportEvent(EVENTS.CAP_PARENT_EMAIL_MODAL_RESEND, {
-        oldConsentStatus: prevPPR.consent_status,
-        newConsentStatus: PPR.consent_status,
-      });
-    };
+      const reportEvent = (eventName, payload = {}) => {
+        payload.inSection = inSection;
+        analyticsReporter.sendEvent(eventName, payload);
+      };
 
-    const handleUpdate = (prevPPR, PPR) => {
-      reportEvent(EVENTS.CAP_PARENT_EMAIL_MODAL_UPDATED, {
-        oldConsentStatus: prevPPR.consent_status,
-        newConsentStatus: PPR.consent_status,
+      const handleClose = parentalPermissionRequest => {
+        reportEvent(
+          EVENTS.CAP_PARENT_EMAIL_MODAL_CLOSED,
+          defaultEventParams(parentalPermissionRequest)
+        );
+      };
+
+      const handleSubmit = parentalPermissionRequest => {
+        reportEvent(
+          EVENTS.CAP_PARENT_EMAIL_SUBMITTED,
+          defaultEventParams(parentalPermissionRequest)
+        );
+      };
+
+      const handleResend = parentalPermissionRequest => {
+        reportEvent(
+          EVENTS.CAP_PARENT_EMAIL_RESEND,
+          defaultEventParams(parentalPermissionRequest)
+        );
+      };
+
+      const handleUpdate = parentalPermissionRequest => {
+        reportEvent(
+          EVENTS.CAP_PARENT_EMAIL_UPDATED,
+          defaultEventParams(parentalPermissionRequest)
+        );
+      };
+
+      reportEvent(EVENTS.CAP_PARENT_EMAIL_MODAL_SHOWN, {
+        consentStatus: currentUser?.childAccountComplianceState,
+        us_state: currentUser?.usStateCode,
       });
+
+      return (
+        <ParentalPermissionModal
+          lockoutDate={lockoutDate}
+          onClose={handleClose}
+          onSubmit={handleSubmit}
+          onResend={handleResend}
+          onUpdate={handleUpdate}
+        />
+      );
     };
 
     ReactDOM.render(
-      <ParentalPermissionModal
-        lockoutDate={getScriptData('lockoutDate')}
-        onClose={handleClose}
-        onSubmit={handleSubmit}
-        onResend={handleResend}
-        onUpdate={handleUpdate}
-      />,
+      <Provider store={getStore()}>
+        <Modal
+          lockoutDate={getScriptData('lockoutDate')}
+          inSection={getScriptData('inSection')}
+        />
+      </Provider>,
       document.getElementById('parental-permission-modal-container')
     );
-
-    reportEvent(EVENTS.CAP_PARENT_EMAIL_MODAL_SHOWN);
   };
 
   if (getScriptData('forceDisplay')) {

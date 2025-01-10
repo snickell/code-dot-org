@@ -1,5 +1,6 @@
 class AiTutorInteractionsController < ApplicationController
   include Rails.application.routes.url_helpers
+  include LevelsHelper
   before_action :authenticate_user!
   load_and_authorize_resource :ai_tutor_interaction
 
@@ -26,42 +27,15 @@ class AiTutorInteractionsController < ApplicationController
     )
     ai_tutor_interaction_params[:user_id] = current_user.id
     ai_tutor_interaction_params[:ai_model_version] = SharedConstants::AI_TUTOR_CHAT_MODEL_VERISON
-    if params[:isProjectBacked]
-      project_data = find_project_and_version_id(ai_tutor_interaction_params[:level_id], ai_tutor_interaction_params[:script_id])
-      ai_tutor_interaction_params[:project_id] = project_data[:project_id]
-      ai_tutor_interaction_params[:project_version_id] = project_data[:version_id]
-    end
+    project_data = get_project_and_version_id(ai_tutor_interaction_params[:level_id], ai_tutor_interaction_params[:script_id])
+    ai_tutor_interaction_params[:project_id] = project_data[:project_id]
+    ai_tutor_interaction_params[:project_version_id] = project_data[:version_id]
 
     ai_tutor_interaction_params
   end
 
   def valid_status
     SharedConstants::AI_TUTOR_INTERACTION_STATUS.value?(params[:status])
-  end
-
-  def find_project_and_version_id(level_id, script_id)
-    project_id = nil
-    version_id = nil
-
-    user_storage_id = storage_id_for_user_id(current_user.id)
-    level = Level.find(level_id)
-    channel_token = ChannelToken.find_channel_token(
-      level,
-      user_storage_id,
-      script_id
-    )
-    if channel_token
-      _owner_id, project_id = storage_decrypt_channel_id(channel_token.channel)
-      source_data = SourceBucket.new.get(channel_token.channel, "main.json")
-      if source_data[:status] == 'FOUND'
-        version_id = source_data[:version_id]
-      end
-    end
-
-    return {
-      project_id: project_id,
-      version_id: version_id,
-    }
   end
 
   # GET /ai_tutor_interactions

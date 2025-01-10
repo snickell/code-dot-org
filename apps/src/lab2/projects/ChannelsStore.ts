@@ -4,6 +4,7 @@
  * A ChannelsStore manages the loading and saving of channels.
  */
 import {Channel, DefaultChannel} from '../types';
+
 import * as channelsApi from './channelsApi';
 import * as projectsApi from './projectsApi';
 
@@ -14,7 +15,7 @@ export interface ChannelsStore {
     levelId: number,
     scriptId?: number,
     scriptLevelId?: string,
-    userId?: string
+    userId?: number
   ) => Promise<Response>;
 
   save: (channel: Channel) => Promise<Response>;
@@ -26,6 +27,8 @@ export interface ChannelsStore {
   publish: (channel: Channel) => Promise<Response>;
 
   unpublish: (channel: Channel) => Promise<Response>;
+
+  getAbuseScore: (channel: Channel) => Promise<number>;
 }
 
 // Note: We don't need to actually save a channel for local storage.
@@ -67,6 +70,11 @@ export class LocalChannelsStore implements ChannelsStore {
     // Unpublishing is not supported for local storage.
     return Promise.resolve(new Response(''));
   }
+
+  getAbuseScore() {
+    // Abuse score is not supported for local storage.
+    return Promise.resolve(0);
+  }
 }
 
 export class RemoteChannelsStore implements ChannelsStore {
@@ -76,7 +84,7 @@ export class RemoteChannelsStore implements ChannelsStore {
     levelId: number,
     scriptId?: number,
     scriptLevelId?: string,
-    userId?: string
+    userId?: number
   ) {
     return projectsApi.getChannelForLevel(
       levelId,
@@ -109,5 +117,9 @@ export class RemoteChannelsStore implements ChannelsStore {
 
   unpublish(channel: Channel) {
     return channelsApi.unpublish(channel);
+  }
+
+  getAbuseScore(channel: Channel) {
+    return channelsApi.fetchAbuseScore(channel.id);
   }
 }

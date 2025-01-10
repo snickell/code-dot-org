@@ -1,4 +1,4 @@
-import {assert, expect} from 'chai';
+import {assert, expect} from 'chai'; // eslint-disable-line no-restricted-imports
 import {mount} from 'enzyme'; // eslint-disable-line no-restricted-imports
 import React from 'react';
 import {FormControl} from 'react-bootstrap'; // eslint-disable-line no-restricted-imports
@@ -7,13 +7,14 @@ import {Provider} from 'react-redux';
 import {MemoryRouter} from 'react-router-dom';
 import {createStore, combineReducers} from 'redux';
 import {Factory} from 'rosie';
-import sinon from 'sinon';
+import sinon from 'sinon'; // eslint-disable-line no-restricted-imports
 
 import {WorkshopForm} from '@cdo/apps/code-studio/pd/workshop_dashboard/components/workshop_form';
 import Permission, {
   WorkshopAdmin,
   ProgramManager,
 } from '@cdo/apps/code-studio/pd/workshop_dashboard/permission';
+import {COURSE_BUILD_YOUR_OWN} from '@cdo/apps/code-studio/pd/workshop_dashboard/workshopConstants';
 import {Subjects} from '@cdo/apps/generated/pd/sharedWorkshopConstants';
 import mapboxReducer from '@cdo/apps/redux/mapbox';
 
@@ -534,6 +535,114 @@ describe('WorkshopForm test', () => {
     assert(wrapper.find('#suppress_email').exists());
     assert(wrapper.find('#suppress_email').first().props().value);
     assert(wrapper.find('#suppress_email').first().props().disabled);
+  });
+
+  it('selecting Build Your Own Workshop does not show subject, paid, or email fields', () => {
+    const wrapper = mount(
+      <Provider store={store}>
+        <MemoryRouter>
+          <WorkshopForm
+            permission={new Permission([WorkshopAdmin])}
+            facilitatorCourses={[]}
+            today={getFakeToday(false)}
+            readOnly={false}
+          />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    const courseField = wrapper.find('#course').first();
+    courseField.simulate('change', {
+      target: {name: 'course', value: COURSE_BUILD_YOUR_OWN},
+    });
+
+    expect(wrapper.find('#subject')).to.have.lengthOf(0);
+    expect(wrapper.find('#funded')).to.have.lengthOf(0);
+    expect(wrapper.find('#suppress_email')).to.have.lengthOf(0);
+  });
+
+  it('selecting Build Your Own Workshop shows and requires name and pl topics', () => {
+    const server = sinon.fakeServer.create();
+    server.respondWith(
+      'GET',
+      '/course_offerings/self_paced_pl_course_offerings',
+      [
+        200,
+        {'Content-Type': 'application/json'},
+        JSON.stringify([
+          {id: '123', display_name: 'myPlTestTopic'},
+          {id: '234', display_name: 'mySecondTopic'},
+        ]),
+      ]
+    );
+    server.respondWith('POST', '/api/v1/pd/workshops', [
+      200,
+      {'Content-Type': 'application/json'},
+      JSON.stringify({}),
+    ]);
+    const onPublish = sinon.spy();
+
+    const wrapper = mount(
+      <Provider store={store}>
+        <MemoryRouter>
+          <WorkshopForm
+            permission={new Permission([WorkshopAdmin])}
+            facilitatorCourses={[]}
+            onSaved={onPublish}
+            today={getFakeToday(false)}
+            readOnly={false}
+          />
+        </MemoryRouter>
+      </Provider>
+    );
+    server.respond();
+
+    // Verify the name field and topics dropdown doesn't show up until Build Your Own is selected
+    expect(wrapper.find('#name').exists()).to.equal(false);
+    expect(wrapper.find('#course_offerings').exists()).to.equal(false);
+    const courseField = wrapper.find('#course').first();
+    courseField.simulate('change', {
+      target: {name: 'course', value: COURSE_BUILD_YOUR_OWN},
+    });
+    assert(wrapper.find('#name').exists());
+    assert(wrapper.find('#course_offerings').exists());
+
+    // Set other fields required to publish any workshop
+    const locationField = wrapper.find('#location_name').first();
+    locationField.simulate('change', {
+      target: {name: 'location_name', value: 'Test location'},
+    });
+
+    const capacityField = wrapper.find('#capacity').first();
+    capacityField.simulate('change', {
+      target: {name: 'capacity', value: 10},
+    });
+
+    // Try (and fail) to publish workshop without filling in name and topics (both required for BYOW)
+    expect(onPublish).not.to.have.been.called;
+    const publishButton = wrapper.find('#workshop-form-save-btn').first();
+    publishButton.simulate('click');
+    server.respond();
+    expect(onPublish).not.to.have.been.called;
+
+    // Fill in name
+    const nameField = wrapper.find('#name').first();
+    nameField.simulate('change', {
+      target: {name: 'capacity', value: 'Fake workshop name'},
+    });
+
+    // Fill in topics (user can select either the label or checkbox, so we expect 2 for each here)
+    const plTopicsDropdown = wrapper.find('#dropdownMenuButton').first();
+    plTopicsDropdown.simulate('click');
+    expect(wrapper.find({name: 'myPlTestTopic'})).to.have.lengthOf(2);
+    expect(wrapper.find({name: 'mySecondTopic'})).to.have.lengthOf(2);
+
+    // Successfully submit form now that all required fields are filled in
+    publishButton.simulate('click');
+    server.respond();
+    expect(onPublish).to.have.been.calledOnce;
+
+    server.restore();
   });
 
   it('editing form as non-admin does not show organizer field', () => {

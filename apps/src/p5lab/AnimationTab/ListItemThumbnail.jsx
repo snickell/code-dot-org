@@ -1,11 +1,13 @@
 /** Animation or Frame thumbnail */
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import _ from 'lodash';
+
 import color from '@cdo/apps/util/color';
+
+import AnimationPreview from '../AnimationPicker/AnimationPreview';
 import {PlayBehavior} from '../constants';
 import * as shapes from '../shapes';
-import AnimationPreview from '../AnimationPicker/AnimationPreview';
 
 const staticStyles = {
   root: {
@@ -49,6 +51,7 @@ export default class ListItemThumbnail extends React.Component {
     singleFrameAnimation: PropTypes.bool.isRequired,
     index: PropTypes.number,
     isSelected: PropTypes.bool,
+    isFocused: PropTypes.bool,
   };
 
   state = {previewSize: 0};
@@ -86,6 +89,7 @@ export default class ListItemThumbnail extends React.Component {
           (this.props.isSelected ? color.purple : color.light_gray),
       },
     });
+
     let playBehavior;
     if (this.props.singleFrameAnimation) {
       playBehavior = PlayBehavior.NEVER_PLAY;
@@ -102,6 +106,7 @@ export default class ListItemThumbnail extends React.Component {
             width={this.state.previewSize}
             height={this.state.previewSize}
             playBehavior={playBehavior}
+            isFocused={this.props.isFocused}
           />
           {this.getIndexBubble()}
         </div>
