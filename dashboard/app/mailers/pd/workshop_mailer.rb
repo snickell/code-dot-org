@@ -233,7 +233,7 @@ class Pd::WorkshopMailer < ApplicationMailer
          reply_to: email_address(@workshop.organizer.name, @workshop.organizer.email)
   end
 
-  def teacher_survey_reminder(enrollment, to_email = '')
+  def teacher_survey_reminder(enrollment)
     @enrollment = enrollment
     @workshop = enrollment.workshop
 
@@ -241,7 +241,7 @@ class Pd::WorkshopMailer < ApplicationMailer
     mail content_type: 'text/html',
       from: from_survey,
       subject: 'Please complete the survey before your workshop!',
-      to: email_address(@enrollment.full_name, to_email.presence || @enrollment.email),
+      to: email_address(@enrollment.full_name, @enrollment.email),
       reply_to: email_address(@workshop.organizer.name, @workshop.organizer.email)
   end
 
