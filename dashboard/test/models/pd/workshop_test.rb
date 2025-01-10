@@ -74,7 +74,7 @@ class Pd::WorkshopTest < ActiveSupport::TestCase
     assert_empty Pd::Workshop.enrolled_in_by(teacher)
 
     # Email match only
-    enrollment.update!(email: teacher.email_mismatch)
+    enrollment.update!(email: teacher.email)
     assert_equal [@workshop], Pd::Workshop.enrolled_in_by(teacher)
 
     # UserId only
