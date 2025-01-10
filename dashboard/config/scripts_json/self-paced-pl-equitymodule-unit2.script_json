@@ -9,7 +9,7 @@
     },
     "new_name": null,
     "family_name": null,
-    "serialized_at": "2025-01-08 23:09:38 UTC",
+    "serialized_at": "2025-01-09 23:22:32 UTC",
     "published_state": null,
     "instruction_type": null,
     "instructor_audience": null,
@@ -255,6 +255,7 @@
       "key": "01b3afb2-d2be-4647-a41b-2d3376019566",
       "position": 1,
       "properties": {
+        "progression_name": "Student-Centered Teaching"
       },
       "seeding_key": {
         "activity_section.key": "01b3afb2-d2be-4647-a41b-2d3376019566",
@@ -265,6 +266,7 @@
       "key": "2e806a1d-8aac-4588-b51c-05e21c0f7d6e",
       "position": 2,
       "properties": {
+        "progression_name": "Prepare to Teach"
       },
       "seeding_key": {
         "activity_section.key": "2e806a1d-8aac-4588-b51c-05e21c0f7d6e",
@@ -379,6 +381,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "self-paced-equity-U2L3-ms-hs-access"
+        ],
         "progression": "Expanding Access for Students"
       },
       "bonus": false,
@@ -401,6 +406,9 @@
       "activity_section_position": 4,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "self-paced-equity-U2L3-CSD-highlight"
+        ],
         "progression": "Expanding Access for Students"
       },
       "bonus": false,
@@ -1150,7 +1158,8 @@
       "properties": {
         "level_keys": [
           "self-paced-equity-U2L4-opening"
-        ]
+        ],
+        "progression": "Student-Centered Teaching"
       },
       "bonus": false,
       "seeding_key": {
@@ -1174,7 +1183,8 @@
       "properties": {
         "level_keys": [
           "self-paced-equity-U2L4-student-centered"
-        ]
+        ],
+        "progression": "Student-Centered Teaching"
       },
       "bonus": false,
       "seeding_key": {
@@ -1198,7 +1208,8 @@
       "properties": {
         "level_keys": [
           "self-paced-equity-U2L4-information-processing"
-        ]
+        ],
+        "progression": "Student-Centered Teaching"
       },
       "bonus": false,
       "seeding_key": {
@@ -1222,7 +1233,8 @@
       "properties": {
         "level_keys": [
           "self-paced-equity-U2L4-coding-identity"
-        ]
+        ],
+        "progression": "Student-Centered Teaching"
       },
       "bonus": false,
       "seeding_key": {
@@ -1246,7 +1258,8 @@
       "properties": {
         "level_keys": [
           "self-paced-equity-U2L4-personally-relevant"
-        ]
+        ],
+        "progression": "Student-Centered Teaching"
       },
       "bonus": false,
       "seeding_key": {
@@ -1268,14 +1281,12 @@
       "activity_section_position": 6,
       "assessment": false,
       "properties": {
-        "level_keys": [
-          "self-paced-equity-U2L-closing"
-        ]
+        "progression": "Student-Centered Teaching"
       },
       "bonus": false,
       "seeding_key": {
         "script_level.level_keys": [
-          "self-paced-equity-U2L-closing"
+          "self-paced-equity-U2L4-realizingpossibilities"
         ],
         "lesson.key": "lesson-4",
         "lesson_group.key": "",
@@ -1283,18 +1294,16 @@
         "activity_section.key": "01b3afb2-d2be-4647-a41b-2d3376019566"
       },
       "level_keys": [
-        "self-paced-equity-U2L-closing"
+        "self-paced-equity-U2L4-realizingpossibilities"
       ]
     },
     {
       "chapter": 42,
       "position": 7,
-      "activity_section_position": 7,
+      "activity_section_position": 1,
       "assessment": false,
       "properties": {
-        "level_keys": [
-          "self-paced-equity-U2L4-prepare-lesson"
-        ]
+        "progression": "Prepare to Teach"
       },
       "bonus": false,
       "seeding_key": {
@@ -1304,7 +1313,7 @@
         "lesson.key": "lesson-4",
         "lesson_group.key": "",
         "script.name": "self-paced-pl-equitymodule-unit2",
-        "activity_section.key": "01b3afb2-d2be-4647-a41b-2d3376019566"
+        "activity_section.key": "2e806a1d-8aac-4588-b51c-05e21c0f7d6e"
       },
       "level_keys": [
         "self-paced-equity-U2L4-prepare-lesson"
@@ -1313,12 +1322,10 @@
     {
       "chapter": 43,
       "position": 8,
-      "activity_section_position": 8,
+      "activity_section_position": 2,
       "assessment": false,
       "properties": {
-        "level_keys": [
-          "self-paced-equity-U2L4-closing"
-        ]
+        "progression": "Prepare to Teach"
       },
       "bonus": false,
       "seeding_key": {
@@ -1328,7 +1335,7 @@
         "lesson.key": "lesson-4",
         "lesson_group.key": "",
         "script.name": "self-paced-pl-equitymodule-unit2",
-        "activity_section.key": "01b3afb2-d2be-4647-a41b-2d3376019566"
+        "activity_section.key": "2e806a1d-8aac-4588-b51c-05e21c0f7d6e"
       },
       "level_keys": [
         "self-paced-equity-U2L4-closing"
@@ -1818,9 +1825,9 @@
     },
     {
       "seeding_key": {
-        "level.key": "self-paced-equity-U2L-closing",
+        "level.key": "self-paced-equity-U2L4-realizingpossibilities",
         "script_level.level_keys": [
-          "self-paced-equity-U2L-closing"
+          "self-paced-equity-U2L4-realizingpossibilities"
         ],
         "lesson.key": "lesson-4",
         "lesson_group.key": "",
@@ -1837,7 +1844,7 @@
         "lesson.key": "lesson-4",
         "lesson_group.key": "",
         "script.name": "self-paced-pl-equitymodule-unit2",
-        "activity_section.key": "01b3afb2-d2be-4647-a41b-2d3376019566"
+        "activity_section.key": "2e806a1d-8aac-4588-b51c-05e21c0f7d6e"
       }
     },
     {
@@ -1849,7 +1856,7 @@
         "lesson.key": "lesson-4",
         "lesson_group.key": "",
         "script.name": "self-paced-pl-equitymodule-unit2",
-        "activity_section.key": "01b3afb2-d2be-4647-a41b-2d3376019566"
+        "activity_section.key": "2e806a1d-8aac-4588-b51c-05e21c0f7d6e"
       }
     }
   ],
