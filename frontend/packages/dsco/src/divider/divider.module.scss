@@ -1,0 +1,21 @@
+@import '@/common/styles/primitiveColors.css';
+
+// Divider common styles
+.divider {
+  border: 0;
+  border-top: 1px solid;
+  margin: 0;
+  width: 100%;
+}
+
+// Divider Colors
+.divider-primary {
+  border-top-color: var(--neutral-gray-20);
+}
+
+.divider-strong {
+  border-top-color: var(--neutral-gray-50);
+}
+
+// Divider Spacing
+// TBD
