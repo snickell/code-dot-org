@@ -919,6 +919,20 @@ class Pd::WorkshopTest < ActiveSupport::TestCase
     Pd::Workshop.send_teacher_pre_work_csa
   end
 
+  test 'CSA teacher pre-work email sends to both the users email and alternate summer email if available' do
+    mock_mail = stub
+    mock_mail.stubs(:deliver_now).returns(nil)
+
+    teacher = create :teacher
+    workshop = create :csa_academic_year_workshop, num_facilitators: 2, subject: Pd::Workshop::SUBJECT_CSA_SUMMER_WORKSHOP
+    application = create :pd_teacher_application, course: 'csa', application_year: workshop.school_year, user: teacher, status: 'accepted'
+    create :pd_enrollment, application_id: application.id, user: teacher, workshop: workshop
+
+    Pd::Workshop.expects(:scheduled_start_in_days).returns([workshop])
+    Pd::WorkshopMailer.expects(:teacher_pre_workshop_csa).returns(mock_mail).times(2)
+    Pd::Workshop.send_teacher_pre_work_csa
+  end
+
   test 'workshop starting date picks the day of the first session' do
     workshop = create :workshop, sessions: [
       session1 = create(:pd_session, start: Time.zone.today + 15.days),
