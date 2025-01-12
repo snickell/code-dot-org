@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
 
-import {OAuthSectionTypes} from '@cdo/apps/lib/ui/accounts/constants';
-import {PLATFORMS} from '@cdo/apps/lib/util/AnalyticsConstants.js';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import {OAuthSectionTypes} from '@cdo/apps/accounts/constants';
+import {PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants.js';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import locale from '@cdo/locale';
 
 import RailsAuthenticityToken from '../../lib/util/RailsAuthenticityToken';
@@ -15,11 +15,14 @@ import {classroomShape, loadErrorShape} from './shapes';
 import {
   cancelImportRosterFlow,
   importOrUpdateRoster,
-  isRosterDialogOpen,
+  rosterImportFailed,
 } from './teacherSectionsRedux';
+import {isRosterDialogOpen} from './teacherSectionsReduxSelectors';
 
 const COMPLETED_EVENT = 'Section Setup Completed';
 const CANCELLED_EVENT = 'Section Setup Cancelled';
+
+const ARCHIVED_STATE = 'ARCHIVED';
 
 const ctaButtonStyle = {
   background: color.orange,
@@ -47,6 +50,12 @@ const ClassroomList = ({classrooms, onSelect, selectedId, rosterProvider}) =>
           {classroom.name}
           {classroom.section && (
             <span style={{color: '#aaa'}}> ({classroom.section})</span>
+          )}
+          {classroom.course_state === ARCHIVED_STATE && (
+            <span id="course-state" style={{color: color.bootstrap_error_text}}>
+              {' '}
+              - {classroom.course_state}
+            </span>
           )}
           <span style={{float: 'right'}}>
             {locale.code()}
@@ -151,6 +160,7 @@ class RosterDialog extends React.Component {
     // Provided by Redux
     handleImport: PropTypes.func,
     handleCancel: PropTypes.func,
+    handleImportFailure: PropTypes.func,
     isOpen: PropTypes.bool,
     classrooms: PropTypes.arrayOf(classroomShape),
     loadError: loadErrorShape,
@@ -199,7 +209,8 @@ class RosterDialog extends React.Component {
         courseName,
       })
         .done(resolve)
-        .fail(jqxhr =>
+        .fail(jqxhr => {
+          this.props.handleImportFailure(jqxhr);
           reject(
             new Error(`
             url: ${importSectionUrl}
@@ -207,8 +218,8 @@ class RosterDialog extends React.Component {
             statusText: ${jqxhr.statusText}
             responseText: ${jqxhr.responseText}
           `)
-          )
-        );
+          );
+        });
     }).then(newSection => this.redirectToEditSectionPage(newSection.id));
   };
 
@@ -353,5 +364,6 @@ export default connect(
   {
     handleImport: importOrUpdateRoster,
     handleCancel: cancelImportRosterFlow,
+    handleImportFailure: rosterImportFailed,
   }
 )(RosterDialog);

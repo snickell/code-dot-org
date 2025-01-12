@@ -10,13 +10,13 @@ import {
   StrongText,
 } from '@cdo/apps/componentLibrary/typography';
 import Button from '@cdo/apps/legacySharedComponents/Button';
-import {EVENTS, PLATFORMS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import i18n from '@cdo/locale';
 import './index.scss';
 
 const reportEvent = (eventName: string, payload: object = {}) => {
-  analyticsReporter.sendEvent(eventName, payload, PLATFORMS.AMPLITUDE);
+  analyticsReporter.sendEvent(eventName, payload);
 };
 
 const returnToCdoButton = () => {
@@ -73,18 +73,26 @@ export interface ChildAccountConsentProps {
   permissionGranted?: boolean;
   permissionGrantedDate?: Date;
   studentId?: number;
+  usState?: string;
 }
 
 const ChildAccountConsent: React.FC<ChildAccountConsentProps> = ({
   permissionGranted,
   permissionGrantedDate,
   studentId,
+  usState,
 }) => {
   if (permissionGranted && permissionGrantedDate) {
-    reportEvent(EVENTS.CAP_PARENT_CONSENT_GRANTED, {studentId: studentId});
+    reportEvent(EVENTS.CAP_PARENT_CONSENT_GRANTED, {
+      studentId,
+      us_state: usState,
+    });
     return permissionGrantedMessage(permissionGrantedDate);
   } else {
-    reportEvent(EVENTS.CAP_PARENT_CONSENT_EXPIRED);
+    reportEvent(EVENTS.CAP_PARENT_CONSENT_EXPIRED, {
+      studentId,
+      us_state: usState,
+    });
     return expiredTokenMessage();
   }
 };

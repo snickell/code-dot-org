@@ -1,8 +1,6 @@
-import GoogleBlockly, {
-  FieldNumberConfig,
-  FieldNumberValidator,
-} from 'blockly/core';
+import * as GoogleBlockly from 'blockly/core';
 
+import {EMPTY_OPTION} from '../constants';
 import {
   ExtendedBlockSvg,
   ExtendedConnection,
@@ -41,8 +39,8 @@ export default class CdoFieldNumber extends GoogleBlockly.FieldNumber {
     min?: string | number | null,
     max?: string | number | null,
     precision?: string | number | null,
-    validator?: FieldNumberValidator | null,
-    config?: FieldNumberConfig
+    validator?: GoogleBlockly.FieldNumberValidator | null,
+    config?: GoogleBlockly.FieldNumberConfig
   ) {
     super(value, min, max, precision, validator, config);
     this.angleHelper = null;
@@ -165,5 +163,21 @@ export default class CdoFieldNumber extends GoogleBlockly.FieldNumber {
   doValueUpdate_(newValue: number) {
     super.doValueUpdate_(newValue);
     this.angleHelper?.animateAngleChange(newValue);
+  }
+
+  /**
+   * Ensure that the input value is a valid number (must fulfill the
+   * constraints placed on the field).
+   *
+   * @param newValue The input value.
+   * @returns A valid number, our special case '???' value, or null if invalid
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected override doClassValidation_(newValue: any): number | null {
+    if (newValue === EMPTY_OPTION) {
+      return newValue; // Return the original value if it's our special case "???"
+    }
+
+    return super.doClassValidation_(newValue);
   }
 }

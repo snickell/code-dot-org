@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 
 import LandingPage from '@cdo/apps/code-studio/pd/professional_learning_landing/LandingPage';
-import {EVENTS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {getStore} from '@cdo/apps/redux';
 import getScriptData from '@cdo/apps/util/getScriptData';
 
@@ -23,16 +23,11 @@ $(() => {
         lastWorkshopSurveyCourse={
           landingPageData['last_workshop_survey_course']
         }
-        deeperLearningCourseData={landingPageData['summarized_plc_enrollments']}
+        showDeeperLearning={landingPageData['show_deeper_learning']}
         currentYearApplicationId={
           landingPageData['current_year_application_id']
         }
         hasEnrolledInWorkshop={landingPageData['has_enrolled_in_workshop']}
-        workshopsAsFacilitator={landingPageData['workshops_as_facilitator']}
-        workshopsAsOrganizer={landingPageData['workshops_as_organizer']}
-        workshopsAsRegionalPartner={
-          landingPageData['workshops_for_regional_partner']
-        }
         plCoursesStarted={landingPageData['pl_courses_started']}
         userPermissions={landingPageData['user_permissions']}
         joinedStudentSections={landingPageData['joined_student_sections']}

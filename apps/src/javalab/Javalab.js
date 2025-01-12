@@ -6,6 +6,9 @@ import {showLevelBuilderSaveButton} from '@cdo/apps/code-studio/header';
 import project from '@cdo/apps/code-studio/initApp/project';
 import {lockContainedLevelAnswers} from '@cdo/apps/code-studio/levels/codeStudioLevels';
 import {TestResults} from '@cdo/apps/constants';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import Neighborhood from '@cdo/apps/miniApps/neighborhood/Neighborhood';
 import {getStore, registerReducers} from '@cdo/apps/redux';
 import javalabMsg from '@cdo/javalab/locale';
 
@@ -18,11 +21,15 @@ import {
 import {initializeSubmitHelper, onSubmitComplete} from '../submitHelper';
 
 import {BackpackAPIContext} from './BackpackAPIContext';
-import {CsaViewMode, ExecutionType, InputMessageType} from './constants';
+import {
+  CsaViewMode,
+  ExecutionType,
+  InputMessageType,
+  STATUS_MESSAGE_PREFIX,
+} from './constants';
 import {getDisplayThemeFromString} from './DisplayTheme';
 import JavabuilderConnection from './JavabuilderConnection';
 import JavalabView from './JavalabView';
-import Neighborhood from './neighborhood/Neighborhood';
 import NeighborhoodVisualizationColumn from './neighborhood/NeighborhoodVisualizationColumn';
 import javalabConsole, {
   appendOutputLog,
@@ -94,6 +101,7 @@ Javalab.prototype.init = function (config) {
 
   this.skin = config.skin;
   this.level = config.level;
+  this.levelIdForAnalytics = config.serverLevelId;
   // Sets display theme based on displayTheme user preference
   this.displayTheme = getDisplayThemeFromString(config.displayTheme);
   this.isStartMode = !!config.level.editBlocks;
@@ -115,7 +123,6 @@ Javalab.prototype.init = function (config) {
   config.noInstructionsWhenCollapsed = true;
 
   config.pinWorkspaceToBottom = true;
-
   config.getCode = this.getCode.bind(this);
   config.afterClearPuzzle = this.afterClearPuzzle.bind(this);
   const onRun = this.onRun.bind(this);
@@ -133,14 +140,19 @@ Javalab.prototype.init = function (config) {
       this.miniApp = new Neighborhood(
         this.onOutputMessage,
         this.onNewlineMessage,
-        this.setIsRunning
+        this.setIsRunning,
+        STATUS_MESSAGE_PREFIX
       );
       config.afterInject = () =>
         this.miniApp.afterInject(
           this.level,
           this.skin,
           config,
-          this.studioApp_
+          (sound, options) =>
+            this.studioApp_.playAudio(sound, {...options, noOverlap: true}),
+          this.studioApp_.playAudioOnFailure.bind(this.studioApp_),
+          this.studioApp_.loadAudio.bind(this.studioApp_),
+          this.studioApp_.getTestResults.bind(this.studioApp_)
         );
       this.visualization = <NeighborhoodVisualizationColumn />;
       break;
@@ -355,10 +367,19 @@ Javalab.prototype.onRun = function () {
   }
 
   this.miniApp?.reset?.();
+  analyticsReporter.sendEvent(EVENTS.JAVALAB_RUN_BUTTON_CLICK, {
+    levelId: this.levelIdForAnalytics,
+  });
   this.executeJavabuilder(ExecutionType.RUN);
 };
 
 Javalab.prototype.onTest = function () {
+  const validation = this.level.validation;
+  const validated = !!validation && Object.keys(validation).length !== 0;
+  analyticsReporter.sendEvent(EVENTS.JAVALAB_TEST_BUTTON_CLICK, {
+    levelId: this.levelIdForAnalytics,
+    validated: validated,
+  });
   this.executeJavabuilder(ExecutionType.TEST);
 };
 

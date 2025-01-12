@@ -1,12 +1,13 @@
 import $ from 'jquery';
 
-import firehoseClient from '@cdo/apps/lib/util/firehose';
+import firehoseClient from '@cdo/apps/metrics/firehose';
+import HttpClient from '@cdo/apps/util/HttpClient';
 import {AbuseConstants} from '@cdo/generated-scripts/sharedConstants';
 import msg from '@cdo/locale';
 
 import {files as filesApi} from '../../clientApi';
 import {CIPHER, ALPHABET} from '../../constants';
-import {CP_API} from '../../lib/kits/maker/boards/circuitPlayground/PlaygroundConstants';
+import {CP_API} from '../../maker/boards/circuitPlayground/PlaygroundConstants';
 import {getStore} from '../../redux';
 import * as utils from '../../utils';
 import header from '../header';
@@ -367,28 +368,24 @@ var projects = (module.exports = {
   },
 
   /**
-   * Sets abuse score, saves the project, and reloads the page
+   * Allows admin user to reset abuse score to 0 and then saves the project.
    */
-  adminResetAbuseScore(score = 0) {
-    var id = this.getCurrentId();
-    if (!id) {
+  adminResetAbuseScore() {
+    const channelId = this.getCurrentId();
+    if (!channelId) {
       return;
     }
-    channels.delete(id + '/abuse', function (err, result) {
+    HttpClient.post(`/v3/channels/${channelId}/abuse/delete`, '', true);
+    assets.patchAll(channelId, 'abuse_score=0', null, function (err, result) {
       if (err) {
         throw err;
       }
-      assets.patchAll(id, `abuse_score=${score}`, null, function (err, result) {
-        if (err) {
-          throw err;
-        }
-      });
-      files.patchAll(id, `abuse_score=${score}`, null, function (err, result) {
-        if (err) {
-          throw err;
-        }
-        $('.admin-abuse-score').text(score);
-      });
+    });
+    files.patchAll(channelId, 'abuse_score=0', null, function (err, result) {
+      if (err) {
+        throw err;
+      }
+      $('.admin-abuse-score').text(0);
     });
   },
 

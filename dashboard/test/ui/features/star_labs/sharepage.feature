@@ -38,7 +38,7 @@ Scenario: Share a flappy game, visit the share page, and visit the workspace
 Scenario: Share and save an artist level to the project gallery
   Given I am on "http://studio.code.org/s/artist/lessons/1/levels/10"
   And I wait for the lab page to fully load
-  And I drag block "1" to block "12"
+  And I drag block "moveForward" to block "whenRun"
 
   When I press "runButton"
   Then I press "finishButton"

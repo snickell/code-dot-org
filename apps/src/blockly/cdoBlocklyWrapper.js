@@ -3,7 +3,7 @@ import {
   CLAMPED_NUMBER_REGEX,
   stringIsXml,
 } from '@cdo/apps/blockly/constants';
-import {MetricEvent} from '@cdo/apps/lib/metrics/events';
+import {MetricEvent} from '@cdo/apps/metrics/events';
 import {APP_HEIGHT} from '@cdo/apps/p5lab/constants';
 import {getStore} from '@cdo/apps/redux';
 import {
@@ -139,6 +139,7 @@ function initializeBlocklyWrapper(blocklyInstance) {
   blocklyWrapper.wrapReadOnlyProperty('useContractEditor');
   blocklyWrapper.wrapReadOnlyProperty('useModalFunctionEditor');
   blocklyWrapper.wrapReadOnlyProperty('Variables');
+  blocklyWrapper.wrapReadOnlyProperty('varsInGlobals');
   blocklyWrapper.wrapReadOnlyProperty('WidgetDiv');
   blocklyWrapper.wrapReadOnlyProperty('weblab_locale');
   blocklyWrapper.wrapReadOnlyProperty('Xml');

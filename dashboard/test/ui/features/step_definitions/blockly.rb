@@ -8,6 +8,17 @@ Given(/^block "([^"]*)" is at a ((?:blockly )?)location "([^"]*)"$/) do |block, 
   @locations[identifier] = BlocklyHelpers::Point.new(x, y)
 end
 
+When /^I add a "([^"]*)" block with id "([^"]*)" to workspace$/ do |type, id|
+  script = <<~JS
+    Blockly.serialization.blocks.append({
+      "type": "#{type}",
+      "id": "#{id}"
+    }, Blockly.getMainWorkspace());
+  JS
+
+  @browser.execute_script(script)
+end
+
 When(/^I click block "([^"]*)"$/) do |block|
   id_selector = get_id_selector
   @browser.execute_script("$(\"[#{id_selector}='#{get_block_id(block)}']\").simulate( 'drag', {handle: 'corner', dx: 0, dy: 0, moves: 5});")
@@ -55,13 +66,13 @@ When /^I connect block "([^"]*)" inside block "([^"]*)"$/ do |from, to|
   @browser.execute_script code
 end
 
-When /^I delete block "([^"]*)"$/ do |id|
-  code = delete_block(id)
+When /^I move block "([^"]*)" to jigsaw ghost$/ do |id|
+  code = move_block_to_jigsaw_ghost(id)
   @browser.execute_script code
 end
 
-When /^I drag block matching selector "([^"]*)" to block matching selector "([^"]*)"$/ do |from, to|
-  code = generate_selector_drag_code(from, to, 0, 30)
+When /^I delete block "([^"]*)"$/ do |id|
+  code = delete_block(id)
   @browser.execute_script code
 end
 
@@ -125,33 +136,38 @@ Then /^I scroll the main blockspace to block "(.*?)"$/ do |block_id|
 end
 
 Then /^block "([^"]*)" is visible in the workspace$/ do |block|
-  id_selector = get_id_selector
   block_id = get_block_id(block)
 
   # Check block existence, blockly-way
   steps "Then block \"#{block}\" has not been deleted"
 
-  # Check block position is within visible blockspace
-  # Get block dimensions
-  block_left = @browser.execute_script("return $(\"[#{id_selector}='#{block_id}']\")[0].getBoundingClientRect().left")
-  block_right = @browser.execute_script("return $(\"[#{id_selector}='#{block_id}']\")[0].getBoundingClientRect().right")
-  block_top = @browser.execute_script("return $(\"[#{id_selector}='#{block_id}']\")[0].getBoundingClientRect().top")
-  block_bottom = @browser.execute_script("return $(\"[#{id_selector}='#{block_id}']\")[0].getBoundingClientRect().bottom")
+  script = <<-JS
+    const workspace = Blockly.getMainWorkspace();
+    const block = workspace.getBlockById('#{block_id}');
+    const boundingRect = block.getBoundingRectangle();
+    const viewMetrics = workspace.getMetricsManager().getViewMetrics();
+    const toolboxWidth = workspace.getToolbox() ? workspace.getToolbox().getWidth() : 0;
 
-  # Get blockspace dimensions
-  # blockspaceRect includes the toolbox on the left, but not the headers on the top.
-  block_space_left = @browser.execute_script('return Blockly.mainBlockSpaceEditor.svg_.getBoundingClientRect().left')
-  block_space_right = @browser.execute_script('return Blockly.mainBlockSpaceEditor.svg_.getBoundingClientRect().right')
-  block_space_top = @browser.execute_script('return Blockly.mainBlockSpaceEditor.svg_.getBoundingClientRect().top')
-  block_space_bottom = @browser.execute_script('return Blockly.mainBlockSpaceEditor.svg_.getBoundingClientRect().bottom')
-  toolbox_width = @browser.execute_script('return Blockly.mainBlockSpaceEditor.getToolboxWidth()')
+    return {
+      blockLeft: boundingRect.left,
+      blockRight: boundingRect.right,
+      blockTop: boundingRect.top,
+      blockBottom: boundingRect.bottom,
+      viewLeft: viewMetrics.left + toolboxWidth,
+      viewRight: viewMetrics.left + viewMetrics.width,
+      viewTop: viewMetrics.top,
+      viewBottom: viewMetrics.top + viewMetrics.height
+    };
+  JS
 
-  # Minimum part of block (in pixels) that must be within workspace to be 'visible'
+  dimensions = @browser.execute_script(script)
+
   block_margin = 10
-  expect(block_bottom).to be > block_space_top + block_margin
-  expect(block_top).to be < block_space_bottom - block_margin
-  expect(block_left).to be < block_space_right - block_margin
-  expect(block_right).to be > block_space_left + block_margin + toolbox_width
+
+  expect(dimensions["blockBottom"]).to be > dimensions["viewTop"] + block_margin
+  expect(dimensions["blockTop"]).to be < dimensions["viewBottom"] - block_margin
+  expect(dimensions["blockLeft"]).to be < dimensions["viewRight"] - block_margin
+  expect(dimensions["blockRight"]).to be > dimensions["viewLeft"] + block_margin
 end
 
 Then /^block "([^"]*)" is child of block "([^"]*)"$/ do |child, parent|
@@ -351,6 +367,43 @@ def current_block_xml
   @browser.execute_script <<-JS
     return __TestInterface.getBlockXML();
   JS
+end
+
+When /^I move block "([^"]*)" to (top|left|bottom|right) edge of workspace$/ do |block, edge|
+  block_id = get_block_id(block)
+  script = <<-JS
+    const workspace = Blockly.getMainWorkspace();
+    const viewMetrics = workspace.getMetricsManager().getViewMetrics();
+    const block = workspace.getBlockById('#{block_id}');
+    const boundingRect = block.getBoundingRectangle();
+
+    const blockWidth = boundingRect.right - boundingRect.left;
+    const blockHeight = boundingRect.bottom - boundingRect.top;
+
+    let x, y;
+
+    switch ('#{edge}') {
+      case 'left':
+        x = viewMetrics.left - blockWidth / 2;
+        y = boundingRect.top; // Maintain current top position
+        break;
+      case 'right':
+        x = viewMetrics.left + viewMetrics.width - blockWidth / 2;
+        y = boundingRect.top; // Maintain current top position
+        break;
+      case 'top':
+        x = boundingRect.left; // Maintain current left position
+        y = viewMetrics.top - blockHeight / 2;
+        break;
+      case 'bottom':
+        x = boundingRect.left; // Maintain current left position
+        y = viewMetrics.top + viewMetrics.height - blockHeight / 2;
+        break;
+    }
+
+    block.moveTo(new Blockly.utils.Coordinate(x, y));
+  JS
+  @browser.execute_script(script)
 end
 
 def clear_main_block_space

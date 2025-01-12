@@ -1,4 +1,3 @@
-/* eslint-disable react/no-is-mounted */
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -8,7 +7,7 @@ import {
   starterAssets as starterAssetsApi,
   files as filesApi,
 } from '@cdo/apps/clientApi';
-import firehoseClient from '@cdo/apps/lib/util/firehose';
+import firehoseClient from '@cdo/apps/metrics/firehose';
 import i18n from '@cdo/locale';
 
 import assetListStore from '../assets/assetListStore';

@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import React from 'react';
 
 import {BodyTwoText, Heading1} from '@cdo/apps/componentLibrary/typography';
@@ -10,13 +11,17 @@ import styles from './account-components.module.scss';
 const AccountBanner: React.FunctionComponent<{
   heading: string;
   desc: string;
-}> = ({heading, desc}) => (
+  showLogo: boolean;
+  className?: string;
+}> = ({heading, desc, showLogo, className}) => (
   <div className={styles.bannerContainer}>
-    <div className={styles.iconContainer}>
-      <img src={codeLogo} alt={i18n.codeLogo()} />
-    </div>
+    {showLogo && (
+      <div className={styles.iconContainer}>
+        <img src={codeLogo} alt={i18n.codeLogo()} />
+      </div>
+    )}
 
-    <div className={styles.titleContainer}>
+    <div className={classNames(className, styles.titleContainer)}>
       <Heading1>{heading}</Heading1>
       <BodyTwoText className={styles.titleDesc}>{desc}</BodyTwoText>
     </div>

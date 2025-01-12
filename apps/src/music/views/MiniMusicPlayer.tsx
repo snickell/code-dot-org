@@ -1,9 +1,10 @@
+import classNames from 'classnames';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
 import AnalyticsReporter from '@cdo/apps/music/analytics/AnalyticsReporter';
+import {ValueOf} from '@cdo/apps/types/utils';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
-import noteImage from '@cdo/static/music/music-note.png';
 
 import Lab2Registry from '../../lab2/Lab2Registry';
 import {
@@ -11,10 +12,13 @@ import {
   SourcesStore,
 } from '../../lab2/projects/SourcesStore';
 import {Channel} from '../../lab2/types';
+import {installFunctionBlocks} from '../blockly/blockUtils';
 import MusicBlocklyWorkspace from '../blockly/MusicBlocklyWorkspace';
 import {setUpBlocklyForMusicLab} from '../blockly/setup';
+import {BlockMode} from '../constants';
 import MusicLibrary from '../player/MusicLibrary';
 import MusicPlayer from '../player/MusicPlayer';
+import AdvancedSequencer from '../player/sequencer/AdvancedSequencer';
 import Simple2Sequencer from '../player/sequencer/Simple2Sequencer';
 
 import moduleStyles from './MiniMusicPlayer.module.scss';
@@ -28,11 +32,17 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
   projects,
   libraryName,
 }) => {
-  const playerRef = useRef<MusicPlayer>(new MusicPlayer());
+  const playerRef = useRef<MusicPlayer | null>(null);
+  if (playerRef.current === null) {
+    playerRef.current = new MusicPlayer();
+  }
   const workspaceRef = useRef<MusicBlocklyWorkspace>(
     new MusicBlocklyWorkspace()
   );
-  const sequencerRef = useRef<Simple2Sequencer>(new Simple2Sequencer());
+  const simple2SequencerRef = useRef<Simple2Sequencer>(new Simple2Sequencer());
+  const advancedSequencerRef = useRef<AdvancedSequencer>(
+    new AdvancedSequencer()
+  );
   const sourcesStoreRef = useRef<SourcesStore>(new RemoteSourcesStore());
   const analyticsReporter = useRef<AnalyticsReporter>(new AnalyticsReporter());
   const [isLoading, setIsLoading] = useState(true);
@@ -66,7 +76,31 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
   // Optimization: cache code and/or compiled song after played once.
   const onPlaySong = useCallback(
     async (project: Channel) => {
-      playerRef.current.stopSong();
+      const blockMode =
+        (project.labConfig?.music?.blockMode as ValueOf<typeof BlockMode>) ||
+        BlockMode.SIMPLE2;
+
+      installFunctionBlocks(blockMode);
+
+      // Determine which sequencer reference to use based on blockMode
+      const sequencerRef =
+        blockMode === BlockMode.ADVANCED
+          ? advancedSequencerRef
+          : simple2SequencerRef;
+
+      playerRef.current?.stopSong();
+
+      // If there is a pack ID, give the player its BPM and key.
+      const currentLibrary = MusicLibrary.getInstance();
+      const packId = project.labConfig?.music.packId || null;
+      if (currentLibrary) {
+        currentLibrary.setCurrentPackId(packId);
+        playerRef.current?.updateConfiguration(
+          currentLibrary.getBPM(),
+          currentLibrary.getKey()
+        );
+      }
+
       // Load code
       const projectSources = await sourcesStoreRef.current.load(project.id);
       workspaceRef.current.loadCode(
@@ -74,7 +108,10 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
       );
 
       // Compile song
-      workspaceRef.current.compileSong({Sequencer: sequencerRef.current});
+      workspaceRef.current.compileSong(
+        {Sequencer: sequencerRef.current},
+        blockMode
+      );
 
       // Execute compiled song
       // Sequence out all possible trigger events to preload sounds if necessary.
@@ -85,19 +122,8 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
       sequencerRef.current.clear();
       workspaceRef.current.executeCompiledSong();
 
-      // If there is a pack ID, give the player its BPM and key.
-      const currentLibrary = MusicLibrary.getInstance();
-      const packId = project.labConfig?.music.packId || null;
-      if (currentLibrary) {
-        currentLibrary.setCurrentPackId(packId);
-        playerRef.current.updateConfiguration(
-          currentLibrary.getBPM(),
-          currentLibrary.getKey()
-        );
-      }
-
       // Preload sounds in player
-      await playerRef.current.preloadSounds(
+      await playerRef.current?.preloadSounds(
         [...allTriggerEvents, ...sequencerRef.current.getPlaybackEvents()],
         (loadTimeMs, soundsLoaded) => {
           if (soundsLoaded > 0) {
@@ -115,7 +141,7 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
       );
 
       // Play sounds
-      playerRef.current.playSong(sequencerRef.current.getPlaybackEvents());
+      playerRef.current?.playSong(sequencerRef.current.getPlaybackEvents());
       setCurrentProjectId(project.id);
 
       // Report analytics on play button.
@@ -127,7 +153,7 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
   );
 
   const onStopSong = useCallback(async () => {
-    playerRef.current.stopSong();
+    playerRef.current?.stopSong();
     setCurrentProjectId(undefined);
   }, []);
 
@@ -147,6 +173,7 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
       name: packFolder.name,
       artist: packFolder.artist,
       color: packFolder.color,
+      image: MusicLibrary.getInstance()?.getPackImageUrl(packId),
     };
   };
 
@@ -166,17 +193,18 @@ const MiniPlayerView: React.FunctionComponent<MiniPlayerViewProps> = ({
                 : onPlaySong(project);
             }}
           >
-            <div className={moduleStyles.pack}>
-              {packId && (
+            <div
+              className={classNames(
+                moduleStyles.pack,
+                project.id === currentProjectId && moduleStyles.packPlaying
+              )}
+            >
+              {packId && packDetails?.image && (
                 <img
-                  src={noteImage}
                   className={moduleStyles.packImage}
-                  style={{
-                    background:
-                      packDetails?.color &&
-                      `radial-gradient(${packDetails.color}, #000`,
-                  }}
+                  src={packDetails.image}
                   alt=""
+                  draggable={false}
                 />
               )}
             </div>

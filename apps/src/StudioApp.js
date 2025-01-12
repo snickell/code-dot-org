@@ -16,8 +16,8 @@ import {addCallouts} from '@cdo/apps/code-studio/callouts';
 import {createLibraryClosure} from '@cdo/apps/code-studio/components/libraries/libraryParser';
 import WorkspaceAlert from '@cdo/apps/code-studio/components/WorkspaceAlert';
 import {queryParams} from '@cdo/apps/code-studio/utils';
-import {EVENTS, PLATFORMS} from '@cdo/apps/lib/util/AnalyticsConstants.js';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {userAlreadyReportedAbuse} from '@cdo/apps/reportAbuse';
 import {setArrowButtonDisabled} from '@cdo/apps/templates/arrowDisplayRedux';
 import {
@@ -40,6 +40,8 @@ import {assets as assetsApi} from './clientApi';
 import * as assets from './code-studio/assets';
 import AbuseError from './code-studio/components/AbuseError';
 import SmallFooter from './code-studio/components/SmallFooter';
+import {RESIZE_VISUALIZATION_EVENT} from './code-studio/components/VisualizationResizeBar';
+import WireframeButtons from './code-studio/components/WireframeButtons';
 import project from './code-studio/initApp/project';
 import {lockContainedLevelAnswers} from './code-studio/levels/codeStudioLevels';
 import {closeWorkspaceAlert} from './code-studio/projectRedux';
@@ -55,14 +57,9 @@ import * as dom from './dom';
 import * as dropletUtils from './dropletUtils';
 import FeedbackUtils from './feedback';
 import Alert from './legacySharedComponents/alert';
-import {
-  configCircuitPlayground,
-  configMicrobit,
-} from './lib/kits/maker/dropletConfig';
 import {isEditWhileRun} from './lib/tools/jsdebugger/redux';
-import {RESIZE_VISUALIZATION_EVENT} from './lib/ui/VisualizationResizeBar';
-import WireframeButtons from './lib/ui/WireframeButtons';
-import firehoseClient from './lib/util/firehose';
+import {configCircuitPlayground, configMicrobit} from './maker/dropletConfig';
+import firehoseClient from './metrics/firehose';
 import puzzleRatingUtils from './puzzleRatingUtils';
 import {getStore} from './redux';
 import {
@@ -95,20 +92,22 @@ import {parseElement as parseXmlElement} from './xml';
 
 var codegen = require('./lib/tools/jsinterpreter/codegen');
 
-var copyrightStrings;
+/**
+ * If the bigPlayspace is enabled, either by experiment or by level property,
+ * then the padding can be configured via query param as well.
+ */
+const bigPlaySpacePadding = queryParams('bigPlayspacePadding') || 160;
 
 /**
- * Store experiment parameters.
+ * Track whether the run button was clicked, which we log an event for. We
+ * only want to log this event once for the first click but not subsequent clicks
  */
-const isBigPlayspaceEnabled = experiments.isEnabledAllowingQueryString(
-  experiments.BIG_PLAYSPACE
-);
-const bigPlaySpacePadding = queryParams('bigPlayspacePadding') || 160;
+let runButtonWasClicked = false;
 
 /**
  * Get the maximum resizable width of the playspace.
  */
-const getMaxResizableVisualizationWidth = () => {
+const getMaxResizableVisualizationWidth = isBigPlayspaceEnabled => {
   return isBigPlayspaceEnabled
     ? Math.min(window.innerHeight - bigPlaySpacePadding, window.innerWidth / 2)
     : 400;
@@ -292,8 +291,13 @@ StudioApp.prototype.configure = function (options) {
   // binding correctly as they pass this function around.
   this.assetUrl = _.bind(this.assetUrl_, this);
 
+  this.isBigPlayspaceEnabled =
+    experiments.isEnabledAllowingQueryString(experiments.BIG_PLAYSPACE) ||
+    options.level.enableBigPlayspace;
+
   this.maxVisualizationWidth =
-    options.maxVisualizationWidth || getMaxResizableVisualizationWidth();
+    options.maxVisualizationWidth ||
+    getMaxResizableVisualizationWidth(this.isBigPlayspaceEnabled);
   this.minVisualizationWidth =
     options.minVisualizationWidth || MIN_VISUALIZATION_WIDTH;
 
@@ -341,7 +345,6 @@ StudioApp.prototype.init = function (config) {
   this.config = config;
 
   config.getCode = this.getCode.bind(this);
-  copyrightStrings = config.copyrightStrings;
 
   if (config.legacyShareStyle && config.hideSource) {
     $('body').addClass('legacy-share-view');
@@ -1027,10 +1030,9 @@ StudioApp.prototype.renderShareFooter_ = function (container) {
   container.appendChild(footerDiv);
 
   var reactProps = {
-    i18nDropdown: '',
+    i18nDropdownInBase: false,
     privacyPolicyInBase: false,
     copyrightInBase: false,
-    copyrightStrings: copyrightStrings,
     baseMoreMenuString: msg.builtOnCodeStudio(),
     baseStyle: {
       paddingLeft: 0,
@@ -1372,18 +1374,11 @@ StudioApp.prototype.onReportComplete = function (response) {
   }
   this.lastShareUrl = response.level_source;
 
-  // Track GA events
   if (response.new_level_completed) {
-    trackEvent(
-      'Puzzle',
-      'Completed',
-      response.level_path,
-      response.level_attempts
-    );
-  }
-
-  if (response.share_failure) {
-    trackEvent('Share', 'Failure', response.share_failure.type);
+    trackEvent('puzzle', 'puzzle_completed', {
+      path: response.level_path,
+      value: response.level_attempts,
+    });
   }
 };
 
@@ -1416,13 +1411,15 @@ StudioApp.prototype.onResize = function () {
     onResizeSmallFooter();
   }
 
-  if (isBigPlayspaceEnabled) {
+  if (this.isBigPlayspaceEnabled) {
     // Let's avoid an infinite recursion by making sure this is a genuine resize.
     if (
       window.innerWidth !== this.lastWindowInnerWidth ||
       window.innerHeight !== this.lastWindowInnerHeight
     ) {
-      this.maxVisualizationWidth = getMaxResizableVisualizationWidth();
+      this.maxVisualizationWidth = getMaxResizableVisualizationWidth(
+        this.isBigPlayspaceEnabled
+      );
 
       const visualizationColumn = document.getElementById(
         'visualizationColumn'
@@ -1575,7 +1572,7 @@ StudioApp.prototype.resizeVisualization = function (width, skipFire = false) {
   visualizationColumn.style.maxWidth = newVizWidth + vizSideBorderWidth + 'px';
   visualization.style.maxWidth = newVizWidthString;
   visualization.style.maxHeight = newVizHeightString;
-  if (isBigPlayspaceEnabled) {
+  if (this.isBigPlayspaceEnabled) {
     // Override the max visualization column width.
     visualizationColumn.style.width = visualizationColumn.style.maxWidth;
     // Override the visualization height.
@@ -1678,13 +1675,6 @@ StudioApp.prototype.displayFeedback = function (options) {
   }
 
   if (experiments.isEnabled(experiments.BUBBLE_DIALOG)) {
-    // Track whether this experiment is in use. If not, delete this and similar
-    // sections of code. If it is, create a non-experiment flag.
-    trackEvent(
-      'experiment',
-      'Feedback bubbleDialog',
-      `AppType ${this.config.app}. Level ${this.config.serverLevelId}`
-    );
     const {response, preventDialog, feedbackType, feedbackImage} = options;
 
     const newFinishDialogApps = {
@@ -2159,9 +2149,6 @@ StudioApp.prototype.configureDom = function (config) {
   var container = document.getElementById(config.containerId);
   var codeWorkspace = container.querySelector('#codeWorkspace');
 
-  const isSignedOut = !config.isSignedIn;
-  const isStandaloneProject = config.level.isProjectLevel;
-
   var runButton = container.querySelector('#runButton');
   var resetButton = container.querySelector('#resetButton');
   var runClick = this.runButtonClick.bind(this);
@@ -2171,22 +2158,24 @@ StudioApp.prototype.configureDom = function (config) {
     trailing: false,
   });
 
-  function handleRunButtonClick() {
-    throttledRunClick.call(this);
-    // Sends a Statsig event when the Run button is pressed by a signed out user
-    // This is related to the Create Account Button A/B Test; see Jira ticket:
-    // https://codedotorg.atlassian.net/browse/ACQ-1938
-    if (isSignedOut && isStandaloneProject) {
-      analyticsReporter.sendEvent(
-        EVENTS.RUN_BUTTON_PRESSED_SIGNED_OUT,
-        {},
-        PLATFORMS.STATSIG
-      );
+  // Modify throttledRunClick to include metrics logging
+  const originalThrottledRunClick = throttledRunClick;
+  throttledRunClick = () => {
+    originalThrottledRunClick();
+    let eventName;
+    if (!!config.level.isProjectLevel) {
+      eventName = EVENTS.PROJECT_ACTIVITY;
+    } else {
+      eventName = EVENTS.LEVEL_ACTIVITY;
     }
-  }
+    if (!runButtonWasClicked) {
+      analyticsReporter.sendEvent(eventName, {}, PLATFORMS.BOTH);
+      runButtonWasClicked = true;
+    }
+  };
 
   if (runButton && resetButton) {
-    dom.addClickTouchEvent(runButton, _.bind(handleRunButtonClick, this));
+    dom.addClickTouchEvent(runButton, _.bind(throttledRunClick, this));
     dom.addClickTouchEvent(resetButton, _.bind(this.resetButtonClick, this));
     this.keyHandler.registerEvent(['Control', 'Enter'], () => {
       if (this.isRunning()) {
@@ -2196,6 +2185,7 @@ StudioApp.prototype.configureDom = function (config) {
       }
     });
   }
+
   var skipButton = container.querySelector('#skipButton');
   if (skipButton) {
     dom.addClickTouchEvent(skipButton, this.skipLevel.bind(this));
@@ -2511,7 +2501,7 @@ StudioApp.prototype.handleEditCode_ = function (config) {
     var filtered =
       editor.completer.completions && editor.completer.completions.filtered;
     for (var i = 0; i < (filtered && filtered.length); i++) {
-      // If we have any exact maches in our filtered completions that include
+      // If we have any exact matches in our filtered completions that include
       // this period, allow the completer to stay active:
       if (filtered[i].exactMatch) {
         return;
@@ -2948,6 +2938,7 @@ StudioApp.prototype.handleUsingBlockly_ = function (config) {
   }
 
   var div = document.getElementById('codeWorkspace');
+  var isJigsaw = config.levelGameName === 'Jigsaw';
   // TODO: How many of these options apply to modal function editor?
   var options = {
     toolbox: config.level.toolbox,
@@ -2988,8 +2979,14 @@ StudioApp.prototype.handleUsingBlockly_ = function (config) {
     showExampleTestButtons: utils.valueOr(config.showExampleTestButtons, false),
     valueTypeTabShapeMap: utils.valueOr(config.valueTypeTabShapeMap, {}),
     typeHints: utils.valueOr(config.level.showTypeHints, false),
-    isBlocklyRtl:
-      getStore().getState().isRtl && config.levelGameName !== 'Jigsaw', // disable RTL for blockly on jigsaw
+    isBlocklyRtl: getStore().getState().isRtl && !isJigsaw, // disable RTL for blockly on jigsaw
+    isJigsaw,
+    analyticsData: {
+      appType: config.app,
+      scriptName: config.scriptName,
+      scriptId: config.scriptId,
+      levelId: config.serverLevelId,
+    },
   };
 
   // Never show unused blocks in edit mode. Procedure autopopulate should always

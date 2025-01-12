@@ -3,6 +3,7 @@ import React, {useCallback} from 'react';
 import {Button} from '@cdo/apps/componentLibrary/button';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 
+import aichatI18n from '../../locale';
 import {
   selectHavePropertiesChanged,
   updateAiCustomization,
@@ -28,7 +29,8 @@ const UpdateButton: React.FunctionComponent<UpdateButtonProps> = ({
 
   return (
     <Button
-      text="Update"
+      id="uitest-update-customizations"
+      text={aichatI18n.modelCustomization_updateButtonText()}
       disabled={isDisabledDefault || saveInProgress || !havePropertiesChanged}
       iconLeft={
         saveInProgress && currentSaveType === 'updateChatbot'

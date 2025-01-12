@@ -6,9 +6,6 @@ class SessionsControllerTest < ActionController::TestCase
 
   setup do
     @request.env["devise.mapping"] = Devise.mappings[:user]
-    Cpa.stubs(:cpa_experience).
-      with(any_parameters).
-      returns(Cpa::NEW_USER_LOCKOUT)
   end
 
   test 'login error derives locale from cdo.locale' do
@@ -225,15 +222,6 @@ class SessionsControllerTest < ActionController::TestCase
     assert_redirected_to '/oauth_sign_out/migrated'
   end
 
-  test "microsoft account users go to generic oauth sign out page after logging out" do
-    student = create(:student, provider: :windowslive)
-    sign_in student
-
-    delete :destroy
-
-    assert_redirected_to '/oauth_sign_out/migrated'
-  end
-
   test "oauth sign out page for facebook" do
     get :oauth_sign_out, params: {provider: 'facebook'}
     assert_select 'a[href="https://www.facebook.com/logout.php"]'
@@ -244,12 +232,6 @@ class SessionsControllerTest < ActionController::TestCase
     get :oauth_sign_out, params: {provider: 'google_oauth2'}
     assert_select 'a[href="https://accounts.google.com/logout"]'
     assert_select 'h4', 'You used Google to sign in. Click here to sign out of Google.'
-  end
-
-  test "oauth sign out page for microsoft account" do
-    get :oauth_sign_out, params: {provider: 'windowslive'}
-    assert_select 'a[href="http://login.live.com/logout.srf"]'
-    assert_select 'h4', 'You used Microsoft to sign in. Click here to sign out of Microsoft.'
   end
 
   test "deleted user cannot sign in" do
@@ -324,7 +306,7 @@ class SessionsControllerTest < ActionController::TestCase
 
     before do
       Policies::ChildAccount::ComplianceState.stubs(:locked_out?).with(user).returns(user_is_locked_out)
-      user.update(child_account_compliance_lock_out_date: DateTime.now)
+      user.update(cap_status_date: DateTime.now)
 
       sign_in user
     end
@@ -341,7 +323,7 @@ class SessionsControllerTest < ActionController::TestCase
 
     it 'assigns @delete_date with 7 day after user lockout date' do
       get :lockout
-      _(assigns[:delete_date]).must_equal DateTime.parse(user.child_account_compliance_lock_out_date).since(7.days)
+      _(assigns[:delete_date]).must_equal user.cap_status_date.since(7.days)
     end
 
     it 'renders lockout page' do

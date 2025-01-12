@@ -4,10 +4,12 @@ import React, {useState, useEffect} from 'react';
 import {Fade} from 'react-bootstrap'; // eslint-disable-line no-restricted-imports
 import {useSelector} from 'react-redux';
 
-import {EVENTS, PLATFORMS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {ParentalPermissionRequest} from '@cdo/apps/redux/parentalPermissionRequestReducer';
-import Notification, {NotificationType} from '@cdo/apps/templates/Notification';
+import Notification, {
+  NotificationType,
+} from '@cdo/apps/sharedComponents/Notification';
 import ParentalPermissionModal from '@cdo/apps/templates/policy_compliance/ParentalPermissionModal';
 import {RootState} from '@cdo/apps/types/redux';
 import color from '@cdo/apps/util/color';
@@ -29,7 +31,17 @@ const ParentalPermissionBanner: React.FC<ParentalPermissionBannerProps> = ({
     .format('ll');
 
   const reportEvent = (eventName: string, payload: object = {}) => {
-    analyticsReporter.sendEvent(eventName, payload, PLATFORMS.AMPLITUDE);
+    analyticsReporter.sendEvent(eventName, payload);
+  };
+
+  const defaultEventParams = (
+    parentalPermissionRequest: ParentalPermissionRequest
+  ) => {
+    return {
+      inSection: currentUser.inSection,
+      us_state: currentUser.usStateCode,
+      consentStatus: parentalPermissionRequest.consent_status,
+    };
   };
 
   useEffect(() => {
@@ -41,9 +53,15 @@ const ParentalPermissionBanner: React.FC<ParentalPermissionBannerProps> = ({
       reportEvent(EVENTS.CAP_PARENT_EMAIL_BANNER_SHOWN, {
         inSection: currentUser.inSection,
         consentStatus: currentUser.childAccountComplianceState,
+        us_state: currentUser.usStateCode,
       });
     }
-  }, [show, currentUser.inSection, currentUser.childAccountComplianceState]);
+  }, [
+    show,
+    currentUser.inSection,
+    currentUser.childAccountComplianceState,
+    currentUser.usStateCode,
+  ]);
 
   const handleModalShow = () => {
     setShowModal(true);
@@ -51,6 +69,7 @@ const ParentalPermissionBanner: React.FC<ParentalPermissionBannerProps> = ({
     reportEvent(EVENTS.CAP_PARENT_EMAIL_BANNER_CLICKED, {
       inSection: currentUser.inSection,
       consentStatus: currentUser.childAccountComplianceState,
+      us_state: currentUser.usStateCode,
     });
   };
 
@@ -65,6 +84,7 @@ const ParentalPermissionBanner: React.FC<ParentalPermissionBannerProps> = ({
 
     reportEvent(EVENTS.CAP_PARENT_EMAIL_MODAL_CLOSED, {
       inSection: currentUser.inSection,
+      us_state: currentUser.usStateCode,
       consentStatus,
     });
   };
@@ -72,28 +92,28 @@ const ParentalPermissionBanner: React.FC<ParentalPermissionBannerProps> = ({
   const handleModalSubmit = (
     parentalPermissionRequest: ParentalPermissionRequest
   ) => {
-    reportEvent(EVENTS.CAP_PARENT_EMAIL_SUBMITTED, {
-      inSection: currentUser.inSection,
-      consentStatus: parentalPermissionRequest.consent_status,
-    });
+    reportEvent(
+      EVENTS.CAP_PARENT_EMAIL_SUBMITTED,
+      defaultEventParams(parentalPermissionRequest)
+    );
   };
 
   const handleModalResend = (
     parentalPermissionRequest: ParentalPermissionRequest
   ) => {
-    reportEvent(EVENTS.CAP_PARENT_EMAIL_RESEND, {
-      inSection: currentUser.inSection,
-      consentStatus: parentalPermissionRequest.consent_status,
-    });
+    reportEvent(
+      EVENTS.CAP_PARENT_EMAIL_RESEND,
+      defaultEventParams(parentalPermissionRequest)
+    );
   };
 
   const handleModalUpdate = (
     parentalPermissionRequest: ParentalPermissionRequest
   ) => {
-    reportEvent(EVENTS.CAP_PARENT_EMAIL_UPDATED, {
-      inSection: currentUser.inSection,
-      consentStatus: parentalPermissionRequest.consent_status,
-    });
+    reportEvent(
+      EVENTS.CAP_PARENT_EMAIL_UPDATED,
+      defaultEventParams(parentalPermissionRequest)
+    );
   };
 
   return (

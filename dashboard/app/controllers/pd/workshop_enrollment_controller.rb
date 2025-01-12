@@ -38,6 +38,8 @@ class Pd::WorkshopEnrollmentController < ApplicationController
         }.to_json
       }
       render :logged_out
+    elsif current_user.user_type == 'student'
+      render :students_cannot_enroll
     elsif missing_application?
       render :missing_application
     elsif current_user.teacher? && current_user.email.blank?
@@ -85,7 +87,8 @@ class Pd::WorkshopEnrollmentController < ApplicationController
               course_url: @workshop.course_url,
               fee: @workshop.fee,
               properties: nil,
-              virtual: @workshop.virtual
+              virtual: @workshop.virtual,
+              course_offerings: @workshop.course_offerings
             }
           ),
           session_dates: session_dates,
@@ -93,7 +96,8 @@ class Pd::WorkshopEnrollmentController < ApplicationController
           facilitators: facilitators,
           workshop_enrollment_status: "unsubmitted",
           previous_courses: Pd::TeacherApplicationConstants::SUBJECTS_TAUGHT_IN_PAST,
-          collect_demographics: collect_demographics
+          collect_demographics: collect_demographics,
+          school_info: Queries::SchoolInfo.current_school(current_user)
         }.to_json
       }
     end

@@ -7,19 +7,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import LtiDynamicRegistrationPage from '@cdo/apps/lib/ui/simpleSignUp/lti/registration/LtiDynamicRegistrationPage';
+import LtiDynamicRegistrationPage from '@cdo/apps/simpleSignUp/lti/registration/LtiDynamicRegistrationPage';
 import getScriptData from '@cdo/apps/util/getScriptData';
 
 document.addEventListener('DOMContentLoaded', () => {
   const mountPoint = document.createElement('div');
   document.body.appendChild(mountPoint);
   const scriptData = getScriptData('json');
-  const {logoUrl, registrationID} = scriptData;
+  const {logoUrl, registrationID, lmsName} = scriptData;
 
   ReactDOM.render(
     <LtiDynamicRegistrationPage
       logoUrl={logoUrl}
       registrationID={registrationID}
+      lmsName={lmsName}
     />,
     mountPoint
   );

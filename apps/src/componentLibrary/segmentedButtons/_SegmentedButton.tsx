@@ -31,6 +31,8 @@ export interface SegmentedButtonModel {
   iconRight?: FontAwesomeV6IconProps;
   /** Icon for IconOnly button type */
   icon?: FontAwesomeV6IconProps;
+  /** Button unique id */
+  id?: string;
 }
 
 interface SegmentedButtonProps extends SegmentedButtonModel {
@@ -48,11 +50,13 @@ const SegmentedButton: React.FunctionComponent<SegmentedButtonProps> = ({
   icon,
   value,
   onChange,
+  id,
 }) => {
   const handleClick = useCallback(() => onChange(value), [onChange, value]);
 
   return (
     <button
+      id={id}
       type="button"
       disabled={disabled}
       onClick={handleClick}

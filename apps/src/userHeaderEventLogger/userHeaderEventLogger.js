@@ -1,7 +1,7 @@
 import $ from 'jquery';
 
-import {EVENTS, PLATFORMS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import getScriptData from '@cdo/apps/util/getScriptData';
 
 const USER_MENU_OPTION_IDS = ['my-projects', 'user-edit', 'user-signout'];
@@ -33,23 +33,19 @@ function addClickEventToLinks(selector, eventName, additionalProperties = {}) {
   });
 }
 
-function getHeaderType(screenWidth) {
-  if (screenWidth < 425) return 'mobile';
-  if (screenWidth < 1024) return 'tablet';
-  if (screenWidth <= 1268) return 'small desktop';
-  return 'large desktop';
-}
-
 const addCreateMenuMetrics = (
   headerCreateMenu,
   platforms,
+  isSignedIn,
   additionalOptions = {}
 ) => {
   if (headerCreateMenu) {
     // Log if a signed-out user clicks the "Create" menu dropdown
     headerCreateMenu.addEventListener('click', () => {
       analyticsReporter.sendEvent(
-        EVENTS.SIGNED_IN_USER_CLICKS_CREATE_DROPDOWN,
+        isSignedIn
+          ? EVENTS.SIGNED_IN_USER_CLICKS_CREATE_DROPDOWN
+          : EVENTS.SIGNED_OUT_USER_CLICKS_CREATE_DROPDOWN,
         additionalOptions,
         platforms
       );
@@ -62,7 +58,9 @@ const addCreateMenuMetrics = (
         .getElementById(`create_menu_option_${option}`)
         .addEventListener('click', () => {
           analyticsReporter.sendEvent(
-            EVENTS.SIGNED_IN_USER_SELECTS_CREATE_DROPDOWN_OPTION,
+            isSignedIn
+              ? EVENTS.SIGNED_IN_USER_SELECTS_CREATE_DROPDOWN_OPTION
+              : EVENTS.SIGNED_OUT_USER_SELECTS_CREATE_DROPDOWN_OPTION,
             {
               option: option,
               ...additionalOptions,
@@ -112,16 +110,6 @@ const addMenuMetrics = (
 };
 
 const addSignedOutMetrics = (pageUrl, headerCreateMenu) => {
-  const screenWidth = window.innerWidth;
-  analyticsReporter.sendEvent(
-    EVENTS.SIGNED_OUT_USER_SEES_HEADER,
-    {
-      pageUrl: pageUrl,
-      headerType: getHeaderType(screenWidth),
-    },
-    PLATFORMS.STATSIG
-  );
-
   // Log if a header link is clicked
   addClickEventToLinks('headerlink', EVENTS.SIGNED_OUT_USER_CLICKS_HEADER_LINK);
 
@@ -132,6 +120,7 @@ const addSignedOutMetrics = (pageUrl, headerCreateMenu) => {
   );
 
   const createAccountButton = document.querySelector('#create_account_button');
+
   // Log if the Create Account button is clicked
   if (createAccountButton) {
     createAccountButton.addEventListener('click', () => {
@@ -139,18 +128,6 @@ const addSignedOutMetrics = (pageUrl, headerCreateMenu) => {
         EVENTS.CREATE_ACCOUNT_BUTTON_CLICKED,
         {pageUrl: pageUrl},
         PLATFORMS.BOTH
-      );
-    });
-  }
-
-  const signInButton = document.getElementById('signin_button');
-  // Log if the Sign in button is clicked
-  if (signInButton) {
-    signInButton.addEventListener('click', () => {
-      analyticsReporter.sendEvent(
-        EVENTS.SIGNED_OUT_USER_CLICKS_SIGN_IN,
-        {pageUrl: pageUrl},
-        PLATFORMS.STATSIG
       );
     });
   }
@@ -165,12 +142,19 @@ const addSignedOutMetrics = (pageUrl, headerCreateMenu) => {
     );
   });
 
-  addCreateMenuMetrics(headerCreateMenu, PLATFORMS.BOTH);
+  addCreateMenuMetrics(headerCreateMenu, PLATFORMS.BOTH, false);
 };
 
 const addSignedInMetrics = (pageUrl, headerCreateMenu) => {
   const userType = getScriptData('userType');
-  const additionalOptions = {userType: userType, pageUrl: pageUrl};
+  const pageControllerName = getScriptData('pageControllerName');
+  const pageActionName = getScriptData('pageActionName');
+  const additionalOptions = {
+    userType: userType,
+    pageUrl: pageUrl,
+    pageControllerName: pageControllerName,
+    pageActionName: pageActionName,
+  };
 
   // Log if a header link is clicked
   addClickEventToLinks(
@@ -203,16 +187,23 @@ const addSignedInMetrics = (pageUrl, headerCreateMenu) => {
     additionalOptions
   );
 
-  addCreateMenuMetrics(headerCreateMenu, PLATFORMS.STATSIG, additionalOptions);
+  addCreateMenuMetrics(
+    headerCreateMenu,
+    PLATFORMS.STATSIG,
+    true,
+    additionalOptions
+  );
 };
 
 $(document).ready(function () {
   const headerCreateMenu = document.getElementById('header_create_menu');
   const pageUrl = window.location.href;
 
-  if (getScriptData('isSignedOut')) {
-    addSignedOutMetrics(pageUrl, headerCreateMenu);
-  } else {
-    addSignedInMetrics(pageUrl, headerCreateMenu);
+  if (!pageUrl.includes('/global/')) {
+    if (getScriptData('isSignedOut')) {
+      addSignedOutMetrics(pageUrl, headerCreateMenu);
+    } else {
+      addSignedInMetrics(pageUrl, headerCreateMenu);
+    }
   }
 });

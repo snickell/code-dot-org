@@ -7,10 +7,11 @@ import {
   flush,
   setUserId,
 } from '@amplitude/analytics-browser';
-import {Block} from 'blockly';
+import * as GoogleBlockly from 'blockly/core';
 
 import DCDO from '@cdo/apps/dcdo';
 import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
+import trackEvent from '@cdo/apps/util/trackEvent';
 import {
   getEnvironment,
   isDevelopmentEnvironment,
@@ -30,6 +31,7 @@ const blockFeatureList = [
   BlockTypes.PLAY_SOUNDS_SEQUENTIAL,
   'functions',
   BlockTypes.PLAY_REST_AT_CURRENT_LOCATION_SIMPLE2,
+  BlockTypes.PLAY_PATTERN_AI_AT_CURRENT_LOCATION_SIMPLE2,
 ];
 
 const triggerBlocks: string[] = [
@@ -78,22 +80,40 @@ const trackedProjectProperties = [
 /**
  * An analytics reporter specifically used for the Music Lab prototype, which logs analytics
  * to Amplitude. For the more general Amplitude Analytics Reporter used across the application
- * outside of Music Lab, check {@link apps/src/lib/util/AnalyticsReporter}.
+ * outside of Music Lab, check {@link apps/src/metrics/AnalyticsReporter}.
  */
 export default class AnalyticsReporter {
-  private initialized: boolean;
-  private session: Session | undefined;
+  private static initialized = false;
 
-  constructor() {
-    this.initialized = false;
+  /**
+   * Temporarily available as a public static method so this reporter can be used outside of the
+   * context of Music Lab, specifically for Panels levels in 2024 Hour of Code progression.
+   * TODO: Remove/consolidate reporters after HOC 2024.
+   */
+  public static async initialize() {
+    if (AnalyticsReporter.initialized) {
+      return;
+    }
+
+    const response = await fetch(API_KEY_ENDPOINT);
+    const responseJson = await response.json();
+
+    if (!responseJson.key) {
+      throw new Error('No key for analytics.');
+    }
+
+    AnalyticsReporter.initialized = true;
+    init(responseJson.key);
   }
+
+  private session: Session | undefined;
 
   async startSession() {
     // Capture start time before making init call
     const startTime = Date.now();
 
     try {
-      await this.initialize();
+      await AnalyticsReporter.initialize();
       this.session = {
         startTime,
         soundsUsed: new Set(),
@@ -121,21 +141,8 @@ export default class AnalyticsReporter {
           .logError(message, error as Error);
       }
     }
-  }
 
-  private async initialize(): Promise<void> {
-    if (this.initialized) {
-      return;
-    }
-    const response = await fetch(API_KEY_ENDPOINT);
-    const responseJson = await response.json();
-
-    if (!responseJson.key) {
-      throw new Error('No key for analytics.');
-    }
-
-    init(responseJson.key);
-    this.initialized = true;
+    trackEvent('music', 'music_session_start');
   }
 
   isSessionInProgress() {
@@ -192,6 +199,7 @@ export default class AnalyticsReporter {
 
   onPackSelected(packId: string) {
     this.onButtonClicked('select-pack', {packId});
+    trackEvent('music', 'music_pack_selected', {value: packId});
   }
 
   onButtonClicked(buttonName: string, properties?: object) {
@@ -208,7 +216,31 @@ export default class AnalyticsReporter {
     });
   }
 
-  private trackUIEvent(eventType: string, payload: object) {
+  onValidationAttempt(passed: boolean, message: string) {
+    this.trackUIEvent('Validation attempt', {passed, message});
+  }
+
+  onOpenPatternAiPanel() {
+    this.trackUIEvent('Pattern AI panel opened');
+  }
+
+  onGenerateAiPatternStart(temperature: number) {
+    this.trackUIEvent('Generate AI pattern start', {temperature});
+  }
+
+  onGenerateAiPatternEnd(
+    timeSeconds: number,
+    isInitialGenerate: boolean,
+    temperature: number
+  ) {
+    this.trackUIEvent('Generate AI pattern end', {
+      timeSeconds,
+      isInitialGenerate,
+      temperature,
+    });
+  }
+
+  private trackUIEvent(eventType: string, payload: object = {}) {
     const logMessage = `${eventType}. Payload: ${JSON.stringify(payload)}`;
 
     if (!this.session) {
@@ -234,7 +266,7 @@ export default class AnalyticsReporter {
     this.session.soundsPlayed[id] = 1 + (this.session.soundsPlayed[id] ?? 0);
   }
 
-  onBlocksUpdated(blocks: Block[]) {
+  onBlocksUpdated(blocks: GoogleBlockly.Block[]) {
     if (!this.session) {
       this.log('No session in progress');
       return;

@@ -8,7 +8,7 @@ import {
   Heading3,
   Heading4,
 } from '@cdo/apps/componentLibrary/typography';
-import FontAwesome from '@cdo/apps/templates/FontAwesome';
+import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import i18n from '@cdo/locale';
 
 import LearningGoals from './LearningGoals';
@@ -178,6 +178,7 @@ export const InfoAlert = ({text, dismissable}) => {
         [style.infoAlert]: !closed,
         [style.infoAlertClosed]: !!closed,
       })}
+      // eslint-disable-next-line react/forbid-dom-props
       data-testid="info-alert"
     >
       <div className={style.infoAlertLeft}>

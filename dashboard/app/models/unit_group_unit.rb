@@ -21,4 +21,10 @@ class UnitGroupUnit < ApplicationRecord
 
   belongs_to :unit_group, foreign_key: 'course_id', optional: true
   belongs_to :script, class_name: 'Unit', optional: true
+
+  after_destroy_commit :update_course_json
+
+  def update_course_json
+    UnitGroup.find_by(id: course_id)&.write_serialization
+  end
 end

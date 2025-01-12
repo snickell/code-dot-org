@@ -7,12 +7,12 @@ import {Provider} from 'react-redux';
 import isRtl from '@cdo/apps/code-studio/isRtlRedux';
 import createResourcesReducer, {
   initResources,
-} from '@cdo/apps/lib/levelbuilder/lesson-editor/resourcesEditorRedux';
-import UnitEditor from '@cdo/apps/lib/levelbuilder/unit-editor/UnitEditor';
+} from '@cdo/apps/levelbuilder/lesson-editor/resourcesEditorRedux';
+import UnitEditor from '@cdo/apps/levelbuilder/unit-editor/UnitEditor';
 import reducers, {
   init,
   mapLessonGroupDataForEditor,
-} from '@cdo/apps/lib/levelbuilder/unit-editor/unitEditorRedux';
+} from '@cdo/apps/levelbuilder/unit-editor/unitEditorRedux';
 import {getStore, registerReducers} from '@cdo/apps/redux';
 import getScriptData from '@cdo/apps/util/getScriptData';
 
@@ -73,6 +73,8 @@ export default function initPage(unitEditorData) {
         initialLocales={locales}
         initialProjectSharing={scriptData.project_sharing || false}
         initialCurriculumUmbrella={scriptData.curriculum_umbrella || ''}
+        initialTopicTags={scriptData.topic_tags || []}
+        initialContentArea={scriptData.content_area || ''}
         initialFamilyName={scriptData.family_name || ''}
         initialVersionYear={scriptData.version_year || ''}
         unitFamilies={unitEditorData.script_families}

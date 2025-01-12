@@ -164,12 +164,22 @@ class DeleteAccountsHelperTest < ActionView::TestCase
       reset_password_token: 'fake-reset-password-token'
     refute_nil user.encrypted_password
     refute_nil user.reset_password_token
+
+    purge_user user
+
+    assert_nil user.encrypted_password
+    assert_nil user.reset_password_token
+  end
+
+  test 'clears secret picture and words' do
+    user = create(:student, :sponsored, reset_password_token: 'fake-reset-password-token')
+
+    refute_nil user.reset_password_token
     refute_nil user.secret_picture
     refute_nil user.secret_words
 
     purge_user user
 
-    assert_nil user.encrypted_password
     assert_nil user.reset_password_token
     assert_nil user.secret_picture
     assert_nil user.secret_words
@@ -301,7 +311,7 @@ class DeleteAccountsHelperTest < ActionView::TestCase
   test 'does not purge dependent students of a teacher' do
     student = create :student_in_picture_section
     teacher = student.teachers.first
-    assert_includes teacher.dependent_students.map {|s| s[:id]}, student.id
+    assert_includes teacher.dependent_students.pluck(:id), student.id
 
     assert_nil teacher.purged_at
     assert_nil student.purged_at
@@ -1412,7 +1422,7 @@ class DeleteAccountsHelperTest < ActionView::TestCase
     Poste2.create_recipient(user.email, name: user.name, ip_address: '127.0.0.1')
 
     refute_empty PEGASUS_DB[:contacts].where(email: email)
-    contact_ids = PEGASUS_DB[:contacts].where(email: email).map {|s| s[:id]}
+    contact_ids = PEGASUS_DB[:contacts].where(email: email).pluck(:id)
 
     purge_user user
 
@@ -1425,7 +1435,7 @@ class DeleteAccountsHelperTest < ActionView::TestCase
     Poste2.create_recipient(email, name: 'Fake name', ip_address: '127.0.0.1')
 
     refute_empty PEGASUS_DB[:contacts].where(email: email)
-    contact_ids = PEGASUS_DB[:contacts].where(email: email).map {|s| s[:id]}
+    contact_ids = PEGASUS_DB[:contacts].where(email: email).pluck(:id)
 
     purge_all_accounts_with_email email
 
@@ -1506,7 +1516,7 @@ class DeleteAccountsHelperTest < ActionView::TestCase
   test "cleans forms matched by email if purging by email" do
     email = 'test@example.com'
     with_form(email: email) do |_|
-      form_ids = PEGASUS_DB[:forms].where(email: email).map {|f| f[:id]}
+      form_ids = PEGASUS_DB[:forms].where(email: email).pluck(:id)
 
       refute_empty PEGASUS_DB[:forms].where(id: form_ids)
       assert(PEGASUS_DB[:forms].where(id: form_ids).any? {|f| f[:email].present?})
@@ -1520,7 +1530,7 @@ class DeleteAccountsHelperTest < ActionView::TestCase
   test "cleans forms matched by user_id" do
     user = create :teacher
     with_form(user: user) do |_|
-      form_ids = PEGASUS_DB[:forms].where(user_id: user.id).map {|f| f[:id]}
+      form_ids = PEGASUS_DB[:forms].where(user_id: user.id).pluck(:id)
 
       refute_empty PEGASUS_DB[:forms].where(id: form_ids)
       assert(PEGASUS_DB[:forms].where(id: form_ids).any? {|f| f[:email].present?})

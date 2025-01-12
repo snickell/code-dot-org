@@ -267,6 +267,8 @@ Resources:
         - arn:aws:iam::aws:policy/AWSBillingReadOnlyAccess
 
 # Console & CLI Roles
+# The term 'FullAccess' means the role has the highest access for it's type, not
+# full access to all resources. It's in comparison to similar 'ReadOnly' roles.
 
 <%
 roles = {
@@ -335,6 +337,15 @@ roles = {
     GoogleIdsSSMParameter: 'BillingGoogleIDs',
     ManagedPolicyArns: [
       'arn:aws:iam::aws:policy/AWSBillingReadOnlyAccess',
+    ]
+  },
+  ProductManagerFullAccessRole: {
+    RoleName: 'ProductManager_FullAccess',
+    GoogleIdsSSMParameter: 'ProductGoogleIDs',
+    ManagedPolicyArns: [
+      'arn:aws:iam::aws:policy/AWSBillingReadOnlyAccess',
+      '!Ref BedrockKnowledgeBaseInvocationPolicy',
+      '!Ref CloudwatchDashboardViewerPolicy',
     ]
   }
 }
@@ -695,6 +706,43 @@ roles.each do |name, config| %>
             Resource: 
               - !Sub "arn:aws:s3:::aws-athena-query-results-${AWS::AccountId}-${AWS::Region}/*"
               - !Sub "arn:aws:s3:::aws-athena-query-results-${AWS::AccountId}-${AWS::Region}"
+  
+  ProductGoogleIDs:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /IAM/ProductGoogleIDs
+      Type: StringList
+      Value: initial,value
+      Description: List of Google IDs of people being granted product access.
+  
+  BedrockKnowledgeBaseInvocationPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: BedrockKnowledgeBaseInvocationPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - bedrock:InvokeModel
+              - bedrock:Retrieve
+              - bedrock:RetrieveAndGenerate
+            Resource:
+              - !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:knowledge-base/*'
+
+  CloudwatchDashboardViewerPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: CloudwatchDashboardViewerPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - cloudwatch:GetDashboard
+              - cloudwatch:ListDashboards
+              - cloudwatch:GetMetricData
+            Resource: '*'
 
   # Used by FirehoseMicroservice Lambda function.
   # TODO move to Data stack
@@ -721,45 +769,6 @@ roles.each do |name, config| %>
             - !Sub "arn:aws:firehose:${AWS::Region}:${AWS::AccountId}:deliverystream/analysis-events"
       ManagedPolicyArns:
       - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  # Percona Monitoring and Management RDS access role.
-  # See: https://www.percona.com/doc/percona-monitoring-and-management/amazon-rds.html#creating-a-policy
-  # TODO: Move to Data stack
-  PMMRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: [ec2.amazonaws.com, ecs-tasks.amazonaws.com]
-            Action: ['sts:AssumeRole']
-      Policies:
-        - PolicyName: PMMRolePolicy
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Sid: Stmt1508404837000
-                Effect: Allow
-                Action:
-                  - 'rds:DescribeDBInstances'
-                  - 'cloudwatch:GetMetricStatistics'
-                  - 'cloudwatch:ListMetrics'
-                Resource: '*'
-              - Sid: Stmt1508410723001
-                Effect: Allow
-                Action:
-                  - 'logs:DescribeLogStreams'
-                  - 'logs:GetLogEvents'
-                  - 'logs:FilterLogEvents'
-                Resource:
-                  - "arn:aws:logs:*:*:log-group:RDSOSMetrics:*"
-  # TODO: Move to Data stack
-  PMMInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      InstanceProfileName: Percona-Monitoring-Management
-      Path: '/'
-      Roles: [!Ref PMMRole]
   # Global managed-policy named role used by ECS.
   # Ref: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html
   EcsTaskExecutionRole:
@@ -774,6 +783,21 @@ roles.each do |name, config| %>
       Path: /
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+  # TODO: Move this to gen_ai_curriculum.yml.erb
+  # Execution role for GenAI Sagemaker Models
+  SagemakerModelExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: SagemakerModelExecutionRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: sagemaker.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AmazonSageMakerFullAccess'
   SessionPermissions:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -820,11 +844,11 @@ Outputs:
     Description: Firehose Lambda Role ARN
     Value: !GetAtt FirehoseLambdaRole.Arn
     Export: {Name: !Sub "${AWS::StackName}-FirehoseLambdaRoleARN"}
-  PerconaMonitoringRoleARN:
-    Description: Percona Monitoring Role ARN
-    Value: !GetAtt PMMRole.Arn
-    Export: {Name: !Sub "${AWS::StackName}-PerconaMonitoringRoleARN"}
   SessionPermissions:
     Description: Session Permissions
     Value: !Ref SessionPermissions
     Export: {Name: !Sub "${AWS::StackName}-SessionPermissions"}
+  SagemakerModelExecutionRoleARN:
+    Description: Execution Role for GenAI Sagemaker Models
+    Value: !GetAtt SagemakerModelExecutionRole.Arn
+    Export: {Name: !Sub "${AWS::StackName}-SagemakerExecutionRoleARN"}

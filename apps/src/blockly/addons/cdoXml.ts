@@ -1,4 +1,4 @@
-import {Workspace, WorkspaceSvg} from 'blockly';
+import * as GoogleBlockly from 'blockly/core';
 
 import {BLOCK_TYPES} from '../constants';
 import {BlocklyWrapperType, XmlBlockConfig} from '../types';
@@ -26,7 +26,7 @@ export default function initializeBlocklyXml(
   // Override domToBlock so that we can gracefully handle unknown blocks.
   blocklyWrapper.Xml.domToBlock = function (
     xmlBlock: Element,
-    workspace: Workspace
+    workspace: GoogleBlockly.Workspace
   ) {
     let block;
     try {
@@ -91,7 +91,7 @@ export default function initializeBlocklyXml(
  * @returns {string} The XML representation of the project.
  *
  */
-export function getProjectXml(workspace: WorkspaceSvg) {
+export function getProjectXml(workspace: GoogleBlockly.WorkspaceSvg) {
   // Start by getting the XML for all blocks on the workspace.
   const workspaceXml = Blockly.Xml.blockSpaceToDom(workspace);
 
@@ -455,19 +455,50 @@ export function getBlockElements(xml: Element) {
   return Array.from(xml.querySelectorAll('xml > block'));
 }
 
+/**
+ * Removes all top-level invisible blocks from a Blockly xml element. "Top-level" blocks
+ * in this case also includes blocks that nested directly within a category element.
+ * Used to (unsupported) invisible blocks from a toolbox definition
+ */
 export function removeInvisibleBlocks(xml: Element) {
-  // Get all top-level blocks
-  const topLevelBlocks = xml.getElementsByTagName('block');
+  const categories = xml.getElementsByTagName('category');
+  const blocks = xml.getElementsByTagName('block');
+
   // Convert HTMLCollection to an array to iterate safely
-  const blocksArray = Array.from(topLevelBlocks);
+  const blocksArray = Array.from(blocks);
+  const categoriesArray = Array.from(categories);
 
   blocksArray.forEach(block => {
     if (
-      block.parentElement === xml &&
+      (block.parentElement === xml ||
+        categoriesArray.includes(block.parentElement as Element)) &&
       block.getAttribute('uservisible') === 'false'
     ) {
       block.remove();
     }
   });
+  return xml;
+}
+
+/**
+ * Removes statically-defined procedure call blocks from the auto-populated
+ * Functions toolbox category. Call blocks are automatically supplied by the
+ * flyout category callback.
+ */
+export function removeStaticCallBlocks(xml: Element) {
+  // Find the auto-populated Functions category, if it exists.
+  const procedureCategory = Array.from(
+    xml.getElementsByTagName('category')
+  ).find(category => category.getAttribute('custom') === 'PROCEDURE');
+
+  if (procedureCategory) {
+    // Find any procedure call blocks defined within the XML for this category
+    const procedureCallBlocks = Array.from(
+      procedureCategory.getElementsByTagName('block')
+    ).filter(block => block.getAttribute('type') === BLOCK_TYPES.procedureCall);
+
+    // Remove each of the filtered blocks
+    procedureCallBlocks.forEach(block => block.remove());
+  }
   return xml;
 }

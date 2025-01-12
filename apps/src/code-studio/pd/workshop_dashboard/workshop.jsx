@@ -11,7 +11,7 @@ import React from 'react';
 import {Grid, Row, Col} from 'react-bootstrap'; // eslint-disable-line no-restricted-imports
 import {connect} from 'react-redux';
 
-import Spinner from '../components/spinner';
+import Spinner from '../../../sharedComponents/Spinner';
 
 import AttendancePanel from './AttendancePanel';
 import DetailsPanel from './DetailsPanel';
@@ -82,6 +82,7 @@ export class Workshop extends React.Component {
           loadingWorkshop: false,
           workshop: _.pick(data, [
             'id',
+            'name',
             'organizer',
             'facilitators',
             'location_name',
@@ -109,6 +110,7 @@ export class Workshop extends React.Component {
             'third_party_provider',
             'course_offerings',
             'module',
+            'participant_group_type',
           ]),
         });
       })

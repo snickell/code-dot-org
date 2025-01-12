@@ -1,7 +1,5 @@
 import {ObservableProcedureModel} from '@blockly/block-shareable-procedures';
 import * as GoogleBlockly from 'blockly/core';
-import {IProcedureModel} from 'blockly/core/procedures';
-import {FlyoutItemInfoArray} from 'blockly/core/utils/toolbox';
 
 import BlockSvgFrame from '@cdo/apps/blockly/addons/blockSvgFrame';
 import CdoFieldButton from '@cdo/apps/blockly/addons/cdoFieldButton';
@@ -14,7 +12,6 @@ import procedureCallerOnChangeMixin from './mixins/procedureCallerOnChangeMixin'
 import procedureCallerMutator from './mutators/procedureCallerMutator';
 import {procedureDefMutator} from './mutators/procedureDefMutator';
 
-const PARAMETERS_LABEL = 'PARAMETERS_LABEL';
 /**
  * A dictionary of our custom procedure block definitions, used across labs.
  * Replaces blocks that are part of core Blockly.
@@ -188,14 +185,6 @@ GoogleBlockly.Extensions.register(
     );
     // Open mini-toolbox by default
     flyoutToggleButton.setIcon(false);
-    // If we added a flyout, place a 'Parameters' label before it.
-    const flyoutInput = this.getInput('flyout_input');
-    if (flyoutInput) {
-      flyoutInput.insertFieldAt(
-        0,
-        new Blockly.FieldLabel(commonI18n.parameters(), PARAMETERS_LABEL)
-      );
-    }
   }
 );
 
@@ -284,7 +273,7 @@ GoogleBlockly.Extensions.register(
        */
       getProcedureModel: function (
         this: ProcedureBlock
-      ): IProcedureModel | null {
+      ): GoogleBlockly.Procedures.IProcedureModel | null {
         if (!this.model_) {
           this.model_ = this.findProcedureModel_(
             this.getFieldValue('NAME'),
@@ -375,7 +364,7 @@ export function flyoutCategory(
   workspace: GoogleBlockly.WorkspaceSvg,
   functionEditorOpen = false
 ) {
-  const blockList: FlyoutItemInfoArray = [];
+  const blockList: GoogleBlockly.utils.toolbox.FlyoutItemInfoArray = [];
 
   // Note: Blockly.Msg was undefined when this code was extracted into global scope
   const functionDefinitionBlock = {
