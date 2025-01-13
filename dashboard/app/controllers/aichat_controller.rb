@@ -36,9 +36,9 @@ class AichatController < ApplicationController
     begin
       request = AichatRequest.create!(
         user_id: current_user.id,
-        model_customizations: params[:aichatModelCustomizations].to_json,
-        stored_messages: messages_for_model.to_json,
-        new_message: params[:newMessage].to_json,
+        model_customizations: params[:aichatModelCustomizations],
+        stored_messages: messages_for_model,
+        new_message: params[:newMessage],
         level_id: context[:currentLevelId],
         script_id: context[:scriptId],
         project_id: get_project_id(context)
@@ -102,6 +102,7 @@ class AichatController < ApplicationController
         level_id: context[:currentLevelId],
         script_id: context[:scriptId],
         project_id: project_id,
+        request_id: event[:requestId], # Only present if ChatEvent is a ChatMessage, otherwise nil
         aichat_event: event.to_json
       )
     rescue StandardError => exception
