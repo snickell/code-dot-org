@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useRef} from 'react';
 import {useSelector} from 'react-redux';
 
 import {nextLevelId} from '@cdo/apps/code-studio/progressReduxSelectors';
@@ -172,6 +172,14 @@ const InstructionsPanel: React.FunctionComponent<InstructionsPanelProps> = ({
   // the unique index.
   const useMessageIndex = useSecondaryFinishButton ? undefined : messageIndex;
 
+  const feedbackRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (feedbackRef.current) {
+      feedbackRef.current.focus();
+    }
+  }, [useMessage, canShowNextButton]);
+
   return (
     <div
       id="instructions"
@@ -232,11 +240,13 @@ const InstructionsPanel: React.FunctionComponent<InstructionsPanelProps> = ({
                 <TextToSpeech text={useMessage} />
               )}
               {useMessage && (
-                <EnhancedSafeMarkdown
-                  markdown={useMessage}
-                  className={moduleStyles.markdownText}
-                  handleInstructionsTextClick={handleInstructionsTextClick}
-                />
+                <div ref={feedbackRef} tabIndex={-1}>
+                  <EnhancedSafeMarkdown
+                    markdown={useMessage}
+                    className={moduleStyles.markdownText}
+                    handleInstructionsTextClick={handleInstructionsTextClick}
+                  />
+                </div>
               )}
               {canShowNextButton && (
                 <Button
