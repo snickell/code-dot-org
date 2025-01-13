@@ -1,12 +1,75 @@
 import {mount} from 'enzyme'; // eslint-disable-line no-restricted-imports
 import React from 'react';
 
+import Spinner from '@cdo/apps/sharedComponents/Spinner';
 import CurriculumQuickAssign from '@cdo/apps/templates/sectionsRefresh/CurriculumQuickAssign';
 import i18n from '@cdo/locale';
 
 window.fetch = jest.fn().mockResolvedValue({json: jest.fn()});
 
 describe('CurriculumQuickAssign', () => {
+  it('shows spinner when isLoading is true', () => {
+    // Mock `fetch` to avoid actual API calls
+    global.fetch = jest.fn().mockResolvedValue({
+      json: jest.fn().mockResolvedValue({}),
+    });
+
+    const wrapper = mount(
+      <CurriculumQuickAssign
+        updateSection={() => {}}
+        sectionCourse={{}}
+        initialParticipantType="teacher"
+        courseFilters={{}}
+        isNewSection={false}
+      />
+    );
+
+    // Wait for the initial state to simulate loading
+    wrapper.update();
+
+    // Verify spinner is rendered
+    expect(wrapper.find(Spinner)).toHaveLength(1);
+
+    // Verify heading text
+    expect(wrapper.find('h3').text()).toBe(i18n.assignCurriculum());
+
+    // Clean up mock
+    global.fetch.mockRestore();
+  });
+  it('shows course options when is new course', () => {
+    // Mock `fetch` to avoid actual API calls
+    global.fetch = jest.fn().mockResolvedValue({
+      json: jest.fn().mockResolvedValue({}),
+    });
+
+    const wrapper = mount(
+      <CurriculumQuickAssign
+        updateSection={() => {}}
+        sectionCourse={{}}
+        initialParticipantType="student"
+        courseFilters={{}}
+        isNewSection={true}
+      />
+    );
+
+    wrapper.update();
+
+    // Verify heading text
+    expect(wrapper.find('h3').text()).toBe(i18n.assignCurriculum());
+    expect(wrapper.find('p').length).toBe(1);
+    // We haven't specified participantType = student, so all 5 buttons appear
+    expect(wrapper.find('Button').length).toBe(5);
+    expect(wrapper.find('Button').at(0).props().text).toBe(
+      i18n.courseBlocksGradeBandsElementary()
+    );
+    expect(wrapper.find('Button[id="uitest-high-button"]').props().text).toBe(
+      i18n.courseBlocksGradeBandsHigh()
+    );
+    expect(wrapper.find('input').length).toBe(1);
+
+    // Clean up mock
+    global.fetch.mockRestore();
+  });
   it('renders headers and the top row of buttons', () => {
     const wrapper = mount(
       <CurriculumQuickAssign updateSection={() => {}} sectionCourse={{}} />
