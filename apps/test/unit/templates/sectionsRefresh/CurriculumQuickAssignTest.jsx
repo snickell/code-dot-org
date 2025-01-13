@@ -21,7 +21,7 @@ describe('CurriculumQuickAssign', () => {
 
     expect(wrapper.find(Spinner)).toHaveLength(1);
     expect(wrapper.find('h3').length).toBe(1);
-    expect(wrapper.find('Button').length).toBe(0);
+    expect(wrapper.find('Button')).toHaveLength(0);
   });
 
   it('renders headers and the top row of buttons', () => {
