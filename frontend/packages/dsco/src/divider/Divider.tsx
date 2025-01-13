@@ -12,13 +12,13 @@ export interface DividerProps extends HTMLAttributes<HTMLElement> {
 
 /**
  * ### Production-ready Checklist:
- * * (✘) implementation of component approved by design team;
- * * (✘) has storybook, covered with stories and documentation;
- * * (✘) has tests: test every prop, every state and every interaction that's js related;
+ * * (✔) implementation of component approved by design team;
+ * * (✔) has storybook, covered with stories and documentation;
+ * * (✔) has tests: test every prop, every state and every interaction that's js related;
  * * (see apps/test/unit/componentLibrary/Divider.test.tsx)
- * * (✘) passes accessibility checks;
+ * * (?) passes accessibility checks;
  *
- * ###  Status: ```WIP```
+ * ###  Status: ```Ready for Dev```
  *
  * Design System: Divider Component.
  * Used to render a section divider line. Can be used to break up the page or section content.
