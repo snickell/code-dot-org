@@ -192,6 +192,7 @@ namespace :build do
       ChatClient.log 'Installing <b>frontend</b> dependencies...'
       RakeUtils.yarn_install
 
+      # Only build frontend packages that are relevant to `code-dot-org/apps`
       ChatClient.log 'Building <b>frontend</b>...'
       RakeUtils.system "yarn release:dryrun --filter @code-dot-org/dsco "
     end

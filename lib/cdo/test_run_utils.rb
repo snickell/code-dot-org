@@ -101,6 +101,7 @@ module TestRunUtils
   def self.run_frontend_tests
     Dir.chdir(frontend_dir) do
       ChatClient.wrap('frontend tests') do
+        # Only run frontend tests that are relevant to `code-dot-org/apps`
         RakeUtils.system_stream_output 'yarn test --filter @code-dot-org/dsco'
       end
     end
