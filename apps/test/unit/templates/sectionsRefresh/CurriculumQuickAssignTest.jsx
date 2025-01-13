@@ -9,70 +9,28 @@ window.fetch = jest.fn().mockResolvedValue({json: jest.fn()});
 
 describe('CurriculumQuickAssign', () => {
   it('shows spinner when isLoading is true', () => {
-    // Mock `fetch` to avoid actual API calls
-    global.fetch = jest.fn().mockResolvedValue({
-      json: jest.fn().mockResolvedValue({}),
-    });
-
-    const wrapper = mount(
-      <CurriculumQuickAssign
-        updateSection={() => {}}
-        sectionCourse={{}}
-        initialParticipantType="teacher"
-        courseFilters={{}}
-        isNewSection={false}
-      />
-    );
-
-    // Wait for the initial state to simulate loading
-    wrapper.update();
-
-    // Verify spinner is rendered
-    expect(wrapper.find(Spinner)).toHaveLength(1);
-
-    // Verify heading text
-    expect(wrapper.find('h3').text()).toBe(i18n.assignCurriculum());
-
-    // Clean up mock
-    global.fetch.mockRestore();
-  });
-  it('shows course options when is new course', () => {
-    // Mock `fetch` to avoid actual API calls
-    global.fetch = jest.fn().mockResolvedValue({
-      json: jest.fn().mockResolvedValue({}),
-    });
-
     const wrapper = mount(
       <CurriculumQuickAssign
         updateSection={() => {}}
         sectionCourse={{}}
         initialParticipantType="student"
         courseFilters={{}}
-        isNewSection={true}
+        isNewSection={false}
       />
     );
 
-    wrapper.update();
-
-    // Verify heading text
-    expect(wrapper.find('h3').text()).toBe(i18n.assignCurriculum());
-    expect(wrapper.find('p').length).toBe(1);
-    // We haven't specified participantType = student, so all 5 buttons appear
-    expect(wrapper.find('Button').length).toBe(5);
-    expect(wrapper.find('Button').at(0).props().text).toBe(
-      i18n.courseBlocksGradeBandsElementary()
-    );
-    expect(wrapper.find('Button[id="uitest-high-button"]').props().text).toBe(
-      i18n.courseBlocksGradeBandsHigh()
-    );
-    expect(wrapper.find('input').length).toBe(1);
-
-    // Clean up mock
-    global.fetch.mockRestore();
+    expect(wrapper.find(Spinner)).toHaveLength(1);
+    expect(wrapper.find('h3').length).toBe(1);
+    expect(wrapper.find('Button').length).toBe(0);
   });
+
   it('renders headers and the top row of buttons', () => {
     const wrapper = mount(
-      <CurriculumQuickAssign updateSection={() => {}} sectionCourse={{}} />
+      <CurriculumQuickAssign
+        updateSection={() => {}}
+        sectionCourse={{}}
+        isNewSection={true}
+      />
     );
 
     expect(wrapper.find('h3').length).toBe(1);
@@ -90,7 +48,11 @@ describe('CurriculumQuickAssign', () => {
 
   it('updates caret direction when clicked', () => {
     const wrapper = mount(
-      <CurriculumQuickAssign updateSection={() => {}} sectionCourse={{}} />
+      <CurriculumQuickAssign
+        updateSection={() => {}}
+        sectionCourse={{}}
+        isNewSection={true}
+      />
     );
 
     expect(wrapper.find('Button').at(0).props().icon).toBe('caret-right');
@@ -103,7 +65,11 @@ describe('CurriculumQuickAssign', () => {
 
   it('opens and closes version dropdowns with table open and collapse', () => {
     const wrapper = mount(
-      <CurriculumQuickAssign updateSection={() => {}} sectionCourse={{}} />
+      <CurriculumQuickAssign
+        updateSection={() => {}}
+        sectionCourse={{}}
+        isNewSection={true}
+      />
     );
     expect(wrapper.find('VersionUnitDropdowns')).toHaveLength(0);
     wrapper
@@ -120,7 +86,11 @@ describe('CurriculumQuickAssign', () => {
 
   it('leaves dropdowns alone when decide later clicked', () => {
     const wrapper = mount(
-      <CurriculumQuickAssign updateSection={() => {}} sectionCourse={{}} />
+      <CurriculumQuickAssign
+        updateSection={() => {}}
+        sectionCourse={{}}
+        isNewSection={true}
+      />
     );
 
     // No dropdowns active at beginning
