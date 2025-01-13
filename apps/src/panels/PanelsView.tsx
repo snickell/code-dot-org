@@ -5,6 +5,7 @@ import Typist from 'react-typist';
 
 import {Button} from '@cdo/apps/componentLibrary/button';
 import TextToSpeech from '@cdo/apps/lab2/views/components/TextToSpeech';
+import {LessonBackground} from '@cdo/apps/types/progressTypes';
 
 import {queryParams} from '../code-studio/utils';
 import FontAwesome from '../legacySharedComponents/FontAwesome';
@@ -30,6 +31,7 @@ const childrenAreaHeight = 70;
 
 interface PanelsProps {
   panels: Panel[];
+  background: LessonBackground;
   onContinue: (nextUrl?: string) => void;
   onSkip?: () => void;
   targetWidth: number;
@@ -54,6 +56,7 @@ interface PanelsProps {
  */
 const PanelsView: React.FunctionComponent<PanelsProps> = ({
   panels,
+  background,
   onContinue,
   onSkip,
   targetWidth,
@@ -283,9 +286,13 @@ const PanelsView: React.FunctionComponent<PanelsProps> = ({
                   className={classNames(
                     'icon',
                     styles.bubble,
-                    index === currentPanelIndex
-                      ? styles.bubbleCurrent
-                      : styles.bubbleNotCurrent
+                    background === 'light'
+                      ? index === currentPanelIndex
+                        ? styles.bubbleCurrentLight
+                        : styles.bubbleNotCurrentLight
+                      : index === currentPanelIndex
+                      ? styles.bubbleCurrentDark
+                      : styles.bubbleNotCurrentDark
                   )}
                   title={undefined}
                   icon="circle"

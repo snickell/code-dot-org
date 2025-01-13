@@ -74,8 +74,11 @@ body.oceans-blue {
   background-color: $oceans_deep_blue;
 }
 
-body.music-black {
+body.music-black, body.dark {
   background-color: $dark_black;
+}
+
+body.dark, body.light {
   overscroll-behavior: none;
 }
 

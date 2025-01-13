@@ -277,11 +277,15 @@ class LessonEditor extends Component {
           </label>
           <label>
             Background
-            <input
+            <select
+              style={styles.dropdown}
               value={background}
-              style={styles.shortInput}
               onChange={e => this.setState({background: e.target.value})}
-            />
+            >
+              <option value="">(none)</option>
+              <option value="light">light</option>
+              <option value="dark">dark</option>
+            </select>
           </label>
           <label>
             Creative Commons Image

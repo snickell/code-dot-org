@@ -75,6 +75,11 @@ const PanelsLabView: React.FunctionComponent = () => {
   const currentAppName = useAppSelector(
     state => state.lab.levelProperties?.appName
   );
+  const background = useAppSelector(
+    state =>
+      state.progress.lessons?.find(l => l.id === state.progress.currentLessonId)
+        ?.background || null
+  );
   const skipUrl = useAppSelector(state => state.lab.levelProperties?.skipUrl);
   const offerBrowserTts =
     useAppSelector(state => state.lab.levelProperties?.offerBrowserTts) ||
@@ -168,6 +173,7 @@ const PanelsLabView: React.FunctionComponent = () => {
   return (
     <PanelsView
       panels={panels}
+      background={background}
       onContinue={onContinue}
       onSkip={skipUrl ? onSkip : undefined}
       targetWidth={windowWidth}
