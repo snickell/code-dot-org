@@ -27,5 +27,8 @@ defineComponents([
   {
     component: Divider,
     definition: DividerContentfulComponentDefinition,
+    options: {
+      wrapComponent: false,
+    },
   },
 ]);
