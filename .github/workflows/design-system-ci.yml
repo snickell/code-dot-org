@@ -59,6 +59,9 @@ jobs:
 
             - name: Update Changelog and Version
               #if: ${{ github.event_name == 'push' }}
-              run: yarn monoweave
+              run: |
+                git config user.name "github-actions[bot]"
+                git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                yarn monoweave
               working-directory: ./frontend/packages/dsco
             
