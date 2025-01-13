@@ -17,13 +17,22 @@ const MultipleTemplate: StoryFn<{
 }> = args => (
   <>
     <p>
-      * Margins on this screen do not represent Component's margins, and are
-      only added to improve storybook view *
+      {args.components.some(componentArg => componentArg.margin)
+        ? '* Gray background exists to show spacing, it will not appear with component *'
+        : "* Margins on this screen do not represent Component's margins, and are only added to improve storybook view *"}
     </p>
+
     <p>Multiple Dividers:</p>
     <div style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
       {args.components?.map((componentArg, index) => (
-        <Divider key={index} {...componentArg} />
+        <div
+          key={index}
+          style={{
+            background: componentArg.margin ? '#646464' : 'transparent',
+          }}
+        >
+          <Divider {...componentArg} />
+        </div>
       ))}
     </div>
   </>
@@ -37,4 +46,14 @@ DefaultDivider.args = {
 export const GroupOfDividers = MultipleTemplate.bind({});
 GroupOfDividers.args = {
   components: [{color: 'primary'}, {color: 'strong'}],
+};
+
+export const GroupOfDividersWithMargin = MultipleTemplate.bind({});
+GroupOfDividersWithMargin.args = {
+  components: [
+    {color: 'primary', margin: 'small'},
+    {color: 'primary', margin: 'medium'},
+    {color: 'primary', margin: 'large'},
+    {color: 'primary', margin: 'extra-large'},
+  ],
 };

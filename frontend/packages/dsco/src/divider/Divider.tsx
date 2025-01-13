@@ -6,6 +6,8 @@ import moduleStyles from './divider.module.scss';
 export interface DividerProps extends HTMLAttributes<HTMLElement> {
   /** Divider Color*/
   color?: 'primary' | 'strong';
+  /** Margin */
+  margin?: 'none' | 'small' | 'medium' | 'large' | 'extra-large';
 }
 
 /**
@@ -24,11 +26,13 @@ export interface DividerProps extends HTMLAttributes<HTMLElement> {
 
 export const Divider: React.FC<DividerProps> = ({
   color = 'primary',
+  margin = 'none',
 }: DividerProps) => (
   <hr
     className={classNames(
       moduleStyles.divider,
       moduleStyles[`divider-${color}`],
+      moduleStyles[`divider-margin-${margin}`],
     )}
   />
 );
