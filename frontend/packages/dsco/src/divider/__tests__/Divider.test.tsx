@@ -10,13 +10,13 @@ describe('Divider Component', () => {
   it('applies the primary color class by default', () => {
     render(<Divider />);
     const dividerElement = screen.getByRole('separator');
-    expect(dividerElement).toHaveClass('divider-primary');
+    expect(dividerElement).toHaveClass('divider-color-primary');
   });
 
   it('applies the strong color class when color prop is strong', () => {
     render(<Divider color="strong" />);
     const dividerElement = screen.getByRole('separator');
-    expect(dividerElement).toHaveClass('divider-strong');
+    expect(dividerElement).toHaveClass('divider-color-strong');
   });
 
   it('applies the no margin class by default', () => {
