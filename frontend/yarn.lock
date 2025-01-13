@@ -968,7 +968,7 @@ __metadata:
     "@code-dot-org/lint-config": "workspace:*"
     "@contentful/experiences-sdk-react": "npm:^1.24.0"
     "@eslint/js": "npm:^9.15.0"
-    "@monoweave/cli": "npm:^1.11.0"
+    "@monoweave/cli": "npm:^1.11.1"
     "@swc/core": "npm:^1.9.3"
     "@swc/jest": "npm:^0.2.37"
     "@testing-library/dom": "npm:^10.4.0"
@@ -2288,7 +2288,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@monoweave/cli@npm:^1.11.0":
+"@monoweave/cli@npm:^1.11.1":
   version: 1.13.0
   resolution: "@monoweave/cli@npm:1.13.0"
   dependencies:
