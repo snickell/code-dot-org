@@ -5,6 +5,7 @@ export const DividerContentfulComponentDefinition: ComponentDefinition = {
   id: 'divider',
   name: 'Divider',
   category: 'Custom Components',
+  builtInStyles: 'cfMargin',
   variables: {
     color: {
       displayName: 'Color',
