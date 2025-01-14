@@ -20,20 +20,20 @@
 }
 
 // Divider Spacing
-.divider-margin {
-  &-small {
+.divider {
+  &-xs {
     margin: 0.5rem 0;
   }
 
-  &-medium {
+  &-s {
     margin: 1rem 0;
   }
 
-  &-large {
+  &-m {
     margin: 2rem 0;
   }
 
-  &-extra-large {
+  &-l {
     margin: 4rem 0;
   }
 }

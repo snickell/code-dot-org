@@ -1,13 +1,16 @@
 import classNames from 'classnames';
 import {HTMLAttributes} from 'react';
 
+import {ComponentSizeXSToL} from '@/common/types';
 import moduleStyles from './divider.module.scss';
 
 export interface DividerProps extends HTMLAttributes<HTMLElement> {
-  /** Divider Color*/
+  /** Divider Color */
   color?: 'primary' | 'strong';
-  /** Margin */
-  margin?: 'none' | 'small' | 'medium' | 'large' | 'extra-large';
+  /** Divider Margin */
+  margin?: 'none' | ComponentSizeXSToL;
+  /** Divider custom className */
+  className?: string;
 }
 
 /**
@@ -15,7 +18,7 @@ export interface DividerProps extends HTMLAttributes<HTMLElement> {
  * * (✔) implementation of component approved by design team;
  * * (✔) has storybook, covered with stories and documentation;
  * * (✔) has tests: test every prop, every state and every interaction that's js related;
- * * (see apps/test/unit/componentLibrary/Divider.test.tsx)
+ * * (see ./__tests__/Divider.test.tsx)
  * * (✔) passes accessibility checks;
  *
  * ###  Status: ```Ready for Dev```
@@ -27,12 +30,14 @@ export interface DividerProps extends HTMLAttributes<HTMLElement> {
 export const Divider: React.FC<DividerProps> = ({
   color = 'primary',
   margin = 'none',
+  className,
 }: DividerProps) => (
   <hr
     className={classNames(
       moduleStyles.divider,
-      moduleStyles[`divider-color-${color}`],
-      moduleStyles[`divider-margin-${margin}`],
+      moduleStyles[`divider-${color}`],
+      moduleStyles[`divider-${margin}`],
+      className,
     )}
   />
 );
