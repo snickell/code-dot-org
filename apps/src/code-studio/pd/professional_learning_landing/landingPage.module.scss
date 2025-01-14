@@ -50,6 +50,12 @@ section {
   .containerMargin {
     margin: 1rem;
   }
+
+  .calendarButtons {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+  }
 }
 
 // TODO - this can be removed once the components on this page
