@@ -54,6 +54,18 @@ class Pd::Session < ApplicationRecord
     "#{formatted_date}, #{start_time}-#{end_time}"
   end
 
+  def session_time_info
+    {
+      year: start.strftime('%Y').strip,
+      month: start.strftime('%m').strip,
+      day: start.strftime('%d').strip,
+      start_hour: start.strftime('%H').strip,
+      start_min: start.strftime('%M').strip,
+      end_hour: self.end.strftime('%H').strip,
+      end_min: self.end.strftime('%M').strip
+    }
+  end
+
   def start_date_us_format
     start.strftime('%b %d %Y').strip
   end

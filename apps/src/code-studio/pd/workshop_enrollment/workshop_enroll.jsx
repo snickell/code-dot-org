@@ -17,6 +17,7 @@ export default class WorkshopEnroll extends React.Component {
     user_id: PropTypes.number.isRequired,
     workshop: WorkshopPropType,
     session_dates: PropTypes.arrayOf(PropTypes.string),
+    session_time_info: PropTypes.arrayOf(PropTypes.object),
     enrollment: PropTypes.shape({
       email: PropTypes.string,
       first_name: PropTypes.string,
@@ -137,6 +138,11 @@ export default class WorkshopEnroll extends React.Component {
       this.props.workshop.subject || ''
     );
     sessionStorage.setItem('workshopName', this.props.workshop.name || '');
+    sessionStorage.setItem(
+      'workshopLocation',
+      this.props.workshop.location || ''
+    );
+    sessionStorage.setItem('sessionTimeInfo', this.props.session_time_info);
 
     navigateToHref('/my-professional-learning');
   }
