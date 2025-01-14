@@ -88,13 +88,13 @@ with
 select distinct
     ul.user_id
     , cs.unit
+    , cs.script_id
     , cs.stage_number
     , cs.stage_name
     , cs.level_number
     , cs.level_name
     , cs.level_type
-    , cs.level_name
-    , cs.level_type
+    , cs.level_id
     , cs.is_group_level
     , cs.activity_level_id  -- contained level if it is a contained level, otherwise, base level
     , cs.activity_level_name  -- contained level if it is a contained level, otherwise, base level

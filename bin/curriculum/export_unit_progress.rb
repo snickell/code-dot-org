@@ -30,7 +30,7 @@ rescue => exception
   raise
 end
 
-def get_project_main_json(user_id, level_id, script_id)
+def get_project_source(user_id, level_id, script_id)
   user_storage_id = storage_id_for_user_id(user_id)
   return unless user_storage_id
 
@@ -44,7 +44,8 @@ def get_project_main_json(user_id, level_id, script_id)
   source_data = SourceBucket.new.get(channel_token.channel, "main.json")
   return unless source_data && source_data[:body] && source_data[:body].respond_to?(:string)
 
-  source_data[:body].string
+  main_json = source_data[:body].string
+  JSON.parse(main_json)['source']
 end
 
 def main
@@ -53,7 +54,9 @@ def main
   client = RedshiftClient.instance
   results = execute_redshift_query(client, query)
   results.each do |row|
-    puts row
+    source = get_project_source(row['user_id'], row['level_id'], row['script_id'])
+    row[:source] = source
+    puts JSON.pretty_generate row
   end
 end
 
