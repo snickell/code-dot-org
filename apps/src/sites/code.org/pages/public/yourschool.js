@@ -13,6 +13,15 @@ registerReducers({isRtl, responsive});
 
 $(document).ready(initYourSchool);
 
+const postponeCensusBanner = teacherId => {
+  $.ajax({
+    url: `/api/v1/users/${teacherId}/postpone_census_banner`,
+    type: 'post',
+  }).fail(xhr => {
+    console.error(`Failed to postpone census banner! ${xhr.responseText}`);
+  });
+};
+
 function showYourSchool() {
   const rawSchoolId = $('#your-school').data('parameters-schoolId');
   const rawSchoolZip = $('#your-school').data('parameters-schoolZip');
@@ -28,6 +37,8 @@ function showYourSchool() {
     schoolState: yourschoolElement.data('parameters-school-state'),
     schoolZip: rawSchoolZip ? rawSchoolZip.toString() : undefined,
   };
+
+  postponeCensusBanner(yourschoolElement.data('parameters-user-id'));
 
   ReactDOM.render(
     <Provider store={getStore()}>

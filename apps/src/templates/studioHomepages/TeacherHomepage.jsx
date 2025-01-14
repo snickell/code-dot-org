@@ -223,8 +223,8 @@ export const UnconnectedTeacherHomepage = ({
               question={censusQuestion}
               teaches={censusBannerTeachesSelection}
               inClass={censusBannerInClassSelection}
-              teacherId={teacherId}
               teacherName={teacherName}
+              teacherId={teacherId}
               teacherEmail={teacherEmail}
               onSubmitSuccess={() => dismissCensusBanner(null, null)}
               onDismiss={() => dismissAndHideCensusBanner()}

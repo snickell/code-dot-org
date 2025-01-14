@@ -23,6 +23,7 @@ export default function CensusTeacherBanner({
   teaches,
   inClass,
   teacherName,
+  teacherId,
   teacherEmail,
   onSubmitSuccess,
   schoolYear,
@@ -233,7 +234,7 @@ export default function CensusTeacherBanner({
         </div>
       );
       const link = encodeURI(
-        `/yourschool?schoolId=${schoolInfo.schoolId}&isTeacher=true&name=${teacherName}&email=${teacherEmail}#form`
+        `/yourschool?schoolId=${schoolInfo.schoolId}&isTeacher=true&name=${teacherName}&email=${teacherEmail}&userId=${teacherId}#form`
       );
       const takeSurveyAndPospone = () => {
         onPostpone();
@@ -404,6 +405,7 @@ CensusTeacherBanner.propTypes = {
   teaches: PropTypes.bool,
   inClass: PropTypes.bool,
   teacherName: PropTypes.string.isRequired,
+  teacherId: PropTypes.string.isRequired,
   teacherEmail: PropTypes.string.isRequired,
   onSubmitSuccess: PropTypes.func.isRequired,
   schoolYear: PropTypes.number.isRequired,
