@@ -5,7 +5,7 @@ import React from 'react';
 import './stub.module.scss';
 
 export interface StubProps {
-  backgroundColor: 'black' | 'white' | 'red';
+  backgroundColor: 'black' | 'white' | 'red' | 'blue';
   label: string;
   onClick?: () => void;
 }
