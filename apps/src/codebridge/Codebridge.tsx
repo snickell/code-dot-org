@@ -18,7 +18,7 @@ import {
 import React, {useEffect, useReducer, useRef} from 'react';
 
 import {FilePreview} from '@cdo/apps/codebridge/FilePreview';
-import './styles/small-footer-dark-overrides.scss';
+import '@cdo/apps/sharedComponents/footer/small-footer-dark-overrides.scss';
 import {LabConfig, ProjectSources} from '@cdo/apps/lab2/types';
 
 import Workspace from './Workspace';

@@ -1,0 +1,17 @@
+@import 'color.scss';
+
+#localeForm {
+  max-width: 50%;
+}
+
+#page-small-footer {
+  .small-footer-base {
+    max-width: 12.5rem;
+    margin-inline-start: 8px;
+    margin-bottom: 8px;
+  }
+
+  .copyright-button {
+    background-color: $light_gray_950;
+  }
+}
