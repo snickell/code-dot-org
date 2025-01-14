@@ -20,6 +20,9 @@ puts "Loading Rails environment..."
 require_relative '../../dashboard/config/environment'
 puts "Rails environment loaded in: #{(Time.now - start_time).to_i} seconds"
 
+# thread-safe client for AWS Comprehend
+$comprehend = Aws::Comprehend::Client.new
+
 def execute_redshift_query(client, query)
   start_time = Time.now
   result = client.exec(query)
@@ -63,6 +66,23 @@ def hashed_user_id(user_id)
   digest[0..31]
 end
 
+def test_pii(source)
+  params = {
+    language_code: "en",
+    text: source
+  }
+  response = $comprehend.detect_pii_entities(params)
+
+  output = {
+    source: source,
+    response: response.entities
+  }
+  puts JSON.pretty_generate output
+end
+
+test_pii("the quick brown fox jumped over the lazy dog")
+test_pii("the quick brown fox (206) 555-1212 jumped over the lazy dog at 55 main st")
+
 def main
   filename = File.expand_path('csd3_including_contained_levels_for_stanford.sql', __dir__)
   query = File.read(filename)
@@ -79,4 +99,4 @@ def main
   end
 end
 
-main
+# main
