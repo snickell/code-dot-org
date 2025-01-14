@@ -235,6 +235,12 @@ export default function CensusTeacherBanner({
       const link = encodeURI(
         `/yourschool?schoolId=${schoolInfo.schoolId}&isTeacher=true&name=${teacherName}&email=${teacherEmail}#form`
       );
+      const takeSurveyAndPospone = () => {
+        onPostpone();
+        setTimeout(() => {
+          window.open(pegasus(link), '_blank', 'noopener noreferrer');
+        }, 0);
+      };
       buttons = (
         <div style={styles.buttonDiv}>
           <Button
@@ -246,11 +252,10 @@ export default function CensusTeacherBanner({
             text="Not now"
           />
           <Button
-            useAsLink={true}
-            href={pegasus(link)}
-            target="_blank"
-            rel="noopener noreferrer"
+            onClick={takeSurveyAndPospone}
             style={styles.button}
+            type="primary"
+            color="purple"
             size="s"
             text="Take the survey"
           />

@@ -1,3 +1,4 @@
+import {action} from '@storybook/addon-actions';
 import React from 'react';
 
 import CensusTeacherBanner from './CensusTeacherBanner';
@@ -8,17 +9,17 @@ export default {
 
 const Template = args => (
   <CensusTeacherBanner
-    onDismiss={() => {}}
-    onPostpone={() => {}}
-    onTeachesChange={() => {}}
-    onInClassChange={() => {}}
+    onDismiss={action('dismiss')}
+    onPostpone={action('postpone')}
+    onTeachesChange={action('teachesChange')}
+    onInClassChange={action('inClassChange')}
     existingSchoolInfo={{
       id: 'ABCD',
       name: 'NCES School',
       country: 'US',
       zip: '12345',
     }}
-    onSubmitSuccess={() => {}}
+    onSubmitSuccess={action('submitSuccess')}
     {...args}
   />
 );
