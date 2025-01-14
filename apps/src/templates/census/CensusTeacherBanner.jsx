@@ -178,7 +178,7 @@ export default function CensusTeacherBanner({
             style={styles.button}
             type="secondary"
             color="gray"
-            size="l"
+            size="m"
             text="Dismiss"
           />
           <Button
@@ -186,7 +186,7 @@ export default function CensusTeacherBanner({
             style={styles.button}
             type="primary"
             color="purple"
-            size="l"
+            size="m"
             text="Submit"
             disabled={submitDisabled}
           />
