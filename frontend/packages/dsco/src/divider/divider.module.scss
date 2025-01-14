@@ -1,7 +1,7 @@
-@import '@/common/styles/primitiveColors.css';
+@import '@/common/styles/colors.css';
 
 // Divider common styles
-hr.divider {
+.divider {
   border: 0;
   border-top: 1px solid;
   margin: 0;
@@ -9,18 +9,18 @@ hr.divider {
 }
 
 // Divider Colors
-hr.divider-color {
+.divider {
   &-primary {
-    border-top-color: var(--neutral-gray-20);
+    border-top-color: var(--background-neutral-quaternary);
   }
 
   &-strong {
-    border-top-color: var(--neutral-gray-50);
+    border-top-color: var(--background-neutral-senary);
   }
 }
 
 // Divider Spacing
-hr.divider-margin {
+.divider-margin {
   &-small {
     margin: 0.5rem 0;
   }
