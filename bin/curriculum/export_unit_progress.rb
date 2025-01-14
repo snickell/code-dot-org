@@ -22,6 +22,7 @@ puts "Rails environment loaded in: #{(Time.now - start_time).to_i} seconds"
 
 # thread-safe client for AWS Comprehend
 $comprehend = Aws::Comprehend::Client.new
+$pii_threshold = 0.9
 
 def execute_redshift_query(client, query)
   start_time = Time.now
@@ -80,8 +81,38 @@ def test_pii(source)
   puts JSON.pretty_generate output
 end
 
-test_pii("the quick brown fox jumped over the lazy dog")
-test_pii("the quick brown fox (206) 555-1212 jumped over the lazy dog at 55 main st")
+# test_pii("the quick brown fox jumped over the lazy dog")
+# test_pii("the quick brown fox (206) 555-1212 jumped over the lazy dog at 55 main st")
+
+def filter_pii(source)
+  params = {
+    language_code: "en",
+    text: source
+  }
+  response = $comprehend.detect_pii_entities(params)
+
+  # a string without pii concerns will contain no entities. example responses:
+  # {
+  #   "source": "the quick brown fox jumped over the lazy dog",
+  #   "response": []
+  # }
+  # {
+  #   "source": "the quick brown fox (206) 555-1212 jumped over the lazy dog at 55 main st",
+  #   "response": [
+  #     "{:score=>0.9999105930328369, :type=>\"PHONE\", :begin_offset=>20, :end_offset=>34}",
+  #     "{:score=>0.9999832510948181, :type=>\"ADDRESS\", :begin_offset=>63, :end_offset=>73}"
+  #   ]
+  # }
+
+  contains_pii = response.entities.any? do |entity|
+    # allow all PII entity types, since the cost of false positives is low
+    # and the cost of false negatives is high. for a list of all types, see:
+    # https://docs.aws.amazon.com/comprehend/latest/dg/how-pii.html#how-pii-types
+    entity.score > $pii_threshold
+  end
+
+  contains_pii ? nil : source
+end
 
 def main
   filename = File.expand_path('csd3_including_contained_levels_for_stanford.sql', __dir__)
@@ -90,6 +121,8 @@ def main
   results = execute_redshift_query(client, query)
   results.each do |row|
     source = get_project_source(row['user_id'], row['level_id'], row['script_id'])
+    source = filter_pii(source)
+    next unless source
     row[:source] = source
 
     row[:hashed_user_id] = hashed_user_id(row['user_id'])
@@ -99,4 +132,4 @@ def main
   end
 end
 
-# main
+main
