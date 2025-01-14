@@ -199,6 +199,7 @@ namespace :build do
   end
 
   tasks = []
+  # Frontend needs to be built prior to apps as apps consumes the design system
   tasks << :frontend if CDO.build_apps
   tasks << :apps if CDO.build_apps
   tasks << :dashboard if CDO.build_dashboard
