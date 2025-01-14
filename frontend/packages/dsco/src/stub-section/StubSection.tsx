@@ -2,6 +2,7 @@
 // This stub component is to be removed once an actual component is implemented.
 
 import React from 'react';
+import './stub-section.module.scss';
 
 export interface StubSectionProps {
   backgroundColor: 'black' | 'white' | 'red';
