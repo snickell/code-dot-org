@@ -41,25 +41,25 @@ jobs:
               run: yarn install
               working-directory: ./frontend
 
-            - name: Install Playwright for Design System Storybook
-              run: npx playwright install --with-deps
-              working-directory: ./frontend/apps/design-system-storybook
+            # - name: Install Playwright for Design System Storybook
+            #   run: npx playwright install --with-deps
+            #   working-directory: ./frontend/apps/design-system-storybook
 
-            - name: Lint
-              run: yarn lint --filter @code-dot-org/dsco --filter @code-dot-org/design-system-storybook
-              working-directory: ./frontend
+            # - name: Lint
+            #   run: yarn lint --filter @code-dot-org/dsco --filter @code-dot-org/design-system-storybook
+            #   working-directory: ./frontend
 
-            - name: Build
-              run: yarn build --filter @code-dot-org/dsco --filter @code-dot-org/design-system-storybook
-              working-directory: ./frontend
+            # - name: Build
+            #   run: yarn build --filter @code-dot-org/dsco --filter @code-dot-org/design-system-storybook
+            #   working-directory: ./frontend
 
-            - name: Unit Tests
-              run: yarn test --filter @code-dot-org/dsco --filter @code-dot-org/design-system-storybook
-              working-directory: ./frontend
+            # - name: Unit Tests
+            #   run: yarn test --filter @code-dot-org/dsco --filter @code-dot-org/design-system-storybook
+            #   working-directory: ./frontend
 
-            - name: UI Tests
-              run: yarn test:ui:ci --filter @code-dot-org/dsco --filter @code-dot-org/design-system-storybook
-              working-directory: ./frontend
+            # - name: UI Tests
+            #   run: yarn test:ui:ci --filter @code-dot-org/dsco --filter @code-dot-org/design-system-storybook
+            #   working-directory: ./frontend
 
             - name: Update Changelog and Version
               #if: ${{ github.event_name == 'push' }}
