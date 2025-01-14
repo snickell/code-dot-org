@@ -28,7 +28,7 @@ defineComponents([
     component: Divider,
     definition: DividerContentfulComponentDefinition,
     options: {
-      wrapComponent: false,
+      wrapContainerWidth: '100%',
     },
   },
 ]);
