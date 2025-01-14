@@ -14,46 +14,20 @@ end.parse!
 
 require_relative '../../deployment'
 require_relative '../../lib/cdo/redshift'
-# require_relative '../../lib/cdo/db'
 
-# start_time = Time.now
-# puts "Loading Rails environment..."
-# require_relative '../../dashboard/config/environment'
-# puts "Rails environment loaded in: #{(Time.now - start_time).to_i} seconds"
+start_time = Time.now
+puts "Loading Rails environment..."
+require_relative '../../dashboard/config/environment'
+puts "Rails environment loaded in: #{(Time.now - start_time).to_i} seconds"
 
 def execute_redshift_query(client, query)
-  # start_time = Time.now
+  start_time = Time.now
   result = client.exec(query)
-  # puts "Query executed in: #{(Time.now - start_time).round(2)} seconds"
+  puts "Query executed in: #{(Time.now - start_time).round(2)} seconds"
   result
 rescue => exception
   puts "Error executing Redshift query: #{exception.message}\n#{exception.backtrace.join("\n")}"
   raise
-end
-
-def test_redshift
-  client = RedshiftClient.instance
-  query = "SELECT count(*) FROM dashboard_production.user_levels"
-  results = execute_redshift_query(client, query)
-  results.each do |row|
-    puts row
-  end
-end
-
-def get_user_level_data
-  DASHBOARD_REPORTING_DB_READER[:user_levels].
-    left_join(:levels, Sequel[:user_levels][:level_id] => Sequel[:levels][:id]).
-    left_join(:scripts, Sequel[:user_levels][:script_id] => Sequel[:scripts][:id]).
-    # must limit id range to run efficiently in production
-    # .where { (Sequel[:user_levels][:id] > 5551913388) & (Sequel[:user_levels][:id] < 5552913388) }
-    where(Sequel[:scripts][:name] => 'csd3-2023', Sequel[:levels][:type] => 'gamelab').
-    select(
-      Sequel[:user_levels][:user_id],
-      Sequel[:user_levels][:script_id],
-      Sequel[:user_levels][:level_id]
-    ).
-    limit(1).
-    first
 end
 
 def get_project_main_json(user_id, level_id, script_id)
