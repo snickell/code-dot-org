@@ -3,10 +3,6 @@ require 'faker'
 
 require_relative '../../lib/cdo/ci_utils'
 
-if defined? ActiveRecord
-  ActiveRecord::Migration&.check_pending!
-end
-
 # This is a workaround for https://github.com/kern/minitest-reporters/issues/230
 Minitest.load_plugins
 Minitest.extensions.delete('rails')
@@ -35,6 +31,12 @@ CDO.stubs(:rack_env).returns(:test) if defined? CDO
 Rails.application&.reload_routes! if defined?(Rails) && defined?(Rails.application)
 
 require File.expand_path('../../config/environment', __FILE__)
+
+# Check for migrations only after we guarantee the environment has been loaded.
+if defined? ActiveRecord
+  ActiveRecord::Migration&.check_pending!
+end
+
 I18n.load_path += Dir[Rails.root.join('test', 'en.yml')]
 I18n.backend.reload!
 I18n.fallbacks[:'te-ST'] = [:'te-ST', :'en-US', :en]
