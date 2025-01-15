@@ -80,6 +80,7 @@ module Services
 
     DEBUG = false
     S3_BUCKET = "cdo-lesson-plans#{'-dev' if DEBUG}".freeze
+    S3_BUCKET_AI = "cdo-ai-diff-production#{'-dev' if DEBUG}".freeze
 
     # Do no generate the overview pdf is there are no lesson plans
     def self.should_generate_overview_pdf?(unit)
@@ -101,8 +102,15 @@ module Services
         # Note that this "filename" includes subdirectories; this is fine
         # only because we're uploading to S3.
         data = File.read(filepath)
-        filename = filepath.delete_prefix(directory).delete_prefix('/')
-        AWS::S3.upload_to_bucket(S3_BUCKET, filename, data, no_random: true)
+        structured_filename = filepath.delete_prefix(directory).delete_prefix('/')
+
+        flat_filename = File.basename(filepath)
+
+        # Upload to the main bucket for PDFs that students and teachers see
+        AWS::S3.upload_to_bucket(S3_BUCKET, structured_filename, data, no_random: true)
+
+        # Upload to the AI bucket for PDFs that are used for ai-supported differentiation
+        AWS::S3.upload_to_bucket(S3_BUCKET_AI, flat_filename, data, no_random: true)
       end
     end
 
@@ -130,6 +138,26 @@ module Services
             puts "Regenerating Lesson PDFs for #{lesson.key} (from #{script.name})"
             generate_lesson_pdf(lesson, dir)
             any_pdf_generated = true
+
+            # Generate matadata
+            if any_pdf_generated
+              metadata ={
+                course: script.name,
+                unit_fullname: script.localized_title,
+                unit: format("U%02d", script.unit_number),
+                lesson: format("L%02d", lesson.absolute_position),
+                url: "blank for now",
+                verified_teacher: true,
+              }
+              full_metadata = {
+                metadataAttributes: metadata
+              }
+              file_path = "/tmp/#{script.name}-#{lesson.absolute_position}.metadata.json"
+              File.write(file_path, full_metadata.to_json)
+              flat_filename = File.basename(file_path)
+              data = File.read(file_path)
+              AWS::S3.upload_to_bucket(S3_BUCKET_AI, flat_filename, data, no_random: true)
+            end
           end
 
           if should_generate_overview_pdf?(script)
