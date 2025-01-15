@@ -1,9 +1,5 @@
+  # Geocoder Redis Cache
 <% cache_node_type = rack_env?(:production) ? 'cache.r3.large' : 'cache.t2.micro' -%>
-  GeocoderSubnetGroup:
-    Type: AWS::ElastiCache::SubnetGroup
-    Properties:
-      Description: Geocoder Cache Subnet Group
-      SubnetIds: <%= subnets.to_json %>
   GeocoderGroup:
     Type: AWS::ElastiCache::ReplicationGroup
     Properties:
@@ -16,13 +12,14 @@
       CacheNodeType: <%= cache_node_type %>
       SecurityGroupIds: [!ImportValue VPC-RedisSecurityGroup]
       CacheSubnetGroupName: !Ref GeocoderSubnetGroup
-  MemcachedParameterGroup:
-    Type: AWS::ElastiCache::ParameterGroup
+
+  GeocoderSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
     Properties:
-      CacheParameterGroupFamily: memcached1.4
-      Description: Memcached modified max_item_size.
-      Properties:
-        max_item_size: <%=64.megabytes%>
+      Description: Geocoder Cache Subnet Group
+      SubnetIds: <%= subnets.to_json %>
+
+  # Rails shared cache Memcached cluster
   Memcached:
     Type: AWS::ElastiCache::CacheCluster
     Properties:
@@ -36,6 +33,15 @@
       AZMode: cross-az
       PreferredAvailabilityZones: <%= AVAILABILITY_ZONES.first(2).to_json %>
       VpcSecurityGroupIds: [!ImportValue VPC-MemcachedSecurityGroup]
+  
+  MemcachedParameterGroup:
+    Type: AWS::ElastiCache::ParameterGroup
+    Properties:
+      CacheParameterGroupFamily: memcached1.4
+      Description: Memcached modified max_item_size.
+      Properties:
+        max_item_size: <%=64.megabytes%>
+
   MemcachedCPUUsageAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
