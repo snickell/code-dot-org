@@ -455,7 +455,12 @@ class UnconnectedMusicView extends React.Component {
   };
 
   getStartSources = () => {
-    if (!this.props.levelProperties?.levelData?.startSources) {
+    const startSources = this.props.levelProperties?.levelData?.startSources;
+    const currentBlockMode = this.props.blockMode;
+    const levelBlockMode = this.props.levelProperties?.levelData?.blockMode;
+    if (!startSources || currentBlockMode !== levelBlockMode) {
+      // Use the default start sources if the level doesn't have any,
+      // or if the block mode doesn't match.
       const startSourcesFilename = 'startSources' + this.props.blockMode;
       return require(`@cdo/static/music/${startSourcesFilename}.json`);
     } else {
