@@ -36,9 +36,9 @@ class AichatController < ApplicationController
     begin
       request = AichatRequest.create!(
         user_id: current_user.id,
-        model_customizations: params[:aichatModelCustomizations].to_json,
-        stored_messages: messages_for_model.to_json,
-        new_message: params[:newMessage].to_json,
+        model_customizations: params[:aichatModelCustomizations],
+        stored_messages: messages_for_model,
+        new_message: params[:newMessage],
         level_id: context[:currentLevelId],
         script_id: context[:scriptId],
         project_id: get_project_id(context)
@@ -102,6 +102,7 @@ class AichatController < ApplicationController
         level_id: context[:currentLevelId],
         script_id: context[:scriptId],
         project_id: project_id,
+        request_id: event[:requestId], # Only present if ChatEvent is a ChatMessage, otherwise nil
         aichat_event: event.to_json
       )
     rescue StandardError => exception
@@ -154,10 +155,29 @@ class AichatController < ApplicationController
     render json: aichat_events
   end
 
-  def check_message_safety
-    string_to_check = params[:message]
-    response_body = AichatSafetyHelper.get_llmguard_response(string_to_check)
-    render(status: :ok, json: response_body)
+  # GET /aichat/user_has_access
+  def user_has_access
+    render(status: :ok, json: {userHasAccess: current_user&.has_aichat_access?})
+  end
+
+  # POST /aichat/find_toxicity
+  # Finds toxicity in the given system prompt and retrieval contexts and returns a list of flagged fields.
+  def find_toxicity
+    locale = params[:locale] || "en"
+    flagged_fields = []
+
+    if params[:systemPrompt].present?
+      toxicity = AichatSafetyHelper.find_toxicity('user', params[:systemPrompt], locale)
+      flagged_fields << {field: 'systemPrompt', toxicity: toxicity} if toxicity.present?
+    end
+
+    if params[:retrievalContexts].present?
+      retrieval_joined = params[:retrievalContexts].join(' ')
+      toxicity = AichatSafetyHelper.find_toxicity('user', retrieval_joined, locale)
+      flagged_fields << {field: 'retrievalContexts', toxicity: toxicity} if toxicity.present?
+    end
+
+    render json: {flagged_fields: flagged_fields}.deep_transform_keys {|key| key.to_s.camelize(:lower)}
   end
 
   private def chat_completion_has_required_params?

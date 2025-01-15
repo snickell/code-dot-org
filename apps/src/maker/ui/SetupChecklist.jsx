@@ -5,10 +5,10 @@ import {connect} from 'react-redux';
 
 import applabI18n from '@cdo/applab/locale';
 import Button from '@cdo/apps/legacySharedComponents/Button';
-import {EVENTS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
 import MBFirmataUpdater from '@cdo/apps/maker/boards/microBit/MBFirmataUpdater';
 import WebSerialPortWrapper from '@cdo/apps/maker/WebSerialPortWrapper';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
 import i18n from '@cdo/locale';
 
@@ -24,10 +24,6 @@ const STATUS_BOARD_CONNECT = 'statusBoardConnect';
 const STATUS_BOARD_COMPONENTS = 'statusBoardComponents';
 const STATUS_BOARD_UPDATE_FIRMATA = 'statusBoardUpdateFirmata';
 
-const MICROBIT_FIRMATA_URL =
-  'https://github.com/microbit-foundation/microbit-firmata#installing-firmata-on-your-bbc-microbit';
-const EXPRESS_FIRMATA_URL =
-  'https://learn.adafruit.com/adafruit-circuit-playground-express/code-org-csd';
 const CLASSIC_FIRMATA_URL =
   'https://learn.adafruit.com/circuit-playground-firmata/overview';
 
@@ -361,12 +357,9 @@ class SetupChecklist extends Component {
   installFirmware() {
     let firmataMarkdown;
     if (this.state.boardTypeDetected === BOARD_TYPE.MICROBIT) {
-      firmataMarkdown = applabI18n.makerSetupInstallFirmataMB({
-        firmataURL: MICROBIT_FIRMATA_URL,
-      });
+      firmataMarkdown = applabI18n.makerSetupInstallFirmataMB();
     } else {
       firmataMarkdown = applabI18n.makerSetupInstallFirmataCP({
-        firmataURLExpress: EXPRESS_FIRMATA_URL,
         firmataURLClassic: CLASSIC_FIRMATA_URL,
       });
     }

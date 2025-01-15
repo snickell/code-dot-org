@@ -15,11 +15,15 @@ type CallbackArgs = {
   [LifecycleEvent.LevelLoadCompleted]: [
     levelProperties: LevelProperties,
     channel: Channel | undefined,
-    initialSources: ProjectSources | undefined
+    initialSources: ProjectSources | undefined,
+    abuseScore: number | undefined,
+    isReadOnly: boolean | undefined
   ];
 };
 
-type Callback<T extends LifecycleEvent> = (...args: CallbackArgs[T]) => void;
+export type Callback<T extends LifecycleEvent> = (
+  ...args: CallbackArgs[T]
+) => void;
 
 /**
  * Notifies listeners of lifecycle events in the Lab2 system, which doesn't reload the page between levels.
@@ -36,6 +40,7 @@ class LifecycleNotifier {
       this.listeners[event] = [];
     }
     this.listeners[event]?.push(callback);
+    return this;
   }
 
   removeListener<T extends LifecycleEvent>(event: T, callback: Callback<T>) {
@@ -45,6 +50,7 @@ class LifecycleNotifier {
         this.listeners[event].splice(index, 1);
       }
     }
+    return this;
   }
 
   notify<T extends LifecycleEvent>(event: T, ...args: CallbackArgs[T]) {

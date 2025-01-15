@@ -7,11 +7,9 @@ import type {
 import {Role} from '../aiComponentLibrary/chatMessage/types';
 import type {ValueOf} from '../types/utils';
 
-export const ChatEventDescriptions = {
-  COPY_CHAT: 'The user copied the chat history.',
-  CLEAR_CHAT: 'The user cleared the chat workspace.',
-  LOAD_LEVEL: 'The user loaded the aichat level.',
-} as const;
+import {FIELDS_CHECKED_FOR_TOXICITY} from './views/modelCustomization/constants';
+
+export type ChatEventDescriptionKey = 'COPY_CHAT' | 'CLEAR_CHAT' | 'LOAD_LEVEL';
 
 export interface ChatEvent {
   // UTC timestamp in milliseconds
@@ -19,13 +17,15 @@ export interface ChatEvent {
   // This field is optional but when it is defined, it must be set to `true`.
   // This allows the chat event to be visible by default without having to add an extra field.
   hideForParticipants?: true;
-  descriptionKey?: keyof typeof ChatEventDescriptions;
+  /** Optional key used if this event has a localized text description (ex. copy chat, clear chat, load level) */
+  descriptionKey?: ChatEventDescriptionKey;
 }
 
 export interface ChatMessage extends ChatEvent {
   chatMessageText: string;
   role: Role;
   status: ValueOf<typeof AiInteractionStatus>;
+  requestId?: number;
 }
 
 export interface ModelUpdate extends ChatEvent {
@@ -37,7 +37,7 @@ export interface ModelUpdate extends ChatEvent {
 export interface Notification extends ChatEvent {
   id: number;
   text: string;
-  notificationType: 'error' | 'success';
+  notificationType: 'permissionsError' | 'error' | 'success';
   includeInChatHistory?: boolean;
 }
 
@@ -146,3 +146,39 @@ export interface LevelAichatSettings {
 
 // The type of save action being performed (customization update, publish, model card save, etc).
 export type SaveType = 'updateChatbot' | 'publishModelCard' | 'saveModelCard';
+
+/** Response structure for the detect toxicity API */
+export interface DetectToxicityResponse {
+  flaggedFields: FlaggedField[];
+}
+
+export type ToxicityCheckedField = (typeof FIELDS_CHECKED_FOR_TOXICITY)[number];
+
+export interface FlaggedField {
+  field: ToxicityCheckedField;
+  toxicity: {
+    text: string;
+    blockedBy: SafetyService;
+    details: BlocklistDetails | WebPurifyDetails | ComprehendDetails;
+  };
+}
+
+type SafetyService = 'blocklist' | 'webpurify' | 'comprehend';
+
+interface BlocklistDetails {
+  blockedWord: string;
+}
+
+interface WebPurifyDetails {
+  type: 'email' | 'address' | 'phone' | 'profanity';
+  content: string;
+}
+
+interface ComprehendDetails {
+  flaggedSegment: string;
+  toxicity: number;
+  maxCategory: {
+    name: string;
+    score: number;
+  };
+}

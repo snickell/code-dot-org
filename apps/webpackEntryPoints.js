@@ -54,6 +54,7 @@ const CODE_STUDIO_ENTRIES = {
   'programming_expressions/show': './src/sites/studio/pages/programming_expressions/show.js',
   'sessions/lockout': './src/sites/studio/pages/sessions/lockout.js',
   'devise/sessions/new': './src/sites/studio/pages/devise/sessions/new.js',
+  'devise/sessions/_login': './src/sites/studio/pages/devise/sessions/_login.js',
   'devise/registrations/_sign_up': './src/sites/studio/pages/devise/registrations/_sign_up.js',
   'devise/registrations/login_type': './src/sites/studio/pages/devise/registrations/login_type.js',
   'devise/registrations/finish_student_account': './src/sites/studio/pages/devise/registrations/finish_student_account.js',
@@ -62,6 +63,8 @@ const CODE_STUDIO_ENTRIES = {
   'devise/registrations/_finish_sign_up': './src/sites/studio/pages/devise/registrations/_finish_sign_up.js',
   'devise/registrations/edit': './src/sites/studio/pages/devise/registrations/edit.js',
   'devise/registrations/account_type': './src/sites/studio/pages/devise/registrations/account_type.js',
+  'followers/student_user_new': './src/sites/studio/pages/followers/student_user_new.js',
+  'followers/students_cannot_join': './src/sites/studio/pages/followers/students_cannot_join.js',
   'essential': './src/sites/studio/pages/essential.js',
   'home/_homepage': './src/sites/studio/pages/home/_homepage.js',
   'layouts/_parent_email_banner': './src/sites/studio/pages/layouts/_parent_email_banner.js',
@@ -145,8 +148,11 @@ const INTERNAL_ENTRIES = {
   'levels/editors/fields/_bubble_choice_sublevel': './src/sites/studio/pages/levels/editors/fields/_bubble_choice_sublevel.js',
   'levels/editors/fields/_blockly': './src/sites/studio/pages/levels/editors/fields/_blockly.js',
   'levels/editors/fields/_callouts': './src/sites/studio/pages/levels/editors/fields/_callouts.js',
+  'levels/editors/fields/_child_level_bubble_choice_fields': './src/sites/studio/pages/levels/editors/fields/_child_level_bubble_choice_fields.js',
   'levels/editors/fields/_droplet': './src/sites/studio/pages/levels/editors/fields/_droplet.js',
   'levels/editors/fields/_grid': './src/sites/studio/pages/levels/editors/fields/_grid.js',
+  'levels/editors/fields/_music_level_data': './src/sites/studio/pages/levels/editors/fields/_music_level_data.js',
+  'levels/editors/fields/_neighborhood_settings': './src/sites/studio/pages/levels/editors/fields/_neighborhood_settings.js',
   'levels/editors/fields/_panels': './src/sites/studio/pages/levels/editors/fields/_panels.js',
   'levels/editors/fields/_poetry_fields': './src/sites/studio/pages/levels/editors/fields/_poetry_fields.js',
   'levels/editors/fields/_predict_settings': './src/sites/studio/pages/levels/editors/fields/_predict_settings.js',
@@ -195,13 +201,13 @@ const PEGASUS_ENTRIES = {
   'code.org/public/transformersone': './src/sites/code.org/pages/public/transformersone.js',
   'code.org/public/teacher-dashboard/index': './src/sites/code.org/pages/public/teacher-dashboard/index.js',
   'code.org/public/yourschool': './src/sites/code.org/pages/public/yourschool.js',
+  'code.org/public/yourschoolteststaging': './src/sites/code.org/pages/public/yourschoolteststaging.js',
   'code.org/public/yourschool/thankyou': './src/sites/code.org/pages/public/yourschool/thankyou.js',
   'code.org/views/admins_email_signup_form': './src/sites/code.org/pages/views/admins_email_signup_form.js',
   'code.org/views/share_privacy': './src/sites/code.org/pages/views/share_privacy.js',
   'code.org/views/theme_common_head_after': './src/sites/code.org/pages/views/theme_common_head_after.js',
   'code.org/views/theme_google_analytics': './src/sites/code.org/pages/views/theme_google_analytics.js',
   'code.org/views/workshop_search': './src/sites/code.org/pages/views/workshop_search.js',
-  'code.org/views/amazon_future_engineer': './src/sites/code.org/pages/views/amazon_future_engineer.js',
   'code.org/views/amazon_future_engineer_eligibility': './src/sites/code.org/pages/views/amazon_future_engineer_eligibility.js',
   'code.org/views/job_board': './src/sites/code.org/pages/views/job_board.js',
   'code.org/views/analytics_event_log_helper': './src/sites/code.org/pages/views/analytics_event_log_helper.js',
@@ -212,17 +218,21 @@ const PEGASUS_ENTRIES = {
   'code.org/views/swiper_page_tools': './src/sites/code.org/pages/views/swiper_page_tools.js',
   'code.org/views/swiper_page_applab': './src/sites/code.org/pages/views/swiper_page_applab.js',
   'code.org/views/swiper_page_videos': './src/sites/code.org/pages/views/swiper_page_videos.js',
+  'code.org/views/swiper_farsi_page_videos': './src/sites/code.org/pages/views/swiper_farsi_page_videos.js',
   'code.org/views/swiper_page_minecraft': './src/sites/code.org/pages/views/swiper_page_minecraft.js',
   'code.org/views/swiper_page_music_lab': './src/sites/code.org/pages/views/swiper_page_music_lab.js',
   'code.org/views/swiper_page_promote': './src/sites/code.org/pages/views/swiper_page_promote.js',
   'code.org/views/tabs_section': './src/sites/code.org/pages/views/tabs_section.js',
   'code.org/views/classy_embed_form': './src/sites/code.org/pages/views/classy_embed_form.js',
   'code.org/public/poetry': './src/sites/code.org/pages/public/poetry.js',
+  'code.org/public/cms-demo': './src/sites/code.org/pages/public/cms-demo.js',
+  'code.org/public/embeddable_census_map': './src/sites/code.org/pages/public/embeddable_census_map.js',
 
   // hourofcode.com
   'hourofcode.com/views/theme_common_head_after': './src/sites/hourofcode.com/pages/views/theme_common_head_after.js',
   'hourofcode.com/views/theme_google_analytics': './src/sites/hourofcode.com/pages/views/theme_google_analytics.js',
   'hourofcode.com/views/analytics_event_log_helper': './src/sites/hourofcode.com/pages/views/analytics_event_log_helper.js',
+  'hourofcode.com/views/swiper_page_resources': './src/sites/hourofcode.com/pages/views/swiper_page_resources.js',
 
   // shared between code.org and hourofcode.com
   'tutorialExplorer': './src/tutorialExplorer/tutorialExplorer.js',
@@ -267,6 +277,11 @@ const PROFESSIONAL_DEVELOPMENT_ENTRIES = {
 const SHARED_ENTRIES = {
   cookieBanner: './src/cookieBanner/cookieBanner.js',
   userHeaderEventLogger: './src/userHeaderEventLogger/userHeaderEventLogger.js',
+  statsigWebAnalytics: './src/metrics/statsigWebAnalytics.js',
+  'global_edition/region_reset_button':
+    './src/globalEdition/regionResetButton.js',
+  'global_edition/region_switch_confirm':
+    './src/globalEdition/regionSwitchConfirm.js',
 };
 
 // prettier-ignore

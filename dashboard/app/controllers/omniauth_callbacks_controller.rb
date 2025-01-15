@@ -9,9 +9,6 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
   skip_before_action :clear_sign_up_session_vars
 
-  # TODO: figure out how to avoid skipping CSRF verification for Powerschool
-  skip_before_action :verify_authenticity_token, only: :powerschool
-
   before_action :check_account_linking_lock
 
   # Note: We can probably remove these once we've broken out all providers
@@ -57,7 +54,6 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     # to Google Classroom courses and rosters
     return redirect_to '/home?open=rosterDialog' if just_authorized_google_classroom?
     return connect_provider if should_connect_provider?
-
     if user
       sign_in_google_oauth2 user
     else
@@ -167,12 +163,7 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     # For some providers, signups can happen without ever having hit the sign_up page, where
     # our tracking data is usually populated, so do it here
     SignUpTracking.begin_sign_up_tracking(session)
-    SignUpTracking.log_oauth_callback provider, session
-
-    # Fiddle with data if it's a Powerschool request (other OpenID 2.0 providers might need similar treatment if we add any)
-    if provider == 'powerschool'
-      auth_hash = extract_powerschool_data(auth_hash)
-    end
+    SignUpTracking.log_oauth_callback provider, request
 
     # Microsoft formats email and name differently, so update it to match expected structure
     if provider == AuthenticationOption::MICROSOFT
@@ -183,7 +174,7 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
       auth_hash = inject_clever_data(auth_hash)
     end
 
-    user = User.from_omniauth(auth_hash, auth_params, session)
+    user = User.from_omniauth(auth_hash, auth_params, request)
 
     prepare_locale_cookie user
 
@@ -204,12 +195,12 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
         email: user.email
     else
       # This is a new registration
-      register_new_user user
+      register_new_user(user)
     end
   end
 
   private def sign_in_google_oauth2(user)
-    SignUpTracking.log_oauth_callback AuthenticationOption::GOOGLE, session
+    SignUpTracking.log_oauth_callback AuthenticationOption::GOOGLE, request
     prepare_locale_cookie user
 
     if allows_section_takeover user
@@ -224,7 +215,7 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     # For some providers, signups can happen without ever having hit the sign_up page, where
     # our tracking data is usually populated, so do it here
     SignUpTracking.begin_sign_up_tracking(session, split_test: true)
-    SignUpTracking.log_oauth_callback AuthenticationOption::GOOGLE, session
+    SignUpTracking.log_oauth_callback AuthenticationOption::GOOGLE, request
 
     user = User.new.tap do |u|
       User.initialize_new_oauth_user(u, auth_hash, auth_params)
@@ -233,7 +224,6 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
       u.oauth_refresh_token = auth_hash.credentials&.refresh_token
     end
     prepare_locale_cookie user
-
     if email_already_taken(user)
       return sign_in_user user if auth_already_exists(auth_hash)
       if allows_silent_takeover(user, auth_hash)
@@ -242,12 +232,12 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
       end
       return redirect_to users_existing_account_path({provider: auth_hash.provider, email: user.email})
     else
-      register_new_user user
+      register_new_user(user)
     end
   end
 
   private def sign_in_clever(user)
-    SignUpTracking.log_oauth_callback AuthenticationOption::CLEVER, session
+    SignUpTracking.log_oauth_callback AuthenticationOption::CLEVER, request
     prepare_locale_cookie user
     user.update_oauth_credential_tokens auth_hash
     sign_in_user user
@@ -260,10 +250,10 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     # our tracking data is usually populated, so do it here
     # Clever performed poorly in our split test, so never send it to the experiment
     SignUpTracking.begin_sign_up_tracking(session, split_test: false)
-    SignUpTracking.log_oauth_callback AuthenticationOption::CLEVER, session
+    SignUpTracking.log_oauth_callback AuthenticationOption::CLEVER, request
 
     auth_hash = inject_clever_data(auth_hash())
-    user = User.from_omniauth(auth_hash, auth_params, session)
+    user = User.from_omniauth(auth_hash, auth_params, request)
     prepare_locale_cookie user
 
     # if the registration credentials identify us as an existing user, simply
@@ -278,7 +268,7 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     return redirect_to users_existing_account_path({provider: auth_hash.provider, email: user.email}) if existing_account
 
     # otherwise, this is a new registration
-    register_new_user user
+    register_new_user(user)
   end
 
   private def find_user_by_credential
@@ -321,24 +311,20 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     @form_data = {
       email: user.email
     }
-
-    render 'omniauth/redirect', {layout: false}
+    new_sign_up_url = determine_sign_up_url(user)
+    render 'omniauth/redirect', layout: false, locals: {new_sign_up_url: new_sign_up_url}
   end
 
-  private def extract_powerschool_data(auth)
-    # OpenID 2.0 data comes back in a different format compared to most of our other oauth data.
-    args = JSON.parse(auth.extra.response.message.to_json)['args']
-    powerschool_data = OmniAuth::AuthHash.new(
-      user_type: args["[\"http://openid.net/srv/ax/1.0\", \"value.ext0\"]"],
-      email: args["[\"http://openid.net/srv/ax/1.0\", \"value.ext1\"]"],
-      name: {
-        first: args["[\"http://openid.net/srv/ax/1.0\", \"value.ext2\"]"],
-        last: args["[\"http://openid.net/srv/ax/1.0\", \"value.ext3\"]"],
-      }
-    )
-
-    auth.info.merge!(powerschool_data)
-    auth
+  private def determine_sign_up_url(user)
+    user_type = cookies['new_sign_up_user_type']
+    cookies.delete('new_sign_up_user_type')
+    if user_type == 'student'
+      return users_new_sign_up_finish_student_account_path
+    elsif user_type == 'teacher'
+      return users_new_sign_up_finish_teacher_account_path
+    end
+    # We are in the old sign up flow -> redirect to old finish_sign_up page
+    return ''
   end
 
   private def extract_microsoft_data(auth)
@@ -435,7 +421,7 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
     begin
       if lookup_user.migrated?
-        ao = AuthenticationOption.create!(
+        AuthenticationOption.create!(
           user: lookup_user,
           email: lookup_email,
           credential_type: provider,
@@ -446,15 +432,6 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
             oauth_refresh_token: auth_hash.credentials&.refresh_token
           }.to_json
         )
-
-        # If the user is now logging in through microsoft_v2_auth and has an existing
-        # windowslive AuthenticationOption, we want to delete windowslive since that is
-        # deprecated in favor of microsoft_v2_auth.
-        windowslive_auth_option = lookup_user.authentication_options.find {|auth_option| auth_option.credential_type == AuthenticationOption::WINDOWS_LIVE}
-        if windowslive_auth_option.present? && provider == AuthenticationOption::MICROSOFT
-          lookup_user.update!(primary_contact_info: ao) if windowslive_auth_option.primary?
-          windowslive_auth_option.destroy!
-        end
       else
         lookup_user.update!(
           email: lookup_email,
@@ -490,7 +467,7 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     flash.notice = I18n.t('auth.signed_in')
 
     # Will only log if the sign_up page session cookie is set, so this is safe to call in all cases
-    SignUpTracking.log_sign_in(user, session, request)
+    SignUpTracking.log_sign_in(user, request)
 
     sign_in_and_redirect user
   end

@@ -33,11 +33,11 @@ require 'cdo/shared_constants'
 require 'cdo/shared_constants/curriculum/shared_course_constants'
 require 'ruby-progressbar'
 
-TEXT_RESPONSE_TYPES = [TextMatch, FreeResponse]
-
 # A sequence of Levels
 class Unit < ApplicationRecord
   self.table_name = 'scripts'
+
+  TEXT_RESPONSE_TYPES = [TextMatch, FreeResponse]
 
   include ScriptConstants
   include Curriculum::SharedCourseConstants
@@ -292,6 +292,10 @@ class Unit < ApplicationRecord
   #   all /s, /lessons and /levels page in that unit to our "This course is deprecated" page.
   #   We don't use published_state here because some courses in the deprecated published state
   #   are not ready to be redirected. In the future we should unify these two states.
+  # content_area - field to categorize the bigger curriculum umbrella to which this unit belongs
+  #   for example, k-5, 6-12, pl, etc.
+  # topic_tags - a collection of tags that help classify the unit based on the content. A unit can
+  #   have multiple topic tags associated with it. For example, AI, Maker
   serialized_attrs %w(
     hideable_lessons
     professional_learning_course
@@ -320,6 +324,8 @@ class Unit < ApplicationRecord
     seeded_from
     use_legacy_lesson_plans
     is_deprecated
+    content_area
+    topic_tags
   )
 
   def self.twenty_hour_unit
@@ -826,7 +832,7 @@ class Unit < ApplicationRecord
   end
 
   def in_initiative?(initiative)
-    return cached&.course_version&.course_offering&.marketing_initiative == initiative
+    return cached&.get_course_version&.course_offering&.marketing_initiative == initiative
   end
 
   # Legacy levels have different video and title logic in LevelsHelper.
@@ -909,29 +915,37 @@ class Unit < ApplicationRecord
   end
 
   def csf?
-    under_curriculum_umbrella?('CSF')
+    under_curriculum_umbrella?(Curriculum::SharedCourseConstants::CURRICULUM_UMBRELLA.CSF)
   end
 
   def csd?
-    under_curriculum_umbrella?('CSD')
+    under_curriculum_umbrella?(Curriculum::SharedCourseConstants::CURRICULUM_UMBRELLA.CSD)
   end
 
   def csp?
-    under_curriculum_umbrella?('CSP')
+    under_curriculum_umbrella?(Curriculum::SharedCourseConstants::CURRICULUM_UMBRELLA.CSP)
   end
 
   def csa?
-    under_curriculum_umbrella?('CSA')
+    under_curriculum_umbrella?(Curriculum::SharedCourseConstants::CURRICULUM_UMBRELLA.CSA)
   end
 
   def csc?
     in_initiative?('CSC')
   end
 
+  def foundations_of_cs?
+    under_curriculum_umbrella?(Curriculum::SharedCourseConstants::CURRICULUM_UMBRELLA.foundations_of_cs)
+  end
+
+  def foundations_of_programming?
+    under_curriculum_umbrella?(Curriculum::SharedCourseConstants::CURRICULUM_UMBRELLA.foundations_of_programming)
+  end
+
   # TODO: (Dani) Update to use new course types framework.
   # Currently this grouping is used to determine whether the script should have # a custom end-of-lesson experience.
   def middle_high?
-    csd? || csp? || csa?
+    csd? || csp? || csa? || foundations_of_cs? || foundations_of_programming?
   end
 
   def requires_verified_instructor?
@@ -1562,7 +1576,7 @@ class Unit < ApplicationRecord
         project_sharing: project_sharing,
         curriculum_umbrella: curriculum_umbrella,
         family_name: family_name,
-        version_year: version_year,
+        version_year: unit_group&.version_year || version_year,
         assigned_section_id: assigned_section_id,
         hasStandards: has_standards_associations?,
         tts: tts?,
@@ -1579,7 +1593,10 @@ class Unit < ApplicationRecord
         scriptOverviewPdfUrl: get_unit_overview_pdf_url,
         scriptResourcesPdfUrl: get_unit_resources_pdf_url,
         updated_at: updated_at.to_s,
-        isPlCourse: pl_course?
+        isPlCourse: pl_course?,
+        showAiAssessmentsAnnouncement: show_ai_assessments_announcement?(user),
+        content_area: content_area,
+        topic_tags: topic_tags,
       }
 
       #TODO: lessons should be summarized through lesson groups in the future
@@ -1595,6 +1612,26 @@ class Unit < ApplicationRecord
 
   def unit_without_lesson_plans?
     lessons.none?(&:has_lesson_plan)
+  end
+
+  def summarize_for_lesson_materials_view(user)
+    summary = {
+      unitId: id,
+      title: title_for_display,
+      name: name,
+      unitNumber: unit_number,
+      unitName: title_for_display,
+      scriptOverviewPdfUrl: get_unit_overview_pdf_url,
+      scriptResourcesPdfUrl: get_unit_resources_pdf_url,
+      teacher_resources: resources.sort_by(&:name).map(&:summarize_for_resources_dropdown),
+      student_resources: student_resources.sort_by(&:name).map(&:summarize_for_resources_dropdown),
+      hasNumberedUnits: unit_group&.has_numbered_units?,
+      versionYear: unit_group&.version_year || version_year,
+    }
+    # Only get lessons with lesson plans
+    summary[:lessons] = lessons.map {|lesson| lesson.summarize_for_lesson_materials(user)}
+
+    summary
   end
 
   def summarize_for_rollup(user = nil)
@@ -1741,6 +1778,10 @@ class Unit < ApplicationRecord
     )
   end
 
+  def unit_number
+    unit_group_units&.first&.position
+  end
+
   def title_for_display
     title = localized_title
     has_prefix = unit_group&.has_numbered_units
@@ -1814,6 +1855,8 @@ class Unit < ApplicationRecord
       :editor_experiment,
       :curriculum_umbrella,
       :weekly_instructional_minutes,
+      :content_area,
+      :topic_tags
     ]
     boolean_keys = [
       :has_verified_resources,
@@ -1941,6 +1984,10 @@ class Unit < ApplicationRecord
     locales = supported_locales || []
     locales += ['en-US'] unless locales.include? 'en-US'
     locales.sort
+  end
+
+  def supported_locale?(locale)
+    supported_locale_codes.include?(locale.to_s)
   end
 
   def supported_locale_names
@@ -2097,6 +2144,17 @@ class Unit < ApplicationRecord
   # send students on the last level of a lesson to the unit overview page.
   def show_unit_overview_between_lessons?
     middle_high? || ['vpl-csd-summer-pilot'].include?(get_course_version&.course_offering&.key)
+  end
+
+  def ai_assessment_enabled?
+    lessons.any? do |lesson|
+      lesson.rubric&.learning_goals&.any?(&:ai_enabled?)
+    end
+  end
+
+  def show_ai_assessments_announcement?(user)
+    # limit to CSD to avoid showing on allthethings
+    user&.teacher? && in_initiative?('CSD') && ai_assessment_enabled? && !user.has_seen_ai_assessments_announcement?
   end
 
   private def teacher_feedback_enabled?

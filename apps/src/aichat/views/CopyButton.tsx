@@ -2,16 +2,17 @@ import React from 'react';
 import {useSelector} from 'react-redux';
 
 import {
-  selectAllVisibleMessages,
   addChatEvent,
+  selectAllVisibleMessages,
+  sendAnalytics,
 } from '@cdo/apps/aichat/redux/aichatRedux';
 import Button from '@cdo/apps/componentLibrary/button/Button';
-import {EVENTS, PLATFORMS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import copyToClipboard from '@cdo/apps/util/copyToClipboard';
 import {useAppDispatch} from '@cdo/apps/util/reduxHooks';
 import {AiInteractionStatus as Status} from '@cdo/generated-scripts/sharedConstants';
 
+import aichatI18n from '../locale';
 import {timestampToDateTime} from '../redux/utils';
 import {
   ChatEvent,
@@ -22,7 +23,9 @@ import {
 
 import {AI_CUSTOMIZATIONS_LABELS} from './modelCustomization/constants';
 
-const CopyButton: React.FunctionComponent = () => {
+const CopyButton: React.FunctionComponent<{isDisabled: boolean}> = ({
+  isDisabled,
+}) => {
   const messages = useSelector(selectAllVisibleMessages);
   const dispatch = useAppDispatch();
 
@@ -30,18 +33,17 @@ const CopyButton: React.FunctionComponent = () => {
     const textToCopy = messages.map(chatEventToFormattedString).join('\n');
     copyToClipboard(
       textToCopy,
-      () => alert('Text copied to clipboard'),
+      () => alert(aichatI18n.copyToClipboardAlert()),
       () => {
         console.error('Error in copying text');
       }
     );
-    analyticsReporter.sendEvent(
-      EVENTS.CHAT_ACTION,
-      {
+    dispatch(
+      sendAnalytics(EVENTS.CHAT_ACTION, {
         action: 'Copy chat history',
-      },
-      PLATFORMS.BOTH
+      })
     );
+
     dispatch(
       addChatEvent({
         timestamp: Date.now(),
@@ -54,11 +56,12 @@ const CopyButton: React.FunctionComponent = () => {
   return (
     <Button
       onClick={handleCopy}
-      text="Copy chat"
+      text={aichatI18n.copyChatButtonText()}
       iconLeft={{iconName: 'clipboard'}}
       size="s"
       color="gray"
       type="secondary"
+      disabled={isDisabled}
     />
   );
 };
@@ -68,19 +71,23 @@ function chatEventToFormattedString(chatEvent: ChatEvent) {
   if (isChatMessage(chatEvent)) {
     return `[${formattedTimestamp} - ${chatEvent.role}] ${
       chatEvent.status === Status.PROFANITY_VIOLATION
-        ? '[FLAGGED AS PROFANITY]'
+        ? aichatI18n.copyChatContainsProfanity()
         : chatEvent.chatMessageText
     }`;
   }
 
   if (isModelUpdate(chatEvent)) {
-    return `[${formattedTimestamp} - Model Update] ${
-      AI_CUSTOMIZATIONS_LABELS[chatEvent.updatedField]
-    } updated.`;
+    return aichatI18n.copyChatFormatting_modelUpdate({
+      timestamp: formattedTimestamp,
+      updatedFieldLabel: AI_CUSTOMIZATIONS_LABELS[chatEvent.updatedField],
+    });
   }
 
   if (isNotification(chatEvent)) {
-    return `[${formattedTimestamp} - Notification] ${chatEvent.text}`;
+    return aichatI18n.copyChatFormatting_notification({
+      timestamp: formattedTimestamp,
+      chatEventText: chatEvent.text,
+    });
   }
 }
 

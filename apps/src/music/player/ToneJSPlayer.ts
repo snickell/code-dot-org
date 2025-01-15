@@ -21,7 +21,6 @@ import {SoundLoadCallbacks} from '../types';
 import {Effects} from './interfaces/Effects';
 import SoundCache from './SoundCache';
 import {
-  AudioPlayer,
   InstrumentData,
   PlayerEvent,
   SampleEvent,
@@ -32,17 +31,18 @@ import {generateEffectsKeyString} from './utils';
 const EMPTY_EFFECTS_KEY = '';
 
 /**
- * An {@link AudioPlayer} implementation using the Tone.js library.
+ * A player implementation using the Tone.js library.
  *
  * TODO:
  * - Sample sequences
  */
-class ToneJSPlayer implements AudioPlayer {
+class ToneJSPlayer {
   private samplers: {[instrument: string]: {[effectsKey: string]: Sampler}};
+  private previewSamplers: {[instrument: string]: Sampler};
   private activePlayers: Source<SourceOptions>[];
   private currentPreview: {
     url: string;
-    player: Source<SourceOptions>;
+    player?: Source<SourceOptions>;
   } | null;
   private effectBusses: {[key: string]: ToneAudioNode};
   private registeredCallbacks: {
@@ -59,16 +59,13 @@ class ToneJSPlayer implements AudioPlayer {
     Transport.bpm.value = bpm;
     this.activePlayers = [];
     this.samplers = {};
+    this.previewSamplers = {};
     this.currentPreview = null;
     this.effectBusses = {};
     this.registeredCallbacks = {};
     this.loadingInstruments = {};
     this.currentSequencePreviewTimer = null;
     this.generateEffectBusses();
-  }
-
-  supportsSamplers(): boolean {
-    return true;
   }
 
   getCurrentPlaybackPosition(): number {
@@ -142,6 +139,8 @@ class ToneJSPlayer implements AudioPlayer {
     }
 
     this.samplers[instrumentName] = effectsSamplers;
+    // Create a separate sampler without effects for previews
+    this.previewSamplers[instrumentName] = new Sampler(urls).toDestination();
     for (const callback of this.registeredCallbacks['InstrumentLoaded'] || []) {
       callback(instrumentName);
     }
@@ -160,11 +159,20 @@ class ToneJSPlayer implements AudioPlayer {
     await this.startContextIfNeeded();
     this.cancelPreviews();
 
+    this.currentPreview = {url: sample.sampleUrl};
+
     const buffer = await this.soundCache.loadSound(sample.sampleUrl);
     if (!buffer) {
       this.metricsReporter.logWarning(
         'Could not load sound which should have been in cache: ' +
           sample.sampleUrl
+      );
+      return;
+    }
+
+    if (this.currentPreview?.url !== sample.sampleUrl) {
+      console.log(
+        `Sample preview ${sample.sampleUrl} playback canceled after load but before play.`
       );
       return;
     }
@@ -190,7 +198,7 @@ class ToneJSPlayer implements AudioPlayer {
     };
 
     player.start();
-    this.currentPreview = {url: sample.sampleUrl, player};
+    this.currentPreview.player = player;
   }
 
   async playSamplesImmediately() {
@@ -206,7 +214,7 @@ class ToneJSPlayer implements AudioPlayer {
     onStop?: () => void
   ) {
     this.cancelPreviews();
-    if (this.samplers[instrument] === undefined) {
+    if (this.previewSamplers[instrument] === undefined) {
       this.metricsReporter.logError(`Instrument not loaded: ${instrument}`);
       return;
     }
@@ -218,11 +226,9 @@ class ToneJSPlayer implements AudioPlayer {
         this.playbackTimeToTransportTime(playbackPosition)
       );
       lastSampleStart = Math.max(lastSampleStart, offsetSeconds);
-      this.samplers[instrument][EMPTY_EFFECTS_KEY].unsync().triggerAttack(
-        notes,
-        `+${offsetSeconds}`,
-        1
-      );
+      this.previewSamplers[instrument]
+        .unsync()
+        .triggerAttack(notes, `+${offsetSeconds}`, 1);
     });
 
     // Play every tick (quarter note) of the sequence.
@@ -240,16 +246,19 @@ class ToneJSPlayer implements AudioPlayer {
   }
 
   cancelPreviews() {
-    if (this.currentPreview) {
-      this.currentPreview.player.stop();
-    }
+    this.currentPreview?.player?.stop();
 
     if (this.currentSequencePreviewTimer) {
       clearInterval(this.currentSequencePreviewTimer);
       this.currentSequencePreviewTimer = null;
     }
 
-    this.stopAllSamplers();
+    this.currentPreview = null;
+
+    // Release all preview samplers
+    Object.values(this.previewSamplers).forEach(sampler =>
+      sampler.releaseAll()
+    );
   }
 
   setBpm(bpm: number) {

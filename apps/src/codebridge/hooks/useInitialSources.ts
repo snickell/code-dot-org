@@ -1,4 +1,7 @@
-import {useMemo} from 'react';
+import {getNextFileId} from '@codebridge/codebridgeContext';
+import {DEFAULT_FOLDER_ID} from '@codebridge/constants';
+import {combineStartSourcesAndValidation} from '@codebridge/utils';
+import {useCallback, useMemo} from 'react';
 
 import {START_SOURCES} from '@cdo/apps/lab2/constants';
 import {
@@ -6,7 +9,11 @@ import {
   getAppOptionsEditingExemplar,
   getAppOptionsViewingExemplar,
 } from '@cdo/apps/lab2/projects/utils';
-import {ProjectSources} from '@cdo/apps/lab2/types';
+import {
+  MultiFileSource,
+  ProjectFileType,
+  ProjectSources,
+} from '@cdo/apps/lab2/types';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 /**
@@ -26,33 +33,91 @@ import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 export const useInitialSources = (defaultSources: ProjectSources) => {
   const labInitialSources = useAppSelector(state => state.lab.initialSources);
-  const levelStartSource = useAppSelector(
+  const levelSource = useAppSelector(
     state => state.lab.levelProperties?.startSources
   );
-  const levelTemplateSource = useAppSelector(
+  const templateSource = useAppSelector(
     state => state.lab.levelProperties?.templateSources
   );
 
   const exemplarSources = useAppSelector(
     state => state.lab.levelProperties?.exemplarSources
   );
-  // We memoize these objects so that they don't cause an unexpected re-render.
-  const projectStartSource: ProjectSources | undefined = useMemo(
-    () => (levelStartSource ? {source: levelStartSource} : undefined),
-    [levelStartSource]
+  const validationFile = useAppSelector(
+    state => state.lab.levelProperties?.validationFile
   );
-  const templateStartSource: ProjectSources | undefined = useMemo(
-    () => (levelTemplateSource ? {source: levelTemplateSource} : undefined),
-    [levelTemplateSource]
+  const isStartMode = getAppOptionsEditBlocks() === START_SOURCES;
+  const serializedMaze = useAppSelector(
+    state => state.lab.levelProperties?.serializedMaze
+  );
+  const miniApp = useAppSelector(state => state.lab.levelProperties?.miniApp);
+
+  const generateProjectSourceFromStartSource = useCallback(
+    (startCode: MultiFileSource) => {
+      // If we have a serialized maze, we need to add it to the project sources so
+      // it is accessible when running/sharing/remixing the code. We save it as a
+      // system support file.
+      if (serializedMaze) {
+        const mazeFileId = getNextFileId(Object.values(startCode.files));
+        const mazeFile = {
+          id: mazeFileId,
+          name: 'serialized_maze.txt',
+          contents: JSON.stringify(serializedMaze),
+          type: ProjectFileType.SYSTEM_SUPPORT,
+          language: 'txt',
+          folderId: DEFAULT_FOLDER_ID,
+        };
+        startCode = {
+          ...startCode,
+          files: {
+            ...startCode.files,
+            [mazeFileId]: mazeFile,
+          },
+        };
+      }
+
+      const source = isStartMode
+        ? combineStartSourcesAndValidation(startCode, validationFile)
+        : startCode;
+
+      const labConfig = miniApp ? {miniApp: {name: miniApp}} : undefined;
+
+      return {source, labConfig};
+    },
+    [isStartMode, miniApp, serializedMaze, validationFile]
   );
 
-  const isStartMode = getAppOptionsEditBlocks() === START_SOURCES;
+  // We memoize these objects so that they don't cause an unexpected re-render.
+  const levelStartSources: ProjectSources | undefined = useMemo(
+    () =>
+      levelSource
+        ? generateProjectSourceFromStartSource(levelSource)
+        : undefined,
+    [levelSource, generateProjectSourceFromStartSource]
+  );
+
+  const templateStartSources: ProjectSources | undefined = useMemo(
+    () =>
+      templateSource
+        ? generateProjectSourceFromStartSource(templateSource)
+        : undefined,
+    [generateProjectSourceFromStartSource, templateSource]
+  );
+
+  const parsedDefaultSources = useMemo(
+    () =>
+      generateProjectSourceFromStartSource(
+        defaultSources.source as MultiFileSource
+      ),
+    [defaultSources, generateProjectSourceFromStartSource]
+  );
+
   const isEditingExemplar = getAppOptionsEditingExemplar();
   const isViewingExemplar = getAppOptionsViewingExemplar();
 
   const initialSources = useMemo(() => {
-    const startSources = projectStartSource || defaultSources;
-    const templateSources = templateStartSource;
+    const startSources = levelStartSources || parsedDefaultSources;
+    const templateSources = templateStartSources;
 
     if (isStartMode) {
       return startSources;
@@ -69,9 +134,9 @@ export const useInitialSources = (defaultSources: ProjectSources) => {
     const projectSources = labInitialSources;
     return projectSources || templateSources || startSources;
   }, [
-    projectStartSource,
-    templateStartSource,
-    defaultSources,
+    levelStartSources,
+    parsedDefaultSources,
+    templateStartSources,
     isStartMode,
     isEditingExemplar,
     isViewingExemplar,
@@ -79,5 +144,10 @@ export const useInitialSources = (defaultSources: ProjectSources) => {
     exemplarSources,
   ]);
 
-  return initialSources;
+  return {
+    initialSources,
+    levelStartSources,
+    templateStartSources,
+    parsedDefaultSources,
+  };
 };

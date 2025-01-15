@@ -6,9 +6,6 @@ class SessionsControllerTest < ActionController::TestCase
 
   setup do
     @request.env["devise.mapping"] = Devise.mappings[:user]
-    Cpa.stubs(:cpa_experience).
-      with(any_parameters).
-      returns(Cpa::NEW_USER_LOCKOUT)
   end
 
   test 'login error derives locale from cdo.locale' do
@@ -171,15 +168,6 @@ class SessionsControllerTest < ActionController::TestCase
     assert_redirected_to '/oauth_sign_out/migrated'
   end
 
-  test "microsoft account users go to generic oauth sign out page after logging out" do
-    student = create(:student, provider: :windowslive)
-    sign_in student
-
-    delete :destroy
-
-    assert_redirected_to '/oauth_sign_out/migrated'
-  end
-
   test "oauth sign out page for facebook" do
     get :oauth_sign_out, params: {provider: 'facebook'}
     assert_select 'a[href="https://www.facebook.com/logout.php"]'
@@ -190,12 +178,6 @@ class SessionsControllerTest < ActionController::TestCase
     get :oauth_sign_out, params: {provider: 'google_oauth2'}
     assert_select 'a[href="https://accounts.google.com/logout"]'
     assert_select 'h4', 'You used Google to sign in. Click here to sign out of Google.'
-  end
-
-  test "oauth sign out page for microsoft account" do
-    get :oauth_sign_out, params: {provider: 'windowslive'}
-    assert_select 'a[href="http://login.live.com/logout.srf"]'
-    assert_select 'h4', 'You used Microsoft to sign in. Click here to sign out of Microsoft.'
   end
 
   test "deleted user cannot sign in" do

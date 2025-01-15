@@ -2,6 +2,7 @@ import classnames from 'classnames';
 import React from 'react';
 
 import {Heading5} from '@cdo/apps/componentLibrary/typography';
+import taImage from '@cdo/apps/templates/rubrics/images/ai-teaching-assistant-assign.png';
 
 import moduleStyles from './sections-refresh.module.scss';
 
@@ -78,6 +79,13 @@ function renderOfferings(
       >
         {course.display_name}
       </label>
+      {course.ai_teaching_assistant_available && (
+        <img
+          src={taImage}
+          className={moduleStyles.taImage}
+          alt="AI Teaching Assistant available"
+        />
+      )}
     </div>
   ));
 }
@@ -124,7 +132,7 @@ function updateSectionCourse(updateCourse, course) {
     courseOfferingId: course.id,
     versionId: courseVersionId,
     unitId: null,
-    hasLessonExtras: hasLessonExtras,
-    hasTextToSpeech: hasTextToSpeech,
+    lessonExtrasAvailable: hasLessonExtras,
+    textToSpeechEnabled: hasTextToSpeech,
   });
 }

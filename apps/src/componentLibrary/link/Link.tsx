@@ -1,11 +1,11 @@
 import classNames from 'classnames';
-import React from 'react';
+import React, {HTMLAttributes} from 'react';
 
 import {ComponentSizeXSToL} from '@cdo/apps/componentLibrary/common/types';
 
 import moduleStyles from './link.module.scss';
 
-type LinkBaseProps = {
+export interface LinkBaseProps extends HTMLAttributes<HTMLAnchorElement> {
   /** Link id */
   id?: string;
   /** Custom class name */
@@ -15,7 +15,7 @@ type LinkBaseProps = {
   /** Should the link open in a new tab? */
   openInNewTab?: boolean;
   /** Link destination */
-  href: string;
+  href?: string;
   /** Is the link disabled? */
   disabled?: boolean;
   /** Callback for click event */
@@ -26,15 +26,15 @@ type LinkBaseProps = {
   type?: 'primary' | 'secondary';
   /** Role of link */
   role?: string;
-};
+}
 
-type LinkWithChildren = LinkBaseProps & {
+export type LinkWithChildren = LinkBaseProps & {
   /** Link content */
   children: React.ReactNode;
   text?: never;
 };
 
-type LinkWithText = LinkBaseProps & {
+export type LinkWithText = LinkBaseProps & {
   /** Link text content */
   text: string;
   children?: never;
@@ -47,7 +47,7 @@ export type LinkProps = LinkWithChildren | LinkWithText;
  * * (✔) implementation of component approved by design team;
  * * (✔) has storybook, covered with stories and documentation;
  * * (✔) has tests: test every prop, every state and every interaction that's js related;
- * * (see apps/test/unit/componentLibrary/LinkTest.jsx)
+ * * (see apps/test/unit/componentLibrary/LinkTest.tsx)
  * * (?) passes accessibility checks;
  *
  * ###  Status: ```Ready for dev```
@@ -69,26 +69,26 @@ const Link: React.FunctionComponent<LinkProps> = ({
   size = 'm',
   type = 'primary',
   role,
-}) => {
-  return (
-    <a
-      className={classNames(
-        moduleStyles.link,
-        moduleStyles[`link-${type}`],
-        moduleStyles[`link-${size}`],
-        className
-      )}
-      href={!disabled ? href : undefined}
-      id={id}
-      onClick={!disabled ? onClick : undefined}
-      rel={openInNewTab || external ? 'noopener noreferrer' : undefined}
-      target={(openInNewTab || undefined) && '_blank'}
-      role={role}
-      {...(disabled ? {'aria-disabled': true} : {})}
-    >
-      {text || children}
-    </a>
-  );
-};
+  ...HTMLAttributes
+}) => (
+  <a
+    className={classNames(
+      moduleStyles.link,
+      moduleStyles[`link-${type}`],
+      moduleStyles[`link-${size}`],
+      className
+    )}
+    href={!disabled ? href : undefined}
+    id={id}
+    onClick={!disabled ? onClick : undefined}
+    rel={openInNewTab || external ? 'noopener noreferrer' : undefined}
+    target={(openInNewTab || undefined) && '_blank'}
+    role={role}
+    {...(disabled ? {'aria-disabled': true} : {})}
+    {...HTMLAttributes}
+  >
+    {text || children}
+  </a>
+);
 
 export default Link;

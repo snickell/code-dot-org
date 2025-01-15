@@ -1,43 +1,41 @@
+import {useCodebridgeContext} from '@codebridge/codebridgeContext';
+import CodebridgeRegistry from '@codebridge/CodebridgeRegistry';
+import {sendCodebridgeAnalyticsEvent} from '@codebridge/utils/analyticsReporterHelper';
 import classNames from 'classnames';
-import React, {useCallback, useContext} from 'react';
+import React, {useContext, useEffect, useMemo, useRef} from 'react';
 import {useSelector} from 'react-redux';
 
-import {
-  navigateToNextLevel,
-  sendSubmitReport,
-} from '@cdo/apps/code-studio/progressRedux';
+import InstructorsOnly from '@cdo/apps/code-studio/components/InstructorsOnly';
+import {sendSubmitReport} from '@cdo/apps/code-studio/progressRedux';
 import {
   getCurrentLevel,
   nextLevelId,
 } from '@cdo/apps/code-studio/progressReduxSelectors';
-import {queryParams} from '@cdo/apps/code-studio/utils';
 import codebridgeI18n from '@cdo/apps/codebridge/locale';
 import {Button} from '@cdo/apps/componentLibrary/button';
 import {FontAwesomeV6IconProps} from '@cdo/apps/componentLibrary/fontAwesomeV6Icon';
+import continueOrFinishLesson from '@cdo/apps/lab2/progress/continueOrFinishLesson';
 import {
   isPredictAnswerLocked,
   setPredictResponse,
 } from '@cdo/apps/lab2/redux/predictLevelRedux';
-import {setIsTesting} from '@cdo/apps/lab2/redux/systemRedux';
+import {setIsValidating} from '@cdo/apps/lab2/redux/systemRedux';
 import {MultiFileSource} from '@cdo/apps/lab2/types';
 import PredictQuestion from '@cdo/apps/lab2/views/components/PredictQuestion';
 import PredictSummary from '@cdo/apps/lab2/views/components/PredictSummary';
 import {DialogType, useDialogControl} from '@cdo/apps/lab2/views/dialogs';
 import {ThemeContext} from '@cdo/apps/lab2/views/ThemeWrapper';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import EnhancedSafeMarkdown from '@cdo/apps/templates/EnhancedSafeMarkdown';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 import {LevelStatus} from '@cdo/generated-scripts/sharedConstants';
 import commonI18n from '@cdo/locale';
 
-import {useCodebridgeContext} from '../codebridgeContext';
-import {appendSystemMessage} from '../redux/consoleRedux';
-
 import ValidationResults from './ValidationResults';
+import ValidationStatusIcon from './ValidationStatusIcon';
 
+import darkModeStyles from '@cdo/apps/lab2/styles/dark-mode.module.scss';
 import moduleStyles from '@codebridge/InfoPanel/styles/validated-instructions.module.scss';
-
-// By default we show the test and navigation buttons unless the URL parameter 'button-bar' is set.
-const SHOW_TEST_NAVIGATION_BUTTONS = !queryParams('button-bar');
 
 interface InstructionsProps {
   /** Additional callback to fire before navigating to the next level. */
@@ -77,7 +75,7 @@ const ValidatedInstructions: React.FunctionComponent<InstructionsProps> = ({
     state => state.lab.levelProperties?.longInstructions
   );
   const hasNextLevel = useSelector(state => nextLevelId(state) !== undefined);
-  const {hasConditions, satisfied} = useAppSelector(
+  const {hasConditions, validationResults, satisfied} = useAppSelector(
     state => state.lab.validationState
   );
   const predictSettings = useAppSelector(
@@ -97,28 +95,33 @@ const ValidatedInstructions: React.FunctionComponent<InstructionsProps> = ({
   ) as MultiFileSource | undefined;
 
   const appType = useAppSelector(state => state.lab.levelProperties?.appName);
-  const isTesting = useAppSelector(state => state.lab2System.isTesting);
-  const isLoadingEnvironment = useAppSelector(
-    state => state.lab2System.loadingCodeEnvironment
+  const isValidating = useAppSelector(state => state.lab2System.isValidating);
+  const hasLoadedEnvironment = useAppSelector(
+    state => state.lab2System.loadedCodeEnvironment
   );
+  const isRunning = useAppSelector(state => state.lab2System.isRunning);
+  const shouldValidateBeDisabled = !hasLoadedEnvironment || isRunning;
+
+  const currentLevel = useAppSelector(state => getCurrentLevel(state));
+  const hasEdited = useAppSelector(state => state.lab2Project.hasEdited);
+
+  // The icon in the validated instructions panel should match the icon in the
+  // header.
+  const passedStatuses = [
+    LevelStatus.perfect,
+    LevelStatus.submitted,
+    LevelStatus.passed,
+    LevelStatus.free_play_complete,
+    LevelStatus.completed_assessment,
+  ];
+  const hasPassed =
+    currentLevel && passedStatuses.includes(currentLevel.status);
 
   const dispatch = useAppDispatch();
 
   const {theme} = useContext(ThemeContext);
 
   const vertical = layout === 'vertical';
-
-  const onFinish = () => {
-    // no op for now
-    // Tracked here: https://codedotorg.atlassian.net/browse/CT-664
-  };
-
-  const onNextPanel = useCallback(() => {
-    if (beforeNextLevel) {
-      beforeNextLevel();
-    }
-    dispatch(navigateToNextLevel());
-  }, [dispatch, beforeNextLevel]);
 
   const onSubmit = () => {
     const dialogTitle = hasSubmitted
@@ -135,42 +138,58 @@ const ValidatedInstructions: React.FunctionComponent<InstructionsProps> = ({
     });
   };
 
-  const handleSubmit = () => {
-    dispatch(
-      sendSubmitReport({appType: appType || '', submitted: !hasSubmitted})
+  const handleSubmit = async () => {
+    // We either submit or unsubmit the project, depending on the current state.
+    const submit = !hasSubmitted;
+    await dispatch(
+      sendSubmitReport({appType: appType || '', submitted: submit})
     );
-    // Go to the next level if we have one and we just submitted.
-    if (hasNextLevel && !hasSubmitted) {
-      onNextPanel();
+    // If we just submitted, continue or finish the lesson.
+    if (submit) {
+      dispatch(continueOrFinishLesson());
     }
   };
 
-  const handleTest = () => {
+  const handleValidate = () => {
     if (onRun) {
-      dispatch(setIsTesting(true));
+      dispatch(setIsValidating(true));
+      sendCodebridgeAnalyticsEvent(EVENTS.CODEBRIDGE_VALIDATE_CLICK, appType);
       onRun(true, dispatch, source).finally(() =>
-        dispatch(setIsTesting(false))
+        dispatch(setIsValidating(false))
       );
     } else {
-      dispatch(appendSystemMessage(codebridgeI18n.cannotTest()));
+      CodebridgeRegistry.getInstance()
+        .getConsoleManager()
+        ?.writeSystemMessage(codebridgeI18n.cannotTest(), appType);
     }
   };
 
   const handleStop = () => {
     if (onStop) {
       onStop();
-      dispatch(setIsTesting(false));
+      dispatch(setIsValidating(false));
     } else {
-      dispatch(appendSystemMessage(codebridgeI18n.cannotStop()));
-      dispatch(setIsTesting(false));
+      CodebridgeRegistry.getInstance()
+        .getConsoleManager()
+        ?.writeSystemMessage(codebridgeI18n.cannotStop(), appType);
+      dispatch(setIsValidating(false));
     }
   };
 
-  // There are two ways to "meet validation" for a level:
-  // If the level has conditions, they must be satisfied.
-  // If the level has no conditions, the user must run their code at least once.
-  const hasMetValidation =
-    (!hasConditions && hasRun) || (hasConditions && satisfied);
+  // There are 3 ways to "meet validation" for a level:
+  // If the level is a predict level, the user must run the code.
+  // Otherwise, if the level has conditions, they must be satisfied.
+  // If the level has no conditions and is not a predict level,
+  // the user must run their code at least once.
+  const hasMetValidation = useMemo(() => {
+    if (predictSettings?.isPredictLevel) {
+      return hasRun;
+    } else if (hasConditions) {
+      return satisfied;
+    } else {
+      return hasRun && hasEdited;
+    }
+  }, [predictSettings, hasConditions, satisfied, hasRun, hasEdited]);
 
   /**
    * Returns the props for the navigation (continue/finish/submit/unsubmit)
@@ -184,13 +203,14 @@ const ValidatedInstructions: React.FunctionComponent<InstructionsProps> = ({
     const showSubmitButton =
       isSubmittable && (hasMetValidation || hasSubmitted);
 
+    // If this is not a submittable level, we show the continue/finish button
+    // if the user has met validation or has already passed the level (green bubble).
+    const showButton = !isSubmittable && (hasMetValidation || hasPassed);
     // We show the finish variant if there is not a next level.
-    const showFinishButton =
-      !isSubmittable && hasMetValidation && !hasNextLevel;
+    const showFinishButton = showButton && !hasNextLevel;
 
     // We show the continue variant if there is a next level.
-    const showContinueButton =
-      !isSubmittable && hasMetValidation && hasNextLevel;
+    const showContinueButton = showButton && hasNextLevel;
 
     const showNavigation =
       showContinueButton || showFinishButton || showSubmitButton || false;
@@ -208,7 +228,7 @@ const ValidatedInstructions: React.FunctionComponent<InstructionsProps> = ({
       return {
         showNavigation,
         navigationText: commonI18n.continue(),
-        handleNavigation: onNextPanel,
+        handleNavigation: () => dispatch(continueOrFinishLesson()),
         navigationIcon: {iconName: 'arrow-right', iconStyle: 'solid'},
       };
     } else {
@@ -216,51 +236,63 @@ const ValidatedInstructions: React.FunctionComponent<InstructionsProps> = ({
       return {
         showNavigation,
         navigationText: commonI18n.finish(),
-        handleNavigation: onFinish,
+        handleNavigation: () => dispatch(continueOrFinishLesson()),
       };
     }
   };
 
   // TODO: If we go with the test button in the instructions panel long-term,
   // we should refactor this to a separate component.
-  const renderTestButton = () => {
+  const renderValidationButton = () => {
     if (!hasConditions) {
       return null;
     }
-    return (
-      <div className={moduleStyles['bubble-' + theme]}>
-        {isTesting ? (
-          <Button
-            text={commonI18n.stopTests()}
-            onClick={handleStop}
-            color={'destructive'}
-            iconLeft={{iconStyle: 'solid', iconName: 'square'}}
-            className={moduleStyles.buttonInstruction}
-            size={'s'}
-          />
-        ) : (
-          <Button
-            text={commonI18n.test()}
-            onClick={() => handleTest()}
-            type={'secondary'}
-            disabled={isLoadingEnvironment}
-            iconLeft={{iconStyle: 'solid', iconName: 'flask'}}
-            className={moduleStyles.buttonInstruction}
-            color={'white'}
-            size={'s'}
-          />
+    return isValidating ? (
+      <Button
+        text={codebridgeI18n.stopValidation()}
+        onClick={handleStop}
+        color={'destructive'}
+        iconLeft={{iconStyle: 'solid', iconName: 'square'}}
+        className={classNames(
+          moduleStyles.buttonInstruction,
+          moduleStyles.validationButton
         )}
-      </div>
+        size={'s'}
+      />
+    ) : (
+      <Button
+        text={codebridgeI18n.validate()}
+        onClick={() => handleValidate()}
+        type={'secondary'}
+        disabled={shouldValidateBeDisabled}
+        iconLeft={{iconStyle: 'solid', iconName: 'clipboard-check'}}
+        className={classNames(
+          darkModeStyles.secondaryButton,
+          moduleStyles.buttonInstruction,
+          moduleStyles.validationButton
+        )}
+        color={'white'}
+        size={'s'}
+        id={'uitest-validate-button'}
+      />
     );
   };
 
   const {showNavigation, navigationText, navigationIcon, handleNavigation} =
     getNavigationButtonProps();
 
-  const validationIcon =
-    hasMetValidation || hasSubmitted
-      ? 'fa-solid fa-circle-check'
-      : 'fa-regular fa-circle';
+  const validationScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (validationResults) {
+      // We must at least set a timeout with a wait of 0 to ensure the scroll happens at all,
+      // because the DOM needs to update before we can scroll to the new element.
+      setTimeout(
+        () => validationScrollRef.current?.scrollIntoView({behavior: 'smooth'}),
+        0
+      );
+    }
+  }, [validationResults]);
 
   // Don't render anything if we don't have any instructions.
   if (instructionsText === undefined) {
@@ -284,30 +316,24 @@ const ValidatedInstructions: React.FunctionComponent<InstructionsProps> = ({
           vertical && moduleStyles.itemVertical
         )}
       >
-        {instructionsText && (
-          <div
-            key={instructionsText}
-            id="instructions-text"
-            className={classNames(
-              moduleStyles['bubble-' + theme],
-              moduleStyles.mainInstructions
-            )}
-          >
-            <div>
-              <i
-                className={classNames(
-                  validationIcon,
-                  moduleStyles.validationIcon
-                )}
-              />
-            </div>
-            <div>
-              {predictSettings?.isPredictLevel && <PredictSummary />}
-              <EnhancedSafeMarkdown
-                markdown={instructionsText}
-                className={moduleStyles.markdownText}
-                handleInstructionsTextClick={handleInstructionsTextClick}
-              />
+        <div className={moduleStyles.scrollingContent}>
+          {instructionsText && (
+            <div
+              key={instructionsText}
+              id="instructions-text"
+              className={classNames(moduleStyles['bubble-' + theme])}
+            >
+              <div className={moduleStyles.mainInstructions}>
+                <ValidationStatusIcon
+                  status={hasPassed ? 'passed' : 'pending'}
+                  className={moduleStyles.validationIcon}
+                />
+                <EnhancedSafeMarkdown
+                  markdown={instructionsText}
+                  className={moduleStyles.markdownText}
+                  handleInstructionsTextClick={handleInstructionsTextClick}
+                />
+              </div>
               <PredictQuestion
                 predictSettings={predictSettings}
                 predictResponse={predictResponse}
@@ -315,16 +341,35 @@ const ValidatedInstructions: React.FunctionComponent<InstructionsProps> = ({
                   dispatch(setPredictResponse(response))
                 }
                 predictAnswerLocked={predictAnswerLocked}
+                className={moduleStyles.predictQuestion}
               />
+              {renderValidationButton()}
             </div>
-          </div>
-        )}
-        {SHOW_TEST_NAVIGATION_BUTTONS && renderTestButton()}
-        <ValidationResults className={moduleStyles['bubble-' + theme]} />
-        {SHOW_TEST_NAVIGATION_BUTTONS && showNavigation && (
+          )}
+
+          {validationResults && (
+            <>
+              <div ref={validationScrollRef} />
+              <div className={classNames(moduleStyles['bubble-' + theme])}>
+                <ValidationResults />
+              </div>
+            </>
+          )}
+          {predictSettings?.isPredictLevel && (
+            <InstructorsOnly>
+              <div className={moduleStyles['bubble-' + theme]}>
+                <PredictSummary />
+              </div>
+            </InstructorsOnly>
+          )}
+        </div>
+        {showNavigation && (
           <div
             id="instructions-navigation"
-            className={moduleStyles['bubble-' + theme]}
+            className={classNames(
+              moduleStyles['bubble-' + theme],
+              moduleStyles.button
+            )}
           >
             <Button
               text={navigationText}
@@ -332,6 +377,7 @@ const ValidatedInstructions: React.FunctionComponent<InstructionsProps> = ({
               color={'white'}
               className={moduleStyles.buttonInstruction}
               iconLeft={navigationIcon}
+              size={'s'}
             />
           </div>
         )}

@@ -48,6 +48,7 @@ const nodeModulesToTranspile = [
   '@blockly/plugin-scroll-options',
   '@blockly/field-angle',
   '@blockly/field-bitmap',
+  '@blockly/field-colour',
   'blockly',
   '@code-dot-org/dance-party',
   '@code-dot-org/johnny-five',
@@ -579,6 +580,9 @@ function createWebpackConfig({
         ),
         PISKEL_DEVELOPMENT_MODE: JSON.stringify(piskelDevMode),
         DEBUG_MINIFIED: envConstants.DEBUG_MINIFIED || 0,
+        'process.env.STATSIG_LOCAL_MODE_OFF': JSON.stringify(
+          envConstants.STATSIG_LOCAL_MODE_OFF ?? ''
+        ),
       }),
       ...(process.env.ANALYZE_BUNDLE
         ? [

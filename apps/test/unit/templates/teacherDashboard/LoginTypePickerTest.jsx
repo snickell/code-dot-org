@@ -2,7 +2,7 @@ import {render, fireEvent, screen, within} from '@testing-library/react';
 import React from 'react';
 
 import {LmsLoginTypeNames} from '@cdo/apps/accounts/constants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {registerReducers, stubRedux, restoreRedux} from '@cdo/apps/redux';
 import commonReducers from '@cdo/apps/redux/commonReducers';
 import currentUser from '@cdo/apps/templates/currentUserRedux';
@@ -42,6 +42,7 @@ describe('LoginTypePicker', () => {
     const realSendEvent = analyticsReporter.sendEvent;
     analyticsReporter.sendEvent = jest.fn();
 
+    // eslint-disable-next-line no-restricted-properties
     const pictureLoginCard = container.querySelector('.uitest-pictureLogin');
     fireEvent.click(pictureLoginCard);
 
@@ -68,6 +69,7 @@ describe('LoginTypePicker', () => {
       />
     );
 
+    // eslint-disable-next-line no-restricted-properties
     const lmsCards = screen.getByTestId('lms-info-cards-container');
     expect(lmsCards.children).toHaveLength(4);
   });
@@ -87,6 +89,7 @@ describe('LoginTypePicker', () => {
       />
     );
 
+    // eslint-disable-next-line no-restricted-properties
     const lmsCards = screen.getByTestId('lms-info-cards-container');
     expect(lmsCards.children).toHaveLength(4);
   });
@@ -106,6 +109,7 @@ describe('LoginTypePicker', () => {
       />
     );
 
+    // eslint-disable-next-line no-restricted-properties
     const lmsCards = screen.getByTestId('lms-info-cards-container');
     expect(lmsCards.children).toHaveLength(3);
     expect(
@@ -128,6 +132,7 @@ describe('LoginTypePicker', () => {
       />
     );
 
+    // eslint-disable-next-line no-restricted-properties
     const lmsCards = screen.getByTestId('lms-info-cards-container');
     expect(lmsCards.children).toHaveLength(3);
     expect(within(lmsCards).queryByText(LmsLoginTypeNames.clever)).toBeNull();

@@ -104,7 +104,7 @@ FactoryBot.define do
 
   factory :user do
     birthday {Time.zone.today - 21.years}
-    email {("#{user_type}_#{SecureRandom.uuid}@code.org")}
+    email {"#{user_type}_#{SecureRandom.uuid}@code.org"}
     password {"00secret"}
     locale {'en-US'}
     sequence(:name) {|n| "User#{n} Codeberg"}
@@ -125,6 +125,9 @@ FactoryBot.define do
         google_sso_provider
         password {nil}
         after(:create) {|user| user.update(admin: true)}
+      end
+      trait :with_educator_role do
+        educator_role {SharedConstants::EDUCATOR_ROLES.first[:value]}
       end
       trait :with_school_info do
         school_info
@@ -280,6 +283,11 @@ FactoryBot.define do
       user_type {User::TYPE_STUDENT}
       birthday {Time.zone.today - 17.years}
 
+      trait :sponsored do
+        encrypted_password {nil}
+        provider {User::PROVIDER_SPONSORED}
+      end
+
       factory :young_student do
         birthday {Time.zone.today - 10.years}
 
@@ -345,6 +353,13 @@ FactoryBot.define do
           section = create :section, login_type: Section::LOGIN_TYPE_EMAIL
           create :follower, student_user: user, section: section
           user.reload
+        end
+      end
+
+      trait :in_google_section do
+        after(:create) do |user|
+          section = create :section, login_type: Section::LOGIN_TYPE_GOOGLE_CLASSROOM
+          section.add_student user
         end
       end
 
@@ -438,7 +453,7 @@ FactoryBot.define do
 
       factory :cpa_non_compliant_student, traits: [:U13, :in_colorado], aliases: %i[non_compliant_child] do
         trait :predates_policy do
-          created_at {Policies::ChildAccount.state_policies.dig('CO', :start_date).ago(1.second)}
+          created_at {Policies::ChildAccount::StatePolicies.state_policies.dig('CO', :start_date).ago(1.second)}
         end
 
         trait :in_grace_period do
@@ -457,7 +472,7 @@ FactoryBot.define do
     end
 
     # We have some tests which want to create student accounts which don't have any authentication setup.
-    # Using this will put the user into an invalid state.
+    # Using this will put the user into an invalid state unless they have another authentication option.
     trait :without_encrypted_password do
       after(:create) do |user|
         user.encrypted_password = nil
@@ -466,11 +481,24 @@ FactoryBot.define do
       end
     end
 
+    # The user factory creates an email authentication option by default. This trait will remove that option.
+    # For testing SSO users who have an email address but not an email authentication option.
+    trait :without_email_auth_option do
+      after(:create) do |user|
+        ao = user.authentication_options.find_by(credential_type: AuthenticationOption::EMAIL)
+        ao&.destroy
+        user.save
+      end
+    end
+
     trait :with_lti_auth do
       after(:create) do |user|
         user.lms_landing_opted_out = true
         user.authentication_options.destroy_all
-        lti_auth = create(:lti_authentication_option, user: user)
+        lti_user_id = create(:lti_user_identity, user: user)
+        user.lti_user_identities << lti_user_id
+        auth_id = lti_user_id.lti_integration.issuer + "|" + lti_user_id.lti_integration.client_id + "|" + lti_user_id.subject
+        lti_auth = create(:lti_authentication_option, user: user, authentication_id: auth_id)
         user.authentication_options << lti_auth
         user.lti_roster_sync_enabled = true
         user.save!
@@ -479,7 +507,7 @@ FactoryBot.define do
 
     trait :sso_provider do
       encrypted_password {nil}
-      provider {%w(facebook windowslive clever).sample}
+      provider {%w(facebook clever).sample}
       sequence(:uid) {|n| n}
     end
 
@@ -520,11 +548,6 @@ FactoryBot.define do
       provider {'microsoft_v2_auth'}
     end
 
-    trait :powerschool_sso_provider do
-      untrusted_email_sso_provider
-      provider {'powerschool'}
-    end
-
     trait :twitter_sso_provider do
       sso_provider
       provider {'twitter'}
@@ -533,11 +556,6 @@ FactoryBot.define do
     trait :qwiklabs_sso_provider do
       sso_provider
       provider {'lti_lti_prod_kids.qwikcamps.com'}
-    end
-
-    trait :windowslive_sso_provider do
-      sso_provider_with_token
-      provider {'windowslive'}
     end
 
     trait :with_facebook_authentication_option do
@@ -603,6 +621,12 @@ FactoryBot.define do
             oauth_token: 'some-clever-token'
           }.to_json
         )
+      end
+    end
+
+    trait :with_lti_authentication_option do
+      after(:create) do |user|
+        create(:lti_authentication_option, user: user)
       end
     end
 
@@ -1079,6 +1103,20 @@ FactoryBot.define do
       participant_audience {"teacher"}
       instructor_audience {"facilitator"}
     end
+
+    factory :foundations_of_cs_script do
+      after(:create) do |foundations_of_cs_script|
+        foundations_of_cs_script.curriculum_umbrella = Curriculum::SharedCourseConstants::CURRICULUM_UMBRELLA.foundations_of_cs
+        foundations_of_cs_script.save!
+      end
+    end
+
+    factory :foundations_of_programming_script do
+      after(:create) do |foundations_of_programming_script|
+        foundations_of_programming_script.curriculum_umbrella = Curriculum::SharedCourseConstants::CURRICULUM_UMBRELLA.foundations_of_programming
+        foundations_of_programming_script.save!
+      end
+    end
   end
 
   factory :project_storage do
@@ -1344,7 +1382,7 @@ FactoryBot.define do
   end
 
   factory :follower do
-    association :student_user, factory: :student
+    association :student_user, factory: %i[student sponsored]
 
     transient do
       section {nil}
@@ -1492,9 +1530,19 @@ FactoryBot.define do
 
   factory :school_info_non_us, class: SchoolInfo do
     country {'GB'}
-    school_type {SchoolInfo::SCHOOL_TYPE_PUBLIC}
-    full_address {'31 West Bank, London, England'}
     school_name {'Grazebrook'}
+  end
+
+  factory :school_info_us_non_nces, class: SchoolInfo do
+    country {'US'}
+    school_name {'Non NCES School'}
+    zip {'12345'}
+  end
+
+  factory :school_info_us_non_school_setting, class: SchoolInfo do
+    country {'US'}
+    school_type {SchoolInfo::SCHOOL_TYPE_NO_SCHOOL_SETTING}
+    zip {'12345'}
   end
 
   factory :school_info_us, class: SchoolInfo do
@@ -1621,7 +1669,7 @@ FactoryBot.define do
 
   factory :school_common, class: School do
     # school ids are not auto-assigned, so we have to assign one here
-    id {((School.maximum(:id) || 0).next).to_s}
+    id {(School.maximum(:id) || 0).next.to_s}
     address_line1 {"123 Sample St"}
     address_line2 {"attn: Main Office"}
     city {"Seattle"}
@@ -1819,8 +1867,6 @@ FactoryBot.define do
     association :teacher
   end
 
-  factory :donor_school
-
   factory :contact_rollups_raw do
     sequence(:email) {|n| "contact_#{n}@example.domain"}
     sequence(:sources) {|n| "dashboard.table_#{n}"}
@@ -1923,6 +1969,18 @@ FactoryBot.define do
   factory :rubric do
     association :lesson
     association :level
+
+    trait :with_learning_goals do
+      transient do
+        num_learning_goals {2}
+      end
+
+      after(:create) do |rubric, evaluator|
+        evaluator.num_learning_goals.times do
+          create :learning_goal, rubric: rubric
+        end
+      end
+    end
 
     trait :with_teacher_evaluations do
       transient do
@@ -2036,11 +2094,19 @@ FactoryBot.define do
 
   factory :aichat_request do
     association :user
-    model_customizations {{temperature: 0.5, retrievalContexts: ["test"], systemPrompt: "test"}.to_json}
+    model_customizations {{temperature: 0.5, retrievalContexts: ["test"], systemPrompt: "test", selectedModelId: "test"}.to_json}
     new_message {{chatMessageText: "hello", role: 'user', status: 'unknown', timestamp: Time.now.to_i}.to_json}
     stored_messages {[].to_json}
     level_id {1}
     script_id {1}
     project_id {1}
+  end
+
+  factory :aichat_thread do
+    association :user
+    external_id {"1234"}
+    llm_version {"dummy_llm"}
+    unit_id {1}
+    level_id {1}
   end
 end

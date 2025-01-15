@@ -7,8 +7,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 
-import {EVENTS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import color from '@cdo/apps/util/color';
 import copyToClipboard from '@cdo/apps/util/copyToClipboard';
 import msg from '@cdo/locale';
@@ -1623,10 +1623,6 @@ FeedbackUtils.prototype.hasExtraTopBlocks = function () {
     if (topBlocks[i].disabled) {
       continue;
     }
-    // Ignore top blocks which are functional definitions.
-    if (topBlocks[i].type === 'functional_definition') {
-      continue;
-    }
     // None of our top level blocks should have a previous or output connection
     // (they should only have a next)
     if (topBlocks[i].previousConnection || topBlocks[i].outputConnection) {
@@ -1854,7 +1850,6 @@ FeedbackUtils.prototype.hasUnusedParam_ = function () {
         return !self.hasMatchingDescendant_(userBlock, function (block) {
           return (
             (block.type === 'parameters_get' ||
-              block.type === 'functional_parameters_get' ||
               block.type === 'variables_get') &&
             block.getFieldValue('VAR') === paramName
           );

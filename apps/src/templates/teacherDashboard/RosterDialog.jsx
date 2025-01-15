@@ -3,8 +3,8 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 import {OAuthSectionTypes} from '@cdo/apps/accounts/constants';
-import {PLATFORMS} from '@cdo/apps/lib/util/AnalyticsConstants.js';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import {PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants.js';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import locale from '@cdo/locale';
 
 import RailsAuthenticityToken from '../../lib/util/RailsAuthenticityToken';
@@ -15,12 +15,14 @@ import {classroomShape, loadErrorShape} from './shapes';
 import {
   cancelImportRosterFlow,
   importOrUpdateRoster,
-  isRosterDialogOpen,
   rosterImportFailed,
 } from './teacherSectionsRedux';
+import {isRosterDialogOpen} from './teacherSectionsReduxSelectors';
 
 const COMPLETED_EVENT = 'Section Setup Completed';
 const CANCELLED_EVENT = 'Section Setup Cancelled';
+
+const ARCHIVED_STATE = 'ARCHIVED';
 
 const ctaButtonStyle = {
   background: color.orange,
@@ -48,6 +50,12 @@ const ClassroomList = ({classrooms, onSelect, selectedId, rosterProvider}) =>
           {classroom.name}
           {classroom.section && (
             <span style={{color: '#aaa'}}> ({classroom.section})</span>
+          )}
+          {classroom.course_state === ARCHIVED_STATE && (
+            <span id="course-state" style={{color: color.bootstrap_error_text}}>
+              {' '}
+              - {classroom.course_state}
+            </span>
           )}
           <span style={{float: 'right'}}>
             {locale.code()}

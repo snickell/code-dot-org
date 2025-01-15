@@ -1,17 +1,26 @@
 import classNames from 'classnames';
 import React, {useCallback, useContext, useEffect} from 'react';
+import {useSelector} from 'react-redux';
 
+import header from '@cdo/apps/code-studio/header';
+import {START_SOURCES, WARNING_BANNER_MESSAGES} from '@cdo/apps/lab2/constants';
+import {isProjectTemplateLevel} from '@cdo/apps/lab2/lab2Redux';
 import {ProgressManagerContext} from '@cdo/apps/lab2/progress/ProgressContainer';
+import {getAppOptionsEditBlocks} from '@cdo/apps/lab2/projects/utils';
 import Instructions from '@cdo/apps/lab2/views/components/Instructions';
 import PanelContainer from '@cdo/apps/lab2/views/components/PanelContainer';
+import {DialogType, useDialogControl} from '@cdo/apps/lab2/views/dialogs';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 import AnalyticsReporter from '../analytics/AnalyticsReporter';
-import AppConfig, {getBaseAssetUrl} from '../appConfig';
+import AppConfig from '../appConfig';
+import {installFunctionBlocks} from '../blockly/blockUtils';
+import MusicBlocklyWorkspace from '../blockly/MusicBlocklyWorkspace';
 import musicI18n from '../locale';
 import MusicPlayer from '../player/MusicPlayer';
 import MusicValidator from '../progress/MusicValidator';
 import {
+  getBlockMode,
   InstructionsPosition,
   setCurrentPlayheadPosition,
   showCallout,
@@ -43,6 +52,7 @@ interface MusicLabViewProps {
   player: MusicPlayer;
   allowPackSelection: boolean;
   analyticsReporter: AnalyticsReporter;
+  blocklyWorkspace: MusicBlocklyWorkspace;
 }
 
 const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
@@ -59,7 +69,9 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
   player,
   allowPackSelection,
   analyticsReporter,
+  blocklyWorkspace,
 }) => {
+  const dialogControl = useDialogControl();
   useUpdatePlayer(player);
   useUpdateAnalytics(analyticsReporter);
   const dispatch = useAppDispatch();
@@ -73,9 +85,19 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
   const hideHeaders = useAppSelector(state => state.music.hideHeaders);
   const appName = useAppSelector(state => state.lab.levelProperties?.appName);
   const skipUrl = useAppSelector(state => state.lab.levelProperties?.skipUrl);
+  const levelData = useAppSelector(
+    state => state.lab.levelProperties?.levelData
+  );
   const isPlayView = useAppSelector(state => state.lab.isShareView);
+  const validationStateCallout = useAppSelector(
+    state => state.lab.validationState.callout
+  );
 
   const progressManager = useContext(ProgressManagerContext);
+
+  const isStartMode = getAppOptionsEditBlocks() === START_SOURCES;
+  const projectTemplateLevel = useAppSelector(isProjectTemplateLevel);
+  const blockMode = useSelector(getBlockMode);
 
   // Pass music validator to Progress Manager
   useEffect(() => {
@@ -83,6 +105,47 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
       progressManager.setValidator(validator);
     }
   }, [progressManager, validator, appName]);
+
+  useEffect(() => {
+    if (isStartMode) {
+      header.showLevelBuilderSaveButton(() => {
+        const updatedLevelData = {
+          ...levelData,
+          startSources: blocklyWorkspace.getCode(),
+        };
+        return {level_data: updatedLevelData};
+      });
+    }
+  }, [blocklyWorkspace, isStartMode, levelData]);
+
+  // Use the Lab2 generic prompt for Blockly prompt dialogs.
+  const showGenericPrompt = useCallback(
+    (
+      message: string,
+      value: string,
+      handleConfirm: (input: string | null) => void
+    ) => {
+      dialogControl.showDialog({
+        type: DialogType.GenericPrompt,
+        message,
+        value,
+        handleConfirm,
+      });
+    },
+    [dialogControl]
+  );
+  const showGenericAlert = useCallback(
+    (message: string) => {
+      dialogControl.showDialog({type: DialogType.GenericAlert, message});
+    },
+    [dialogControl]
+  );
+  Blockly.dialog.setPrompt(showGenericPrompt);
+  Blockly.dialog.setAlert(showGenericAlert);
+
+  useEffect(() => {
+    installFunctionBlocks(blockMode);
+  }, [blockMode]);
 
   // Update loop that runs while playback is in progress.
   const doPlaybackUpdate = useCallback(() => {
@@ -109,6 +172,17 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
     [dispatch]
   );
 
+  useEffect(() => {
+    if (validationStateCallout) {
+      dispatch(showCallout(validationStateCallout));
+    }
+  }, [dispatch, validationStateCallout]);
+
+  const hideChaff = useCallback(
+    () => blocklyWorkspace.hideChaff(),
+    [blocklyWorkspace]
+  );
+
   const renderInstructions = useCallback(
     (position: InstructionsPosition) => {
       return (
@@ -127,7 +201,6 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
             hideHeaders={hideHeaders}
           >
             <Instructions
-              baseUrl={getBaseAssetUrl() || ''}
               layout={
                 position !== InstructionsPosition.TOP
                   ? 'vertical'
@@ -225,9 +298,20 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
                 clearCode={clearCode}
                 allowPackSelection={allowPackSelection}
                 skipUrl={skipUrl}
+                hideChaff={hideChaff}
               />
             }
           >
+            {isStartMode && (
+              <div
+                id="startSourcesWarningBanner"
+                className={moduleStyles.warningBanner}
+              >
+                {projectTemplateLevel
+                  ? WARNING_BANNER_MESSAGES.TEMPLATE
+                  : WARNING_BANNER_MESSAGES.STANDARD}
+              </div>
+            )}
             <div id={blocklyDivId} />
             {showAdvancedControls && (
               <div className={moduleStyles.advancedControlsContainer}>

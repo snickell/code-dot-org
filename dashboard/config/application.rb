@@ -12,7 +12,9 @@ require_relative '../legacy/middleware/sound_library_api'
 require_relative '../legacy/middleware/animation_library_api'
 
 require 'bootstrap-sass'
+require 'cdo/global_edition'
 require 'cdo/hash'
+require 'cdo/i18n'
 require 'cdo/i18n_backend'
 require 'cdo/shared_constants'
 
@@ -47,6 +49,15 @@ module Dashboard
         resource '/dashboardapi/*', headers: :any, methods: [:get]
       end
     end
+
+    if CDO.use_cookie_dcdo
+      # Enables the setting of DCDO via cookies for testing purposes.
+      require 'cdo/rack/cookie_dcdo'
+      config.middleware.insert_before Rack::Cors, Rack::CookieDCDO
+    end
+
+    require 'cdo/rack/global_edition'
+    config.middleware.insert_before Rack::Cors, Rack::GlobalEdition
 
     unless CDO.chef_managed
       # Only Chef-managed environments run an HTTP-cache service alongside the Rack app.
@@ -92,10 +103,10 @@ module Dashboard
     require 'cdo/rack/upgrade_insecure_requests'
     config.middleware.use ::Rack::UpgradeInsecureRequests
 
-    if CDO.use_cookie_dcdo
-      # Enables the setting of DCDO via cookies for testing purposes.
-      require 'cdo/rack/cookie_dcdo'
-      config.middleware.insert_after ActionDispatch::RequestId, Rack::CookieDCDO
+    if CDO.use_geolocation_override
+      # Apply the remote_addr middleware to allow pretending to be at a particular IP
+      require 'cdo/rack/geolocation_override'
+      config.middleware.insert_after ActionDispatch::RequestId, Rack::GeolocationOverride
     end
 
     config.encoding = 'utf-8'
@@ -117,19 +128,16 @@ module Dashboard
     config.i18n.load_path += Dir[Rails.root.join('config', 'locales', '*.json').to_s]
     config.i18n.backend = CDO.i18n_backend
     config.i18n.enforce_available_locales = false
-    config.i18n.available_locales = [SharedConstants::DEFAULT_LOCALE]
-    config.i18n.fallbacks[:defaults] = [SharedConstants::DEFAULT_LOCALE]
-    config.i18n.default_locale = SharedConstants::DEFAULT_LOCALE
-    LOCALES = YAML.load_file("#{Rails.root}/config/locales.yml")
-    LOCALES.each do |locale, data|
-      next unless data.is_a? Hash
-      data.symbolize_keys!
-      unless data[:debug] && Rails.env.production?
-        config.i18n.available_locales << locale
-      end
-      if data[:fallback]
-        config.i18n.fallbacks[locale] = data[:fallback]
-      end
+    config.i18n.available_locales = [Cdo::I18n::DEFAULT_LOCALE]
+    config.i18n.fallbacks[:defaults] = [Cdo::I18n::DEFAULT_LOCALE]
+    config.i18n.default_locale = Cdo::I18n::DEFAULT_LOCALE
+    LOCALES = Cdo::I18n::LOCALE_CONFIGS
+    Cdo::I18n.available_languages.each do |language|
+      locale = language[:locale_s]
+      fallback_locale = Cdo::I18n::LOCALE_CONFIGS.dig(locale, :fallback)
+
+      config.i18n.available_locales << locale
+      config.i18n.fallbacks[locale] = fallback_locale if fallback_locale
     end
 
     config.after_initialize do

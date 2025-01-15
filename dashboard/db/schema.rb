@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_08_07_174943) do
+ActiveRecord::Schema.define(version: 2024_12_16_152219) do
 
   create_table "activities", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
     t.integer "user_id"
@@ -78,7 +78,20 @@ ActiveRecord::Schema.define(version: 2024_08_07_174943) do
     t.json "aichat_event"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "request_id"
+    t.index ["request_id"], name: "index_aichat_events_on_request_id"
     t.index ["user_id", "level_id", "script_id"], name: "index_ace_user_level_script"
+  end
+
+  create_table "aichat_messages", charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
+    t.bigint "aichat_thread_id", null: false
+    t.text "external_id", null: false
+    t.integer "role", null: false
+    t.text "content", null: false
+    t.boolean "is_preset", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["aichat_thread_id"], name: "index_aichat_messages_on_aichat_thread_id"
   end
 
   create_table "aichat_requests", charset: "utf8mb4", collation: "utf8mb4_bin", force: :cascade do |t|
@@ -93,6 +106,7 @@ ActiveRecord::Schema.define(version: 2024_08_07_174943) do
     t.text "response"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["execution_status"], name: "index_aichat_requests_on_execution_status"
   end
 
   create_table "aichat_sessions", charset: "utf8mb4", collation: "utf8mb4_bin", force: :cascade do |t|
@@ -105,6 +119,18 @@ ActiveRecord::Schema.define(version: 2024_08_07_174943) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["user_id", "level_id", "script_id"], name: "index_acs_user_level_script"
+  end
+
+  create_table "aichat_threads", charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.text "external_id", null: false
+    t.text "llm_version", null: false
+    t.text "title"
+    t.integer "unit_id"
+    t.integer "level_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_aichat_threads_on_user_id"
   end
 
   create_table "assessment_activities", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
@@ -449,6 +475,7 @@ ActiveRecord::Schema.define(version: 2024_08_07_174943) do
     t.string "video"
     t.datetime "published_date"
     t.integer "self_paced_pl_course_offering_id"
+    t.boolean "ai_teaching_assistant_available", default: false, null: false
     t.index ["key"], name: "index_course_offerings_on_key", unique: true
   end
 
@@ -543,7 +570,7 @@ ActiveRecord::Schema.define(version: 2024_08_07_174943) do
     t.integer "priority", default: 0, null: false
     t.integer "attempts", default: 0, null: false
     t.text "handler", null: false
-    t.text "last_error"
+    t.text "last_error", size: :medium, collation: "utf8mb4_unicode_ci"
     t.datetime "run_at"
     t.datetime "locked_at"
     t.datetime "failed_at"
@@ -736,7 +763,7 @@ ActiveRecord::Schema.define(version: 2024_08_07_174943) do
     t.integer "ai_confidence"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.text "observations"
+    t.text "observations", collation: "utf8mb4_unicode_ci"
     t.integer "ai_confidence_exact_match"
     t.text "evidence"
     t.index ["learning_goal_id"], name: "index_learning_goal_ai_evaluations_on_learning_goal_id"
@@ -765,6 +792,7 @@ ActiveRecord::Schema.define(version: 2024_08_07_174943) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["learning_goal_id"], name: "index_learning_goal_teacher_evaluations_on_learning_goal_id"
+    t.index ["teacher_id"], name: "index_learning_goal_teacher_evaluations_on_teacher_id"
     t.index ["user_id", "teacher_id"], name: "index_learning_goal_teacher_evaluations_on_user_and_teacher_id"
   end
 
@@ -892,6 +920,7 @@ ActiveRecord::Schema.define(version: 2024_08_07_174943) do
     t.index ["game_id"], name: "index_levels_on_game_id"
     t.index ["level_num"], name: "index_levels_on_level_num"
     t.index ["name"], name: "index_levels_on_name"
+    t.index ["type"], name: "index_levels_on_type"
   end
 
   create_table "levels_script_levels", id: false, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
@@ -931,8 +960,16 @@ ActiveRecord::Schema.define(version: 2024_08_07_174943) do
     t.bigint "lti_integration_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "name"
     t.index ["deployment_id"], name: "index_lti_deployments_on_deployment_id"
     t.index ["lti_integration_id"], name: "index_lti_deployments_on_lti_integration_id"
+  end
+
+  create_table "lti_deployments_user_identities", id: false, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
+    t.bigint "lti_deployment_id", null: false
+    t.bigint "lti_user_identity_id", null: false
+    t.index ["lti_deployment_id"], name: "index_lti_deployments_user_identities_on_lti_deployment_id"
+    t.index ["lti_user_identity_id"], name: "index_lti_deployments_user_identities_on_lti_user_identity_id"
   end
 
   create_table "lti_feedbacks", charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
@@ -1501,6 +1538,8 @@ ActiveRecord::Schema.define(version: 2024_08_07_174943) do
     t.string "funding_type"
     t.text "properties"
     t.string "module"
+    t.string "name"
+    t.string "participant_group_type"
     t.index ["organizer_id"], name: "index_pd_workshops_on_organizer_id"
     t.index ["regional_partner_id"], name: "index_pd_workshops_on_regional_partner_id"
   end
@@ -1845,6 +1884,7 @@ ActiveRecord::Schema.define(version: 2024_08_07_174943) do
     t.string "validation_type", default: "full", null: false
     t.index ["school_district_id"], name: "fk_rails_951bceb7e3"
     t.index ["school_id"], name: "index_school_infos_on_school_id"
+    t.index ["school_name", "country", "school_type"], name: "index_school_infos_on_school_name_and_country_and_school_type"
   end
 
   create_table "school_stats_by_years", primary_key: ["school_id", "school_year"], charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
@@ -1901,9 +1941,7 @@ ActiveRecord::Schema.define(version: 2024_08_07_174943) do
     t.decimal "longitude", precision: 9, scale: 6, comment: "Location longitude"
     t.string "school_category"
     t.string "last_known_school_year_open", limit: 9
-    t.boolean "is_current"
     t.index ["id"], name: "index_schools_on_id", unique: true
-    t.index ["is_current"], name: "index_schools_on_is_current"
     t.index ["last_known_school_year_open"], name: "index_schools_on_last_known_school_year_open"
     t.index ["name", "city"], name: "index_schools_on_name_and_city", type: :fulltext
     t.index ["school_district_id"], name: "index_schools_on_school_district_id"
@@ -2227,6 +2265,21 @@ ActiveRecord::Schema.define(version: 2024_08_07_174943) do
     t.index ["user_id"], name: "index_user_geos_on_user_id"
   end
 
+  create_table "user_level_interactions", charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "level_id", null: false
+    t.integer "script_id", null: false
+    t.string "school_year", null: false
+    t.string "interaction", null: false
+    t.string "code_version"
+    t.json "metadata"
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["level_id"], name: "index_user_level_interactions_on_level_id"
+    t.index ["user_id"], name: "index_user_level_interactions_on_user_id"
+  end
+
   create_table "user_levels", id: { type: :bigint, unsigned: true }, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "level_id", null: false
@@ -2458,6 +2511,7 @@ ActiveRecord::Schema.define(version: 2024_08_07_174943) do
 
   add_foreign_key "ai_tutor_interaction_feedbacks", "ai_tutor_interactions"
   add_foreign_key "ai_tutor_interaction_feedbacks", "users"
+  add_foreign_key "aichat_events", "aichat_requests", column: "request_id"
   add_foreign_key "cap_user_events", "users"
   add_foreign_key "census_submission_form_maps", "census_submissions"
   add_foreign_key "census_summaries", "schools"

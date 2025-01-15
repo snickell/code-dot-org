@@ -293,7 +293,6 @@ Devise.setup do |config|
       end
     end,
   }
-  config.omniauth :windowslive, CDO.dashboard_windowslive_key, CDO.dashboard_windowslive_secret, scope: 'wl.basic wl.emails'
 
   config.omniauth :microsoft_v2_auth, CDO.dashboard_microsoft_key, CDO.dashboard_microsoft_secret
 
@@ -301,19 +300,6 @@ Devise.setup do |config|
   # initiates the oauth flow (instead of us as we do with facebook
   # with a log in with facebook button)
   config.omniauth :clever, CDO.dashboard_clever_key, CDO.dashboard_clever_secret, provider_ignores_state: true
-
-  # Powerschool OpenID config
-  config.omniauth :openid, {
-    provider_ignores_state: true,
-    name: :powerschool,
-    identifier_param: 'openid_identifier',
-    required: %w(
-      http://powerschool.com/entity/type
-      http://powerschool.com/entity/email
-      http://powerschool.com/entity/firstName
-      http://powerschool.com/entity/lastName
-    ).freeze
-  }
 
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
@@ -340,7 +326,7 @@ Devise.setup do |config|
       end
     # Students younger than 13 shouldn't see App Lab and Game Lab unless they
     # are in a teacher's section for privacy reasons.
-    limit_project_types = user.under_13? && !user.sections_as_student.any?
+    limit_project_types = user.under_13? && user.sections_as_student.none?
     auth.cookies[environment_specific_cookie_name("_limit_project_types")] = {value: limit_project_types, domain: :all, httponly: true}
     auth.cookies[environment_specific_cookie_name("_user_type")] = {value: user_type, domain: :all, httponly: true}
     auth.cookies[environment_specific_cookie_name("_shortName")] = {value: user.short_name, domain: :all}
@@ -353,6 +339,10 @@ Devise.setup do |config|
     auth.cookies[environment_specific_cookie_name("_shortName")] = {value: "", expires: Time.at(0), domain: :all}
     auth.cookies[environment_specific_cookie_name("_experiments")] = {value: "", expires: Time.at(0), domain: :all}
     auth.cookies[environment_specific_cookie_name("_assumed_identity")] = {value: "", expires: Time.at(0), domain: :all, httponly: true}
+    # statsig_stable_id is set in the application controller so it's available for
+    # all users, both signed-in and signed-out. When the user logs out, we remove
+    # this cookie because it is user-specific.
+    auth.cookies[:statsig_stable_id] = {value: "", expires: Time.at(0), domain: :all}
 
     # These marketing cookies are set in the home_controller in init_homepage. When the user logs out, we
     # remove these cookies because they are user-specific. The cookies are set in init_homepage instead of after_set_user
@@ -363,10 +353,11 @@ Devise.setup do |config|
   end
 
   OmniAuth.config.before_request_phase do |env|
-    Metrics::Events.log_event_with_session(
-      session: env['rack.session'],
+    request = Rack::Request.new(env)
+    Metrics::Events.log_event(
+      request: request,
       event_name: "#{env['omniauth.strategy'].options[:name]}-begin-auth",
-      )
+    )
   end
 
   # ==> Mountable engine configurations

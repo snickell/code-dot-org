@@ -1,3 +1,5 @@
+require 'cdo/i18n'
+
 class ScriptsController < ApplicationController
   include VersionRedirectOverrider
 
@@ -14,6 +16,27 @@ class ScriptsController < ApplicationController
   use_reader_connection_for_route(:show)
 
   def show
+    if Experiment.enabled?(user: current_user, experiment_name: 'teacher-local-nav-v2') || DCDO.get('teacher-local-nav-v2', false)
+      if request.query_parameters.include? "user_id"
+        redirect_query_string = request.query_string.sub("user_id=#{request.query_parameters[:user_id]}", "").sub("&&", "&")
+        if redirect_query_string.empty?
+          redirect_to script_path(@script)
+        else
+          redirect_to "#{script_path(@script)}?#{redirect_query_string}"
+        end
+        return
+      end
+      if current_user&.user_type == "teacher" && current_user.sections_instructed.any? {|s| s.script_id == @script.id || s.unit_group&.default_units&.any? {|u| u.id == @script.id}}
+        if !params[:section_id] && current_user&.last_section_id
+          redirect_to "/teacher_dashboard/sections/#{current_user.last_section_id}/unit/#{@script.name}"
+          return
+        elsif params[:section_id]
+          redirect_to "/teacher_dashboard/sections/#{params[:section_id]}/unit/#{@script.name}"
+          return
+        end
+      end
+    end
+
     if @script.is_deprecated
       return render 'errors/deprecated_course'
     end
@@ -51,19 +74,14 @@ class ScriptsController < ApplicationController
     @show_redirect_warning = params[:redirect_warning] == 'true'
     unless current_user&.student?
       @section = current_user&.sections_instructed&.all&.find {|s| s.id.to_s == params[:section_id]}&.summarize
-      sections = current_user.try {|u| u.sections_instructed.all.reject(&:hidden).map(&:summarize)}
-      @sections_with_assigned_info = sections&.map {|section| section.merge!({"isAssigned" => section[:script_id] == @script.id})}
+      @sections = current_user.try {|u| u.sections_instructed.all.reject(&:hidden).map(&:summarize)}
     end
-
-    @show_unversioned_redirect_warning = !!session[:show_unversioned_redirect_warning] && !@script.is_course
-    session[:show_unversioned_redirect_warning] = false
 
     additional_script_data = {
       course_name: @script.unit_group&.name,
       course_id: @script.unit_group&.id,
       show_redirect_warning: @show_redirect_warning,
       redirect_script_url: @redirect_unit_url,
-      show_unversioned_redirect_warning: !!@show_unversioned_redirect_warning,
       section: @section,
       user_type: current_user&.user_type,
       user_id: current_user&.id,
@@ -74,7 +92,7 @@ class ScriptsController < ApplicationController
       locale_code: request.locale,
       course_link: @script.course_link(params[:section_id]),
       course_title: @script.course_title || I18n.t('view_all_units'),
-      sections: @sections_with_assigned_info
+      sections: @sections
     }
 
     @script_data = @script.summarize(true, current_user, false, request.locale).merge(additional_script_data)
@@ -176,7 +194,7 @@ class ScriptsController < ApplicationController
       script: @script ? @script.summarize_for_unit_edit : {},
       has_course: @script&.unit_groups&.any?,
       i18n: @script ? @script.summarize_i18n_for_edit : {},
-      locales: options_for_locale_select,
+      locales: Cdo::I18n.locale_options,
       script_families: Unit.family_names,
       version_year_options: Unit.get_version_year_options,
       is_levelbuilder: current_user.levelbuilder?
@@ -281,7 +299,6 @@ class ScriptsController < ApplicationController
 
     if Unit.family_names.include?(unit_name)
       script = Unit.get_unit_family_redirect_for_user(unit_name, user: current_user, locale: request.locale)
-      session[:show_unversioned_redirect_warning] = true
       Unit.log_redirect(unit_name, script.redirect_to, request, 'unversioned-script-redirect', current_user&.user_type) if script.present?
       return script
     end
@@ -337,10 +354,12 @@ class ScriptsController < ApplicationController
       :include_student_lesson_plans,
       :use_legacy_lesson_plans,
       :lesson_groups,
+      :content_area,
       resourceIds: [],
       studentResourceIds: [],
       project_widget_types: [],
       supported_locales: [],
+      topic_tags: [],
     ).to_h
     h[:peer_reviews_to_complete] = h[:peer_reviews_to_complete].to_i > 0 ? h[:peer_reviews_to_complete].to_i : nil
     h[:announcements] = JSON.parse(h[:announcements]) if h[:announcements]

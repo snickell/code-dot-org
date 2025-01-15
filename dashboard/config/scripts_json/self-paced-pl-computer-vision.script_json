@@ -4,11 +4,17 @@
     "wrapup_video_id": null,
     "login_required": false,
     "properties": {
-      "is_migrated": true
+      "content_area": "self_paced_pl_9_12",
+      "curriculum_umbrella": "Self-paced PL - 9-12 special topics",
+      "is_migrated": true,
+      "topic_tags": [
+        "ai"
+      ],
+      "version_year": "unversioned"
     },
     "new_name": null,
     "family_name": null,
-    "serialized_at": "2024-06-18 14:09:17 UTC",
+    "serialized_at": "2025-01-13 22:03:34 UTC",
     "published_state": null,
     "instruction_type": null,
     "instructor_audience": null,

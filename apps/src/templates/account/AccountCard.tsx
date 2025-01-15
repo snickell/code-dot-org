@@ -7,13 +7,13 @@ import {
   LinkButton,
   buttonColors,
 } from '@cdo/apps/componentLibrary/button';
+import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon';
 import {
   Card,
   CardActions,
   CardContent,
   CardHeader,
-} from '@cdo/apps/componentLibrary/card';
-import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon';
+} from '@cdo/apps/sharedComponents/card';
 
 import styles from './account-components.module.scss';
 
@@ -38,6 +38,7 @@ const AccountCard: React.FunctionComponent<{
   onClick,
   iconList,
 }) => (
+  // eslint-disable-next-line react/forbid-component-props
   <Card data-testid={id}>
     <div className={styles.contentWrapper}>
       <CardHeader

@@ -4,14 +4,16 @@
     "wrapup_video_id": null,
     "login_required": true,
     "properties": {
-      "curriculum_umbrella": "CSD Self Paced PL",
+      "content_area": "self_paced_pl_6_8",
+      "curriculum_umbrella": "Self-paced PL - CSD",
       "is_migrated": true,
       "student_detail_progress_view": true,
-      "tts": true
+      "tts": true,
+      "version_year": "2024"
     },
     "new_name": null,
     "family_name": null,
-    "serialized_at": "2024-05-06 17:36:25 UTC",
+    "serialized_at": "2025-01-13 21:18:27 UTC",
     "published_state": null,
     "instruction_type": null,
     "instructor_audience": null,
@@ -449,6 +451,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-ModuleOverview-mod2_-csd_CSD-PL-24"
+        ],
         "progression": "Unit Overview"
       },
       "bonus": false,
@@ -471,6 +476,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD-U2SelfPaced-Lesson1Cert_CSD-PL-24"
+        ],
         "progression": "Unit Overview"
       },
       "bonus": false,
@@ -493,6 +501,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PL Overview-self-paced-unit2_CSD-PL-24"
+        ],
         "progression": "Unit Overview"
       },
       "bonus": false,
@@ -515,6 +526,9 @@
       "activity_section_position": 4,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-pilot-S22-CI-Unit_Overview-mod2_-csd_CSD-PL-24"
+        ],
         "progression": "Unit Overview"
       },
       "bonus": false,
@@ -537,6 +551,9 @@
       "activity_section_position": 5,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CI-LessonTypes-U2_-csd_CSD-PL-24"
+        ],
         "progression": "Unit Overview"
       },
       "bonus": false,
@@ -559,6 +576,9 @@
       "activity_section_position": 6,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-pilot-S22-CI-Unit_PSP-mod2_-csd_CSD-PL-24"
+        ],
         "progression": "Unit Overview"
       },
       "bonus": false,
@@ -581,6 +601,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-pilot-S22-CI-Unit_tools-mod2_-csd_CSD-PL-24"
+        ],
         "progression": "Learning Tools"
       },
       "bonus": false,
@@ -603,6 +626,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-Intro to Web Lab - Part 1_CSD-PL-24"
+        ],
         "progression": "Learning Tools"
       },
       "bonus": false,
@@ -625,6 +651,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD-U2-Self-Paced-ProjectPreview_CSD-PL-24"
+        ],
         "progression": "Learning Tools"
       },
       "bonus": false,
@@ -647,6 +676,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-pilot-S22-2-week1-mod2_-csd_CSD-PL-24"
+        ],
         "progression": "Explore the First Week of Curriculum"
       },
       "bonus": false,
@@ -669,6 +701,9 @@
       "activity_section_position": 2,
       "assessment": true,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-vocab-c4u-mod2_-csd_CSD-PL-24"
+        ],
         "progression": "Explore the First Week of Curriculum"
       },
       "bonus": false,
@@ -691,6 +726,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-mod2-lesson2-overview_-csd_CSD-PL-24"
+        ],
         "progression": "Overview"
       },
       "bonus": false,
@@ -713,6 +751,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-U2-SelfPaced-Intro to HTML_CSD-PL-24"
+        ],
         "progression": "Explore HTML and Web Lab"
       },
       "bonus": false,
@@ -735,6 +776,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-mod2-HTML-overview_-csd_CSD-PL-24"
+        ],
         "progression": "Explore HTML and Web Lab"
       },
       "bonus": false,
@@ -757,6 +801,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-CSDU2 - Type Anything_CSD-PL-24"
+        ],
         "progression": "Explore HTML and Web Lab"
       },
       "bonus": false,
@@ -779,6 +826,9 @@
       "activity_section_position": 4,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-Summer-CI-CSD U2 Inspector Warm Up_CSD-PL-24"
+        ],
         "progression": "Explore HTML and Web Lab"
       },
       "bonus": false,
@@ -801,6 +851,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-Summer-CI-CSD U2 HTML Adding Paragraphs_CSD-PL-24"
+        ],
         "progression": "Add Structure Using HTML"
       },
       "bonus": false,
@@ -823,6 +876,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-Summer-CI-CSD U2 Heading Demo_CSD-PL-24"
+        ],
         "progression": "Add Structure Using HTML"
       },
       "bonus": false,
@@ -845,6 +901,9 @@
       "activity_section_position": 3,
       "assessment": true,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-CSD Header Size MC_2018_2019_pilot_-csd_CSD-PL-24"
+        ],
         "progression": "Add Structure Using HTML"
       },
       "bonus": false,
@@ -867,6 +926,9 @@
       "activity_section_position": 4,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-Summer-CI-CSD-U2 Unordered Lists_CSD-PL-24"
+        ],
         "progression": "Add Structure Using HTML"
       },
       "bonus": false,
@@ -889,6 +951,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-Summer-CI-CSD U2 Image Tag 1_CSD-PL-24"
+        ],
         "progression": "Add Images"
       },
       "bonus": false,
@@ -911,6 +976,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-mod2-ImagesInHTML_-csd_CSD-PL-24"
+        ],
         "progression": "Add Images"
       },
       "bonus": false,
@@ -933,6 +1001,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-Summer-CI-CSD U2 Image Tag Inconsistent Spelling_CSD-PL-24"
+        ],
         "progression": "Add Images"
       },
       "bonus": false,
@@ -955,6 +1026,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD_Lesson2WrapUp_self-paced-unit2_CSD-PL-24"
+        ],
         "progression": "Section Wrap Up"
       },
       "bonus": false,
@@ -977,6 +1051,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-sample-mod2-lesson3-overview_-csd_CSD-PL-24"
+        ],
         "progression": "Overview"
       },
       "bonus": false,
@@ -999,6 +1076,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD-U2SelfPaced-CSS-overview_CSD-PL-24"
+        ],
         "progression": "Overview"
       },
       "bonus": false,
@@ -1021,6 +1101,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-Video: Intro to CSS_CSD-PL-24"
+        ],
         "progression": "Style Text with CSS"
       },
       "bonus": false,
@@ -1043,6 +1126,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-Summer-CI-CSD U2 text style h1_CSD-PL-24"
+        ],
         "progression": "Style Text with CSS"
       },
       "bonus": false,
@@ -1065,6 +1151,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-Summer-CI-CSD U2 text style h3_CSD-PL-24"
+        ],
         "progression": "Style Text with CSS"
       },
       "bonus": false,
@@ -1087,6 +1176,9 @@
       "activity_section_position": 4,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-Summer-CI-CSD U2 text style size_CSD-PL-24"
+        ],
         "progression": "Style Text with CSS"
       },
       "bonus": false,
@@ -1109,6 +1201,9 @@
       "activity_section_position": 5,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-Summer-CI-CSD Web Headings Wrong Tag in Rule Set_CSD-PL-24"
+        ],
         "progression": "Style Text with CSS"
       },
       "bonus": false,
@@ -1131,6 +1226,9 @@
       "activity_section_position": 6,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-Video: Intro to CSS Part 2_CSD-PL-24"
+        ],
         "progression": "Style Text with CSS"
       },
       "bonus": false,
@@ -1153,6 +1251,9 @@
       "activity_section_position": 7,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-Summer-CI-CSD U2 add file_CSD-PL-24"
+        ],
         "progression": "Style Text with CSS"
       },
       "bonus": false,
@@ -1175,6 +1276,9 @@
       "activity_section_position": 8,
       "assessment": true,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-mod2-CSS-elements-C4U_-csd_CSD-PL-24"
+        ],
         "progression": "Style Text with CSS"
       },
       "bonus": false,
@@ -1197,6 +1301,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-CSD U2 layout style sample_CSD-PL-24"
+        ],
         "progression": "Style Elements with CSS"
       },
       "bonus": false,
@@ -1219,6 +1326,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-mod2-StylingElements_-csd_CSD-PL-24"
+        ],
         "progression": "Style Elements with CSS"
       },
       "bonus": false,
@@ -1241,6 +1351,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD-U2SelfPaced-FlexboxOverview_CSD-PL-24"
+        ],
         "progression": "Using Flexbox"
       },
       "bonus": false,
@@ -1263,6 +1376,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD-U2SelfPaced-FlexboxVideo1_CSD-PL-24"
+        ],
         "progression": "Using Flexbox"
       },
       "bonus": false,
@@ -1285,6 +1401,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD-U2SelfPaced-Flexbox2_CSD-PL-24"
+        ],
         "progression": "Using Flexbox"
       },
       "bonus": false,
@@ -1307,6 +1426,9 @@
       "activity_section_position": 4,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD-U2SelfPaced-Flexbox3_CSD-PL-24"
+        ],
         "progression": "Using Flexbox"
       },
       "bonus": false,
@@ -1329,6 +1451,9 @@
       "activity_section_position": 5,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD-U2SelfPaced-Flexbox4_CSD-PL-24"
+        ],
         "progression": "Using Flexbox"
       },
       "bonus": false,
@@ -1351,6 +1476,9 @@
       "activity_section_position": 6,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD-U2SelfPaced-Flexbox5_CSD-PL-24"
+        ],
         "progression": "Using Flexbox"
       },
       "bonus": false,
@@ -1373,6 +1501,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD-U2SelfPaced-FlexboxVideo2_CSD-PL-24"
+        ],
         "progression": "Flexbox Children"
       },
       "bonus": false,
@@ -1395,6 +1526,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD-U2SelfPaced-FlexboxChildren2_CSD-PL-24"
+        ],
         "progression": "Flexbox Children"
       },
       "bonus": false,
@@ -1417,6 +1551,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD-U2SelfPaced-FlexboxChildren3_CSD-PL-24"
+        ],
         "progression": "Flexbox Children"
       },
       "bonus": false,
@@ -1439,6 +1576,9 @@
       "activity_section_position": 4,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD-U2SelfPaced-FlexboxChildren4_CSD-PL-24"
+        ],
         "progression": "Flexbox Children"
       },
       "bonus": false,
@@ -1461,6 +1601,9 @@
       "activity_section_position": 5,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD-U2SelfPaced-FlexboxChildren5_CSD-PL-24"
+        ],
         "progression": "Flexbox Children"
       },
       "bonus": false,
@@ -1483,6 +1626,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD_Lesson3WrapUp_self-paced-unit2_CSD-PL-24"
+        ],
         "progression": "Section Wrap Up"
       },
       "bonus": false,
@@ -1505,6 +1651,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-mod2-L4-overview_-csd_CSD-PL-24"
+        ],
         "progression": "Overview"
       },
       "bonus": false,
@@ -1527,6 +1676,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-mod2-L4-DigitalFootprint-overview_-csd_CSD-PL-24"
+        ],
         "progression": "Digital Citizenship"
       },
       "bonus": false,
@@ -1549,6 +1701,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-mod2-L4-DigitalFootprint-activity_-csd_CSD-PL-24"
+        ],
         "progression": "Digital Citizenship"
       },
       "bonus": false,
@@ -1571,6 +1726,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-mod2-L4-DigitalFootprint-answer_-csd_CSD-PL-24"
+        ],
         "progression": "Digital Citizenship"
       },
       "bonus": false,
@@ -1593,6 +1751,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-mod2-L4-IntellectualProperty-overview_-_CSD-PL-24"
+        ],
         "progression": "Intellectual Property"
       },
       "bonus": false,
@@ -1615,6 +1776,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-mod2-L4-SourcesAndResearch-overview_-cs_CSD-PL-24"
+        ],
         "progression": "Sources and research"
       },
       "bonus": false,
@@ -1637,6 +1801,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-csd web search video_CSD-PL-24"
+        ],
         "progression": "Sources and research"
       },
       "bonus": false,
@@ -1659,6 +1826,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD-U2SelfPaced-Lesson4-Matching_CSD-PL-24"
+        ],
         "progression": "Section Wrap Up"
       },
       "bonus": false,
@@ -1681,6 +1851,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "CSD_Lesson4WrapUp_self-paced-unit2_CSD-PL-24"
+        ],
         "progression": "Section Wrap Up"
       },
       "bonus": false,
@@ -1703,6 +1876,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-UnitWrapUp-Overview-Mod2_-csd_CSD-PL-24"
+        ],
         "progression": "Overview"
       },
       "bonus": false,
@@ -1725,6 +1901,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-Summer-CI-CSD U2-Mini-ProjectsOverview_-csd_CSD-PL-24"
+        ],
         "progression": "Unit Projects"
       },
       "bonus": false,
@@ -1747,6 +1926,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-Cahpter1-ProjectOverview-mod2_-csd_CSD-PL-24"
+        ],
         "progression": "Unit Projects"
       },
       "bonus": false,
@@ -1769,6 +1951,9 @@
       "activity_section_position": 3,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "VPL-CSD-PILOT-S22-CI-Cahpter2-ProjectOverview-mod2_-csd_CSD-PL-24"
+        ],
         "progression": "Unit Projects"
       },
       "bonus": false,
@@ -1791,6 +1976,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "-VPL-CSD-PILOT-summer22-navigation_-csd_CSD-PL-24"
+        ],
         "progression": "Wrap Up"
       },
       "bonus": false,

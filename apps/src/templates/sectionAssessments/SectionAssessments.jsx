@@ -20,7 +20,7 @@ import UnitSelector from '@cdo/apps/templates/sectionProgress/UnitSelector';
 import i18n from '@cdo/locale';
 
 import {h3Style} from '../../legacySharedComponents/Headings';
-import firehoseClient from '../../lib/util/firehose';
+import firehoseClient from '../../metrics/firehose';
 
 import AssessmentSelector from './AssessmentSelector';
 import FeedbackDownload from './FeedbackDownload';
@@ -196,6 +196,7 @@ class SectionAssessments extends Component {
       this.props.assessmentId === ASSESSMENT_FEEDBACK_OPTION_ID;
 
     return (
+      // eslint-disable-next-line react/forbid-dom-props
       <div data-testid={'assessments-tab'}>
         <div style={styles.selectors}>
           <div style={styles.unitSelection}>

@@ -156,7 +156,7 @@ class LevelsController < ApplicationController
     bubble_choice_parents = BubbleChoice.parent_levels(@level.name)
     any_parent_in_script = bubble_choice_parents.any? {|pl| pl.script_levels.any?}
     @in_script = @level.script_levels.any? || any_parent_in_script
-    @standalone = ProjectsController::STANDALONE_PROJECTS.values.map {|h| h[:name]}.include?(@level.name)
+    @standalone = ProjectsController::STANDALONE_PROJECTS.values.pluck(:name).include?(@level.name)
     if @level.is_a? Applab
       @dataset_library_manifest = DatablockStorageLibraryManifest.instance.library_manifest
     end
@@ -345,6 +345,32 @@ class LevelsController < ApplicationController
     render json: {redirect: level_url(@level)}
   end
 
+  # PATCH /levels/:id/update_bubble_choice_settings
+  def update_bubble_choice_settings
+    changes = JSON.parse(request.body.read)
+    # Handle display_name
+    if @level.respond_to?(:display_name) || !@level.properties.key?("display_name")
+      @level.properties["display_name"] = changes["display_name"]
+    end
+
+    # Handle bubble_choice_description
+    if @level.respond_to?(:bubble_choice_description) || !@level.properties.key?("bubble_choice_description")
+      @level.properties["bubble_choice_description"] = changes["bubble_choice_description"]
+    end
+
+    # Handle thumbnail_url
+    if @level.respond_to?(:thumbnail_url) || !@level.properties.key?("thumbnail_url")
+      @level.properties["thumbnail_url"] = changes["thumbnail_url"]
+    end
+
+    @level.log_changes(current_user)
+    if @level.save
+      render json: {message: 'Level updated successfully', level: @level}, status: :ok
+    else
+      render json: {errors: @level.errors.full_messages}, status: :unprocessable_entity
+    end
+  end
+
   # POST /levels
   # POST /levels.json
   def create
@@ -505,19 +531,23 @@ class LevelsController < ApplicationController
     links = {}
 
     links[@level.name] = [{text: level_path(@level), url: level_url(@level)}]
+    links[@level.name] << {text: "#{level_path(@level)} (reset version history)", url: "#{level_url(@level)}?reset=true"}
     if @level.level_concept_difficulty && !@level.level_concept_difficulty.concept_difficulties_as_string.empty?
       links[@level.name] << {text: "LCD: #{@level.level_concept_difficulty.concept_difficulties_as_string}", url: ''}
     end
-    is_standalone_project = ProjectsController::STANDALONE_PROJECTS.values.map {|h| h[:name]}.include?(@level.name)
+    is_standalone_project = ProjectsController::STANDALONE_PROJECTS.values.pluck(:name).include?(@level.name)
     # Curriculum writers rarely need to edit STANDALONE_PROJECTS levels, and accidental edits to these levels
     # can be quite disruptive. As a workaround you can navigate directly to the edit url for these levels.
-    if Rails.application.config.levelbuilder_mode && !is_standalone_project
+    # We allow editing from the test environment to enable UI testing of the edit page.
+    if (Rails.application.config.levelbuilder_mode || rack_env?(:test)) && !is_standalone_project
       can_edit_level = can? :edit, @level
       if can_edit_level
         links[@level.name] << {text: '[E]dit', url: edit_level_path(@level), access_key: 'e'}
-        if @level.is_a?(Javalab) || @level.is_a?(Pythonlab) || @level.is_a?(Weblab2)
+        if [Javalab, Music, Pythonlab, Weblab2].include?(@level.class)
           links[@level.name] << {text: "[s]tart", url: edit_blocks_level_path(@level, :start_sources), access_key: 's'}
-          links[@level.name] << {text: "e[x]emplar", url: edit_exemplar_level_path(@level), access_key: 'x'}
+          if @level.class != Music
+            links[@level.name] << {text: "e[x]emplar", url: edit_exemplar_level_path(@level), access_key: 'x'}
+          end
         end
       else
         links[@level.name] << {text: '(Cannot edit)', url: ''}

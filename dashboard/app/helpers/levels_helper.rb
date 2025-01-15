@@ -84,6 +84,28 @@ module LevelsHelper
     view_options(signed_replay_log_url: signed_url)
   end
 
+  def get_project_and_version_id(level_id, script_id)
+    result = {project_id: nil, version_id: nil}
+
+    user_storage_id = storage_id_for_user_id(current_user.id)
+    return result unless user_storage_id
+
+    level = Level.find(level_id)
+    return result unless level
+
+    channel_token = ChannelToken.find_channel_token(level, user_storage_id, script_id)
+    return result unless channel_token
+
+    _owner_id, result[:project_id] = storage_decrypt_channel_id(channel_token.channel)
+    source_data = SourceBucket.new.get(channel_token.channel, "main.json")
+
+    if source_data[:status] == 'FOUND'
+      result[:version_id] = source_data[:version_id]
+    end
+
+    result
+  end
+
   # If given a user, find the channel associated with the given level/user.
   # Otherwise, gets the storage_id associated with the (potentially signed out)
   # current user, and either finds or creates a channel for the level
@@ -353,7 +375,7 @@ module LevelsHelper
     @app_options['teacherMarkdown'] = @level.localized_teacher_markdown if Policies::InlineAnswer.visible_for_script_level?(current_user, @script_level)
 
     @app_options[:dialog] = {
-      skipSound: !!(@level.properties['options'].try(:[], 'skip_sound')),
+      skipSound: !!@level.properties['options'].try(:[], 'skip_sound'),
       preTitle: @level.properties['pre_title'],
       fallbackResponse: @fallback_response.to_json,
       callback: @callback,
@@ -539,10 +561,6 @@ module LevelsHelper
       sublevelCallback: @sublevel_callback,
     }
 
-    if @game&.owns_footer_for_share? || @legacy_share_style
-      app_options[:copyrightStrings] = build_copyright_strings
-    end
-
     app_options
   end
 
@@ -701,10 +719,6 @@ module LevelsHelper
     end
     app_options[:send_to_phone_url] = send_to_phone_url if app_options[:isUS]
 
-    if @game&.owns_footer_for_share? || @legacy_share_style
-      app_options[:copyrightStrings] = build_copyright_strings
-    end
-
     app_options
   end
 
@@ -722,22 +736,8 @@ module LevelsHelper
       app_options[:is_viewing_exemplar] = level_options[:is_viewing_exemplar] || false
     end
     app_options[:share] = level_options[:share] if level_options[:share]
+    app_options[:public_caching] = @public_caching
     app_options.camelize_keys
-  end
-
-  def build_copyright_strings
-    # These would ideally also go in _javascript_strings.html right now, but it can't
-    # deal with params.
-    {
-      thanks: ERB::Util.url_encode(I18n.t('footer.thanks')),
-      help_from_html: I18n.t('footer.help_from_html'),
-      art_from_html: ERB::Util.url_encode(I18n.t('footer.art_from_html', current_year: Time.now.year)),
-      code_from_html: ERB::Util.url_encode(I18n.t('footer.code_from_html')),
-      powered_by_aws: I18n.t('footer.powered_by_aws'),
-      trademark: ERB::Util.url_encode(I18n.t('footer.trademark', current_year: Time.now.year, cs_discoveries: "CS Discoveries&reg;")),
-      built_on_github: I18n.t('footer.built_on_github'),
-      google_copyright: ERB::Util.url_encode(I18n.t('footer.google_copyright'))
-    }
   end
 
   def match_answer_as_image(path, width)

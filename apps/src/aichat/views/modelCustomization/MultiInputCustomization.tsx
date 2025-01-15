@@ -4,6 +4,7 @@ import Button from '@cdo/apps/componentLibrary/button/Button';
 import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
 import {StrongText} from '@cdo/apps/componentLibrary/typography/TypographyElements';
 
+import aichatI18n from '../../locale';
 import {Visibility} from '../../types';
 
 import FieldLabel from './FieldLabel';
@@ -20,6 +21,8 @@ const MultiInputCustomization: React.FunctionComponent<{
   isReadOnly: boolean;
   hideInputBoxWhenReadOnly: boolean;
   onUpdateItems: (updatedItems: string[]) => void;
+  addButtonId?: string;
+  validationAlert?: React.ReactNode;
 }> = ({
   label,
   fieldId,
@@ -29,6 +32,8 @@ const MultiInputCustomization: React.FunctionComponent<{
   isReadOnly,
   hideInputBoxWhenReadOnly,
   onUpdateItems,
+  addButtonId,
+  validationAlert,
 }) => {
   const [newItem, setNewItem] = useState('');
 
@@ -59,10 +64,12 @@ const MultiInputCustomization: React.FunctionComponent<{
               value={newItem}
               disabled={isReadOnly}
             />
+            {!isReadOnly && validationAlert}
           </div>
           <div className={modelCustomizationStyles.addItemContainer}>
             <Button
-              text="Add"
+              id={addButtonId}
+              text={aichatI18n.addCustomizationButtonText()}
               type="secondary"
               color="gray"
               size="s"
@@ -74,7 +81,7 @@ const MultiInputCustomization: React.FunctionComponent<{
         </>
       )}
       <div className={modelCustomizationStyles.addedItemsHeaderContainer}>
-        <StrongText>Added</StrongText>
+        <StrongText>{aichatI18n.addCustomizationCompletionText()}</StrongText>
       </div>
       {addedItems.map((message, index) => {
         return (

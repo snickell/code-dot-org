@@ -6,20 +6,23 @@ import {connect} from 'react-redux';
 import {asyncLoadCoursesWithProgress} from '@cdo/apps/redux/unitSelectionRedux';
 
 import styles from './unit-selector.module.scss';
-import skeletonizeContent from '@cdo/apps/componentLibrary/skeletonize-content.module.scss';
+import skeletonizeContent from '@cdo/apps/sharedComponents/skeletonize-content.module.scss';
 
 function UnitSelector({
+  sectionId,
   scriptId,
   onChange,
   coursesWithProgress,
   asyncLoadCoursesWithProgress,
   isLoadingCourses,
+  isLoadingSectionData,
 }) {
+  // Reload courses with progress when selected section changes.
   React.useEffect(() => {
-    if (!coursesWithProgress || coursesWithProgress.length === 0) {
+    if (sectionId) {
       asyncLoadCoursesWithProgress();
     }
-  }, [coursesWithProgress, asyncLoadCoursesWithProgress]);
+  }, [sectionId, asyncLoadCoursesWithProgress]);
 
   const loadingSkeleton = () => (
     <div>
@@ -34,7 +37,8 @@ function UnitSelector({
     </div>
   );
 
-  return isLoadingCourses ||
+  return isLoadingSectionData ||
+    isLoadingCourses ||
     !coursesWithProgress ||
     coursesWithProgress.length === 0 ? (
     loadingSkeleton()
@@ -63,9 +67,11 @@ function UnitSelector({
 UnitSelector.propTypes = {
   coursesWithProgress: PropTypes.array.isRequired,
   scriptId: PropTypes.number,
+  sectionId: PropTypes.number,
   onChange: PropTypes.func.isRequired,
   asyncLoadCoursesWithProgress: PropTypes.func.isRequired,
   isLoadingCourses: PropTypes.bool,
+  isLoadingSectionData: PropTypes.bool.isRequired,
 };
 
 export const UnconnectedUnitSelector = UnitSelector;
@@ -73,7 +79,9 @@ export const UnconnectedUnitSelector = UnitSelector;
 export default connect(
   state => ({
     coursesWithProgress: state.unitSelection.coursesWithProgress,
+    sectionId: state.teacherSections.selectedSectionId,
     isLoadingCourses: state.unitSelection.isLoadingCoursesWithProgress,
+    isLoadingSectionData: state.teacherSections.isLoadingSectionData,
   }),
   dispatch => ({
     asyncLoadCoursesWithProgress() {

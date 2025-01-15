@@ -14,8 +14,8 @@ import {
   Heading4,
 } from '@cdo/apps/componentLibrary/typography';
 import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
-import {EVENTS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import i18n from '@cdo/locale';
 
 import {
@@ -317,38 +317,40 @@ const ExpandedCurriculumCatalogCard = ({
                   className={style.closeButton}
                 />
               </div>
-              <div className={style.relatedContainer}>
-                <Heading4 visualAppearance="heading-xs">
-                  {i18n.relatedCurricula()}
-                </Heading4>
-                <hr className={style.thickDivider} />
-                <img
-                  id="similarCurriculumImage"
-                  src={recommendedSimilarCurriculum.image || defaultImageSrc}
-                  alt={recommendedSimilarCurriculum.display_name}
-                />
-                <Link
-                  id="similarCurriculumButton"
-                  name={recommendedSimilarCurriculum.display_name}
-                  className={style.relatedCurriculaLink}
-                  text={recommendedSimilarCurriculum.display_name}
-                  href={`#${curriculumCatalogCardIdPrefix}${recommendedSimilarCurriculum.key}`}
-                  onClick={handleClickRecommendedSimilarCurriculum}
-                />
-                <img
-                  id="stretchCurriculumImage"
-                  src={recommendedStretchCurriculum.image || defaultImageSrc}
-                  alt={recommendedStretchCurriculum.display_name}
-                />
-                <Link
-                  id="stretchCurriculumButton"
-                  name={recommendedStretchCurriculum.display_name}
-                  className={style.relatedCurriculaLink}
-                  text={recommendedStretchCurriculum.display_name}
-                  href={`#${curriculumCatalogCardIdPrefix}${recommendedStretchCurriculum.key}`}
-                  onClick={handleClickRecommendedStretchCurriculum}
-                />
-              </div>
+              {recommendedSimilarCurriculum && (
+                <div className={style.relatedContainer}>
+                  <Heading4 visualAppearance="heading-xs">
+                    {i18n.relatedCurricula()}
+                  </Heading4>
+                  <hr className={style.thickDivider} />
+                  <img
+                    id="similarCurriculumImage"
+                    src={recommendedSimilarCurriculum.image || defaultImageSrc}
+                    alt={recommendedSimilarCurriculum.display_name}
+                  />
+                  <Link
+                    id="similarCurriculumButton"
+                    name={recommendedSimilarCurriculum.display_name}
+                    className={style.relatedCurriculaLink}
+                    text={recommendedSimilarCurriculum.display_name}
+                    href={`#${curriculumCatalogCardIdPrefix}${recommendedSimilarCurriculum.key}`}
+                    onClick={handleClickRecommendedSimilarCurriculum}
+                  />
+                  <img
+                    id="stretchCurriculumImage"
+                    src={recommendedStretchCurriculum.image || defaultImageSrc}
+                    alt={recommendedStretchCurriculum.display_name}
+                  />
+                  <Link
+                    id="stretchCurriculumButton"
+                    name={recommendedStretchCurriculum.display_name}
+                    className={style.relatedCurriculaLink}
+                    text={recommendedStretchCurriculum.display_name}
+                    href={`#${curriculumCatalogCardIdPrefix}${recommendedStretchCurriculum.key}`}
+                    onClick={handleClickRecommendedStretchCurriculum}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

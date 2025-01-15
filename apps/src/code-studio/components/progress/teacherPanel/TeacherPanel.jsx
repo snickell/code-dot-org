@@ -28,7 +28,7 @@ import {setViewType, ViewType} from '@cdo/apps/code-studio/viewAsRedux';
 import fontConstants from '@cdo/apps/fontConstants';
 import Button from '@cdo/apps/legacySharedComponents/Button';
 import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
-import firehoseClient from '@cdo/apps/lib/util/firehose';
+import firehoseClient from '@cdo/apps/metrics/firehose';
 import SortByNameDropdown from '@cdo/apps/templates/SortByNameDropdown';
 import {
   pageTypes,
@@ -72,6 +72,7 @@ class TeacherPanel extends React.Component {
     levelsWithProgress: PropTypes.arrayOf(levelWithProgress),
     loadLevelsWithProgress: PropTypes.func.isRequired,
     teacherId: PropTypes.number,
+    isSortedByFamilyName: PropTypes.bool,
     exampleSolutions: PropTypes.array,
     currentLevelId: PropTypes.string,
     selectUser: PropTypes.func.isRequired,
@@ -174,6 +175,7 @@ class TeacherPanel extends React.Component {
       levelsWithProgress,
       pageType,
       teacherId,
+      isSortedByFamilyName,
       exampleSolutions,
       isCurrentLevelLab2,
       lab2ExampleSolutions,
@@ -213,6 +215,7 @@ class TeacherPanel extends React.Component {
               selectedUserId={selectedUserId}
               teacherId={teacherId}
               levelsWithProgress={levelsWithProgress}
+              isSortedByFamilyName={isSortedByFamilyName}
             />
           )}
           {displayLevelExamples && (
@@ -378,6 +381,7 @@ export default connect(
       isLoadingLevelsWithProgress:
         state.teacherPanel.isLoadingLevelsWithProgress,
       teacherId: state.currentUser.userId,
+      isSortedByFamilyName: state.currentUser.isSortedByFamilyName,
       exampleSolutions: state.pageConstants?.exampleSolutions,
       currentLevelId: state.progress.currentLevelId,
       lab2ExampleSolutions: state.lab?.levelProperties?.exampleSolutions,

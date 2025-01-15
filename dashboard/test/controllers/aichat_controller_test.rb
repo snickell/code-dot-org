@@ -22,6 +22,7 @@ class AichatControllerTest < ActionController::TestCase
     @student1_aichat_event2 = create(:aichat_event, user_id: @authorized_student1.id, level_id: @level.id, script_id: @script.id, aichat_event: valid_student1_chat_message2.to_json)
     @teacher1_aichat_event = create(:aichat_event, user_id: @authorized_teacher1.id, level_id: @level.id, script_id: @script.id, aichat_event: valid_teacher1_chat_message.to_json)
     @student2_aichat_event = create(:aichat_event, user_id: @authorized_student2.id, level_id: @level.id, script_id: @script.id, aichat_event: valid_student2_chat_message.to_json)
+    @student1_aichat_request = create(:aichat_request, user_id: @authorized_student1.id, model_customizations: @default_model_customizations.to_json, stored_messages: [].to_json, new_message: valid_student1_chat_message1.to_json, execution_status: SharedConstants::AI_REQUEST_EXECUTION_STATUS[:SUCCESS])
     @default_model_customizations = {temperature: 0.5, retrievalContexts: ["test"], systemPrompt: "test"}.stringify_keys
     @default_aichat_context = {
       currentLevelId: @level.id,
@@ -66,6 +67,7 @@ class AichatControllerTest < ActionController::TestCase
     :log_chat_event,
     :student_chat_history,
     :start_chat_completion,
+    :find_toxicity,
     [:chat_request, :get, {id: 1}]
   ].each do |action, method = :post, params = {}|
     users.each do |user|
@@ -122,9 +124,9 @@ class AichatControllerTest < ActionController::TestCase
     assert_equal request.level_id, @level.id
     assert_equal request.script_id, @script.id
     assert_equal request.project_id, @project_id
-    assert_equal request.model_customizations, @default_model_customizations.to_json
-    assert_equal request.stored_messages, [].to_json
-    assert_equal request.new_message, @valid_params_chat_completion[:newMessage].to_json
+    assert_equal request.model_customizations, @default_model_customizations
+    assert_equal request.stored_messages, []
+    assert_equal request.new_message, @valid_params_chat_completion[:newMessage].stringify_keys
     assert_equal request.execution_status, SharedConstants::AI_REQUEST_EXECUTION_STATUS[:NOT_STARTED]
   end
 
@@ -147,6 +149,7 @@ class AichatControllerTest < ActionController::TestCase
     assert_response :forbidden
   end
 
+  # log_chat_event tests
   test 'authorized teacher has access to log_chat_event test' do
     sign_in(@authorized_teacher1)
     post :log_chat_event, params: @valid_params_log_chat_event, as: :json
@@ -174,6 +177,22 @@ class AichatControllerTest < ActionController::TestCase
     aichat_event_row = AichatEvent.find(json_response['chat_event_id'])
     stored_aichat_event = JSON.parse(aichat_event_row.aichat_event)
     assert_equal stored_aichat_event['timestamp'], @valid_params_log_chat_event[:newChatEvent][:timestamp]
+  end
+
+  test 'log_chat_event logs requestId successfully to AichatEvents table' do
+    sign_in(@authorized_student1)
+
+    # need a valid requestId for foreign key constraint
+    request_id = @student1_aichat_request.id
+    params = @valid_params_log_chat_event.merge(newChatEvent: @valid_params_log_chat_event[:newChatEvent].merge(requestId: request_id))
+
+    post :log_chat_event, params: params, as: :json
+
+    assert_response :success
+    assert_equal json_response.keys, ['chat_event_id', 'chat_event']
+    aichat_event_row = AichatEvent.find(json_response['chat_event_id'])
+    stored_aichat_event = JSON.parse(aichat_event_row.aichat_event)
+    assert_equal request_id, stored_aichat_event['requestId']
   end
 
   test 'Bad request if required params are not included for student_chat_history' do
@@ -220,7 +239,7 @@ class AichatControllerTest < ActionController::TestCase
   # chat_request tests
   test 'GET chat_request returns not found if request does not exist' do
     sign_in(@authorized_student1)
-    get :chat_request, params: {id: 1}, as: :json
+    get :chat_request, params: {id: 100}, as: :json
     assert_response :not_found
   end
 
@@ -243,5 +262,109 @@ class AichatControllerTest < ActionController::TestCase
     assert_equal json_response.keys, ['executionStatus', 'response']
     assert_equal json_response['executionStatus'], execution_status
     assert_equal json_response['response'], response
+  end
+
+  # user_has_access tests
+  test 'signed out user does not have access to user_has_access test' do
+    get :user_has_access
+    assert_response :forbidden
+  end
+
+  test 'GET user_has_access returns false for unauthorized teacher' do
+    sign_in(create(:teacher))
+    get :user_has_access
+    assert_response :success
+    assert_equal json_response['userHasAccess'], false
+  end
+
+  test 'GET user_has_access returns true for authorized teacher' do
+    sign_in(@authorized_teacher1)
+    get :user_has_access
+    assert_response :success
+    assert_equal json_response['userHasAccess'], true
+  end
+
+  test 'GET user_has_access returns false for unauthorized student' do
+    sign_in(create(:student))
+    get :user_has_access
+    assert_response :success
+    assert_equal json_response['userHasAccess'], false
+  end
+
+  test 'GET user_has_access returns true for student of authorized teacher' do
+    sign_in(@authorized_student1)
+    get :user_has_access
+    assert_response :success
+    assert_equal json_response['userHasAccess'], true
+  end
+
+  test 'find_toxicity returns toxicity if detected in system prompt' do
+    sign_in(@authorized_student1)
+    system_prompt = 'hello system prompt'
+    locale = 'en'
+    toxicity_response = {text: system_prompt, blocked_by: 'comprehend', details: {}}
+    AichatSafetyHelper.expects(:find_toxicity).with('user', system_prompt, locale).returns(toxicity_response)
+
+    expected_response = {
+      flaggedFields: [{field: 'systemPrompt', toxicity: toxicity_response.camelize_keys}]
+    }.deep_stringify_keys
+
+    post :find_toxicity, params: {systemPrompt: system_prompt, locale: locale}, as: :json
+    assert_response :success
+    assert_equal expected_response, json_response
+  end
+
+  test 'find_toxicity returns toxicity if detected in retrieval context' do
+    sign_in(@authorized_student1)
+    retrieval_contexts = ['retrieval1', 'retrieval2']
+    locale = 'en'
+    toxicity_response = {text: retrieval_contexts.join(' '), blocked_by: 'comprehend', details: {}}
+    AichatSafetyHelper.expects(:find_toxicity).with('user', retrieval_contexts.join(' '), locale).returns(toxicity_response)
+
+    expected_response = {
+      flaggedFields: [{field: 'retrievalContexts', toxicity: toxicity_response.camelize_keys}]
+    }.deep_stringify_keys
+
+    post :find_toxicity, params: {retrievalContexts: retrieval_contexts, locale: locale}, as: :json
+    assert_response :success
+    assert_equal expected_response, json_response
+  end
+
+  test 'find_toxicity returns toxicity if detected in both system prompt and retrieval contexts' do
+    sign_in(@authorized_student1)
+    system_prompt = 'hello system prompt'
+    retrieval_contexts = ['retrieval1', 'retrieval2']
+    locale = 'en'
+    toxicity_response_system_prompt = {text: system_prompt, blocked_by: 'comprehend', details: {}}
+    toxicity_response_retrieval_contexts = {text: retrieval_contexts.join(' '), blocked_by: 'comprehend', details: {}}
+    AichatSafetyHelper.expects(:find_toxicity).with('user', system_prompt, locale).returns(toxicity_response_system_prompt)
+    AichatSafetyHelper.expects(:find_toxicity).with('user', retrieval_contexts.join(' '), locale).returns(toxicity_response_retrieval_contexts)
+
+    expected_response = {
+      flaggedFields: [
+        {field: 'systemPrompt', toxicity: toxicity_response_system_prompt.camelize_keys},
+        {field: 'retrievalContexts', toxicity: toxicity_response_retrieval_contexts.camelize_keys}
+      ]
+    }.deep_stringify_keys
+
+    post :find_toxicity, params: {systemPrompt: system_prompt, retrievalContexts: retrieval_contexts, locale: locale}, as: :json
+    assert_response :success
+    assert_equal expected_response, json_response
+  end
+
+  test 'find_toxicity returns empty flagged fields if no toxicity detected' do
+    sign_in(@authorized_student1)
+    system_prompt = 'hello system prompt'
+    retrieval_contexts = ['retrieval1', 'retrieval2']
+    locale = 'en'
+    AichatSafetyHelper.expects(:find_toxicity).twice.returns(nil)
+
+    expected_response = {
+      flaggedFields: []
+    }.deep_stringify_keys
+
+    post :find_toxicity, params: {systemPrompt: system_prompt, retrievalContexts: retrieval_contexts, locale: locale}, as: :json
+    assert_response :success
+    assert_equal expected_response, json_response
   end
 end

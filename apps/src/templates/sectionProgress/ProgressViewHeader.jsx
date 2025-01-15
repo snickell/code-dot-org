@@ -2,14 +2,15 @@ import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
-import {EVENTS} from '@cdo/apps/lib/util/AnalyticsConstants';
-import analyticsReporter from '@cdo/apps/lib/util/AnalyticsReporter';
+import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
+import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {getSelectedScriptFriendlyName} from '@cdo/apps/redux/unitSelectionRedux';
 import i18n from '@cdo/locale';
 
 import {h3Style} from '../../legacySharedComponents/Headings';
-import firehoseClient from '../../lib/util/firehose';
+import firehoseClient from '../../metrics/firehose';
 import color from '../../util/color';
+import {getUnitUrl} from '../teacherDashboard/urlHelpers';
 
 import {ViewType, unitDataPropType} from './sectionProgressConstants';
 import {getCurrentUnitData} from './sectionProgressRedux';
@@ -27,7 +28,14 @@ class ProgressViewHeader extends Component {
 
   getLinkToOverview() {
     const {scriptData, sectionId} = this.props;
-    return scriptData ? `${scriptData.path}?section_id=${sectionId}` : null;
+    return scriptData
+      ? getUnitUrl(
+          sectionId,
+          scriptData.name,
+          null,
+          `${scriptData.path}?section_id=${sectionId}`
+        )
+      : null;
   }
 
   navigateToScript = () => {
