@@ -5,7 +5,7 @@ import React from 'react';
 import './stub-section.module.scss';
 
 export interface StubSectionProps {
-  backgroundColor: 'black' | 'white' | 'red';
+  backgroundColor: 'black' | 'white' | 'red' | 'green';
   label: string;
 }
 
