@@ -1,7 +1,7 @@
 # Change Log pre-1
 
 All of the pre-1 package version are listed here.
-Since initially dsco was a part of code-dot-ord/apps build - it initially had 1 Changelog per each DSCO
+Since initially component-library was a part of code-dot-org/apps build - it initially had 1 Changelog per each component-library
 component/entity. All of that Changelogs will be combined into one in this file grouped by component/entity.
 
 ## `componentLibrary/alert`
