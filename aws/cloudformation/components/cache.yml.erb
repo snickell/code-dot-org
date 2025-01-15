@@ -36,3 +36,50 @@
       AZMode: cross-az
       PreferredAvailabilityZones: <%= AVAILABILITY_ZONES.first(2).to_json %>
       VpcSecurityGroupIds: [!ImportValue VPC-MemcachedSecurityGroup]
+  MemcachedCPUUsageAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: Production Shared Cache CPU Utilization
+      AlarmDescription: The Elasticache Memcached cluster, which we use to support
+          CDO.shared_cache in production is working much harder than usual. May
+          impact site performance if utilization is too high, but as of Jan 2025
+          we are unsure what the actual impact would be, and how high exactly this
+          alarm threshold should be set.
+      ActionsEnabled: true
+      AlarmActions:
+          - !Ref InfraUrgent
+      MetricName: CPUUtilization
+      Namespace: AWS/ElastiCache
+      Statistic: Average
+      Dimensions:
+          - Name: CacheClusterId
+            Value: !GetAtt Memcached.Id
+      Period: 300
+      EvaluationPeriods: 5
+      DatapointsToAlarm: 5
+      Threshold: 20
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: breaching
+
+  MemcachedCPUUsageWarningAlarm
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: Production Shared Cache CPU Utilization - WARN
+      AlarmDescription: The Elasticache Memcached cluster, which supports
+          CDO.shared_cache in production is working a lot harder than usual.
+          Unlikely to reflect actual user impact, but should be investigated.
+      ActionsEnabled: true
+      AlarmActions:
+          - !Ref !InfraWorkdayUrgent
+      MetricName: CPUUtilization
+      Namespace: AWS/ElastiCache
+      Statistic: Average
+      Dimensions:
+          - Name: CacheClusterId
+            Value: !GetAtt Memcached.Id
+      Period: 300
+      EvaluationPeriods: 5
+      DatapointsToAlarm: 5
+      Threshold: 5
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: breaching
