@@ -22,7 +22,7 @@ puts "Rails environment loaded in: #{(Time.now - start_time).to_i} seconds"
 
 # thread-safe client for AWS Comprehend
 $comprehend = Aws::Comprehend::Client.new
-$pii_threshold = 0.9
+$pii_threshold = 0.8
 
 def execute_redshift_query(client, query)
   start_time = Time.now
@@ -84,7 +84,9 @@ end
 # test_pii("the quick brown fox jumped over the lazy dog")
 # test_pii("the quick brown fox (206) 555-1212 jumped over the lazy dog at 55 main st")
 
-def filter_pii(source)
+def check_pii(source)
+  return [0, []] unless source.present?
+
   params = {
     language_code: "en",
     text: source
@@ -104,14 +106,9 @@ def filter_pii(source)
   #   ]
   # }
 
-  contains_pii = response.entities.any? do |entity|
-    # allow all PII entity types, since the cost of false positives is low
-    # and the cost of false negatives is high. for a list of all types, see:
-    # https://docs.aws.amazon.com/comprehend/latest/dg/how-pii.html#how-pii-types
-    entity.score > $pii_threshold
-  end
+  max_score = response.entities.map(&:score).max || 0
 
-  contains_pii ? nil : source
+  [max_score, response.entities]
 end
 
 def main
@@ -121,14 +118,19 @@ def main
   results = execute_redshift_query(client, query)
   results.each do |row|
     source = get_project_source(row['user_id'], row['level_id'], row['script_id'])
-    source = filter_pii(source)
-    next unless source
+
+    pii_score, pii_entities = check_pii(source)
+    row[:pii_score] = pii_score
+    row[:pii_entities] = pii_entities
+    if pii_score > $pii_threshold
+      source = nil
+    end
     row[:source] = source
 
     row[:hashed_user_id] = hashed_user_id(row['user_id'])
     row.delete('user_id')
 
-    puts JSON.pretty_generate row
+    puts JSON.stringify(row)
   end
 end
 
