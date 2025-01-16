@@ -25,24 +25,21 @@ RUN --mount=type=cache,sharing=locked,uid=${UID},gid=${GID},target=${HOME}/.rben
 EOF
 
 ################################################################################
-FROM code-dot-org-core AS code-dot-org-pdm-install
+FROM code-dot-org-core AS code-dot-org-uv-install
 ################################################################################
 
 # Install python packages
 
-COPY --chown=${UID} \
-  pyproject.toml \
-  pdm.lock \
-  ./
+# COPY --chown=${UID} \
+#   pyproject.toml \
+#   uv.lock \
+#   ./
 
-COPY --chown=${UID} \
-  python/pycdo/pyproject.toml \
-  python/pycdo/pdm.lock \
-  ./python/pycdo/
+# FIXME: how do we deal with the python deps not being fully included???
 
-RUN <<EOF
-  pdm install > /dev/null < /dev/null
-EOF
+# RUN <<EOF
+#   uv sync --frozen
+# EOF
 
 ################################################################################
 FROM code-dot-org-core AS code-dot-org-node_modules
@@ -115,15 +112,15 @@ COPY --chown=${UID} --link \
   --from=code-dot-org-db-seed  / \
   ./
 
-# Copy in python packages from code-dot-org/.venv (built in parallel)
-COPY --chown=${UID} --link \
-  --from=code-dot-org-pdm-install ${SRC}/.venv \
-  ${SRC}/.venv
+# # Copy in python packages from code-dot-org/.venv (built in parallel)
+# COPY --chown=${UID} --link \
+#   --from=code-dot-org-pdm-install ${SRC}/.venv \
+#   ${SRC}/.venv
 
-# Copy in python for the venv from ~/.local/share/pdm
-COPY --chown=${UID} --link \
-  --from=code-dot-org-pdm-install ${HOME}/.local/share/pdm \
-  ${HOME}/.local/share/pdm
+# # Copy in python for the venv from ~/.local/share/pdm
+# COPY --chown=${UID} --link \
+#   --from=code-dot-org-pdm-install ${HOME}/.local/share/pdm \
+#   ${HOME}/.local/share/pdm
 
 # Copy in ~/.rbenv (built in parallel)
 COPY --chown=${UID} --link \
