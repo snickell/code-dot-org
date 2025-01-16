@@ -23,6 +23,9 @@ ENV \
   AWS_PROFILE=cdo \
   SRC=${SRC}
 
+# -e is important because we are using the `RUN <<EOF` approach to multi-line shell
+# commands rather than manually stringing with && statements. If we don't set -e
+# then RUN lines will not exit if one of their commands fails.
 SHELL [ "/bin/sh", "-euxc" ]
 
 RUN <<EOF
