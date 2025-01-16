@@ -128,8 +128,8 @@ RUN <<EOF
   ./aws/install
   rm awscliv2.zip
 
-  # install pdm for managing our python dependencies
-  pip install -q pdm
+  # install uv for managing our python dependencies
+  curl -LsSf https://astral.sh/uv/0.5.18/install.sh | XDG_BIN_HOME=/usr/local/bin UV_NO_MODIFY_PATH=1 sh
 
   # Install Sauce Connect Proxy
   mkdir sauce_connect
