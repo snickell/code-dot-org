@@ -69,9 +69,9 @@ const StudentCodeDatasetMaker: React.FC = () => {
       <br />
       <br />
       <p>
-        If the dataset is for Meaures of Learning, the keep everything
-        organized, the datasets should be named with the course, unit, lesson
-        and level. For example: CSP_U4_L6_L3, for CSP Unit 4, Lesson 6, Level 3.
+        If the dataset is for Meaures of Learning, to keep everything organized,
+        the datasets should be named with the course, unit, lesson and level.
+        For example: CSP_U4_L6_L3, for CSP Unit 4, Lesson 6, Level 3.
       </p>
       <TextField
         name="Dataset Name"
