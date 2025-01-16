@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
+require 'parallel'
 
 $options = {}
 OptionParser.new do |opts|
@@ -22,7 +23,9 @@ puts "Rails environment loaded in: #{(Time.now - start_time).to_i} seconds"
 
 # thread-safe client for AWS Comprehend
 $comprehend = Aws::Comprehend::Client.new
-$pii_threshold = 0.8
+$pii_threshold = 0.7
+
+$max_threads = 100
 
 def execute_redshift_query(client, query)
   start_time = Time.now
@@ -34,7 +37,7 @@ rescue => exception
   raise
 end
 
-def get_project_source(user_id, level_id, script_id)
+def get_project_channel_id(user_id, level_id, script_id)
   user_storage_id = storage_id_for_user_id(user_id)
   return unless user_storage_id
 
@@ -45,11 +48,20 @@ def get_project_source(user_id, level_id, script_id)
   channel_token = ChannelToken.find_channel_token(level, user_storage_id, script_id)
   return unless channel_token
 
-  source_data = SourceBucket.new.get(channel_token.channel, "main.json")
-  return unless source_data && source_data[:body] && source_data[:body].respond_to?(:string)
+  channel_token.channel
+end
+
+def get_project_source(channel_id)
+  return nil unless channel_id
+
+  source_data = SourceBucket.new.get(channel_id, "main.json")
+  return nil unless source_data && source_data[:body] && source_data[:body].respond_to?(:string)
 
   main_json = source_data[:body].string
   JSON.parse(main_json)['source']
+rescue NoMethodError => exception
+  puts "Error getting source for channel id: #{channel_id}: #{exception}"
+  nil
 end
 
 def hashed_user_id(user_id)
@@ -66,23 +78,6 @@ def hashed_user_id(user_id)
   # https://en.wikipedia.org/wiki/Birthday_attack#Simple_approximation
   digest[0..31]
 end
-
-def test_pii(source)
-  params = {
-    language_code: "en",
-    text: source
-  }
-  response = $comprehend.detect_pii_entities(params)
-
-  output = {
-    source: source,
-    response: response.entities
-  }
-  puts JSON.pretty_generate output
-end
-
-# test_pii("the quick brown fox jumped over the lazy dog")
-# test_pii("the quick brown fox (206) 555-1212 jumped over the lazy dog at 55 main st")
 
 def check_pii(source)
   return [0, []] unless source.present?
@@ -116,22 +111,45 @@ def main
   query = File.read(filename)
   client = RedshiftClient.instance
   results = execute_redshift_query(client, query)
-  results.each do |row|
-    source = get_project_source(row['user_id'], row['level_id'], row['script_id'])
 
-    pii_score, pii_entities = check_pii(source)
-    row[:pii_score] = pii_score
-    row[:pii_entities] = pii_entities
-    if pii_score > $pii_threshold
-      source = nil
-    end
-    row[:source] = source
-
-    row[:hashed_user_id] = hashed_user_id(row['user_id'])
-    row.delete('user_id')
-
-    puts JSON.stringify(row)
+  puts "Looking up channel ids..."
+  start_time = Time.now
+  # not parallelizing this step yet because we are limited to 5 connections to active record.
+  results = results.map do |row|
+    channel_id = get_project_channel_id(row['user_id'], row['level_id'], row['script_id'])
+    row[:channel_id] = channel_id
+    row
   end
+  puts "Channel id lookups completed in #{(Time.now - start_time).round(2)} seconds. rows: #{results.count}"
+
+  puts "Processing source..."
+  start_time = Time.now
+  File.open('output.jsonl', 'w') do |file|
+    mutex = Mutex.new
+
+    # parallelize network requests to projects API and AWS Comprehend
+    Parallel.each(results, in_threads: $max_threads) do |row|
+      source = get_project_source(row[:channel_id])
+
+      pii_score, pii_entities = check_pii(source)
+      row[:pii_score] = pii_score
+      row[:pii_entities] = pii_entities
+      if pii_score > $pii_threshold
+        source = nil
+        row['link_to_project'] = nil
+        row[:channel_id] = nil
+      end
+      row[:source] = source
+
+      row[:hashed_user_id] = hashed_user_id(row['user_id'])
+      row.delete('user_id')
+
+      mutex.synchronize do
+        file.puts row.to_json
+      end
+    end
+  end
+  puts "Processed source in #{(Time.now - start_time).round(2)} seconds. rows: #{results.count} threads: #{$max_threads}"
 end
 
 main
