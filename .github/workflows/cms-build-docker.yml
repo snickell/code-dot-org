@@ -36,7 +36,7 @@ jobs:
     # Expose the docker image and tag that this job produces
     outputs:
       fullImageUri: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}@${{ steps.push.outputs.digest }}
-      imageId: ${{ steps.push.outputs.imageid }}
+      digest: ${{ steps.push.outputs.digest }}
 
     steps:
       - uses: actions/checkout@v4
@@ -112,4 +112,4 @@ jobs:
       working-directory: ./aws/cdk/marketing
       run: |
         npm install
-        cdk deploy MarketingStack-Staging --parameters MarketingStack-Staging:ContainerImageHash=${{ needs.build-and-push-image.outputs.imageId }}
+        cdk deploy MarketingStack-Staging --parameters MarketingStack-Staging:ContainerImageHash=${{ needs.build-and-push-image.outputs.digest }}

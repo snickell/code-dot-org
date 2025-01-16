@@ -67,7 +67,7 @@ export class MarketingStack extends cdk.Stack {
          * 
          * When the deployment Github Action is trigerred, the deployment process will update this image field to the sha256sum that is produced by the build process.
          */
-        image: ecs.ContainerImage.fromRegistry(`ghcr.io/code-dot-org/marketing@${marketingImageShaSum.valueAsString}`),
+        image: ecs.ContainerImage.fromRegistry(`ghcr.io/code-dot-org/marketing@sha256:${marketingImageShaSum.valueAsString}`),
         containerPort: 3000,
         secrets: {
           CONTENTFUL_TOKEN: ecs.Secret.fromSecretsManager(secretsManager.Secret.fromSecretCompleteArn(this, 'Contentful', 'arn:aws:secretsmanager:us-west-2:165336972514:secret:development/marketing/90t6bu6vlf76/contentful-fOz371'), 'CONTENTFUL_TOKEN')
