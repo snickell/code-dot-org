@@ -3,6 +3,7 @@ import markdownToTxt from 'markdown-to-txt';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import Typist from 'react-typist';
 
+import {capitalizeFirstLetter} from '@cdo/apps/blockly/utils';
 import {Button} from '@cdo/apps/componentLibrary/button';
 import TextToSpeech from '@cdo/apps/lab2/views/components/TextToSpeech';
 import {LessonBackground} from '@cdo/apps/types/progressTypes';
@@ -166,6 +167,8 @@ const PanelsView: React.FunctionComponent<PanelsProps> = ({
     return null;
   }
 
+  const backgroundSuffix = capitalizeFirstLetter(background || 'dark');
+
   const previousPanel =
     panel.fadeInOverPrevious &&
     previousPanelIndex !== undefined &&
@@ -286,13 +289,9 @@ const PanelsView: React.FunctionComponent<PanelsProps> = ({
                   className={classNames(
                     'icon',
                     styles.bubble,
-                    background === 'light'
-                      ? index === currentPanelIndex
-                        ? styles.bubbleCurrentLight
-                        : styles.bubbleNotCurrentLight
-                      : index === currentPanelIndex
-                      ? styles.bubbleCurrentDark
-                      : styles.bubbleNotCurrentDark
+                    index === currentPanelIndex
+                      ? styles[`bubbleCurrent${backgroundSuffix}`]
+                      : styles[`bubbleNotCurrent${backgroundSuffix}`]
                   )}
                   title={undefined}
                   icon="circle"

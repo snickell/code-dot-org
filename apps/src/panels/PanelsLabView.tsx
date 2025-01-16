@@ -16,7 +16,10 @@ import {useDialogControl, DialogType} from '@cdo/apps/lab2/views/dialogs';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 import {sendSuccessReport} from '../code-studio/progressRedux';
-import {getCurrentLevel} from '../code-studio/progressReduxSelectors';
+import {
+  getCurrentLevel,
+  getCurrentLesson,
+} from '../code-studio/progressReduxSelectors';
 import {queryParams} from '../code-studio/utils';
 import useLifecycleNotifier from '../lab2/hooks/useLifecycleNotifier';
 import {LifecycleEvent} from '../lab2/utils';
@@ -76,9 +79,7 @@ const PanelsLabView: React.FunctionComponent = () => {
     state => state.lab.levelProperties?.appName
   );
   const background = useAppSelector(
-    state =>
-      state.progress.lessons?.find(l => l.id === state.progress.currentLessonId)
-        ?.background || null
+    state => getCurrentLesson(state)?.background || null
   );
   const skipUrl = useAppSelector(state => state.lab.levelProperties?.skipUrl);
   const offerBrowserTts =

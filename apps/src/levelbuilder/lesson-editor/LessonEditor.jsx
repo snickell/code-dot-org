@@ -286,6 +286,12 @@ class LessonEditor extends Component {
               <option value="light">light</option>
               <option value="dark">dark</option>
             </select>
+            <HelpTip>
+              <p>
+                Choose a light or dark background for a lesson containing Lab2
+                levels.
+              </p>
+            </HelpTip>
           </label>
           <label>
             Creative Commons Image
