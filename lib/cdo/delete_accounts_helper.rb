@@ -48,7 +48,7 @@ class DeleteAccountsHelper
 
     project_ids = DASHBOARD_DB[:projects].where(storage_id: user.user_storage_id).map(:id)
     channel_count = project_ids.count
-    encrypted_channel_ids = project_ids.map do |project_id|
+    project_ids.map do |project_id|
       storage_encrypt_channel_id user.user_storage_id, project_id
     end
 
@@ -63,13 +63,6 @@ class DeleteAccountsHelper
     project_commits = ProjectCommit.where(project_id: project_ids)
     project_commits.each {|version| version.update!(comment: nil)}
     @log.puts "Cleared #{project_commits.count} ProjectCommit comments" if project_commits.count > 0
-
-    # Clear S3 contents for user's channels
-    @log.puts "Deleting S3 contents for #{channel_count} channels"
-    buckets = [SourceBucket, AssetBucket, AnimationBucket, FileBucket].map(&:new)
-    buckets.product(encrypted_channel_ids).each do |bucket, encrypted_channel_id|
-      bucket.hard_delete_channel_content encrypted_channel_id
-    end
 
     # Clear Datablock Storage contents for user's projects
     @log.puts "Deleting Datablock Storage contents for #{project_ids.count} projects"
