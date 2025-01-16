@@ -121,15 +121,15 @@ COPY --chown=${UID} --link \
   --from=code-dot-org-db-seed  / \
   ./
 
-# # Copy in python packages from code-dot-org/.venv (built in parallel)
-# COPY --chown=${UID} --link \
-#   --from=code-dot-org-pdm-install ${SRC}/.venv \
-#   ${SRC}/.venv
+# Copy in python packages from code-dot-org/.venv (built in parallel)
+COPY --chown=${UID} --link \
+  --from=code-dot-org-uv-sync ${SRC}/.venv \
+  ${SRC}/.venv
 
-# # Copy in python for the venv from ~/.local/share/pdm
-# COPY --chown=${UID} --link \
-#   --from=code-dot-org-pdm-install ${HOME}/.local/share/pdm \
-#   ${HOME}/.local/share/pdm
+# # Copy in python install for the venv from ~/.local/share/uv
+COPY --chown=${UID} --link \
+  --from=code-dot-org-uv-sync ${HOME}/.local/share/uv \
+  ${HOME}/.local/share/uv
 
 # Copy in ~/.rbenv (built in parallel)
 COPY --chown=${UID} --link \
