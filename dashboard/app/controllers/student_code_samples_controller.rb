@@ -14,8 +14,8 @@ class StudentCodeSamplesController < ApplicationController
     until code_samples.length == num_samples
       student_ids.each do |student_id|
         storage_id = storage_id_for_user_id(student_id)
-        channel_token = ChannelToken.where(storage_id: storage_id, level_id: params[:level_id], script_id: params[:script_id]).last
-        user_level = UserLevel.where(user_id: student_id, level_id: params[:level_id], script_id: params[:script_id]).last
+        channel_token = ChannelToken.where(storage_id: storage_id, level_id: level_id, script_id: script_id).last
+        user_level = UserLevel.where(user_id: student_id, level_id: level_id, script_id: script_id).last
         if user_level && channel_token
           storage_app_id = channel_token.storage_app_id
           token = storage_encrypt_channel_id(storage_id, storage_app_id)

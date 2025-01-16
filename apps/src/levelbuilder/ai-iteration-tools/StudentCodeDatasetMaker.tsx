@@ -1,12 +1,8 @@
-import React, {useEffect, useState} from 'react';
-import Papa, {parse} from 'papaparse';
+import React, {useState} from 'react';
+import Papa from 'papaparse';
 import Button from '@cdo/apps/componentLibrary/button/Button';
 import TextField from '@cdo/apps/componentLibrary/textField';
 import {fetchStudentCodeSamples} from './StudentCodeSamplesApi';
-
-// interface StudentCodeProps {
-//     allowed: boolean;
-//   }
 
 interface StudentCodeSample {
   projectId: string;
@@ -23,10 +19,7 @@ const StudentCodeDatasetMaker: React.FC = () => {
   const [fetchedSamples, setFetchedSamples] = useState<StudentCodeSample[]>([]);
 
   const downloadCSV = () => {
-    console.log('fetchedSamples', fetchedSamples);
-
     const csv = Papa.unparse(fetchedSamples);
-    console.log('csv', csv);
     const csvData = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
     const csvURL = window.URL.createObjectURL(csvData);
     const tempLink = document.createElement('a');
@@ -75,6 +68,11 @@ const StudentCodeDatasetMaker: React.FC = () => {
       />
       <br />
       <br />
+      <p>
+        If the dataset is for Meaures of Learning, the keep everything
+        organized, the datasets should be named with the course, unit, lesson
+        and level. For example: CSP_U4_L6_L3, for CSP Unit 4, Lesson 6, Level 3.
+      </p>
       <TextField
         name="Dataset Name"
         label="What do you want to name this dataset?"

@@ -5,7 +5,6 @@ export async function fetchStudentCodeSamples(
   scriptId: number,
   levelId: number
 ): Promise<string | null> {
-  console.log('Fetching student code samples');
   try {
     const response = await fetch(
       `/student_code_samples/${numSamples}/${scriptId}/${levelId}`,
@@ -17,7 +16,6 @@ export async function fetchStudentCodeSamples(
         },
       }
     );
-    console.log('response', response);
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
