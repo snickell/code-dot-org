@@ -38,7 +38,7 @@ FROM code-dot-org-core AS code-dot-org-uv-install
 # FIXME: how do we deal with the python deps not being fully included???
 
 # RUN <<EOF
-#   uv sync --frozen
+#   uv sync --frozen --quiet
 # EOF
 
 ################################################################################
