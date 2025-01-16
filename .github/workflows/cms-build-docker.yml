@@ -108,7 +108,7 @@ jobs:
       run: |
         npm i -g aws-cdk
 
-    - name: [Staging] Deploy Marketing App to AWS
+    - name: "[Staging] Deploy Marketing App to AWS"
       working-directory: ./aws/cdk/marketing
       run: |
         cdk deploy MarketingStack-Staging --parameters MarketingStack-Staging:ContainerImageHash=${{ needs.build-and-push-image.outputs.digest }}
