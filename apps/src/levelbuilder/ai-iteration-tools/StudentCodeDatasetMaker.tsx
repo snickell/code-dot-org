@@ -42,9 +42,6 @@ const StudentCodeDatasetMaker: React.FC = () => {
   return (
     <div>
       <h2>Generate Student Code Datasets</h2>
-      <p>
-        Allows you to generate datasets of student code samples from levels.
-      </p>
       <br />
       <TextField
         name="Level Id"
@@ -68,14 +65,12 @@ const StudentCodeDatasetMaker: React.FC = () => {
       />
       <br />
       <br />
-      <p>
-        If the dataset is for Meaures of Learning, to keep everything organized,
-        the datasets should be named with the course, unit, lesson and level.
-        For example: CSP_U4_L6_L3, for CSP Unit 4, Lesson 6, Level 3.
-      </p>
       <TextField
         name="Dataset Name"
         label="What do you want to name this dataset?"
+        helperMessage=" If the dataset is for Meaures of Learning,
+        the dataset should be named with the course, unit, lesson and level.
+        For example: CSP_U4_L6_L3, for CSP Unit 4, Lesson 6, Level 3."
         onChange={e => setDatasetName(e.target.value)}
         value={datasetName}
       />
@@ -89,7 +84,6 @@ const StudentCodeDatasetMaker: React.FC = () => {
           isPending={pending}
         />
       </div>
-      <br />
       <br />
       <div>
         <Button

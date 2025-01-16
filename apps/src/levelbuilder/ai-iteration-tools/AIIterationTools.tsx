@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import AITutorTester from './ai-tutor/AITutorTester';
 import StudentCodeDatasetMaker from './StudentCodeDatasetMaker';
 
@@ -15,6 +15,9 @@ const AIIterationTools: React.FC<AIIterationToolsProps> = ({allowed}) => {
         the fun of iterating on our AI tools.
       </p>
       <StudentCodeDatasetMaker />
+      <br />
+      <hr />
+      <br />
       <AITutorTester allowed={allowed} />
     </div>
   );
