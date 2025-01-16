@@ -25,21 +25,30 @@ RUN --mount=type=cache,sharing=locked,uid=${UID},gid=${GID},target=${HOME}/.rben
 EOF
 
 ################################################################################
-FROM code-dot-org-core AS code-dot-org-uv-install
+FROM code-dot-org-core AS code-dot-org-uv-sync
 ################################################################################
 
 # Install python packages
 
-# COPY --chown=${UID} \
-#   pyproject.toml \
-#   uv.lock \
-#   ./
+COPY --chown=${UID} \
+  pyproject.toml \
+  uv.lock \
+  ./
 
-# FIXME: how do we deal with the python deps not being fully included???
+# We need a COPY line for each pyproject.toml in python/.
+#
+# Generate these by running this from code-dot-org/ root dir:
+#   find python | grep pyproject.toml | grep -v .venv | awk '{print "COPY --chown=${UID} " $0 " " $0}'
+COPY --chown=${UID} python/pycdo/pyproject.toml python/pycdo/pyproject.toml
+COPY --chown=${UID} python/pythonlab/pythonlab_setup/pyproject.toml python/pythonlab/pythonlab_setup/pyproject.toml
+COPY --chown=${UID} python/pythonlab/neighborhood/pyproject.toml python/pythonlab/neighborhood/pyproject.toml
+COPY --chown=${UID} python/pythonlab/unittest_runner/pyproject.toml python/pythonlab/unittest_runner/pyproject.toml
 
-# RUN <<EOF
-#   uv sync --frozen --quiet
-# EOF
+RUN <<EOF
+  # --no-install-workspace means we dont need the full contents of each package under python/
+  # but we still need their pyproject.toml files to be installed
+  uv sync --frozen --no-install-workspace --quiet
+EOF
 
 ################################################################################
 FROM code-dot-org-core AS code-dot-org-node_modules
