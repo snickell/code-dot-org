@@ -186,9 +186,9 @@ class ScriptLevelsController < ApplicationController
       end
     end
 
+    # The lesson might contain a background that should be applied to all levels.
     if params[:lesson_position]
-      lesson = @script.lesson_by_relative_position(params[:lesson_position].to_i)
-      lesson_background_class = "background-#{lesson.properties['background']}"
+      lesson_background_class = "background-#{@script_level.lesson.properties['background']}"
     end
     @body_classes = lesson_background_class || @level.properties['background']
 
