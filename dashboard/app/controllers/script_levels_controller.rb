@@ -186,10 +186,11 @@ class ScriptLevelsController < ApplicationController
       end
     end
 
-    lesson = @script.lesson_by_relative_position(params[:lesson_position].to_i)
-    @body_classes = lesson.properties['background'] ?
-      "background-#{lesson.properties['background']}" :
-      @level.properties['background']
+    if params[:lesson_position]
+      lesson = @script.lesson_by_relative_position(params[:lesson_position].to_i)
+      lesson_background_class = "background-#{lesson.properties['background']}"
+    end
+    @body_classes = lesson_background_class || @level.properties['background']
 
     @rubric = @script_level.lesson.rubric
     ai_rubrics_enabled_for_user = @view_as_user&.verified_teacher? || @view_as_user&.teachers&.any?(&:verified_teacher?)
