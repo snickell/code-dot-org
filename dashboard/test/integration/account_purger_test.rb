@@ -27,7 +27,7 @@ class AccountPurgerIntegrationTest < ActionDispatch::IntegrationTest
     purger.purge_data_for_account(user)
 
     # Ensure that the purger completed
-    refute user.purged_at
+    assert user.purged_at
   end
 
   # We can purge a student in a section when they have a family name.
