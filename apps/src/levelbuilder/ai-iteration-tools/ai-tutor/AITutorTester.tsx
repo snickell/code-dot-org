@@ -16,7 +16,7 @@ import {
   availableEndpoints,
   DEFAULT_TEMPERATURE,
   genAIEndpointIds,
-  modelCardInfo,
+  // modelCardInfo,
 } from './constants';
 import {Endpoint} from './types';
 
@@ -74,51 +74,51 @@ const AITutorTester: React.FC<AITutorTesterProps> = ({allowed}) => {
   const getAIResponses = async () => {
     setResponsesPending(true);
     const responsePromises = data.map(async row => {
-      if (
-        genAIEndpointIds.includes(
-          selectedEndpoint as ValueOf<typeof AiChatModelIds>
-        )
-      ) {
-        return getGenAIResponses(row);
-      } else {
-        return askAITutor(row);
-      }
+      // if (
+      //   genAIEndpointIds.includes(
+      //     selectedEndpoint as ValueOf<typeof AiChatModelIds>
+      //   )
+      // ) {
+      //   return getGenAIResponses(row);
+      // } else {
+      return askAITutor(row);
+      // }
     });
 
     await Promise.allSettled(responsePromises);
   };
 
-  const getGenAIResponses = async (row: AIInteraction) => {
-    const systemPrompt = row.systemPrompt ? row.systemPrompt : '';
-    const chatMessage: ChatMessage = {
-      chatMessageText: row.studentInput,
-      role: Role.USER,
-      status: 'ok',
-      timestamp: new Date().getTime(),
-    };
-    const temperature = row.temperature ? row.temperature : DEFAULT_TEMPERATURE;
-    const aiCustomizations = {
-      selectedModelId: selectedEndpoint as ValueOf<typeof AiChatModelIds>,
-      temperature: temperature,
-      systemPrompt: systemPrompt,
-      retrievalContexts: [],
-      modelCardInfo: modelCardInfo,
-    };
-    const levelId = row.levelId ? row.levelId : null;
-    const aichatContext = {
-      currentLevelId: levelId,
-      scriptId: null,
-      channelId: undefined,
-    };
-    const genAIResponse = await postAichatCompletionMessage(
-      chatMessage,
-      [],
-      aiCustomizations,
-      aichatContext
-    );
-    row.aiResponse = genAIResponse?.messages[1]?.chatMessageText;
-    setResponseCount(prevResponseCount => prevResponseCount + 1);
-  };
+  // const getGenAIResponses = async (row: AIInteraction) => {
+  //   const systemPrompt = row.systemPrompt ? row.systemPrompt : '';
+  //   const chatMessage: ChatMessage = {
+  //     chatMessageText: row.studentInput,
+  //     role: Role.USER,
+  //     status: 'ok',
+  //     timestamp: new Date().getTime(),
+  //   };
+  //   const temperature = row.temperature ? row.temperature : DEFAULT_TEMPERATURE;
+  //   const aiCustomizations = {
+  //     selectedModelId: selectedEndpoint as ValueOf<typeof AiChatModelIds>,
+  //     temperature: temperature,
+  //     systemPrompt: systemPrompt,
+  //     retrievalContexts: [],
+  //     modelCardInfo: modelCardInfo,
+  //   };
+  //   const levelId = row.levelId ? row.levelId : null;
+  //   const aichatContext = {
+  //     currentLevelId: levelId,
+  //     scriptId: null,
+  //     channelId: undefined,
+  //   };
+  //   const genAIResponse = await postAichatCompletionMessage(
+  //     chatMessage,
+  //     [],
+  //     aiCustomizations,
+  //     aichatContext
+  //   );
+  //   row.aiResponse = genAIResponse?.messages[1]?.chatMessageText;
+  //   setResponseCount(prevResponseCount => prevResponseCount + 1);
+  // };
 
   const askAITutor = async (row: AIInteraction) => {
     const chatApiResponse = await getChatCompletionMessage(
@@ -165,7 +165,7 @@ const AITutorTester: React.FC<AITutorTesterProps> = ({allowed}) => {
         resulting updated CSV.
       </p>
       <br />
-      <SimpleDropdown
+      {/* <SimpleDropdown
         labelText="Choose an endpoint"
         isLabelVisible={false}
         onChange={event => onDropdownChange(event.target.value as Endpoint)}
@@ -175,7 +175,7 @@ const AITutorTester: React.FC<AITutorTesterProps> = ({allowed}) => {
         selectedValue={selectedEndpoint}
         name="aiChatTesterDropdown"
         size="s"
-      />
+      /> */}
       <br />
       <br />
       <AITutorTesterSampleColumns endpoint={selectedEndpoint} />
