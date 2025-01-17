@@ -1,8 +1,8 @@
 # Development with Docker
 
-The basic setup runs dashboard (our service) and its dependencies (e.g. mysql, redis)
-inside containers. For an alternative setup, where only dependencies like mysql run
-inside containers, see the [alternative setup](#alternative-setup-run-dependent-services-in-docker).
+The basic setup runs dashboard (our service) and its dependent services (e.g. mysql, redis)
+inside containers. For an alternative setup, where only dependent services run inside containers,
+see the [alternative setup](#alternative-setup-run-dependent-services-in-docker).
 
 ## Basic Setup
 
