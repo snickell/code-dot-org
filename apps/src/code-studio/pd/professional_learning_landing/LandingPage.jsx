@@ -268,7 +268,7 @@ function LandingPage({
         sessionStorage.getItem('workshopLocation', null)
       );
       setEnrollSuccessWorkshopSessionInfo(
-        sessionStorage.getItem('sessionTimeInfo', null)
+        JSON.parse(sessionStorage.getItem('sessionTimeInfo', null))
       );
 
       analyticsReporter.sendEvent(EVENTS.WORKSHOP_ENROLLMENT_COMPLETED_EVENT, {

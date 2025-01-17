@@ -2,7 +2,11 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 
 import Button from '@cdo/apps/componentLibrary/button/Button';
-import {Heading2, BodyTwoText} from '@cdo/apps/componentLibrary/typography';
+import LinkButton from '@cdo/apps/componentLibrary/button/LinkButton';
+import Typography, {
+  Heading2,
+  BodyTwoText,
+} from '@cdo/apps/componentLibrary/typography';
 import AccessibleDialog from '@cdo/apps/sharedComponents/AccessibleDialog';
 import i18n from '@cdo/locale';
 
@@ -25,31 +29,29 @@ export default function WorkshopEnrollmentCelebrationDialog({
     setIsOpen(false);
   };
 
-  // const addToGoogleCalendarLink = () => {
-  //   const firstSession = workshopSessionInfo[0];
-  //   const date = `${firstSession.year}${firstSession.month}${firstSession.day}`;
-  //   const startTime = `${date}T${firstSession.start_hour}${firstSession.start_min}00Z`;
-  //   const endTime = `${date}T${firstSession.end_hour}${firstSession.end_min}00Z`;
+  const buildGoogleCalendarLink = session => {
+    const date = `${session.year}${session.month}${session.day}`;
+    const startTime = `${date}T${session.start_hour}${session.start_min}00Z`;
+    const endTime = `${date}T${session.end_hour}${session.end_min}00Z`;
 
-  //   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-  //     workshopTitle
-  //   )}&location=${encodeURIComponent(
-  //     workshopLocation
-  //   )}&dates=${startTime}/${endTime}`;
-  // };
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+      workshopTitle
+    )}&location=${encodeURIComponent(
+      workshopLocation
+    )}&dates=${startTime}/${endTime}`;
+  };
 
-  // const addToOutlookCalendarLink = () => {
-  //   const firstSession = workshopSessionInfo[0];
-  //   const date = `${firstSession.year}-${firstSession.month}-${firstSession.day}`;
-  //   const startTime = `${date}T${firstSession.start_hour}:${firstSession.start_min}:00Z`;
-  //   const endTime = `${date}T${firstSession.end_hour}:${firstSession.end_min}:00Z`;
+  const buildOutlookCalendarLink = session => {
+    const date = `${session.year}-${session.month}-${session.day}`;
+    const startTime = `${date}T${session.start_hour}:${session.start_min}:00Z`;
+    const endTime = `${date}T${session.end_hour}:${session.end_min}:00Z`;
 
-  //   return `https://outlook.live.com/calendar/action/compose?rru=addevent&subject=${encodeURIComponent(
-  //     workshopTitle
-  //   )}&location=${encodeURIComponent(
-  //     workshopLocation
-  //   )}&startdt=${startTime}&enddt=${endTime}`;
-  // };
+    return `https://outlook.live.com/calendar/action/compose?rru=addevent&subject=${encodeURIComponent(
+      workshopTitle
+    )}&location=${encodeURIComponent(
+      workshopLocation
+    )}&startdt=${startTime}&enddt=${endTime}`;
+  };
 
   return (
     isOpen && (
@@ -58,13 +60,40 @@ export default function WorkshopEnrollmentCelebrationDialog({
         onClose={onCloseDialog}
         closeOnClickBackdrop={true}
       >
-        <div className={style.containerMargin}>
-          <img src={CelebrationImage} alt="" />
-          <div className={style.containerMargin}>
+        <div className={style.dialogContainer}>
+          <div className={style.contentContainer}>
+            <img src={CelebrationImage} alt="" />
             <Heading2>{i18n.enrollmentCelebrationTitle()}</Heading2>
             <BodyTwoText>
               {i18n.enrollmentCelebrationBody({workshopName: workshopTitle})}
             </BodyTwoText>
+            <div className={style.calendarButtonContainer}>
+              <Typography semanticTag={'h3'} visualAppearance={'overline-two'}>
+                {i18n.addToYourCalendar()}
+              </Typography>
+              <div className={style.calendarButtons}>
+                <LinkButton
+                  text={'Google'}
+                  href={buildGoogleCalendarLink(workshopSessionInfo[0])}
+                  type={'secondary'}
+                  color={'black'}
+                  iconLeft={{
+                    iconName: 'brands fa-google',
+                    iconStyle: 'light',
+                  }}
+                />
+                <LinkButton
+                  text={'Outlook'}
+                  href={buildOutlookCalendarLink(workshopSessionInfo[0])}
+                  type={'secondary'}
+                  color={'black'}
+                  iconLeft={{
+                    iconName: 'brands fa-microsoft',
+                    iconStyle: 'light',
+                  }}
+                />
+              </div>
+            </div>
           </div>
           <Button
             onClick={onCloseDialog}

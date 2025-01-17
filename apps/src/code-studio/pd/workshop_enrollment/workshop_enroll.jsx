@@ -142,7 +142,10 @@ export default class WorkshopEnroll extends React.Component {
       'workshopLocation',
       this.props.workshop.location || ''
     );
-    sessionStorage.setItem('sessionTimeInfo', this.props.session_time_info);
+    sessionStorage.setItem(
+      'sessionTimeInfo',
+      JSON.stringify(this.props.session_time_info)
+    );
 
     navigateToHref('/my-professional-learning');
   }
