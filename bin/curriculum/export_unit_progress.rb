@@ -11,6 +11,9 @@ OptionParser.new do |opts|
   end
 end.parse!
 
+# TODO: start requiring the unit name, and pass it to
+# csd3_including_contained_levels_for_stanford.sql to query an entire unit.
+
 # raise "Unit name is required" unless $options[:unit]
 
 require_relative '../../deployment'
@@ -30,7 +33,7 @@ $max_threads = 100
 def execute_redshift_query(client, query)
   start_time = Time.now
   result = client.exec(query)
-  puts "Query executed in: #{(Time.now - start_time).round(2)} seconds"
+  puts "Redshift query executed in: #{(Time.now - start_time).round(2)} seconds"
   result
 rescue => exception
   puts "Error executing Redshift query: #{exception.message}\n#{exception.backtrace.join("\n")}"
