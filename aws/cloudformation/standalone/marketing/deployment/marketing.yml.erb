@@ -1,0 +1,151 @@
+# Marketing App Resources
+# This template is manually deployed to create/update the Marketing App's AWS resources.
+
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Marketing App AWS resources
+
+Parameters:
+  Environment:
+    Type: String
+    Default: "test"
+    Description: "Environment being deployed to (production or test)"
+  ContainerImageHashDigest:
+    Type: String
+    Description: "The sha256sum of the marketing container image."
+
+Resources:
+  # Route 53 root hosted zone for marketing.dev-code.org
+  RootHostedZone:
+  Type: AWS::Route53::HostedZone
+  Properties:
+    Name: marketing.dev-code.org.
+
+  # TLS Cert for the ECS ALB
+  TLSCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: dev.marketing.dev-code.org
+      DomainValidationOptions:
+        - DomainName: dev.marketing.dev-code.org
+          HostedZoneId:
+            Ref: RootHostedZone
+      ValidationMethod: DNS
+
+  ###########################
+  # Start AWS VPC Resources #
+  ###########################
+  
+  # VPC for ECS and ALB
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+
+<% Config::AVAILABILITY_ZONES.each do |region, index| %>
+  # Public Subnet for <% region %>
+  VpcPublicSubnet<% index %>:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: <% region %>
+      CidrBlock: 10.0.0.0/18
+      MapPublicIpOnLaunch: true
+      VpcId:
+        Ref: Vpc
+
+  # Route Table for Public Subnet <% region %>
+  VpcPublicSubnet<% index %>RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: Vpc
+
+  VpcPublicSubnet<% index %>RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: VpcPublicSubnet<% index %>RouteTable
+      SubnetId:
+        Ref: VpcPublicSubnet<% index %>Subnet
+
+  VpcPublicSubnet1DefaultRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: VpcIG
+      RouteTableId:
+        Ref: VpcPublicSubnet<% index %>RouteTable
+    DependsOn:
+      - VpcVPCGW
+
+  # Elastic IP
+  VpcPublicSubnet<% index %>EIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  VpcPublicSubnet<% index %>NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - VpcPublicSubnet<% index %>EIP
+          - AllocationId
+      SubnetId:
+        Ref: VpcPublicSubnet<% index %>Subnet
+    DependsOn:
+      - VpcPublicSubnet<% index %>DefaultRoute
+      - VpcPublicSubnet<% index %>RouteTableAssociation
+
+  VpcPrivateSubnet<% index %>:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: <% region %>
+      CidrBlock: 10.0.128.0/18
+      MapPublicIpOnLaunch: false
+      VpcId:
+        Ref: Vpc
+
+  VpcPrivateSubnet<% index %>RouteTable:
+    Type: AWS::EC2::RouteTable
+      VpcId:
+        Ref: Vpc
+
+  VpcPrivateSubnet<% index %>RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: VpcPrivateSubnet<% index %>RouteTable
+      SubnetId:
+        Ref: VpcPrivateSubnet<% index %>Subnet
+
+  VpcPrivateSubnet<% index %>DefaultRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: VpcPublicSubnet<% index %>NATGateway
+      RouteTableId:
+        Ref: VpcPrivateSubnet<% index %>RouteTable
+<% end %>
+
+  VpcIGW:
+    Type: AWS::EC2::InternetGateway
+
+  VpcVPCGW:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId:
+        Ref: VpcIGW
+      VpcId:
+        Ref: Vpc
+
+  ###########################
+  # End AWS VPC Resources   #
+  ###########################
+
+
