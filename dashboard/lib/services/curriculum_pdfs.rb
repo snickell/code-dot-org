@@ -104,13 +104,8 @@ module Services
         data = File.read(filepath)
         structured_filename = filepath.delete_prefix(directory).delete_prefix('/')
 
-        flat_filename = File.basename(filepath)
-
         # Upload to the main bucket for PDFs that students and teachers see
         AWS::S3.upload_to_bucket(S3_BUCKET, structured_filename, data, no_random: true)
-
-        # Upload to the AI bucket for PDFs that are used for ai-supported differentiation
-        AWS::S3.upload_to_bucket(S3_BUCKET_AI, flat_filename, data, no_random: true)
       end
     end
 
@@ -135,8 +130,7 @@ module Services
           any_pdf_generated = false
 
           script.lessons.select(&:has_lesson_plan).each do |lesson|
-            puts "Regenerating Lesson PDFs for #{lesson.key} (from #{script.name})"
-            generate_lesson_pdf(lesson, dir)
+            pdf_pathname = generate_lesson_pdf(lesson, dir)
             any_pdf_generated = true
 
             # Generate matadata
@@ -144,19 +138,14 @@ module Services
               metadata ={
                 course: script.name,
                 unit_fullname: script.localized_title,
-                unit: format("U%02d", script.unit_number),
+                unit: script.unit_number ? format("U%02d", script.unit_number) : "U1",
                 lesson: format("L%02d", lesson.absolute_position),
-                url: "blank for now",
+                url: "https://studio.code.org" + lesson.lesson_plan_html_url,
                 verified_teacher: true,
               }
-              full_metadata = {
-                metadataAttributes: metadata
-              }
               file_path = "/tmp/#{script.name}-#{lesson.absolute_position}.metadata.json"
-              File.write(file_path, full_metadata.to_json)
-              flat_filename = File.basename(file_path)
-              data = File.read(file_path)
-              AWS::S3.upload_to_bucket(S3_BUCKET_AI, flat_filename, data, no_random: true)
+              add_metadata_to_ai_s3(file_path, metadata)
+              add_pdf_to_ai_s3(pdf_pathname)
             end
           end
 
@@ -178,6 +167,24 @@ module Services
           end
         end
       end
+    end
+
+    def self.add_metadata_to_ai_s3(file_path, metadata)
+      full_metadata = {
+        metadataAttributes: metadata
+      }
+      File.write(file_path, full_metadata.to_json)
+      flat_filename = File.basename(file_path)
+      data = File.read(file_path)
+      AWS::S3.upload_to_bucket(S3_BUCKET_AI, flat_filename, data, no_random: true)
+    end
+
+    def self.add_pdf_to_ai_s3(filepath)
+      data = File.read(filepath)
+
+      flat_filename = File.basename(filepath)
+
+      AWS::S3.upload_to_bucket(S3_BUCKET_AI, flat_filename, data, no_random: true)
     end
 
     def self.generate_missing_pdfs
