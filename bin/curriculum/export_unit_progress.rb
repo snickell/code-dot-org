@@ -14,7 +14,7 @@ end.parse!
 # raise "Unit name is required" unless $options[:unit]
 
 require_relative '../../deployment'
-require_relative '../../lib/cdo/redshift'
+require_relative '../../lib/cdo/redshift' if rack_env?(:production)
 
 start_time = Time.now
 puts "Loading Rails environment..."
@@ -106,11 +106,32 @@ def check_pii(source)
   [max_score, response.entities]
 end
 
+def fetch_progress
+  if Rails.env.production?
+    # fetch the data from redshift in production, because it relies on an unindexed query on
+    # user_levels as well as views that are only available in redshift.
+    filename = File.expand_path('csd3_including_contained_levels_for_stanford.sql', __dir__)
+    query = File.read(filename)
+    client = RedshiftClient.instance
+    execute_redshift_query(client, query)
+  elsif Rails.env.development?
+    # fetch the data from the local db instead of redshift when running in
+    # development. this allows us to test the codepaths for project fetch
+    # and pii detection without needing to run the script in production.
+    unit_name = $options[:unit].presence || 'csd3-2024'
+    unit = Unit.find_by_name(unit_name)
+    raise "Unit not found: #{unit_name}" unless unit
+    unit_progress = UserLevel.where(script_id: unit.id).pluck(:user_id, :level_id, :script_id)
+    keys = [:user_id, :level_id, :script_id]
+    unit_progress.map! {|row| keys.zip(row).to_h.with_indifferent_access}
+    unit_progress
+  else
+    raise "Unsupported environment: #{Rails.env}"
+  end
+end
+
 def main
-  filename = File.expand_path('csd3_including_contained_levels_for_stanford.sql', __dir__)
-  query = File.read(filename)
-  client = RedshiftClient.instance
-  results = execute_redshift_query(client, query)
+  results = fetch_progress
 
   puts "Looking up channel ids..."
   start_time = Time.now
