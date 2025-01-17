@@ -17,7 +17,6 @@ export interface MarketingStackProps extends cdk.StackProps {
 
 export class MarketingStack extends cdk.Stack {
   private rootHostedZone: route53.IHostedZone;
-  private ecsService: ecs_patterns.ApplicationLoadBalancedFargateService;
 
   constructor(scope: Construct, id: string, props?: MarketingStackProps) {
     super(scope, id, props);
@@ -54,7 +53,7 @@ export class MarketingStack extends cdk.Stack {
       description: "The sha256sum of the marketing container image."});
 
     // Create Service
-    this.ecsService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, "FargateService", {
+    new ecs_patterns.ApplicationLoadBalancedFargateService(this, "FargateService", {
       cluster,
       certificate,
       domainName: 'dev.marketing.dev-code.org',
