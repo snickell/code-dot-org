@@ -96,11 +96,10 @@ def process_row_pii(row)
   row[:pii_score] = pii_score
   row[:pii_entities] = pii_entities
   if pii_score > $pii_threshold
-    source = nil
+    row[:source] = nil
     row['link_to_project'] = nil
     row[:channel_id] = nil
   end
-  row[:source] = source
 end
 
 def check_source_pii(source)
