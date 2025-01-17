@@ -82,7 +82,19 @@ def hashed_user_id(user_id)
   digest[0..31]
 end
 
-def check_pii(source)
+def process_row_pii(row)
+  pii_score, pii_entities = check_source_pii(row[:source])
+  row[:pii_score] = pii_score
+  row[:pii_entities] = pii_entities
+  if pii_score > $pii_threshold
+    source = nil
+    row['link_to_project'] = nil
+    row[:channel_id] = nil
+  end
+  row[:source] = source
+end
+
+def check_source_pii(source)
   return [0, []] unless source.present?
 
   params = {
@@ -153,17 +165,9 @@ def main
 
     # parallelize network requests to projects API and AWS Comprehend
     Parallel.each(results, in_threads: $max_threads) do |row|
-      source = get_project_source(row[:channel_id])
+      row[:source] = get_project_source(row[:channel_id])
 
-      pii_score, pii_entities = check_pii(source)
-      row[:pii_score] = pii_score
-      row[:pii_entities] = pii_entities
-      if pii_score > $pii_threshold
-        source = nil
-        row['link_to_project'] = nil
-        row[:channel_id] = nil
-      end
-      row[:source] = source
+      process_row_pii(row)
 
       row[:hashed_user_id] = hashed_user_id(row['user_id'])
       row.delete('user_id')
