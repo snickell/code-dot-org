@@ -801,6 +801,98 @@ $small-footer-standard-width: 400px;
   }
 }
 
+body.background-dark, body.music-black {
+  .small-footer-base {
+    background-color: initial;
+    border-top: initial;
+  }
+
+  #page-small-footer {
+    user-select: none;
+
+    .small-footer-base {
+      margin-inline-start: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 0;
+      transition: max-width 0.75s;
+
+      .version-caption {
+        display: none;
+      }
+
+      > p {
+        color: $light_white;
+      }
+    }
+
+    /* Use the underlying background color. */
+    select, .copyright-button {
+      background-color: initial;
+    }
+
+    /* Edge uses the select's background color for the dropdown as well, so we
+     * override it here. */
+    option {
+      background-color: $neutral_dark;
+    }
+
+    .copyright-button {
+      height: 1.625rem;
+      width: 1.625rem;
+      box-sizing: border-box;
+      border: solid 1px $light_white;
+      color: $light_white;
+    }
+  }
+
+  .languageSelect {
+    > div {
+      select {
+        border-color: $light_white;
+        background-color: $light_black;
+        color: $light_white;
+      }
+      &::after {
+        background-color: initial;
+
+        // This will otherwise get overridden by the simpleDropdown DSCO component
+        color: $light_white !important;
+      }
+      &::before {
+        background-color: initial;
+        color: $light_white;
+      }
+
+      &:has(select:hover) {
+        select:not(:disabled) {
+          color: $light_white;
+          background-color: $light_black;
+        }
+        &::before {
+          color: $light_white;
+        }
+        &::after {
+          color: $light_white;
+        }
+      }
+
+      &:has(select:active) {
+        select:not(:disabled) {
+          color: $light_white;
+          background-color: $light_black;
+        }
+
+        &::before {
+          color: $light_white;
+        }
+        &::after {
+          color: $light_white;
+        }
+      }
+    }
+  }
+}
+
 .responsive-content-desktop-footer {
   @media screen and (max-width: 969px) {
     & {

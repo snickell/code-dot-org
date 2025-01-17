@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
 
-import '@cdo/apps/sharedComponents/footer/small-footer-dark-overrides.scss';
 import './small-footer-music-overrides.scss';
 
 import DCDO from '@cdo/apps/dcdo';

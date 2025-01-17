@@ -1,14 +1,8 @@
 @import 'color.scss';
 
+/* The small footer over music is narrow. */
 #page-small-footer {
   .small-footer-base {
     max-width: 12.5rem;
-    margin-inline-start: 10px;
-    margin-bottom: 12px;
-    padding-bottom: 0;
-  }
-
-  select, .copyright-button {
-    background-color: $light_gray_950;
   }
 }
