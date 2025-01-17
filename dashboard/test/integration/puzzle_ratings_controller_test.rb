@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class PuzzleRatingsControllerTest < ActionController::TestCase
+class PuzzleRatingsControllerTest < ActionDispatch::IntegrationTest
   setup do
     PuzzleRating.stubs(:enabled?).returns true
     @student = create :student
@@ -11,31 +11,31 @@ class PuzzleRatingsControllerTest < ActionController::TestCase
     level = create :level
 
     assert_does_not_create(PuzzleRating) do
-      post :create, params: {}, format: :json
+      post puzzle_ratings_path, params: {}, as: :json
     end
     assert_response :bad_request
 
     assert_does_not_create(PuzzleRating) do
-      post :create, params: {script_id: @script.id}, format: :json
+      post puzzle_ratings_path, params: {script_id: @script.id}, as: :json
     end
     assert_response :bad_request
 
     assert_does_not_create(PuzzleRating) do
-      post :create, params: {level_id: level.id}, format: :json
+      post puzzle_ratings_path, params: {level_id: level.id}, as: :json
     end
     assert_response :bad_request
 
     assert_does_not_create(PuzzleRating) do
-      post :create, params: {rating: 0}, format: :json
+      post puzzle_ratings_path, params: {rating: 0}, as: :json
     end
     assert_response :bad_request
 
     assert_creates(PuzzleRating) do
-      post :create, params: {
+      post puzzle_ratings_path, params: {
         script_id: @script.id,
         level_id: level.id,
         rating: 0
-      }, format: :json
+      }, as: :json
     end
     assert_response :created
   end
@@ -45,22 +45,22 @@ class PuzzleRatingsControllerTest < ActionController::TestCase
 
     [nil, 0.5, 2, -1].each do |bad_rating|
       assert_does_not_create(PuzzleRating) do
-        post :create, params: {
+        post puzzle_ratings_path, params: {
           script_id: @script.id,
           level_id: level.id,
           rating: bad_rating
-        }, format: :json
+        }, as: :json
       end
       assert_response :bad_request
     end
 
     [0, 1].each do |good_rating|
       assert_creates(PuzzleRating) do
-        post :create, params: {
+        post puzzle_ratings_path, params: {
           script_id: @script.id,
           level_id: level.id,
           rating: good_rating
-        }, format: :json
+        }, as: :json
       end
       assert_response :created
     end
@@ -78,13 +78,13 @@ class PuzzleRatingsControllerTest < ActionController::TestCase
     }
 
     assert_creates(PuzzleRating) do
-      post :create, params: params, format: :json
+      post puzzle_ratings_path, params: params, as: :json
     end
 
     assert_response :created
 
     assert_does_not_create(PuzzleRating) do
-      post :create, params: params, format: :json
+      post puzzle_ratings_path, params: params, as: :json
     end
 
     assert_response :bad_request
@@ -100,13 +100,13 @@ class PuzzleRatingsControllerTest < ActionController::TestCase
     }
 
     assert_creates(PuzzleRating) do
-      post :create, params: params, format: :json
+      post puzzle_ratings_path, params: params, as: :json
     end
 
     assert_response :created
 
     assert_creates(PuzzleRating) do
-      post :create, params: params, format: :json
+      post puzzle_ratings_path, params: params, as: :json
     end
 
     assert_response :created
@@ -124,7 +124,7 @@ class PuzzleRatingsControllerTest < ActionController::TestCase
     }
 
     assert_does_not_create(PuzzleRating) do
-      post :create, params: params, format: :json
+      post puzzle_ratings_path, params: params, as: :json
     end
 
     assert_response :unauthorized
