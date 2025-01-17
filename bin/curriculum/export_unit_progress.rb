@@ -30,6 +30,30 @@ $pii_threshold = 0.7
 
 $max_threads = 100
 
+def fetch_progress
+  if Rails.env.production?
+    # fetch the data from redshift in production, because it relies on an unindexed query on
+    # user_levels as well as views that are only available in redshift.
+    filename = File.expand_path('csd3_including_contained_levels_for_stanford.sql', __dir__)
+    query = File.read(filename)
+    client = RedshiftClient.instance
+    execute_redshift_query(client, query)
+  elsif Rails.env.development?
+    # fetch the data from the local db instead of redshift when running in
+    # development. this allows us to test the codepaths for project fetch
+    # and pii detection without needing to run the script in production.
+    unit_name = $options[:unit].presence || 'csd3-2024'
+    unit = Unit.find_by_name(unit_name)
+    raise "Unit not found: #{unit_name}" unless unit
+    unit_progress = UserLevel.where(script_id: unit.id).pluck(:user_id, :level_id, :script_id)
+    keys = [:user_id, :level_id, :script_id]
+    unit_progress.map! {|row| keys.zip(row).to_h.with_indifferent_access}
+    unit_progress
+  else
+    raise "Unsupported environment: #{Rails.env}"
+  end
+end
+
 def execute_redshift_query(client, query)
   start_time = Time.now
   result = client.exec(query)
@@ -65,21 +89,6 @@ def get_project_source(channel_id)
 rescue NoMethodError => exception
   puts "Error getting source for channel id: #{channel_id}: #{exception}"
   nil
-end
-
-def hashed_user_id(user_id)
-  secret_key = CDO.properties_encryption_key
-  raise "missing CDO.properties_encryption_key" unless secret_key
-
-  # a one-way hash that cannot be reverse-engineered by guessing and
-  # checking user ids without knowing the secret.
-  input_data = "#{user_id}#{secret_key}"
-  digest = Digest::SHA256.hexdigest(input_data)
-
-  # truncate to 128 bits to make digest length more manageable. user ids are
-  # currently 27 bits in 2025. chance of collision is 2^-75 which low enough to ignore.
-  # https://en.wikipedia.org/wiki/Birthday_attack#Simple_approximation
-  digest[0..31]
 end
 
 def process_row_pii(row)
@@ -121,28 +130,19 @@ def check_source_pii(source)
   [max_score, response.entities]
 end
 
-def fetch_progress
-  if Rails.env.production?
-    # fetch the data from redshift in production, because it relies on an unindexed query on
-    # user_levels as well as views that are only available in redshift.
-    filename = File.expand_path('csd3_including_contained_levels_for_stanford.sql', __dir__)
-    query = File.read(filename)
-    client = RedshiftClient.instance
-    execute_redshift_query(client, query)
-  elsif Rails.env.development?
-    # fetch the data from the local db instead of redshift when running in
-    # development. this allows us to test the codepaths for project fetch
-    # and pii detection without needing to run the script in production.
-    unit_name = $options[:unit].presence || 'csd3-2024'
-    unit = Unit.find_by_name(unit_name)
-    raise "Unit not found: #{unit_name}" unless unit
-    unit_progress = UserLevel.where(script_id: unit.id).pluck(:user_id, :level_id, :script_id)
-    keys = [:user_id, :level_id, :script_id]
-    unit_progress.map! {|row| keys.zip(row).to_h.with_indifferent_access}
-    unit_progress
-  else
-    raise "Unsupported environment: #{Rails.env}"
-  end
+def hashed_user_id(user_id)
+  secret_key = CDO.properties_encryption_key
+  raise "missing CDO.properties_encryption_key" unless secret_key
+
+  # a one-way hash that cannot be reverse-engineered by guessing and
+  # checking user ids without knowing the secret.
+  input_data = "#{user_id}#{secret_key}"
+  digest = Digest::SHA256.hexdigest(input_data)
+
+  # truncate to 128 bits to make digest length more manageable. user ids are
+  # currently 27 bits in 2025. chance of collision is 2^-75 which low enough to ignore.
+  # https://en.wikipedia.org/wiki/Birthday_attack#Simple_approximation
+  digest[0..31]
 end
 
 def main
