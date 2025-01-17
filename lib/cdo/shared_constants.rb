@@ -808,4 +808,16 @@ module SharedConstants
     OWNER_TOO_NEW: 'owner_too_new',
     PROJECT_TOO_NEW: 'project_too_new',
   }
+
+  EDUCATOR_ROLES = [
+    {value: "classroom_teacher", category: 'educator'},
+    {value: "stem_tech_teacher", category: 'educator'},
+    {value: "subject_area_teacher", category: 'educator'},
+    {value: "librarian_media_specialist", category: 'educator'},
+    {value: "homeschool_teacher", category: 'educator'},
+    {value: "school_admin", category: "admin"},
+    {value: "district_admin", category: "admin"},
+    {value: "parent", category: 'other'},
+    {value: "other", category: 'other'}
+  ].freeze
 end
