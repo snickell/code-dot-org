@@ -45,31 +45,31 @@ Resources:
       EnableDnsSupport: true
       InstanceTenancy: default
 
-<% Config::AVAILABILITY_ZONES.each do |region, index| %>
-  # Public Subnet for <% region %>
-  VpcPublicSubnet<% index %>:
+<% Config::AVAILABILITY_ZONES.each_with_index do |region, index| %>
+  # Public Subnet for <%= region %>
+  VpcPublicSubnet<%= index %>:
     Type: AWS::EC2::Subnet
     Properties:
-      AvailabilityZone: <% region %>
+      AvailabilityZone: <%= region %>
       CidrBlock: 10.0.0.0/18
       MapPublicIpOnLaunch: true
       VpcId:
         Ref: Vpc
 
-  # Route Table for Public Subnet <% region %>
-  VpcPublicSubnet<% index %>RouteTable:
+  # Route Table for Public Subnet <%= region %>
+  VpcPublicSubnet<%= index %>RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId:
         Ref: Vpc
 
-  VpcPublicSubnet<% index %>RouteTableAssociation:
+  VpcPublicSubnet<%= index %>RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId:
-        Ref: VpcPublicSubnet<% index %>RouteTable
+        Ref: VpcPublicSubnet<%= index %>RouteTable
       SubnetId:
-        Ref: VpcPublicSubnet<% index %>Subnet
+        Ref: VpcPublicSubnet<%= index %>Subnet
 
   VpcPublicSubnet1DefaultRoute:
     Type: AWS::EC2::Route
@@ -78,59 +78,59 @@ Resources:
       GatewayId:
         Ref: VpcIG
       RouteTableId:
-        Ref: VpcPublicSubnet<% index %>RouteTable
+        Ref: VpcPublicSubnet<%= index %>RouteTable
     DependsOn:
       - VpcVPCGW
 
   # Elastic IP
-  VpcPublicSubnet<% index %>EIP:
+  VpcPublicSubnet<%= index %>EIP:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
 
-  VpcPublicSubnet<% index %>NATGateway:
+  VpcPublicSubnet<%= index %>NATGateway:
     Type: AWS::EC2::NatGateway
     Properties:
       AllocationId:
         Fn::GetAtt:
-          - VpcPublicSubnet<% index %>EIP
+          - VpcPublicSubnet<%= index %>EIP
           - AllocationId
       SubnetId:
-        Ref: VpcPublicSubnet<% index %>Subnet
+        Ref: VpcPublicSubnet<%= index %>Subnet
     DependsOn:
-      - VpcPublicSubnet<% index %>DefaultRoute
-      - VpcPublicSubnet<% index %>RouteTableAssociation
+      - VpcPublicSubnet<%= index %>DefaultRoute
+      - VpcPublicSubnet<%= index %>RouteTableAssociation
 
-  VpcPrivateSubnet<% index %>:
+  VpcPrivateSubnet<%= index %>:
     Type: AWS::EC2::Subnet
     Properties:
-      AvailabilityZone: <% region %>
+      AvailabilityZone: <%= region %>
       CidrBlock: 10.0.128.0/18
       MapPublicIpOnLaunch: false
       VpcId:
         Ref: Vpc
 
-  VpcPrivateSubnet<% index %>RouteTable:
+  VpcPrivateSubnet<%= index %>RouteTable:
     Type: AWS::EC2::RouteTable
       VpcId:
         Ref: Vpc
 
-  VpcPrivateSubnet<% index %>RouteTableAssociation:
+  VpcPrivateSubnet<%= index %>RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId:
-        Ref: VpcPrivateSubnet<% index %>RouteTable
+        Ref: VpcPrivateSubnet<%= index %>RouteTable
       SubnetId:
-        Ref: VpcPrivateSubnet<% index %>Subnet
+        Ref: VpcPrivateSubnet<%= index %>Subnet
 
-  VpcPrivateSubnet<% index %>DefaultRoute:
+  VpcPrivateSubnet<%= index %>DefaultRoute:
     Type: AWS::EC2::Route
     Properties:
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId:
-        Ref: VpcPublicSubnet<% index %>NATGateway
+        Ref: VpcPublicSubnet<%= index %>NATGateway
       RouteTableId:
-        Ref: VpcPrivateSubnet<% index %>RouteTable
+        Ref: VpcPrivateSubnet<%= index %>RouteTable
 <% end %>
 
   VpcIGW:
@@ -148,4 +148,8 @@ Resources:
   # End AWS VPC Resources   #
   ###########################
 
-
+  ###########################
+  # Start AWS ECS Resources #
+  ###########################
+  EcsCluster:
+    Type: AWS::ECS::Cluster
