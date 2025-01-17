@@ -833,7 +833,7 @@ body.background-dark, body.music-black {
     /* Edge uses the select's background color for the dropdown as well, so we
      * override it here. */
     option {
-      background-color: $neutral_dark;
+      background-color: $light_gray_950;
     }
 
     .copyright-button {
