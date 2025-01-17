@@ -102,10 +102,9 @@ module Services
         # Note that this "filename" includes subdirectories; this is fine
         # only because we're uploading to S3.
         data = File.read(filepath)
-        structured_filename = filepath.delete_prefix(directory).delete_prefix('/')
+        filename = filepath.delete_prefix(directory).delete_prefix('/')
 
-        # Upload to the main bucket for PDFs that students and teachers see
-        AWS::S3.upload_to_bucket(S3_BUCKET, structured_filename, data, no_random: true)
+        AWS::S3.upload_to_bucket(S3_BUCKET, filename, data, no_random: true)
       end
     end
 
@@ -130,6 +129,8 @@ module Services
           any_pdf_generated = false
 
           script.lessons.select(&:has_lesson_plan).each do |lesson|
+            puts "Regenerating Lesson PDFs for #{lesson.key} (from #{script.name})"
+            # generate PDF and get the pathname to the generated PDF
             pdf_pathname = generate_lesson_pdf(lesson, dir)
             any_pdf_generated = true
 
