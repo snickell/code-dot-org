@@ -103,7 +103,6 @@ module Services
         # only because we're uploading to S3.
         data = File.read(filepath)
         filename = filepath.delete_prefix(directory).delete_prefix('/')
-
         AWS::S3.upload_to_bucket(S3_BUCKET, filename, data, no_random: true)
       end
     end
