@@ -25,7 +25,7 @@ module Cdo
     # - ge_prefix: "/global/fa"
     # - ge_region: "fa"
     # - main_path: "/home"
-    PATH_PATTERN = Regexp.new <<~REGEXP.remove(/\s+/)
+    PATH_PATTERN = Regexp.new <<~REGEXP.gsub(/\s+/, '')
       ^(?<ge_prefix>
         #{ROOT_PATH}/
         (?<ge_region>#{REGIONS.join('|')})
