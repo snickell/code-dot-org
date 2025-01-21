@@ -3,11 +3,13 @@ module OpenaiChatHelper
   OPENAI_CHAT_COMPLETION_API_KEY = CDO.openai_chat_completion_api_key
   TEMPERATURE = 0
   OPENAI_AICHAT_SAFETY_API_KEY = CDO.openai_aichat_safety_api_key
+  # need separate key?
 
   # We should always specify a version for the LLM so the results don't unexpectedly change.
   GPT_MODEL = SharedConstants::AI_TUTOR_CHAT_MODEL_VERISON
   AICHAT_SAFETY_GPT_MODEL = SharedConstants::AICHAT_SAFETY_MODEL_VERSION
 
+  # set this up to take temperature as an argument
   def self.request_chat_completion(messages)
     # Set up the API endpoint URL and request headers
     headers = {
@@ -17,18 +19,20 @@ module OpenaiChatHelper
     headers["OpenAI-Organization"] = CDO.openai_chat_completion_org_id if CDO.openai_chat_completion_org_id
 
     data = {
-      model: GPT_MODEL,
-      temperature: TEMPERATURE,
+      model: AICHAT_SAFETY_GPT_MODEL,
+      # temperature: TEMPERATURE,
       messages: messages
     }
 
-    HTTParty.post(
+    # puts messages[1][:content]
+    response = HTTParty.post(
       OPEN_AI_URL,
       headers: headers,
       body: data.to_json,
       open_timeout: DCDO.get('openai_http_open_timeout', 5),
       read_timeout: DCDO.get('openai_http_read_timeout', 30)
     )
+    response.body
   end
 
   # Used to check safety content given text with the given moderation system prompt.
