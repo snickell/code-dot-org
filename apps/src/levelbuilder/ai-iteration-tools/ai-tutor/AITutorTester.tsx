@@ -42,8 +42,6 @@ interface AITutorTesterProps {
 const AITutorTester: React.FC<AITutorTesterProps> = ({allowed}) => {
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [data, setData] = useState<AIInteraction[]>([]);
-  const [selectedEndpoint, setSelectedEndpoint] =
-    useState<Endpoint>('ai-tutor');
   const [responseCount, setResponseCount] = useState<number>(0);
   const [responsesPending, setResponsesPending] = useState<boolean>(false);
 
@@ -63,10 +61,6 @@ const AITutorTester: React.FC<AITutorTesterProps> = ({allowed}) => {
     }
   };
 
-  const onDropdownChange = (value: Endpoint) => {
-    setSelectedEndpoint(value);
-  };
-
   const updateData = (result: {data: AIInteraction[]}) => {
     setData(result.data);
   };
@@ -74,51 +68,11 @@ const AITutorTester: React.FC<AITutorTesterProps> = ({allowed}) => {
   const getAIResponses = async () => {
     setResponsesPending(true);
     const responsePromises = data.map(async row => {
-      // if (
-      //   genAIEndpointIds.includes(
-      //     selectedEndpoint as ValueOf<typeof AiChatModelIds>
-      //   )
-      // ) {
-      //   return getGenAIResponses(row);
-      // } else {
       return askAITutor(row);
-      // }
     });
 
     await Promise.allSettled(responsePromises);
   };
-
-  // const getGenAIResponses = async (row: AIInteraction) => {
-  //   const systemPrompt = row.systemPrompt ? row.systemPrompt : '';
-  //   const chatMessage: ChatMessage = {
-  //     chatMessageText: row.studentInput,
-  //     role: Role.USER,
-  //     status: 'ok',
-  //     timestamp: new Date().getTime(),
-  //   };
-  //   const temperature = row.temperature ? row.temperature : DEFAULT_TEMPERATURE;
-  //   const aiCustomizations = {
-  //     selectedModelId: selectedEndpoint as ValueOf<typeof AiChatModelIds>,
-  //     temperature: temperature,
-  //     systemPrompt: systemPrompt,
-  //     retrievalContexts: [],
-  //     modelCardInfo: modelCardInfo,
-  //   };
-  //   const levelId = row.levelId ? row.levelId : null;
-  //   const aichatContext = {
-  //     currentLevelId: levelId,
-  //     scriptId: null,
-  //     channelId: undefined,
-  //   };
-  //   const genAIResponse = await postAichatCompletionMessage(
-  //     chatMessage,
-  //     [],
-  //     aiCustomizations,
-  //     aichatContext
-  //   );
-  //   row.aiResponse = genAIResponse?.messages[1]?.chatMessageText;
-  //   setResponseCount(prevResponseCount => prevResponseCount + 1);
-  // };
 
   const askAITutor = async (row: AIInteraction) => {
     const chatApiResponse = await getChatCompletionMessage(
@@ -159,65 +113,55 @@ const AITutorTester: React.FC<AITutorTesterProps> = ({allowed}) => {
           You need to be a levelbuilder with AI Tutor access to use this tool.
         </h3>
       )}
-      <p>
-        Upload a CSV of student inputs that will be sent to the selected
-        service. AI responses will then be saved and you can download the
-        resulting updated CSV.
-      </p>
-      <br />
-      {/* <SimpleDropdown
-        labelText="Choose an endpoint"
-        isLabelVisible={false}
-        onChange={event => onDropdownChange(event.target.value as Endpoint)}
-        items={availableEndpoints.map(endpoint => {
-          return {value: endpoint.id, text: endpoint.name};
-        })}
-        selectedValue={selectedEndpoint}
-        name="aiChatTesterDropdown"
-        size="s"
-      /> */}
-      <br />
-      <br />
-      <AITutorTesterSampleColumns endpoint={selectedEndpoint} />
-      <div>
-        <div className={styles.buttonSpacing}>
-          <input
-            className="csv-input"
-            type="file"
-            name="file"
-            onChange={handleChange}
-            disabled={!allowed}
-          />
-        </div>
-
-        <div className={styles.buttonSpacing}>
-          <Button
-            text="Upload"
-            onClick={importCSV}
-            disabled={!csvSelected || !allowed}
-          />
-        </div>
-
-        <div className={styles.buttonSpacing}>
-          <Button
-            text="Get Responses"
-            onClick={getAIResponses}
-            disabled={!dataUploaded || !allowed}
-            isPending={responsesPending}
-          />
-          <span>
-            {responseCount} of {data.length}
-          </span>
-        </div>
-
+      {allowed && (
         <div>
-          <Button
-            text="Download CSV"
-            onClick={downloadCSV}
-            disabled={!aiResponded || !allowed}
-          />
+          <p>
+            Upload a CSV of student inputs that will be sent to the selected
+            service. AI responses will then be saved and you can download the
+            resulting updated CSV.
+          </p>
+          <br />
+          <br />
+          <br />
+          <AITutorTesterSampleColumns endpoint={'ai-tutor'} />
+          <div>
+            <div className={styles.buttonSpacing}>
+              <input
+                className="csv-input"
+                type="file"
+                name="file"
+                onChange={handleChange}
+                disabled={!allowed}
+              />
+            </div>
+            <div className={styles.buttonSpacing}>
+              <Button
+                text="Upload"
+                onClick={importCSV}
+                disabled={!csvSelected || !allowed}
+              />
+            </div>
+            <div className={styles.buttonSpacing}>
+              <Button
+                text="Get Responses"
+                onClick={getAIResponses}
+                disabled={!dataUploaded || !allowed}
+                isPending={responsesPending}
+              />
+              <span>
+                {responseCount} of {data.length}
+              </span>
+            </div>
+            <div>
+              <Button
+                text="Download CSV"
+                onClick={downloadCSV}
+                disabled={!aiResponded || !allowed}
+              />
+            </div>
+          </div>
         </div>
-      </div>
+      )}
       <br />
     </div>
   );
