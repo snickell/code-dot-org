@@ -19752,8 +19752,20 @@ en:
           lessons: {}
           lesson_groups: {}
         6-12-intro-to-programming-python:
-          lessons: {}
-          lesson_groups: {}
+          lessons:
+            lesson-1:
+              name: Working with Objects
+            lesson-2:
+              name: Functions and Parameters
+            lesson-3:
+              name: Debugging Strategies
+            lesson-4:
+              name: Introduction to Loops
+            lesson-5:
+              name: Conditional Statements
+          lesson_groups:
+            lessonGroup-2:
+              display_name: console-only levels
           name: 6-12-intro-to-programming-python
           title: 6-12 Intro to Programming (Python) Playground
           description_audience: ''
@@ -19802,6 +19814,26 @@ en:
           lesson_groups: {}
           name: 6-12-networks-and-the-internet
           title: 6-12 Networks and the Internet Playground
+          description_audience: ''
+          description_short: ''
+          description: ''
+          student_description: ''
+        tess-modularity-test-unit-1:
+          lessons: {}
+          lesson_groups: {}
+          name: tess-modularity-test-unit-1
+          title: Modularity yay
+          description_audience: ''
+          description_short: ''
+          description: ''
+          student_description: ''
+        jamila-sandbox:
+          lessons:
+            lesson-1:
+              name: python lab stuff
+          lesson_groups: {}
+          name: jamila-sandbox
+          title: jamila's stuff go away
           description_audience: ''
           description_short: ''
           description: ''
