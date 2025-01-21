@@ -1,5 +1,3 @@
-export {
-  useDropdownContext, DropdownProviderWrapper
-} from './DropdownContext';
+export {useDropdownContext, DropdownProviderWrapper} from './DropdownContext';
 
-export {useTheme, ThemeProvider} from './ThemeContext'
+export {useTheme, ThemeProvider} from './ThemeContext';
