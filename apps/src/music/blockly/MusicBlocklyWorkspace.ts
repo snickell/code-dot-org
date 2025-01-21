@@ -4,6 +4,7 @@ import {BLOCK_TYPES, Renderers} from '@cdo/apps/blockly/constants';
 import CdoDarkTheme from '@cdo/apps/blockly/themes/cdoDark';
 import {ProcedureBlock, ExtendedBlock} from '@cdo/apps/blockly/types';
 import {disableOrphanBlocks} from '@cdo/apps/blockly/utils';
+import {TOOLBOX_BLOCKS} from '@cdo/apps/lab2/constants';
 import LabMetricsReporter from '@cdo/apps/lab2/Lab2MetricsReporter';
 import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
 import {getAppOptionsEditBlocks} from '@cdo/apps/lab2/projects/utils';
@@ -85,27 +86,39 @@ export default class MusicBlocklyWorkspace {
    * @param container HTML element to inject the workspace into
    * @param onBlockSpaceChange callback fired when any block space change events occur
    * @param isReadOnlyWorkspace is the workspace readonly
-   * @param toolbox information about the toolbox
+   * @param toolboxAllowList information about the toolbox
    *
    */
   init(
     container: HTMLElement,
     onBlockSpaceChange: (e: GoogleBlockly.Events.Abstract) => void,
     isReadOnlyWorkspace: boolean,
-    toolbox: ToolboxData | undefined,
+    toolboxAllowList: ToolboxData | undefined,
     isRtl: boolean,
-    blockMode: ValueOf<typeof BlockMode>
+    blockMode: ValueOf<typeof BlockMode>,
+    toolboxDefinition?: GoogleBlockly.utils.toolbox.ToolboxInfo
   ) {
+    const isToolboxMode = getAppOptionsEditBlocks() === TOOLBOX_BLOCKS;
+
     if (this.workspace) {
       this.workspace.dispose();
     }
 
     this.container = container;
 
-    this.toolbox = toolbox;
+    this.toolbox = toolboxAllowList;
     this.blockMode = blockMode;
 
-    const toolboxBlocks = getToolbox(blockMode, toolbox);
+    // The default toolbox consists of all blocks supported by the
+    // current block mode.
+    let toolboxBlocks = getToolbox(blockMode);
+
+    // Toolbox mode always uses the default (full) toolbox.
+    if ((toolboxDefinition || toolboxAllowList) && !isToolboxMode) {
+      toolboxBlocks =
+        // Use whichever toolbox configuration is available from the level configuration.
+        toolboxDefinition || getToolbox(blockMode, toolboxAllowList);
+    }
 
     // This dialog is used for naming variables, which are only present in advanced mode.
     const customSimpleDialog = function (options: {
@@ -160,6 +173,36 @@ export default class MusicBlocklyWorkspace {
     }
     this.workspace = new GoogleBlockly.Workspace();
     this.headlessMode = true;
+  }
+
+  /**
+   * Set up the Blockly workspace for toolbox mode (levelbuilder).
+   * Adds blocks to the workspace based on the level's toolbox configuration.
+   * Automatically cleans up the workspace as blocks move.
+   * TODO: Add category blocks to workspace.
+   */
+  initializeToolboxMode(
+    blockMode: ValueOf<typeof BlockMode>,
+    levelToolbox?: ToolboxData,
+    levelToolboxDefinition?: GoogleBlockly.utils.toolbox.ToolboxInfo
+  ) {
+    const toolbox =
+      levelToolboxDefinition || getToolbox(blockMode, levelToolbox);
+    if (toolbox.kind === 'flyoutToolbox') {
+      toolbox.contents.forEach(blockInfo =>
+        Blockly.serialization.blocks.append(
+          blockInfo as GoogleBlockly.serialization.blocks.State,
+          Blockly.getMainWorkspace()
+        )
+      );
+    }
+    const workspace = this.workspace as GoogleBlockly.WorkspaceSvg;
+    workspace.cleanUp();
+    workspace.addChangeListener(e => {
+      if (e.type === Blockly.Events.BLOCK_MOVE) {
+        workspace.cleanUp();
+      }
+    });
   }
 
   resizeBlockly() {
@@ -412,6 +455,34 @@ export default class MusicBlocklyWorkspace {
       return {};
     }
     return Blockly.serialization.workspaces.save(this.workspace);
+  }
+
+  /**
+   * Serialize the top blocks of the workspace as a toolbox.
+   * @returns a toolbox definition that can be handled directly by Blockly.
+   * TODO: Serialize category blocks as categories rather than blocks.
+   */
+  workspaceToToolboxDefinition() {
+    if (!this.workspace) {
+      this.metricsReporter.logWarning(
+        'workspaceToToolboxDefinition called before workspace initialized.'
+      );
+      return {};
+    }
+    const toolboxContents: GoogleBlockly.utils.toolbox.BlockInfo[] = [];
+    this.workspace.getTopBlocks(true).map(block => {
+      toolboxContents.push({
+        kind: 'block',
+        ...Blockly.serialization.blocks.save(block, {saveIds: false}),
+        enabled: true,
+      });
+    });
+
+    const flyoutDefinition: GoogleBlockly.utils.toolbox.FlyoutDefinition = {
+      kind: 'flyoutToolbox',
+      contents: toolboxContents,
+    };
+    return flyoutDefinition;
   }
 
   getAllBlocks() {
