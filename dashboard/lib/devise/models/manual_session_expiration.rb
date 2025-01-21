@@ -20,7 +20,7 @@ module Devise
       #
       # @see https://github.com/heartcombo/devise/blob/v4.9.3/lib/devise/models/database_authenticatable.rb#L175-L178
       def authenticatable_salt
-        "#{super}::#{session_expiration_token}"
+        "#{super}#{session_expiration_token}"
       end
 
       # Expire all existing sessions by updating the session expiration token
