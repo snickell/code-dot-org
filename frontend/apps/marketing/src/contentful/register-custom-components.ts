@@ -3,20 +3,26 @@
  *
  * Note: This file must be imported both server-side and client-side to ensure Contentful is able to map on both rendering modes.
  */
-import {defineComponents} from '@contentful/experiences-sdk-react';
-import {Stub, StubContentfulComponentDefinition} from '@code-dot-org/dsco/stub';
+import Divider, {DividerContentfulComponentDefinition} from '@/components/divider';
 import {
-  StubSection,
-  StubSectionContentfulComponentDefinition,
-} from '@code-dot-org/dsco/stub-section';
+  defineComponents,
+  CONTENTFUL_COMPONENTS,
+} from '@contentful/experiences-sdk-react';
 
-defineComponents([
+defineComponents(
+  [
+    {
+      component: Divider,
+      definition: DividerContentfulComponentDefinition,
+      options: {
+        wrapContainerWidth: '100%',
+      },
+    },
+  ],
   {
-    component: Stub,
-    definition: StubContentfulComponentDefinition,
+    enabledBuiltInComponents: [
+      CONTENTFUL_COMPONENTS.heading.id, // Remove this once Heading component is implemented
+      CONTENTFUL_COMPONENTS.image.id,
+    ],
   },
-  {
-    component: StubSection,
-    definition: StubSectionContentfulComponentDefinition,
-  },
-]);
+);
