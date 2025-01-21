@@ -1,0 +1,54 @@
+@import '@/typography/typography.module';
+@import '@/common/styles/variables';
+
+// Video common styles
+.video {
+  width: 100%;
+  margin: unset;
+
+  & > .videoWrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    padding-top: 56.25%;
+    border: 1px solid #EAEBEB;
+    border-radius: $border-radius;
+    box-sizing: content-box;
+    display: block;
+
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+  }
+}
+
+// Footer styles
+.footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+
+  .caption {
+    @include figcaption;
+    font-weight: 600;
+  }
+
+  .download {
+    margin-top: 0.5rem;
+  }
+
+  // Align the download button to the right
+  // when there is no caption shown.
+  &:not(:has(.caption)) {
+    justify-content: flex-end;
+  }
+}
