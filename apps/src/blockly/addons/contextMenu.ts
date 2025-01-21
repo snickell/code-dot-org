@@ -124,7 +124,7 @@ const registerEditable = function (weight: number) {
         : 'Make Editable to Users';
     },
     preconditionFn: function () {
-      if (Blockly.isStartMode) {
+      if (Blockly.isStartMode || Blockly.isToolboxMode) {
         return MenuOptionStates.ENABLED;
       }
       return MenuOptionStates.HIDDEN;
@@ -145,7 +145,11 @@ const registerShadow = function (weight: number) {
   const shadowOption = {
     displayText: () => 'Make Shadow',
     preconditionFn: function (scope: GoogleBlockly.ContextMenuRegistry.Scope) {
-      if (Blockly.isStartMode && scope.block && canBeShadow(scope.block)) {
+      if (
+        (Blockly.isStartMode || Blockly.isToolboxMode) &&
+        scope.block &&
+        canBeShadow(scope.block)
+      ) {
         // isShadow is a built in Blockly function that checks whether the block
         // is a shadow or not.
         return MenuOptionStates.ENABLED;
@@ -179,7 +183,7 @@ const registerUnshadow = function (weight: number) {
     },
     preconditionFn: function (scope: GoogleBlockly.ContextMenuRegistry.Scope) {
       if (
-        Blockly.isStartMode &&
+        (Blockly.isStartMode || Blockly.isToolboxMode) &&
         scope.block &&
         hasShadowChildren(scope.block)
       ) {
