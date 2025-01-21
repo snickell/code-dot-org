@@ -23,7 +23,8 @@
       "types": "./dist/divider/index.d.ts",
       "import": "./dist/divider/index.js",
       "require": "./dist/divider/index.cjs"
-    }
+    },
+    "./divider/index.css": "./dist/divider/index.css"
   },
   "main": "components/index.ts",
   "files": [
