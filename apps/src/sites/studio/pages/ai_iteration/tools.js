@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import getScriptData from '@cdo/apps/util/getScriptData';
 import AIIterationTools from '@cdo/apps/levelbuilder/ai-iteration-tools/AIIterationTools';
+import getScriptData from '@cdo/apps/util/getScriptData';
 
 $(document).ready(() => {
   const aiIterationToolsData = getScriptData('aiIterationToolsData');

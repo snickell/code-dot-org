@@ -1,24 +1,11 @@
 import Papa from 'papaparse';
 import React, {useEffect, useState} from 'react';
 
-import {postAichatCompletionMessage} from '@cdo/apps/aichat/aichatApi';
-import {ChatMessage} from '@cdo/apps/aichat/types';
-import {Role} from '@cdo/apps/aiComponentLibrary/chatMessage/types';
 import {getChatCompletionMessage} from '@cdo/apps/aiTutor/chatApi';
 import {formatQuestionForAITutor} from '@cdo/apps/aiTutor/redux/aiTutorRedux';
 import Button from '@cdo/apps/componentLibrary/button/Button';
-import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
-import {ValueOf} from '@cdo/apps/types/utils';
-import {AiChatModelIds} from '@cdo/generated-scripts/sharedConstants';
 
 import AITutorTesterSampleColumns from './AITutorTesterSampleColumns';
-import {
-  availableEndpoints,
-  DEFAULT_TEMPERATURE,
-  genAIEndpointIds,
-  // modelCardInfo,
-} from './constants';
-import {Endpoint} from './types';
 
 import styles from './ai-tutor-tester.module.scss';
 
