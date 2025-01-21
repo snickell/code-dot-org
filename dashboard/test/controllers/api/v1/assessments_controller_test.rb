@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class Api::V1::AssessmentsControllerTest < ActionController::TestCase
+class Api::V1::AssessmentsControllerTest < ActionDispatch::IntegrationTest
   self.use_transactional_test_case = true
 
   setup_all do
@@ -25,13 +25,13 @@ class Api::V1::AssessmentsControllerTest < ActionController::TestCase
 
   # index tests - gets assessment questions and answers
   test 'logged out cannot get assessment questions and answers' do
-    get :index
+    get assessments_path
     assert_response :forbidden
   end
 
   test 'students cannot get assessment questions and answers' do
     sign_in @student_1
-    get :index
+    get assessments_path
     assert_response :forbidden
   end
 
@@ -41,13 +41,13 @@ class Api::V1::AssessmentsControllerTest < ActionController::TestCase
     create(:follower, section: section).student_user
 
     sign_in non_verified_teacher
-    get :index
+    get assessments_path
     assert_response :forbidden
   end
 
   test 'verified teacher can get assessment questions and answers' do
     sign_in @teacher
-    get :index, params: {section_id: @section.id, script_id: @unit.id}
+    get assessments_path, params: {section_id: @section.id, script_id: @unit.id}
     assert_response :success
     assert_equal '{}', @response.body
   end
@@ -103,7 +103,7 @@ class Api::V1::AssessmentsControllerTest < ActionController::TestCase
     create :script_level, script: script, levels: [level1], assessment: true, lesson: lesson
 
     # Call the controller method.
-    get :index, params: {
+    get assessments_path, params: {
       section_id: @section.id,
       script_id: script.id
     }
@@ -146,7 +146,7 @@ class Api::V1::AssessmentsControllerTest < ActionController::TestCase
 
   # section_responses tests - gets student responses to assessment
   test 'logged out cannot get assessment responses from students' do
-    get :section_responses
+    get section_responses_assessments_path
     assert_response :forbidden
   end
 
@@ -154,7 +154,7 @@ class Api::V1::AssessmentsControllerTest < ActionController::TestCase
     script = create :script
     sign_in @teacher_other
 
-    get :section_responses, params: {
+    get section_responses_assessments_path, params: {
       section_id: @section.id,
       script_id: script.id
     }
@@ -163,13 +163,13 @@ class Api::V1::AssessmentsControllerTest < ActionController::TestCase
 
   test 'students cannot get assessment responses from students' do
     sign_in @student_1
-    get :section_responses
+    get section_responses_assessments_path
     assert_response :forbidden
   end
 
   test 'gets no assessment responses from students when no assessment' do
     sign_in @teacher
-    get :section_responses, params: {section_id: @section.id, script_id: @unit.id}
+    get section_responses_assessments_path, params: {section_id: @section.id, script_id: @unit.id}
     assert_response :success
     assert_equal '{}', @response.body
   end
@@ -245,7 +245,7 @@ class Api::V1::AssessmentsControllerTest < ActionController::TestCase
     end
 
     # Call the controller method.
-    get :section_responses, params: {
+    get section_responses_assessments_path, params: {
       section_id: @section.id,
       script_id: script.id
     }
@@ -331,7 +331,7 @@ class Api::V1::AssessmentsControllerTest < ActionController::TestCase
     end
 
     # Call the controller method.
-    get :section_responses, params: {
+    get section_responses_assessments_path, params: {
       section_id: @section.id,
       script_id: script.id
     }
@@ -419,7 +419,7 @@ class Api::V1::AssessmentsControllerTest < ActionController::TestCase
     end
 
     # We can retrieve this with the survey API.
-    get :section_surveys, params: {
+    get section_surveys_assessments_path, params: {
       section_id: @section.id,
       script_id: script.id
     }
@@ -427,7 +427,7 @@ class Api::V1::AssessmentsControllerTest < ActionController::TestCase
     assert_equal 1, JSON.parse(@response.body).keys.length
 
     # But, we get an empty result with the assessment responses API because the assessment is anonymous.
-    get :section_responses, params: {
+    get section_responses_assessments_path, params: {
       section_id: @section.id,
       script_id: script.id
     }
@@ -437,7 +437,7 @@ class Api::V1::AssessmentsControllerTest < ActionController::TestCase
 
   # section_surveys tests - gets the survey questions and anonymous responses
   test 'logged out cannot get survey responses from students' do
-    get :section_surveys
+    get section_surveys_assessments_path
     assert_response :forbidden
   end
 
@@ -445,7 +445,7 @@ class Api::V1::AssessmentsControllerTest < ActionController::TestCase
     script = create :script
     sign_in @teacher_other
 
-    get :section_surveys, params: {
+    get section_surveys_assessments_path, params: {
       section_id: @section.id,
       script_id: script.id
     }
@@ -454,13 +454,13 @@ class Api::V1::AssessmentsControllerTest < ActionController::TestCase
 
   test 'students cannot get survey responses from students' do
     sign_in @student_1
-    get :section_surveys
+    get section_surveys_assessments_path
     assert_response :forbidden
   end
 
   test 'gets no survey responses from students when no survey' do
     sign_in @teacher
-    get :section_surveys, params: {section_id: @section.id, script_id: @unit.id}
+    get section_surveys_assessments_path, params: {section_id: @section.id, script_id: @unit.id}
     assert_response :success
     assert_equal '{}', @response.body
   end
@@ -542,7 +542,7 @@ class Api::V1::AssessmentsControllerTest < ActionController::TestCase
         level_source: create(:level_source, level: sub_level4, data: "-1")
     end
 
-    get :section_surveys, params: {
+    get section_surveys_assessments_path, params: {
       section_id: @section.id,
       script_id: script.id
     }
@@ -681,7 +681,7 @@ class Api::V1::AssessmentsControllerTest < ActionController::TestCase
     end
 
     # We can retrieve this with the survey API, but there will be no levelgroup_results.
-    get :section_surveys, params: {
+    get section_surveys_assessments_path, params: {
       section_id: @section.id,
       script_id: script.id
     }
@@ -714,7 +714,7 @@ class Api::V1::AssessmentsControllerTest < ActionController::TestCase
     end
 
     assert_queries 12 do
-      get :section_feedback, params: {section_id: @section.id, script_id: script.id}
+      get section_feedback_assessments_path, params: {section_id: @section.id, script_id: script.id}
     end
 
     assert_response :success
