@@ -55,7 +55,7 @@ module Populator
   end
 
   def put(bucket, path, data)
-    return unless CDO.aws_s3_emulated?
+    return unless CDO.aws_s3_emulated
     return if AWS::S3.exists_in_bucket(bucket, path)
 
     data = data.call if data.is_a? Proc

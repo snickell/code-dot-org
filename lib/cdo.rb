@@ -282,12 +282,6 @@ module Cdo
       running_web_application? && ENV.fetch('CI', nil)
     end
 
-    # The web server is connected to an emulated S3 server local to this server.
-    def aws_s3_emulated?
-      # This is true when an endpoint is set explicitly
-      !!(CDO.aws_s3_endpoint && (rack_env?(:development) || rack_env?(:test)))
-    end
-
     def shared_image_url(path)
       "/shared/images/#{path}"
     end

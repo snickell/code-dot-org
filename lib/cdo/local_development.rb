@@ -25,7 +25,7 @@ module Cdo
     #
     # See `lib/cdo/local_development/s3_emulation/`
     def self.populate_local_s3_bucket(bucket, key)
-      return unless CDO.aws_s3_emulated?
+      return unless CDO.aws_s3_emulated
       return if AWS::S3.exists_in_bucket(bucket, key)
 
       # Determine the Populator class that can generate files for this bucket, if it

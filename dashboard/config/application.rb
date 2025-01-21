@@ -84,7 +84,7 @@ module Dashboard
       # Automatically load tools intended to make the local development
       # environment behave more like production.
       require 'cdo/local_development'
-      if CDO.aws_s3_emulated?
+      if CDO.aws_s3_emulated
         config.autoload_paths << Rails.root.join('../lib/cdo/local_development/s3_emulation')
       end
     end

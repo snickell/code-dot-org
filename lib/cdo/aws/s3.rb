@@ -47,7 +47,7 @@ module AWS
     # the credentials specified in the CDO config.
     # @return [Aws::S3::Client]
     def self.connect_v2!
-      self.s3 ||= if CDO.aws_s3_emulated?
+      self.s3 ||= if CDO.aws_s3_emulated
                     Aws::S3::Client.new(
                       endpoint: CDO.aws_s3_endpoint,
                       access_key_id: CDO.aws_s3_access_key_id,
@@ -84,11 +84,9 @@ module AWS
     # @param [String] key
     # @return [String]
     def self.download_from_bucket(bucket, key, options = {})
-      if rack_env?(:development)
-        # For development environments, we look to see if we should lazily populate the
-        # local bucket first.
-        Cdo::LocalDevelopment.populate_local_s3_bucket(bucket, key)
-      end
+      # If we are emulating S3 (usually for local development environments), we
+      # first attempt to lazily populate the emulated bucket.
+      Cdo::LocalDevelopment.populate_local_s3_bucket(bucket, key) if CDO.aws_s3_emulated
 
       create_client.get_object(bucket: bucket, key: key).body.read.force_encoding(Encoding::BINARY)
     rescue Aws::S3::Errors::NoSuchKey
