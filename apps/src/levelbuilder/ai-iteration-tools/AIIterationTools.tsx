@@ -4,10 +4,14 @@ import AITutorTester from './ai-tutor/AITutorTester';
 import StudentCodeDatasetMaker from './StudentCodeDatasetMaker';
 
 interface AIIterationToolsProps {
-  allowed: boolean;
+  canUseAITutor: boolean;
+  canMakeDatasets: boolean;
 }
 
-const AIIterationTools: React.FC<AIIterationToolsProps> = ({allowed}) => {
+const AIIterationTools: React.FC<AIIterationToolsProps> = ({
+  canMakeDatasets,
+  canUseAITutor,
+}) => {
   return (
     <div>
       <h1>AI Iteration Tools</h1>
@@ -15,11 +19,11 @@ const AIIterationTools: React.FC<AIIterationToolsProps> = ({allowed}) => {
         A small suite of tools accessible to Levelbuilders who want to join in
         the fun of iterating on our AI tools.
       </p>
-      <StudentCodeDatasetMaker />
+      <StudentCodeDatasetMaker allowed={canMakeDatasets} />
       <br />
       <hr />
       <br />
-      <AITutorTester allowed={allowed} />
+      <AITutorTester allowed={canUseAITutor} />
     </div>
   );
 };
