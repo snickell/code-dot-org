@@ -207,6 +207,27 @@ class SessionsControllerTest < ActionController::TestCase
     assert @response.cookies["remember_user_token"]
   end
 
+  test "session can be expired" do
+    teacher = create(:teacher)
+    create_session_for_user(teacher)
+    original_id = session.id.dup
+
+    post :expire_other
+    refute_equal session.id, original_id
+  end
+
+  test "misc session data will be preserved through expiration" do
+    teacher = create(:teacher)
+    create_session_for_user(teacher)
+    # User-identifying data will NOT be preserved.
+    session[:_csrf_token] = "baz"
+    session[:foo] = "bar"
+
+    post :expire_other
+    refute_equal session[:_csrf_token], "baz"
+    assert_equal session[:foo], "bar"
+  end
+
   class LtiAccountLinkingSignInPageTest < ActionDispatch::IntegrationTest
     test 'renders alternative account linking login page during LTI registration' do
       DCDO.stubs(:get)
