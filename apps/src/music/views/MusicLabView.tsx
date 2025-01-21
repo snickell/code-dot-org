@@ -45,6 +45,7 @@ interface MusicLabViewProps {
   hasTrigger: (id: string) => boolean;
   getCurrentPlayheadPosition: () => number;
   updateHighlightedBlocks: () => void;
+  checkForEnd: () => void;
   undo: () => void;
   redo: () => void;
   clearCode: () => void;
@@ -62,6 +63,7 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
   hasTrigger,
   getCurrentPlayheadPosition,
   updateHighlightedBlocks,
+  checkForEnd,
   undo,
   redo,
   clearCode,
@@ -149,11 +151,13 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
 
   // Update loop that runs while playback is in progress.
   const doPlaybackUpdate = useCallback(() => {
+    checkForEnd();
     dispatch(setCurrentPlayheadPosition(getCurrentPlayheadPosition()));
     updateHighlightedBlocks();
     progressManager?.updateProgress();
   }, [
     dispatch,
+    checkForEnd,
     getCurrentPlayheadPosition,
     updateHighlightedBlocks,
     progressManager,
