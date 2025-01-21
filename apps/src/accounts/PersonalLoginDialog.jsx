@@ -4,7 +4,7 @@ import React from 'react';
 import Button from '@cdo/apps/legacySharedComponents/Button';
 import {ADD_A_PERSONAL_LOGIN_HELP_URL} from '@cdo/apps/lib/util/urlHelpers';
 import BaseDialog from '@cdo/apps/templates/BaseDialog';
-import GlobalRegionWrapper from '@cdo/apps/templates/GlobalRegionWrapper';
+import GlobalEditionWrapper from '@cdo/apps/templates/GlobalEditionWrapper';
 import color from '@cdo/apps/util/color';
 import i18n from '@cdo/locale';
 
@@ -64,7 +64,7 @@ export default class PersonalLoginDialog extends React.Component {
               })}
             </strong>
           </p>
-          <GlobalRegionWrapper
+          <GlobalEditionWrapper
             component={PersonalLoggingDeleteAccountDialog}
             componentId="PersonalLoggingDeleteAccountDialog"
           />

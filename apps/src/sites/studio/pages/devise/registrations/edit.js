@@ -16,7 +16,7 @@ import {SchoolInformation} from '@cdo/apps/accounts/SchoolInformation';
 import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {getStore} from '@cdo/apps/redux';
-import GlobalRegionWrapper from '@cdo/apps/templates/GlobalRegionWrapper';
+import GlobalEditionWrapper from '@cdo/apps/templates/GlobalEditionWrapper';
 import LockoutLinkedAccounts from '@cdo/apps/templates/policy_compliance/LockoutLinkedAccounts';
 import color from '@cdo/apps/util/color';
 import getScriptData from '@cdo/apps/util/getScriptData';
@@ -110,7 +110,7 @@ $(document).ready(() => {
     document.getElementById('lti-sync-settings');
   if (ltiSyncSettingsMountPoint) {
     ReactDOM.render(
-      <GlobalRegionWrapper
+      <GlobalEditionWrapper
         component={LtiRosterSyncSettings}
         componentId="LtiRosterSyncSettings"
         props={{

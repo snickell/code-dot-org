@@ -5,7 +5,7 @@ import {
   ADD_A_PERSONAL_LOGIN_HELP_URL,
   RELEASE_OR_DELETE_RECORDS_EXPLANATION,
 } from '@cdo/apps/lib/util/urlHelpers';
-import GlobalRegionWrapper from '@cdo/apps/templates/GlobalRegionWrapper';
+import GlobalEditionWrapper from '@cdo/apps/templates/GlobalEditionWrapper';
 import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
 import i18n from '@cdo/locale';
 
@@ -14,7 +14,7 @@ export const TeacherWarning = () => {
     <div>
       <SafeMarkdown markdown={i18n.deleteAccount_teacherWarning()} />
 
-      <GlobalRegionWrapper
+      <GlobalEditionWrapper
         component={() => (
           <SafeMarkdown
             markdown={i18n.deleteAccount_personalLoginInstructions({
