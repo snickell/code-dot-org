@@ -2,6 +2,7 @@
 
 .weekColumn {
   width: 100px;
+  min-width: 100px;
   background-color: $purple;
   color: white;
   text-align: center;
@@ -38,8 +39,11 @@
 
 .keySection {
   display: flex;
-  justify-content: space-around;
   width: 90%;
   align-items: center;
   font-size: 15px;
+}
+
+.keyCell {
+  margin-inline-start: 24px;
 }

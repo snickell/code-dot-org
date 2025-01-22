@@ -107,7 +107,7 @@ export default function UnitCalendarGrid({
             <td className={styles.weekColumn}>Key</td>
             <td className={styles.scheduleColumn}>
               <div className={styles.keySection}>
-                <div>
+                <div className={styles.keyCell}>
                   <FontAwesome
                     icon="square-o"
                     style={{
@@ -117,7 +117,7 @@ export default function UnitCalendarGrid({
                   />
                   {i18n.instructionalLesson()}
                 </div>
-                <div>
+                <div className={styles.keyCell}>
                   <FontAwesome
                     icon="check-circle"
                     style={{
@@ -127,7 +127,7 @@ export default function UnitCalendarGrid({
                   />
                   {i18n.assessment()}
                 </div>
-                <div>
+                <div className={styles.keyCell}>
                   <FontAwesome icon="scissors" className={styles.keyIcon} />
                   {i18n.unpluggedLesson()}
                 </div>
