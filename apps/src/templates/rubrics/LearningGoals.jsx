@@ -7,7 +7,7 @@ import {
   OverlineThreeText,
   Heading5,
   StrongText,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@code-dot-org/component-library/typography';
 import EditorAnnotator from '@cdo/apps/EditorAnnotator';
 import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';

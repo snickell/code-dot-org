@@ -6,7 +6,7 @@ import {
   setUnitSummaryReduxData,
   UnitSummaryResponse,
 } from '@cdo/apps/code-studio/components/progress/UnitSummaryUtils';
-import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
+import {SimpleDropdown} from '@code-dot-org/component-library/dropdown';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import Spinner from '@cdo/apps/sharedComponents/Spinner';

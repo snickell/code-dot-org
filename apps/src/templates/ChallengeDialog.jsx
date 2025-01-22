@@ -3,7 +3,7 @@ import Radium from 'radium'; // eslint-disable-line no-restricted-imports
 import React from 'react';
 
 import assetUrl from '@cdo/apps/code-studio/assetUrl';
-import Button, {buttonColors} from '@cdo/apps/componentLibrary/button/Button';
+import {Button, buttonColors} from '@code-dot-org/component-library/button';
 import {getStore} from '@cdo/apps/redux';
 import i18n from '@cdo/locale';
 

@@ -3,7 +3,7 @@ import {LanguageSupport} from '@codemirror/language';
 import React, {useCallback, useMemo} from 'react';
 
 import codebridgeI18n from '@cdo/apps/codebridge/locale';
-import {BodyOneText} from '@cdo/apps/componentLibrary/typography';
+import {BodyOneText} from '@code-dot-org/component-library/typography';
 import {getActiveFileForSource} from '@cdo/apps/lab2/projects/utils';
 import CodeEditor from '@cdo/apps/lab2/views/components/editor/CodeEditor';
 

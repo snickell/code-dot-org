@@ -4,7 +4,7 @@ import Draggable, {DraggableEventHandler} from 'react-draggable';
 
 import ChatMessage from '@cdo/apps/aiComponentLibrary/chatMessage/ChatMessage';
 import {Role} from '@cdo/apps/aiComponentLibrary/chatMessage/types';
-import Button from '@cdo/apps/componentLibrary/button';
+import Button from '@code-dot-org/component-library/button';
 import {AiInteractionStatus as Status} from '@cdo/generated-scripts/sharedConstants';
 import aiBotOutlineIcon from '@cdo/static/ai-bot-outline.png';
 

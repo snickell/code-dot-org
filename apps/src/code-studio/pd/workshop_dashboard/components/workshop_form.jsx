@@ -25,7 +25,7 @@ import {
 import {connect} from 'react-redux';
 import Select from 'react-select';
 
-import Checkbox from '@cdo/apps/componentLibrary/checkbox/Checkbox';
+import Checkbox from '@code-dot-org/component-library/checkbox';
 import {
   ActiveCourseWorkshops,
   Subjects,

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import Button from '@cdo/apps/componentLibrary/button';
+import Button from '@code-dot-org/component-library/button';
 import BaseDialog from '@cdo/apps/templates/BaseDialog';
 import DialogFooter from '@cdo/apps/templates/teacherDashboard/DialogFooter';
 import {navigateToHref} from '@cdo/apps/utils';

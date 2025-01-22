@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import {BodyThreeText} from '@cdo/apps/componentLibrary/typography';
+import {BodyThreeText} from '@code-dot-org/component-library/typography';
 
 import {ITEM_TYPE_SHAPE} from './ItemType';
 import ProgressIcon from './ProgressIcon';

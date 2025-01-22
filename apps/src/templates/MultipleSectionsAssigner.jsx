@@ -3,12 +3,12 @@ import React, {useState} from 'react';
 import {connect} from 'react-redux';
 
 import {updateHiddenScript} from '@cdo/apps/code-studio/hiddenLessonRedux';
-import Checkbox from '@cdo/apps/componentLibrary/checkbox';
+import Checkbox from '@code-dot-org/component-library/checkbox';
 import {
   Heading3,
   Heading5,
   BodyTwoText,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@code-dot-org/component-library/typography';
 import Button from '@cdo/apps/legacySharedComponents/Button';
 import AccessibleDialog from '@cdo/apps/sharedComponents/AccessibleDialog';
 import {sectionForDropdownShape} from '@cdo/apps/templates/teacherDashboard/shapes';

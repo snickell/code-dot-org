@@ -5,8 +5,8 @@ import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {connect, useDispatch} from 'react-redux';
 
-import Tabs from '@cdo/apps/componentLibrary/tabs';
-import {Heading2} from '@cdo/apps/componentLibrary/typography';
+import Tabs from '@code-dot-org/component-library/tabs';
+import {Heading2} from '@code-dot-org/component-library/typography';
 import DCDO from '@cdo/apps/dcdo';
 import {pegasus} from '@cdo/apps/lib/util/urlHelpers';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';

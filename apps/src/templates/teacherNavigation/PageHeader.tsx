@@ -3,8 +3,8 @@ import _ from 'lodash';
 import React, {useCallback, useEffect, useState} from 'react';
 import {matchPath, useLocation} from 'react-router-dom';
 
-import {Heading1} from '@cdo/apps/componentLibrary/typography';
-import Typography from '@cdo/apps/componentLibrary/typography/Typography';
+import {Heading1} from '@code-dot-org/component-library/typography';
+import Typography from '@code-dot-org/component-library/typography';
 import {
   convertStudentDataToArray,
   filterAgeGatedStudents,

@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import React, {useCallback} from 'react';
 
 import codebridgeI18n from '@cdo/apps/codebridge/locale';
-import Button from '@cdo/apps/componentLibrary/button';
+import Button from '@code-dot-org/component-library/button';
 import {START_SOURCES} from '@cdo/apps/lab2/constants';
 import useLifecycleNotifier from '@cdo/apps/lab2/hooks/useLifecycleNotifier';
 import {getAppOptionsEditBlocks} from '@cdo/apps/lab2/projects/utils';

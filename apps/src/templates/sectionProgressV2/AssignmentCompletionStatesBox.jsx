@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {StrongText} from '@cdo/apps/componentLibrary/typography';
+import {StrongText} from '@code-dot-org/component-library/typography';
 import i18n from '@cdo/locale';
 
 import {ITEM_TYPE} from './ItemType';

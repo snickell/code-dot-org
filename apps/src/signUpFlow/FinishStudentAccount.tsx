@@ -2,17 +2,17 @@ import classNames from 'classnames';
 import cookies from 'js-cookie';
 import React, {useState, useEffect, useMemo} from 'react';
 
-import {Button, buttonColors} from '@cdo/apps/componentLibrary/button';
-import Checkbox from '@cdo/apps/componentLibrary/checkbox/Checkbox';
-import CloseButton from '@cdo/apps/componentLibrary/closeButton/CloseButton';
-import SimpleDropdown from '@cdo/apps/componentLibrary/dropdown/simpleDropdown';
-import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
-import TextField from '@cdo/apps/componentLibrary/textField/TextField';
+import {Button, buttonColors} from '@code-dot-org/component-library/button';
+import Checkbox from '@code-dot-org/component-library/checkbox';
+import CloseButton  from '@code-dot-org/component-library/closeButton';
+import SimpleDropdown from '@code-dot-org/component-library/dropdown/simpleDropdown';
+import FontAwesomeV6Icon from '@code-dot-org/component-library/fontAwesomeV6Icon';
+import TextField from '@code-dot-org/component-library/textField';
 import {
   Heading2,
   BodyTwoText,
   BodyThreeText,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@code-dot-org/component-library/typography';
 import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';

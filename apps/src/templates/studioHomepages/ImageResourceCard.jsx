@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
-import Button, {buttonColors} from '@cdo/apps/componentLibrary/button/Button';
+import {Button, buttonColors} from '@code-dot-org/component-library/button';
 import fontConstants from '@cdo/apps/fontConstants';
 
 import color from '../../util/color';

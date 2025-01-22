@@ -6,7 +6,7 @@ import {
   selectAllVisibleMessages,
   sendAnalytics,
 } from '@cdo/apps/aichat/redux/aichatRedux';
-import Button from '@cdo/apps/componentLibrary/button/Button';
+import Button from '@code-dot-org/component-library/button';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import copyToClipboard from '@cdo/apps/util/copyToClipboard';
 import {useAppDispatch} from '@cdo/apps/util/reduxHooks';

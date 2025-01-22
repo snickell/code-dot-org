@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 
-import Link from '@cdo/apps/componentLibrary/link';
+import Link from '@code-dot-org/component-library/link';
 import {LtiProviderContext} from '@cdo/apps/simpleSignUp/lti/link/LtiLinkAccountPage/context';
 import {navigateToHref} from '@cdo/apps/utils';
 import i18n from '@cdo/locale';

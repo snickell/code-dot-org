@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import React from 'react';
 
-import {BodyTwoText, Heading1} from '@cdo/apps/componentLibrary/typography';
+import {BodyTwoText, Heading1} from '@code-dot-org/component-library/typography';
 import i18n from '@cdo/locale';
 
 import codeLogo from '../images/codeLogo.svg';

@@ -3,7 +3,7 @@ import React, {useMemo, useState} from 'react';
 import ChatMessage from '@cdo/apps/aiComponentLibrary/chatMessage/ChatMessage';
 import {Role} from '@cdo/apps/aiComponentLibrary/chatMessage/types';
 import {getChatMessageDisplayText} from '@cdo/apps/aiComponentLibrary/chatMessage/utils';
-import Button from '@cdo/apps/componentLibrary/button/Button';
+import Button from '@code-dot-org/component-library/button';
 import {AiInteractionStatus as Status} from '@cdo/generated-scripts/sharedConstants';
 
 import aichatI18n from '../locale';

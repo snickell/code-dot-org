@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 
 import {nextLevelId} from '@cdo/apps/code-studio/progressReduxSelectors';
 import {queryParams} from '@cdo/apps/code-studio/utils';
-import {Button} from '@cdo/apps/componentLibrary/button';
+import {Button} from '@code-dot-org/component-library/button';
 import {LevelPredictSettings} from '@cdo/apps/lab2/levelEditors/types';
 import continueOrFinishLesson from '@cdo/apps/lab2/progress/continueOrFinishLesson';
 import {

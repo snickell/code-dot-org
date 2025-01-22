@@ -1,7 +1,7 @@
 import {PDFDownloadLink} from '@react-pdf/renderer';
 import React, {useState} from 'react';
 
-import Button from '@cdo/apps/componentLibrary/button/Button';
+import Button from '@code-dot-org/component-library/button';
 import {commonI18n} from '@cdo/apps/types/locale';
 
 import AiDiffPdf from './AiDiffPdf';

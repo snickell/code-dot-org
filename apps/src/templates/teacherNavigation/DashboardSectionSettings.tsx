@@ -1,7 +1,7 @@
 import React from 'react';
 import {useBlocker} from 'react-router-dom';
 
-import Modal from '@cdo/apps/componentLibrary/modal/Modal';
+import Modal from '@code-dot-org/component-library/modal';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 import i18n from '@cdo/locale';
 

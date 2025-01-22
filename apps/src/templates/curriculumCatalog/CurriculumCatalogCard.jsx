@@ -9,8 +9,8 @@ import {
   Button,
   buttonColors,
   LinkButton,
-} from '@cdo/apps/componentLibrary/button';
-import {BodyThreeText, Heading4} from '@cdo/apps/componentLibrary/typography';
+} from '@code-dot-org/component-library/button';
+import {BodyThreeText, Heading4} from '@code-dot-org/component-library/typography';
 import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';

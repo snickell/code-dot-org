@@ -2,12 +2,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {NavLink} from 'react-router-dom';
 
-import {LinkButton} from '@cdo/apps/componentLibrary/button';
+import {LinkButton} from '@code-dot-org/component-library/button';
 import {
   Heading3,
   BodyTwoText,
   Heading1,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@code-dot-org/component-library/typography';
 import emptyDesk from '@cdo/apps/templates/teacherDashboard/images/empty_desk.svg';
 import blankScreen from '@cdo/apps/templates/teacherDashboard/images/no_curriculum_assigned.svg';
 import i18n from '@cdo/locale';

@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 
-import Link from '@cdo/apps/componentLibrary/link';
-import {Heading6} from '@cdo/apps/componentLibrary/typography';
+import Link from '@code-dot-org/component-library/link';
+import {Heading6} from '@code-dot-org/component-library/typography';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {tryGetLocalStorage, trySetLocalStorage} from '@cdo/apps/utils';

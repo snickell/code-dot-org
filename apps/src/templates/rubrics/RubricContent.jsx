@@ -7,7 +7,7 @@ import {
   BodyTwoText,
   Heading3,
   Heading4,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@code-dot-org/component-library/typography';
 import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import i18n from '@cdo/locale';
 

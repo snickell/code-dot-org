@@ -3,7 +3,7 @@ import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React, {useCallback, useState} from 'react';
 
-import {Figcaption} from '@cdo/apps/componentLibrary/typography';
+import {Figcaption} from '@code-dot-org/component-library/typography';
 import Button from '@cdo/apps/legacySharedComponents/Button';
 import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';

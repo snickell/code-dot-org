@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 
-import Button, {buttonColors} from '@cdo/apps/componentLibrary/button';
+import Button, {buttonColors} from '@code-dot-org/component-library/button';
 import i18n from '@cdo/locale';
 
 import color from '../../util/color';

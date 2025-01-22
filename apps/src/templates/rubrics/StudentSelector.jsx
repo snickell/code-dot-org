@@ -11,7 +11,7 @@ import {
   BodyThreeText,
   EmText,
   OverlineThreeText,
-} from '@cdo/apps/componentLibrary/typography';
+} from '@code-dot-org/component-library/typography';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';

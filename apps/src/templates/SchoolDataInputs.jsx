@@ -2,9 +2,9 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useMemo} from 'react';
 
-import {Button} from '@cdo/apps/componentLibrary/button';
-import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
-import {BodyTwoText, Heading2} from '@cdo/apps/componentLibrary/typography';
+import {Button} from '@code-dot-org/component-library/button';
+import {SimpleDropdown} from '@code-dot-org/component-library/dropdown';
+import {BodyTwoText, Heading2} from '@code-dot-org/component-library/typography';
 import {
   SELECT_COUNTRY,
   US_COUNTRY_CODE,

@@ -12,7 +12,7 @@ import CurriculumCatalogCard from '@cdo/apps/templates/curriculumCatalog/Curricu
 import PropTypes from 'prop-types';
 import React, {useState, useEffect} from 'react';
 
-import {Heading5, BodyTwoText} from '@cdo/apps/componentLibrary/typography';
+import {Heading5, BodyTwoText} from '@code-dot-org/component-library/typography';
 import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import GlobalEditionWrapper from '@cdo/apps/templates/GlobalEditionWrapper';
