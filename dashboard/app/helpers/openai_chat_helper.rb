@@ -10,7 +10,7 @@ module OpenaiChatHelper
   AICHAT_SAFETY_GPT_MODEL = SharedConstants::AICHAT_SAFETY_MODEL_VERSION
 
   # set this up to take temperature as an argument
-  def self.request_chat_completion(messages)
+  def self.request_chat_completion(messages, temperature = TEMPERATURE)
     # Set up the API endpoint URL and request headers
     headers = {
       "Content-Type" => "application/json",
@@ -20,7 +20,7 @@ module OpenaiChatHelper
 
     data = {
       model: AICHAT_SAFETY_GPT_MODEL,
-      # temperature: TEMPERATURE,
+      temperature: temperature,
       messages: messages
     }
 
