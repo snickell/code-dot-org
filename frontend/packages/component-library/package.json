@@ -282,7 +282,6 @@
   },
   "prettier": "@code-dot-org/lint-config/prettier/index.mjs",
   "dependencies": {
-    "classnames": "^2.5.1",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
@@ -302,6 +301,7 @@
     "@types/node": "^22.9.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "classnames": "^2.5.1",
     "clean-package": "^2.2.0",
     "conventional-changelog-conventionalcommits": "^7.0.2",
     "esbuild-sass-plugin": "^3.3.1",
@@ -324,6 +324,7 @@
     "typescript-eslint": "^8.15.0"
   },
   "peerDependencies": {
+    "classnames": "^2.5.1",
     "react": ">=16",
     "react-dom": ">=16"
   },
