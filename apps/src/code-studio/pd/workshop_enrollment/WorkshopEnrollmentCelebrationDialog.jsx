@@ -5,6 +5,8 @@ import Button from '@cdo/apps/componentLibrary/button/Button';
 import LinkButton from '@cdo/apps/componentLibrary/button/LinkButton';
 import Typography, {
   Heading2,
+  Heading3,
+  Heading6,
   BodyTwoText,
 } from '@cdo/apps/componentLibrary/typography';
 import AccessibleDialog from '@cdo/apps/sharedComponents/AccessibleDialog';
@@ -20,13 +22,21 @@ export default function WorkshopEnrollmentCelebrationDialog({
   workshopSessionInfo,
   onClose,
 }) {
+  const hasMultipleSessions = workshopSessionInfo.length > 1;
   const [isOpen, setIsOpen] = useState(true);
+  const [multipleSessionDialogType, setMultipleSessionDialogType] =
+    useState('');
 
-  const onCloseDialog = () => {
+  const onCloseCelebrationDialog = () => {
     if (onClose) {
       onClose();
     }
     setIsOpen(false);
+  };
+
+  const onCloseSessionCalendarDialog = () => {
+    setMultipleSessionDialogType('');
+    onCloseCelebrationDialog();
   };
 
   const buildGoogleCalendarLink = session => {
@@ -53,53 +63,162 @@ export default function WorkshopEnrollmentCelebrationDialog({
     )}&startdt=${startTime}&enddt=${endTime}`;
   };
 
+  const getCalendarLink = session => {
+    if (multipleSessionDialogType === 'google') {
+      return buildGoogleCalendarLink(session);
+    } else if (multipleSessionDialogType === 'outlook') {
+      return buildOutlookCalendarLink(session);
+    }
+  };
+
+  const RenderCalendarSessionDialog = () => {
+    return (
+      <AccessibleDialog
+        className={style.celebrationContainer}
+        onClose={() => setMultipleSessionDialogType('')}
+        closeOnClickBackdrop={true}
+      >
+        <div className={style.showMultipleSessionDialogContainer}>
+          <Heading3>{i18n.enrollmentCelebrationAddToCalendarTitle()}</Heading3>
+          <hr />
+          <BodyTwoText>
+            {i18n.enrollmentCelebrationAddToCalendarDesc()}
+          </BodyTwoText>
+          <table>
+            <thead>
+              <tr>
+                <th>
+                  <Heading6>{i18n.date()}</Heading6>
+                </th>
+                <th>
+                  <Heading6>{i18n.time()}</Heading6>
+                </th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {workshopSessionInfo.map((session, index) => (
+                <tr key={`session-${index}`}>
+                  <td>
+                    <BodyTwoText>{session.date_text}</BodyTwoText>
+                  </td>
+                  <td>
+                    <BodyTwoText>{session.time_text}</BodyTwoText>
+                  </td>
+                  <td>
+                    <LinkButton
+                      text={i18n.enrollmentCelebrationAddToCalendarButton()}
+                      type={'secondary'}
+                      color={'black'}
+                      iconLeft={{iconName: 'fa-solid fa-plus'}}
+                      className={style.addSessionToCalendarButton}
+                      href={getCalendarLink(session)}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <hr />
+          <div className={style.closeMultipleSessionDialogContainer}>
+            <Button
+              text={i18n.enrollmentCelebrationChangeCalendarButton()}
+              type={'secondary'}
+              color={'black'}
+              iconLeft={{iconName: 'fa-solid fa-arrow-left'}}
+              onClick={() => setMultipleSessionDialogType('')}
+            />
+            <Button
+              text={i18n.enrollmentCelebrationCallToAction()}
+              type={'primary'}
+              onClick={onCloseSessionCalendarDialog}
+            />
+          </div>
+        </div>
+      </AccessibleDialog>
+    );
+  };
+
   return (
     isOpen && (
       <AccessibleDialog
         className={style.celebrationContainer}
-        onClose={onCloseDialog}
+        onClose={onCloseCelebrationDialog}
         closeOnClickBackdrop={true}
       >
-        <div className={style.dialogContainer}>
-          <div className={style.contentContainer}>
-            <img src={CelebrationImage} alt="" />
-            <Heading2>{i18n.enrollmentCelebrationTitle()}</Heading2>
-            <BodyTwoText>
-              {i18n.enrollmentCelebrationBody({workshopName: workshopTitle})}
-            </BodyTwoText>
-            <div className={style.calendarButtonContainer}>
-              <Typography semanticTag={'h3'} visualAppearance={'overline-two'}>
-                {i18n.addToYourCalendar()}
-              </Typography>
-              <div className={style.calendarButtons}>
-                <LinkButton
-                  text={'Google'}
-                  href={buildGoogleCalendarLink(workshopSessionInfo[0])}
-                  type={'secondary'}
-                  color={'black'}
-                  iconLeft={{
-                    iconName: 'brands fa-google',
-                    iconStyle: 'light',
-                  }}
-                />
-                <LinkButton
-                  text={'Outlook'}
-                  href={buildOutlookCalendarLink(workshopSessionInfo[0])}
-                  type={'secondary'}
-                  color={'black'}
-                  iconLeft={{
-                    iconName: 'brands fa-microsoft',
-                    iconStyle: 'light',
-                  }}
-                />
+        <>
+          {multipleSessionDialogType && RenderCalendarSessionDialog()}
+          <div className={style.dialogContainer}>
+            <div className={style.contentContainer}>
+              <img src={CelebrationImage} alt="" />
+              <Heading2>{i18n.enrollmentCelebrationTitle()}</Heading2>
+              <BodyTwoText>
+                {i18n.enrollmentCelebrationBody({workshopName: workshopTitle})}
+              </BodyTwoText>
+              <div className={style.calendarButtonContainer}>
+                <Typography
+                  semanticTag={'h3'}
+                  visualAppearance={'overline-two'}
+                >
+                  {i18n.addToYourCalendar()}
+                </Typography>
+                <div className={style.calendarButtons}>
+                  {hasMultipleSessions ? (
+                    <>
+                      <Button
+                        text={'Google'}
+                        type={'secondary'}
+                        color={'black'}
+                        iconLeft={{
+                          iconName: 'brands fa-google',
+                          iconStyle: 'light',
+                        }}
+                        onClick={() => setMultipleSessionDialogType('google')}
+                      />
+                      <Button
+                        text={'Outlook'}
+                        type={'secondary'}
+                        color={'black'}
+                        iconLeft={{
+                          iconName: 'brands fa-microsoft',
+                          iconStyle: 'light',
+                        }}
+                        onClick={() => setMultipleSessionDialogType('outlook')}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <LinkButton
+                        text={'Google'}
+                        type={'secondary'}
+                        color={'black'}
+                        iconLeft={{
+                          iconName: 'brands fa-google',
+                          iconStyle: 'light',
+                        }}
+                        href={buildGoogleCalendarLink(workshopSessionInfo[0])}
+                      />
+                      <LinkButton
+                        text={'Outlook'}
+                        type={'secondary'}
+                        color={'black'}
+                        iconLeft={{
+                          iconName: 'brands fa-microsoft',
+                          iconStyle: 'light',
+                        }}
+                        href={buildOutlookCalendarLink(workshopSessionInfo[0])}
+                      />
+                    </>
+                  )}
+                </div>
               </div>
             </div>
+            <Button
+              onClick={onCloseCelebrationDialog}
+              text={i18n.enrollmentCelebrationCallToAction()}
+            />
           </div>
-          <Button
-            onClick={onCloseDialog}
-            text={i18n.enrollmentCelebrationCallToAction()}
-          />
-        </div>
+        </>
       </AccessibleDialog>
     )
   );

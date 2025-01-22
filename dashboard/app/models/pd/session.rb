@@ -55,6 +55,9 @@ class Pd::Session < ApplicationRecord
   end
 
   def session_time_info
+    start_time = start.strftime('%l:%M%p').strip
+    end_time = self.end.strftime('%l:%M%p').strip
+
     {
       year: start.strftime('%Y').strip,
       month: start.strftime('%m').strip,
@@ -62,7 +65,9 @@ class Pd::Session < ApplicationRecord
       start_hour: start.strftime('%H').strip,
       start_min: start.strftime('%M').strip,
       end_hour: self.end.strftime('%H').strip,
-      end_min: self.end.strftime('%M').strip
+      end_min: self.end.strftime('%M').strip,
+      date_text: start.strftime('%B %-d, %Y').strip,
+      time_text: "#{start_time} - #{end_time}"
     }
   end
 

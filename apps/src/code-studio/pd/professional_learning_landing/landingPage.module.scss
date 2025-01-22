@@ -2,6 +2,7 @@
 
 @use 'color.scss';
 @import 'typography';
+@import 'breakpoints';
 
 main.wrapper {
   max-width: 60rem;
@@ -42,13 +43,19 @@ section {
   place-content: center;
   display: flex;
   text-align: center;
+  width: 100%;
 
   img {
     width: 264px;
   }
 
-  h2, h3, p {
+  h2, h3, h6, p {
     margin-bottom: 0;
+  }
+
+  hr {
+    margin: 0;
+    border-color: color.$light_gray_200;
   }
 
   .dialogContainer {
@@ -78,7 +85,62 @@ section {
         gap: 0.75rem;
       }
     }
-  }  
+  }
+
+  .showMultipleSessionDialogContainer {
+    display: flex;
+    flex-direction: column;
+    text-align: start;
+    margin: 0.5rem 1rem;
+    gap: 1rem;
+
+    table {
+      border: 1px solid;
+      border-radius: 0.25rem;
+      border-color: color.$light_gray_200;
+      table-layout: auto !important;
+
+      th {
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+        background-color: color.$light_gray_50;
+        border: none;
+
+        @media screen and (min-width: $width-sm) {
+          width: fit-content;
+        }
+      }
+
+      tbody {
+        tr {
+          border-top: 1px solid;
+          border-color: color.$light_gray_200;
+        }
+      }
+
+      td {
+        border: none;
+        
+        @media screen and (min-width: $width-sm) {
+          width: fit-content;
+        }
+      }
+
+      .addSessionToCalendarButton {
+        padding: 0.125rem 0.5rem;
+        border-color: color.$light_gray_400;
+
+        span {
+          font-size: 0.75rem;
+        }
+      }
+    }
+
+    .closeMultipleSessionDialogContainer {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
 }
 
 // TODO - this can be removed once the components on this page
