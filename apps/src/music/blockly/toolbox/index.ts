@@ -182,6 +182,7 @@ export function addToolboxBlocksToWorkspace(
   contents: GoogleBlockly.utils.toolbox.ToolboxItemInfo[],
   workspace: GoogleBlockly.WorkspaceSvg
 ) {
+  workspace.clear();
   contents.forEach(toolboxItem => {
     if (toolboxItem.kind === 'block') {
       // Add blocks directly to the workspace.

@@ -186,7 +186,7 @@ export function validateBlockCategories(workspace) {
   const topBlocks = workspace.getTopBlocks(true);
   let noCategoryBlocks = false;
   if (
-    !workspace.getBlocksByType(BlockTypes.CATEGORY).length ||
+    !workspace.getBlocksByType(BlockTypes.CATEGORY).length &&
     !workspace.getBlocksByType(BlockTypes.CUSTOM_CATEGORY).length
   ) {
     noCategoryBlocks = true;

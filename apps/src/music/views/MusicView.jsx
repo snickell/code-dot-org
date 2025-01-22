@@ -25,7 +25,11 @@ import {SignInState} from '@cdo/apps/templates/currentUserRedux';
 import AppConfig from '../appConfig';
 import {TRIGGER_FIELD} from '../blockly/constants';
 import MusicBlocklyWorkspace from '../blockly/MusicBlocklyWorkspace';
-import {getToolbox, localizeCategoryNames} from '../blockly/toolbox';
+import {
+  addToolboxBlocksToWorkspace,
+  getToolbox,
+  localizeCategoryNames,
+} from '../blockly/toolbox';
 import {
   BlockMode,
   LEGACY_DEFAULT_LIBRARY,
@@ -472,12 +476,14 @@ class UnconnectedMusicView extends React.Component {
       const defaultSources = require(`@cdo/static/music/${startSourcesFilename}.json`);
       this.loadCode(defaultSources);
     } else if (isToolboxMode) {
-      // TODO: Toolbox mode should restore the full toolbox on start over.
       const toolbox = getToolbox(
         this.props.blockMode,
         this.props.levelProperties?.levelData?.toolbox
       );
-      console.log(toolbox);
+      addToolboxBlocksToWorkspace(
+        toolbox.contents,
+        this.musicBlocklyWorkspace.workspace
+      );
     } else {
       // Otherwise, use getStartSources which handles levelData and fallback logic.
       this.loadCode(this.getStartSources());
