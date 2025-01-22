@@ -4,12 +4,11 @@
     "wrapup_video_id": null,
     "login_required": false,
     "properties": {
-      "is_migrated": true,
-      "version_year": "2025"
+      "is_migrated": true
     },
     "new_name": null,
     "family_name": null,
-    "serialized_at": "2025-01-16 22:08:32 UTC",
+    "serialized_at": "2025-01-22 19:00:20 UTC",
     "published_state": null,
     "instruction_type": null,
     "instructor_audience": null,
@@ -997,6 +996,9 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "ML-Events"
+        ]
       },
       "bonus": false,
       "seeding_key": {

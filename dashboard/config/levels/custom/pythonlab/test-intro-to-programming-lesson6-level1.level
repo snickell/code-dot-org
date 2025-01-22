@@ -1,6 +1,5 @@
 <Pythonlab>
   <config><![CDATA[{
-  "published": true,
   "game_id": 72,
   "created_at": "2025-01-22T18:37:15.000Z",
   "level_num": "custom",
@@ -360,7 +359,7 @@
           "id": "0",
           "name": "main.py",
           "language": "py",
-          "contents": "from neighborhood import Painter\n\nbob = Painter()\n\ndef move_fast():\n  bob.move()\n  bob.move()\n  bob.move()\n\nmove_fast()\nbob.paint('Blue')\nmove_fast()",
+          "contents": "from neighborhood import Painter\n\n\n# move painter one square forward\npainter.move()\npainter.paint(\"yellow\")",
           "folderId": "0",
           "active": true,
           "open": true
@@ -370,6 +369,7 @@
       }
     }
   },
-  "audit_log": "[{\"changed_at\":\"2025-01-22T18:37:15.800+00:00\",\"changed\":[\"cloned from \\\"test-intro-to-programming-lesson7-level1\\\"\"],\"cloned_from\":\"test-intro-to-programming-lesson7-level1\"},{\"changed_at\":\"2025-01-22 18:51:24 +0000\",\"changed\":[\"serialized_maze\",\"predict_settings\",\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
+  "published": true,
+  "audit_log": "[{\"changed_at\":\"2025-01-22T18:37:15.800+00:00\",\"changed\":[\"cloned from \\\"test-intro-to-programming-lesson7-level1\\\"\"],\"cloned_from\":\"test-intro-to-programming-lesson7-level1\"},{\"changed_at\":\"2025-01-22 18:51:24 +0000\",\"changed\":[\"serialized_maze\",\"predict_settings\",\"long_instructions\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"},{\"changed_at\":\"2025-01-22 18:58:42 +0000\",\"changed\":[\"start_sources\"],\"changed_by_id\":18605,\"changed_by_email\":\"katie.frank+levelbuilder@code.org\"}]"
 }]]></config>
 </Pythonlab>
