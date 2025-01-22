@@ -11,10 +11,12 @@ class UserLevelInteractionsController < ApplicationController
     if should_create_uli?(user_level_interaction_params[:metadata])
       @user_level_interaction = UserLevelInteraction.new(user_level_interaction_params)
       if @user_level_interaction.save
-        render json: {message: "Successfully created UserLevelInteraction.", id: @user_level_interaction.id}, status: :created
+        render(status: :created, json: {message: "Successfully created UserLevelInteraction.", id: @user_level_interaction.id})
       else
         render(status: :not_acceptable, json: {error: 'There was an error creating a new UserLevelInteraction.'})
       end
+    else
+      render(status: :ok, json: {message: 'UserLevelInteraction not created because this is not a CSP 2024+ script or the user is not a student.'})
     end
   end
 
