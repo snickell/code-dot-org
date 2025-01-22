@@ -134,19 +134,18 @@ module Services
             any_pdf_generated = true
 
             # Generate matadata
-            if any_pdf_generated
-              metadata ={
-                course: script.name,
-                unit_fullname: script.localized_title,
-                unit: script.unit_number ? format("U%02d", script.unit_number) : "U1",
-                lesson: format("L%02d", lesson.absolute_position),
-                url: "https://studio.code.org" + lesson.lesson_plan_html_url,
-                verified_teacher: true,
-              }
-              file_path = "/tmp/#{script.name}-#{lesson.absolute_position}.metadata.json"
-              add_metadata_to_ai_s3(file_path, metadata)
-              add_pdf_to_ai_s3(pdf_pathname)
-            end
+            course_name = script.unit_group ? script.unit_group.name : script.name
+            metadata ={
+              course: course_name,
+              unit_fullname: script.name,
+              unit: script.unit_number ? format("U%02d", script.unit_number) : "U01",
+              lesson: format("L%02d", lesson.absolute_position),
+              url: "https://studio.code.org" + lesson.lesson_plan_html_url,
+              verified_teacher: false,
+            }
+            file_path = "/tmp/#{script.name}-#{lesson.absolute_position}.metadata.json"
+            add_metadata_to_ai_s3(file_path, metadata)
+            add_pdf_to_ai_s3(pdf_pathname)
           end
 
           if should_generate_overview_pdf?(script)
@@ -170,19 +169,17 @@ module Services
     end
 
     def self.add_metadata_to_ai_s3(file_path, metadata)
-      full_metadata = {
+      full_metadata_json = {
         metadataAttributes: metadata
-      }
-      File.write(file_path, full_metadata.to_json)
-      flat_filename = File.basename(file_path)
-      data = File.read(file_path)
-      AWS::S3.upload_to_bucket(S3_BUCKET_AI, flat_filename, data, no_random: true)
+      }.to_json
+      flat_filename = "live/pdfgen_#{File.basename(file_path)}"
+      AWS::S3.upload_to_bucket(S3_BUCKET_AI, flat_filename, full_metadata_json, no_random: true)
     end
 
     def self.add_pdf_to_ai_s3(filepath)
       data = File.read(filepath)
 
-      flat_filename = File.basename(filepath)
+      flat_filename = "live/pdfgen_#{File.basename(filepath)}"
 
       AWS::S3.upload_to_bucket(S3_BUCKET_AI, flat_filename, data, no_random: true)
     end
