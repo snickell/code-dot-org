@@ -25,6 +25,8 @@ const WEEKLY_INSTRUCTIONAL_MINUTES_OPTIONS = [
 export const WEEK_WIDTH = 585;
 
 const UnitCalendar: React.FC = () => {
+  const calendarRef = React.useRef<HTMLDivElement>(null);
+
   const [isLoading, setIsLoading] = useState(false); // it is only loading when you do the fetch
 
   const [weeklyInstructionalMinutes, setWeeklyInstructionalMinutes] =
@@ -131,7 +133,7 @@ const UnitCalendar: React.FC = () => {
       {!isLoading && <CalendarEmptyState />}
       <div className={styles.calendarContentContainer}>
         {!isLoading && hasCalendar && (
-          <div>
+          <div ref={calendarRef}>
             <div className={styles.minutesPerWeekWrapper}>
               <div className={styles.minutesPerWeekDescription}>
                 {i18n.instructionalMinutesPerWeek()}
@@ -148,9 +150,9 @@ const UnitCalendar: React.FC = () => {
               />
             </div>
             <UnitCalendarGrid
-              lessons={calendarLessons}
+              lessons={calendarLessons || []}
               weeklyInstructionalMinutes={parseInt(weeklyInstructionalMinutes)}
-              weekWidth={WEEK_WIDTH}
+              weekWidth={calendarRef.current?.offsetWidth || WEEK_WIDTH}
             />
           </div>
         )}
