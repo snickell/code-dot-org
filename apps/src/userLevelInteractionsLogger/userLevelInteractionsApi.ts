@@ -7,7 +7,6 @@ import {UserLevelInteraction} from './types';
 export async function logUserLevelInteraction(
   interactionData: UserLevelInteraction
 ) {
-  console.log('logUserLevelInteraction', interactionData);
   try {
     const response = await fetch('/user_level_interactions', {
       method: 'POST',
