@@ -1,6 +1,6 @@
+import Typography from '@code-dot-org/component-library/typography';
 import React from 'react';
 
-import Typography from '@code-dot-org/component-library/typography';
 import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 
 import {ConditionType, Validation, Condition} from '../../types';

@@ -1,9 +1,9 @@
+import {Button, buttonColors} from '@code-dot-org/component-library/button';
+import {EmText} from '@code-dot-org/component-library/typography';
 import classNames from 'classnames';
 import React, {useState} from 'react';
 
 import {Role} from '@cdo/apps/aiComponentLibrary/chatMessage/types';
-import {Button, buttonColors} from '@code-dot-org/component-library/button';
-import {EmText} from '@code-dot-org/component-library/typography';
 import {useAppDispatch} from '@cdo/apps/util/reduxHooks';
 import {AiChatTeacherFeedback as TeacherFeedback} from '@cdo/generated-scripts/sharedConstants';
 

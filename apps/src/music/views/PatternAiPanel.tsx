@@ -1,3 +1,7 @@
+import {Button} from '@code-dot-org/component-library/button';
+import {SimpleDropdown} from '@code-dot-org/component-library/dropdown';
+import FontAwesomeV6Icon from '@code-dot-org/component-library/fontAwesomeV6Icon';
+import Slider from '@code-dot-org/component-library/slider';
 import classNames from 'classnames';
 import React, {
   ChangeEvent,
@@ -6,6 +10,21 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+
+import {useInterval} from '@cdo/apps/util/useInterval';
+
+import {generatePattern} from '../ai/patternAi';
+import appConfig from '../appConfig';
+import {PATTERN_AI_NUM_EVENTS, PATTERN_AI_NUM_SEED_EVENTS} from '../constants';
+import musicI18n from '../locale';
+import MusicRegistry from '../MusicRegistry';
+import {InstrumentEventValue} from '../player/interfaces/InstrumentEvent';
+import MusicLibrary from '../player/MusicLibrary';
+
+import LoadingOverlay from './LoadingOverlay';
+import PreviewControls from './PreviewControls';
+
+import styles from './patternAiPanel.module.scss';
 
 const aiBotImages = [
   require(`@cdo/static/music/ai/ai-bot-0.png`),
@@ -21,25 +40,6 @@ const aiBotGeneratingImages = [
 ];
 
 const arrowImage = require(`@cdo/static/music/music-callout-arrow.png`);
-
-import {Button} from '@code-dot-org/component-library/button';
-import {SimpleDropdown} from '@code-dot-org/component-library/dropdown';
-import FontAwesomeV6Icon from '@code-dot-org/component-library/fontAwesomeV6Icon';
-import Slider from '@code-dot-org/component-library/slider';
-import {useInterval} from '@cdo/apps/util/useInterval';
-
-import {generatePattern} from '../ai/patternAi';
-import appConfig from '../appConfig';
-import {PATTERN_AI_NUM_EVENTS, PATTERN_AI_NUM_SEED_EVENTS} from '../constants';
-import musicI18n from '../locale';
-import MusicRegistry from '../MusicRegistry';
-import {InstrumentEventValue} from '../player/interfaces/InstrumentEvent';
-import MusicLibrary from '../player/MusicLibrary';
-
-import LoadingOverlay from './LoadingOverlay';
-import PreviewControls from './PreviewControls';
-
-import styles from './patternAiPanel.module.scss';
 
 // Generate an array containing tick numbers from 1..PATTERN_AI_NUM_EVENTS.
 const arrayOfTicks = Array.from(

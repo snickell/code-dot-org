@@ -1,6 +1,6 @@
+import Alert, {alertTypes} from '@code-dot-org/component-library/alert';
 import React, {useCallback, useMemo} from 'react';
 
-import Alert, {alertTypes} from '@code-dot-org/component-library/alert';
 import {useAppDispatch} from '@cdo/apps/util/reduxHooks';
 
 import aichatI18n from '../../locale';

@@ -1,6 +1,5 @@
-import React from 'react';
-
 import TextField from '@code-dot-org/component-library/textField';
+import React from 'react';
 
 import {PREDICT_FREE_RESPONSE_DEFAULT_HEIGHT} from '../../constants';
 import {LevelPredictSettings} from '../types';

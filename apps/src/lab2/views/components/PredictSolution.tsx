@@ -1,6 +1,9 @@
+import {
+  BodyThreeText,
+  Heading1,
+} from '@code-dot-org/component-library/typography';
 import React from 'react';
 
-import {BodyThreeText, Heading1} from '@code-dot-org/component-library/typography';
 import {
   LevelPredictSettings,
   PredictQuestionType,

@@ -1,7 +1,7 @@
+import Alert, {alertTypes} from '@code-dot-org/component-library/alert';
 import React, {useState} from 'react';
 
 import AbuseExclamation from '@cdo/apps/code-studio/components/AbuseExclamation';
-import Alert, {alertTypes} from '@code-dot-org/component-library/alert';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 import i18n from '@cdo/locale';
 

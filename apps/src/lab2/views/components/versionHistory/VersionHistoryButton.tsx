@@ -1,10 +1,12 @@
+import Alert from '@code-dot-org/component-library/alert';
+import {Button} from '@code-dot-org/component-library/button';
+import {
+  TooltipProps,
+  WithTooltip,
+} from '@code-dot-org/component-library/tooltip';
 import classNames from 'classnames';
 import React, {useCallback, useState} from 'react';
 
-import Alert from '@code-dot-org/component-library/alert';
-import {Button} from '@code-dot-org/component-library/button';
-import {TooltipProps} from '@code-dot-org/component-library/tooltip';
-import { WithTooltip } from '@code-dot-org/component-library/tooltip';
 import {isReadOnlyWorkspace} from '@cdo/apps/lab2/lab2Redux';
 import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
 import lab2I18n from '@cdo/apps/lab2/locale';

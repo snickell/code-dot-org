@@ -1,13 +1,13 @@
-import classNames from 'classnames';
-import PropTypes from 'prop-types';
-import React from 'react';
-
 import RadioButton from '@code-dot-org/component-library/radioButton/RadioButton';
 import {
   BodyThreeText,
   StrongText,
   Heading6,
 } from '@code-dot-org/component-library/typography';
+import classNames from 'classnames';
+import PropTypes from 'prop-types';
+import React from 'react';
+
 import i18n from '@cdo/locale';
 
 import {UNDERSTANDING_LEVEL_STRINGS} from './rubricHelpers';

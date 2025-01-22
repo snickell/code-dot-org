@@ -1,9 +1,11 @@
+import Button from '@code-dot-org/component-library/button';
+import {
+  TooltipProps,
+  WithTooltip,
+} from '@code-dot-org/component-library/tooltip';
 import React, {useCallback} from 'react';
 
 import codebridgeI18n from '@cdo/apps/codebridge/locale';
-import Button from '@code-dot-org/component-library/button';
-import {TooltipProps} from '@code-dot-org/component-library/tooltip';
-import { WithTooltip } from '@code-dot-org/component-library/tooltip';
 
 import {useCodebridgeContext} from '../codebridgeContext';
 

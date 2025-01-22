@@ -1,11 +1,11 @@
+import Button from '@code-dot-org/component-library/button';
+import SimpleDropdown from '@code-dot-org/component-library/dropdown/simpleDropdown';
+import Slider, {SliderProps} from '@code-dot-org/component-library/slider';
 import classNames from 'classnames';
 import React, {useState, useMemo} from 'react';
 import {useSelector} from 'react-redux';
 
 import {AichatLevelProperties, ModelDescription} from '@cdo/apps/aichat/types';
-import Button from '@code-dot-org/component-library/button';
-import SimpleDropdown from '@code-dot-org/component-library/dropdown/simpleDropdown';
-import Slider, {SliderProps} from '@code-dot-org/component-library/slider';
 import {isReadOnlyWorkspace} from '@cdo/apps/lab2/lab2Redux';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 

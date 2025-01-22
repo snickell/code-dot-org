@@ -1,7 +1,9 @@
-import React, {useState} from 'react';
-
 import SimpleDropdown from '@code-dot-org/component-library/dropdown/simpleDropdown';
-import {BodyThreeText, StrongText} from '@code-dot-org/component-library/typography';
+import {
+  BodyThreeText,
+  StrongText,
+} from '@code-dot-org/component-library/typography';
+import React, {useState} from 'react';
 
 import aichatI18n from '../../locale';
 import {ModelDescription} from '../../types';

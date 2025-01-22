@@ -1,8 +1,7 @@
-import React, {useState} from 'react';
-
 import Checkbox from '@code-dot-org/component-library/checkbox';
 import {SimpleDropdown} from '@code-dot-org/component-library/dropdown';
 import {BodyThreeText} from '@code-dot-org/component-library/typography';
+import React, {useState} from 'react';
 
 import {PREDICT_FREE_RESPONSE_DEFAULT_HEIGHT} from '../../constants';
 import {LevelPredictSettings, PredictQuestionType} from '../types';

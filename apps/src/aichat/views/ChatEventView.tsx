@@ -1,6 +1,6 @@
+import Alert from '@code-dot-org/component-library/alert';
 import React from 'react';
 
-import Alert from '@code-dot-org/component-library/alert';
 import {commonI18n} from '@cdo/apps/types/locale';
 import {useAppDispatch} from '@cdo/apps/util/reduxHooks';
 

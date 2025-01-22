@@ -1,6 +1,5 @@
-import React from 'react';
-
 import Chips from '@code-dot-org/component-library/chips';
+import React from 'react';
 
 import moduleStyles from './suggested-prompt.module.scss';
 

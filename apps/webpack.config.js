@@ -195,7 +195,9 @@ const APPLICATION_ALIASES = {
   // and not the one specified by linked dependencies.
 
   react: p('node_modules/react'),
-  '@/common/styles': p('node_modules/@code-dot-org/component-library/dist/styles'),
+  '@/common/styles': p(
+    'node_modules/@code-dot-org/component-library/dist/styles'
+  ),
   '@/typography': p('node_modules/@code-dot-org/component-library/dist/styles'),
 };
 

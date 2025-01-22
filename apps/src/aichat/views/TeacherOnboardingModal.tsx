@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {Button, buttonColors} from '@code-dot-org/component-library/button';
 import Link from '@code-dot-org/component-library/link';
 import {
@@ -7,6 +5,8 @@ import {
   BodyTwoText,
   Heading3,
 } from '@code-dot-org/component-library/typography';
+import React from 'react';
+
 import AccessibleDialog from '@cdo/apps/sharedComponents/AccessibleDialog';
 import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
 import i18n from '@cdo/locale';

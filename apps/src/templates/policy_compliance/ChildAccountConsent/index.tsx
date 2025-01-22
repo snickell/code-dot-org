@@ -1,7 +1,3 @@
-import cookies from 'js-cookie';
-import PropTypes from 'prop-types';
-import React from 'react';
-
 import {
   Heading4,
   BodyThreeText,
@@ -9,6 +5,10 @@ import {
   EmText,
   StrongText,
 } from '@code-dot-org/component-library/typography';
+import cookies from 'js-cookie';
+import PropTypes from 'prop-types';
+import React from 'react';
+
 import Button from '@cdo/apps/legacySharedComponents/Button';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';

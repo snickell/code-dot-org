@@ -1,7 +1,3 @@
-import {TextLink} from '@dsco_/link';
-import PropTypes from 'prop-types';
-import React, {useEffect, useRef} from 'react';
-
 import {
   Button,
   buttonColors,
@@ -13,6 +9,10 @@ import {
   Heading3,
   Heading4,
 } from '@code-dot-org/component-library/typography';
+import {TextLink} from '@dsco_/link';
+import PropTypes from 'prop-types';
+import React, {useEffect, useRef} from 'react';
+
 import FontAwesome from '@cdo/apps/legacySharedComponents/FontAwesome';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';

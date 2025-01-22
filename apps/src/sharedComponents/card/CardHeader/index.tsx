@@ -1,6 +1,5 @@
-import React from 'react';
-
 import Typography from '@code-dot-org/component-library/typography';
+import React from 'react';
 
 interface CardHeaderProps {
   title?: string;

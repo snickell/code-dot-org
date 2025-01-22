@@ -1,3 +1,5 @@
+import {SimpleDropdown} from '@code-dot-org/component-library/dropdown';
+import Typography from '@code-dot-org/component-library/typography';
 import _ from 'lodash';
 import React, {useState, useEffect} from 'react';
 import {

@@ -1,7 +1,7 @@
+import Button from '@code-dot-org/component-library/button';
 import classNames from 'classnames';
 import React, {useEffect, useRef, useState} from 'react';
 
-import Button from '@code-dot-org/component-library/button';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 import aichatI18n from '../locale';

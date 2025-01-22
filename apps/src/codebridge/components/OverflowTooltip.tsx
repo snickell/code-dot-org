@@ -1,6 +1,8 @@
+import {
+  TooltipProps,
+  WithTooltip,
+} from '@code-dot-org/component-library/tooltip';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-
-import {TooltipProps, WithTooltip} from '@code-dot-org/component-library/tooltip';
 
 interface OverflowTooltipProps {
   children: React.ReactNode;
