@@ -25,7 +25,7 @@ export default class PersonalLoginDialog extends React.Component {
 
   render() {
     const {isOpen, dependentStudentsCount, onCancel, onConfirm} = this.props;
-    const PersonalLoggingDeleteAccountDialog = () => (
+    const PersonalLoginDeleteAccountDialog = () => (
       <>
         <p>
           {i18n.personalLoginDialog_body3()}
@@ -65,8 +65,8 @@ export default class PersonalLoginDialog extends React.Component {
             </strong>
           </p>
           <GlobalEditionWrapper
-            component={PersonalLoggingDeleteAccountDialog}
-            componentId="PersonalLoggingDeleteAccountDialog"
+            component={PersonalLoginDeleteAccountDialog}
+            componentId="PersonalLoginDeleteAccountDialog"
           />
           <ConfirmCancelFooter
             confirmText={i18n.personalLoginDialog_button()}

@@ -180,9 +180,12 @@ pages:
       MarketingAnnouncementBanner: false
       TeacherResources: false
       IncubatorBanner: false
+  # Account Settings
   - path: /users/edit
     components:
+      # Do not all LTI use
       LtiRosterSyncSettings: false
-      PersonalLoggingDeleteAccountDialog: false
+      # Do not provide parental links for how to create accounts when deleting sections / accounts
+      PersonalLoginDeleteAccountDialog: false
       DeleteAccountPersonalLoginInstructions: false
 
