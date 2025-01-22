@@ -49,6 +49,14 @@ export const VideoWithFallback: Story = {
     youTubeId: 'nKIu9yen5nc',
     showCaption: false,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'This is a video component with a fallback HTML video player. The fallback player will show up if YouTube is blocked, and a Download button will also show up. To test this block _www.youtube.com_ and _www.youtube-nocookie.com_ in the Network tab in DevTools.',
+      },
+    },
+  },
   play: async ({canvasElement}) => {
     const canvas = within(canvasElement);
     const video = canvas.getByRole('figure');

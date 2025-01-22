@@ -1,5 +1,5 @@
+import {useState, useEffect, HTMLAttributes} from 'react';
 import classNames from 'classnames';
-import {HTMLAttributes} from 'react';
 
 import moduleStyles from './video.module.scss';
 import LinkButton from '../button/LinkButton';
@@ -27,7 +27,7 @@ export interface VideoProps extends HTMLAttributes<HTMLElement> {
  *
  * ###  Status: ```WIP```
  *
- * Design System: Video Component. This component is used to display a video from YouTube with the option to download it if an externally hosted fallback is provided. The video can also be displayed with a caption and works with responsive screen sizes.
+ * Design System: Video Component. This component is used to display a video from YouTube with a fallback HTML video player, and the option to download it, if an externally hosted fallback is provided. The video can also be displayed with a caption and works with responsive screen sizes.
  */
 
 export const Video: React.FC<VideoProps> = ({
@@ -36,34 +36,77 @@ export const Video: React.FC<VideoProps> = ({
   videoFallback,
   showCaption,
   className,
-}: VideoProps) => (
-  <figure className={moduleStyles.video}>
-    <div className={moduleStyles.videoWrapper}>
-      <iframe
-        className={classNames(className)}
-        src={`https://www.youtube-nocookie.com/embed/${youTubeId}`}
-        title={videoTitle}
-        allowFullScreen
-      />
-    </div>
-    <div className={moduleStyles.footer}>
-      {showCaption && (
-        <figcaption className={moduleStyles.caption}>{videoTitle}</figcaption>
-      )}
-      {videoFallback && (
-        <LinkButton
-          className={moduleStyles.download}
-          color="gray"
-          href={videoFallback}
-          iconLeft={{
-            iconName: 'download',
-            iconStyle: 'solid',
-          }}
-          size="xs"
-          text="Download"
-          type="secondary"
-        />
-      )}
-    </div>
-  </figure>
-);
+}: VideoProps) => {
+  const [isYouTubeBlocked, setIsYouTubeBlocked] = useState(false);
+  const posterThumbnail = `//i.ytimg.com/vi/${youTubeId}/mqdefault.jpg`;
+
+  // Check to see if YouTube is blocked.
+  // If it is, we'll use the fallback video player.
+  useEffect(() => {
+    const checkIfYouTubeIsBlocked = (url: string): Promise<boolean> => {
+      return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => resolve(false);
+        img.onerror = () => resolve(true);
+        img.src = `${url}?_=${Math.random()}`;
+      });
+    };
+
+    const checkYouTubeUrls = async () => {
+      const isYouTubeBlocked = await checkIfYouTubeIsBlocked(
+        'https://www.youtube.com/favicon.ico',
+      );
+      const isYouTubeNoCookieBlocked = await checkIfYouTubeIsBlocked(
+        'https://www.youtube-nocookie.com/favicon.ico',
+      );
+
+      setIsYouTubeBlocked(isYouTubeBlocked || isYouTubeNoCookieBlocked);
+    };
+
+    checkYouTubeUrls();
+  }, []);
+
+  return (
+    <figure className={moduleStyles.video}>
+      <div className={moduleStyles.videoWrapper}>
+        {isYouTubeBlocked && videoFallback ? (
+          // Disabling this eslint rule since we don't support captions on all of our videos.
+          // eslint-disable-next-line jsx-a11y/media-has-caption
+          <video
+            className={classNames(className)}
+            controls
+            poster={posterThumbnail}
+          >
+            <source src={videoFallback} type="video/mp4" />
+          </video>
+        ) : (
+          <iframe
+            className={classNames(className)}
+            src={`https://www.youtube-nocookie.com/embed/${youTubeId}`}
+            title={videoTitle}
+            allowFullScreen
+          />
+        )}
+      </div>
+      <div className={moduleStyles.footer}>
+        {showCaption && (
+          <figcaption className={moduleStyles.caption}>{videoTitle}</figcaption>
+        )}
+        {videoFallback && (
+          <LinkButton
+            className={moduleStyles.download}
+            color="gray"
+            href={videoFallback}
+            iconLeft={{
+              iconName: 'download',
+              iconStyle: 'solid',
+            }}
+            size="xs"
+            text="Download"
+            type="secondary"
+          />
+        )}
+      </div>
+    </figure>
+  );
+};
