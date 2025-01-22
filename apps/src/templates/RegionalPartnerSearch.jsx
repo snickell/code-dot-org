@@ -21,7 +21,7 @@ import {
   BodyThreeText,
   Heading2,
   Heading3,
-} from '../componentLibrary/typography';
+} from '@code-dot-org/component-library/typography';
 import * as color from '../util/color';
 
 const WorkshopCard = props => {

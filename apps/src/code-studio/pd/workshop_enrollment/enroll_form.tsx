@@ -9,7 +9,7 @@ import {Button} from '@code-dot-org/component-library/button';
 import Checkbox from '@code-dot-org/component-library/checkbox';
 import SimpleDropdown from '@code-dot-org/component-library/dropdown/simpleDropdown';
 import FontAwesomeV6Icon from '@code-dot-org/component-library/fontAwesomeV6Icon';
-import RadioButtonsGroup from '@code-dot-org/component-library/radioButton';
+import { RadioButtonsGroup } from '@code-dot-org/component-library/radioButton';
 import TextField from '@code-dot-org/component-library/textField';
 import Typography from '@code-dot-org/component-library/typography';
 import {SubjectNames} from '@cdo/apps/generated/pd/sharedWorkshopConstants';
@@ -45,7 +45,7 @@ import {
 } from './constants';
 
 import styles from '@cdo/apps/code-studio/pd/workshop_enrollment/EnrollForm/styles.module.scss';
-import textFieldStyles from '@code-dot-org/component-library/textField/textfield.module.scss';
+import textFieldStyles from '@code-dot-org/component-library/dist/styles/textfield.module.scss';
 
 interface SchoolInfoProps {
   country?: string;

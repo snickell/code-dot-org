@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import Tags from '@code-dot-org/component-library/tags/Tags';
+import Tags from '@code-dot-org/component-library/tags';
 
 export default function CardLabels({subjectsAndTopics}) {
   if (subjectsAndTopics.length === 0) {

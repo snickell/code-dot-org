@@ -193,7 +193,10 @@ const APPLICATION_ALIASES = {
   // Prevent webpack from including linked npm dependencies' version of React
   // In other words, only bundle one copy of React (the one specified in this file)
   // and not the one specified by linked dependencies.
+
   react: p('node_modules/react'),
+  '@/common/styles': p('node_modules/@code-dot-org/component-library/dist/styles'),
+  '@/typography': p('node_modules/@code-dot-org/component-library/dist/styles'),
 };
 
 const LOCALE_ALIASES = {
