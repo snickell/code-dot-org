@@ -292,9 +292,15 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
         instructionsPosition === InstructionsPosition.TOP &&
         renderInstructions(InstructionsPosition.TOP)}
 
-      {timelineAtTop && renderPlayArea(true)}
+      {timelineAtTop && !isToolboxMode && renderPlayArea(true)}
 
-      <div id="work-area" className={moduleStyles.workArea}>
+      <div
+        id="work-area"
+        className={classNames(moduleStyles.workArea, {
+          // Allow full height when the play area is hidden.
+          [moduleStyles.toolboxMode]: isToolboxMode,
+        })}
+      >
         {showInstructions &&
           instructionsPosition === InstructionsPosition.LEFT &&
           renderInstructions(InstructionsPosition.LEFT)}
@@ -347,7 +353,7 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
           renderInstructions(InstructionsPosition.RIGHT)}
       </div>
 
-      {!timelineAtTop && renderPlayArea(false)}
+      {!timelineAtTop && !isToolboxMode && renderPlayArea(false)}
     </div>
   );
 };
