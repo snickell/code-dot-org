@@ -23,7 +23,8 @@ module Cdo
     # And will invoke the `populate` method on the first one that actually exists; in this
     # example, CdoSoundLibrary::HocSongMeta::Populate.
     #
-    # See `lib/cdo/local_development/s3_emulation/`
+    # See `lib/cdo/local_development/s3_emulation/`; in particular,
+    # `cdo_sound_library/hoc_song_meta/populate.rb`
     def self.populate_local_s3_bucket(bucket, key)
       return unless CDO.aws_s3_emulated
       return if AWS::S3.exists_in_bucket(bucket, key)
@@ -36,8 +37,12 @@ module Cdo
         part.tr('-', '_').camelize
       end
 
-      # The 'base' will be the most specific populator found for the path within the
-      # bucket.
+      # The 'base' will be the most specific populator found for the path
+      # within the bucket. Start by attempting to set `base` to a Populate
+      # class found in a module containing every possible `class_part` we
+      # discovered; a NameError means no such class exists, so if we get one we
+      # remove the least-significant part of the potential path and try again
+      # until we find one that works.
       base = nil
       relative_path = []
       until class_parts.empty?

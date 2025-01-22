@@ -10,11 +10,9 @@ include:
   # Services the dashboard server depends on
   - path: ./docker/developers/docker-compose.mysql.yml
   - path: ./docker/developers/docker-compose.redis.yml
-
-  # MinIO S3 Emulation
   - path: ./docker/developers/docker-compose.minio.yml
 
-  # The dashboard server
+  # The dashboard server itself
   - path: ./docker/developers/docker-compose.dashboard.yml
 
 services:

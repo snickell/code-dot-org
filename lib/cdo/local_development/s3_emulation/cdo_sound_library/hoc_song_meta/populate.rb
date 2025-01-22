@@ -17,6 +17,14 @@ class CdoSoundLibrary::HocSongMeta::Populate
   TEST_MUSIC_URL = 'https://curriculum.code.org/media/uploads/synthesize.mp3'.freeze
   TEST_MUSIC_BPM = 110.0
 
+  # Check if the local system has ffmpeg support. Note that this populator does
+  # NOT require ffmpeg for any essential functionality. It is used to make the
+  # generated files sync up better with the in-browser animations, which may be
+  # aesthetically desirable for local development but isn't strictly necessary.
+  #
+  # If you would like to add ffmpeg to a development envirnment, `apt install
+  # ffmpeg` or `brew install ffmpeg` should work for most Linux or MacOS
+  # environments respectively.
   def ffmpeg?
     unless defined?(@ffmpeg)
       @ffmpeg = !!system('which ffmpeg > /dev/null')
