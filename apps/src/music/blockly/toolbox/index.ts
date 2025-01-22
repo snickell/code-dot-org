@@ -19,7 +19,7 @@ const baseCategoryCssConfig = {
   label: moduleStyles.toolboxLabel,
 };
 
-const dynamicCategoryLabels: {
+export const dynamicCategoryLabels: {
   [key in Category]?: string;
 } = {
   [Category.Functions]: 'PROCEDURE',
@@ -133,6 +133,33 @@ export function getToolbox(
 }
 
 /**
+ * Localizes the category names in the toolbox. Required for levels
+ * with categorized toolboxes that were defined in levelbuilder's
+ * toolbox mode.
+ */
+export function localizeCategoryNames(
+  toolbox: GoogleBlockly.utils.toolbox.ToolboxInfo
+): GoogleBlockly.utils.toolbox.ToolboxInfo {
+  return {
+    ...toolbox,
+    contents: toolbox.contents.map(toolboxItem => {
+      if (toolboxItem.kind === 'category') {
+        const staticCategory =
+          toolboxItem as GoogleBlockly.utils.toolbox.StaticCategoryInfo;
+        const originalName = staticCategory.name as Category;
+        const localizedName = categoryTypeToLocalizedName[originalName];
+
+        return {
+          ...staticCategory,
+          name: localizedName || staticCategory.name,
+        };
+      }
+      return toolboxItem;
+    }),
+  };
+}
+
+/**
  * A toolbox category for Toolbox mode, containing a block for specifying
  * the start of a category. Only available for levelbuilders.
  */
@@ -140,7 +167,10 @@ export const toolboxModeCategory = {
   kind: 'category',
   name: 'Categories',
   cssconfig: baseCategoryCssConfig,
-  contents: [{kind: 'block', type: 'category'}],
+  contents: [
+    {kind: 'block', type: BlockTypes.CATEGORY},
+    {kind: 'block', type: BlockTypes.CUSTOM_CATEGORY},
+  ],
 };
 
 /**
@@ -162,36 +192,40 @@ export function addToolboxBlocksToWorkspace(
     } else if (toolboxItem.kind === 'category' && 'custom' in toolboxItem) {
       // For categories with a custom value ('PROCEDURES' OR 'VARIABLES'),
       // get the category name.
-      const dynamicCategoryName =
-        dynamicCategoryToCategoryName[
-          (toolboxItem as GoogleBlockly.utils.toolbox.DynamicCategoryInfo)
-            .custom
-        ];
+      const dynamicCategoryName = (
+        toolboxItem as GoogleBlockly.utils.toolbox.DynamicCategoryInfo
+      ).custom;
       // Create a category block
       Blockly.serialization.blocks.append(
         {
-          type: BlockTypes.CATEGORY,
+          type: BlockTypes.CUSTOM_CATEGORY,
           fields: {
-            CATEGORY: dynamicCategoryName,
+            CUSTOM: dynamicCategoryName,
           },
         },
         workspace
       );
     } else if (toolboxItem.kind === 'category') {
+      const categoryInfo =
+        toolboxItem as GoogleBlockly.utils.toolbox.StaticCategoryInfo;
+      // For a localized category, like "Sounds", get the category name, like "Play".
       const categoryName =
-        localizedNameToCategoryType[
-          (toolboxItem as GoogleBlockly.utils.toolbox.StaticCategoryInfo).name
-        ];
-      // Create a category block
-      Blockly.serialization.blocks.append(
-        {
-          type: BlockTypes.CATEGORY,
-          fields: {
-            CATEGORY: categoryName,
+        localizedNameToCategoryType[categoryInfo.name] ||
+        (categoryInfo.name as Category);
+      if (Category[categoryName]) {
+        // Create a category block
+        Blockly.serialization.blocks.append(
+          {
+            type: BlockTypes.CATEGORY,
+            fields: {
+              CATEGORY: categoryName,
+            },
           },
-        },
-        workspace
-      );
+          workspace
+        );
+      } else {
+        console.warn('Unsupported category found:', toolboxItem);
+      }
       // Recursively process the contents of the static category
       addToolboxBlocksToWorkspace(
         (toolboxItem as GoogleBlockly.utils.toolbox.StaticCategoryInfo)
@@ -205,19 +239,41 @@ export function addToolboxBlocksToWorkspace(
 }
 
 /**
- * Creates a new category with default values. Used to convert workspace
+ * Creates a new static category. Used to convert workspace
  * blocks into a toolbox defintion in levelbuilder's toolbox mode.
- * @returns JSON representation of a new category called 'DEFAULT'.
+ * @returns JSON representation of a new static category.
  */
-export function getNewCategory() {
+export function getNewStaticCategory(
+  name: string = 'DEFAULT'
+): GoogleBlockly.utils.toolbox.StaticCategoryInfo {
   return {
     kind: 'category',
+    name,
     cssconfig: baseCategoryCssConfig,
     contents: [] as GoogleBlockly.utils.toolbox.ToolboxItemInfo[],
     id: undefined,
     categorystyle: undefined,
     colour: undefined,
     hidden: undefined,
-    name: 'DEFAULT',
+  };
+}
+
+/**
+ * Creates a new dynamic category. Used to convert workspace
+ * blocks into a toolbox defintion in levelbuilder's toolbox mode.
+ * @returns JSON representation of a new dynamic category.
+ */
+export function getNewDynamicCategory(
+  custom: string
+): GoogleBlockly.utils.toolbox.ToolboxItemInfo {
+  return {
+    kind: 'category',
+    custom,
+    name: dynamicCategoryToCategoryName[custom],
+    cssconfig: baseCategoryCssConfig,
+    id: undefined,
+    categorystyle: undefined,
+    colour: undefined,
+    hidden: undefined,
   };
 }

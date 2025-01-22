@@ -39,6 +39,7 @@ export enum BlockTypes {
   FUNCTION_DEFINITION = 'procedures_defnoreturn',
   FUNCTION_DEFINITION_RETURN = 'procedures_defreturn',
   CATEGORY = 'category',
+  CUSTOM_CATEGORY = 'custom_category',
 }
 
 export const FunctionDefinitionBlockTypes: string[] = [

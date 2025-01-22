@@ -27,7 +27,7 @@ import {
   playChordAtCurrentLocationSimple2,
   playTuneAtCurrentLocationSimple2,
 } from './blocks/simple2';
-import {categoryBlock} from './blocks/toolboxMode';
+import {dynamicCategoryBlock, staticCategoryBlock} from './blocks/toolboxMode';
 import {
   newTrackAtMeasure,
   newTrackAtStart,
@@ -68,7 +68,8 @@ const blockList = [
   playSoundInTrack,
   restInTrack,
   valueSample,
-  categoryBlock,
+  staticCategoryBlock,
+  dynamicCategoryBlock,
 ];
 
 const MUSIC_BLOCKS = {};

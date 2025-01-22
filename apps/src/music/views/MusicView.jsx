@@ -25,7 +25,7 @@ import {SignInState} from '@cdo/apps/templates/currentUserRedux';
 import AppConfig from '../appConfig';
 import {TRIGGER_FIELD} from '../blockly/constants';
 import MusicBlocklyWorkspace from '../blockly/MusicBlocklyWorkspace';
-import {getToolbox} from '../blockly/toolbox';
+import {getToolbox, localizeCategoryNames} from '../blockly/toolbox';
 import {
   BlockMode,
   LEGACY_DEFAULT_LIBRARY,
@@ -284,7 +284,9 @@ class UnconnectedMusicView extends React.Component {
     const toolboxAllowList =
       isStartMode || isToolboxMode ? undefined : levelData?.toolbox;
     // The toolboxDefinition property is a full toolbox that Blockly can load.
-    const toolboxDefinition = levelData?.toolboxDefinition;
+    const localizedToolboxDefinition =
+      levelData?.toolboxDefinition &&
+      localizeCategoryNames(levelData.toolboxDefinition);
 
     await this.loadAndInitializePlayer(libraryName || DEFAULT_LIBRARY);
 
@@ -311,7 +313,7 @@ class UnconnectedMusicView extends React.Component {
           toolboxAllowList,
           this.props.isRtl,
           this.props.blockMode,
-          toolboxDefinition
+          localizedToolboxDefinition
         );
 
     this.props.setShowInstructions(

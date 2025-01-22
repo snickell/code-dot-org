@@ -17,6 +17,7 @@ import {BlockMode, Triggers} from '../constants';
 import musicI18n from '../locale';
 
 import {BlockTypes} from './blockTypes';
+import {validateBlockCategories} from './blockUtils';
 import {
   FIELD_TRIGGER_START_NAME,
   TriggerStart,
@@ -27,8 +28,8 @@ import {
   getToolbox,
   addToolboxBlocksToWorkspace,
   toolboxModeCategory,
-  getNewCategory,
-  categoryTypeToLocalizedName,
+  getNewStaticCategory,
+  getNewDynamicCategory,
 } from './toolbox';
 import {Category, ToolboxData} from './toolbox/types';
 
@@ -200,10 +201,10 @@ export default class MusicBlocklyWorkspace {
     const workspace = this.workspace as GoogleBlockly.WorkspaceSvg;
     addToolboxBlocksToWorkspace(toolbox.contents, workspace);
 
-    workspace.cleanUp();
+    validateBlockCategories(workspace);
     workspace.addChangeListener(e => {
       if (e.type === Blockly.Events.BLOCK_MOVE) {
-        workspace.cleanUp();
+        validateBlockCategories(workspace);
       }
     });
   }
@@ -478,8 +479,7 @@ export default class MusicBlocklyWorkspace {
       contents: [],
     };
     let flyoutItems: GoogleBlockly.utils.toolbox.FlyoutItemInfo[] = [];
-    let currentCategory: GoogleBlockly.utils.toolbox.StaticCategoryInfo =
-      getNewCategory();
+    let currentCategory = getNewStaticCategory();
 
     topBlocks.forEach(block => {
       if (block.type === BlockTypes.CATEGORY) {
@@ -492,13 +492,26 @@ export default class MusicBlocklyWorkspace {
           fullToolbox.contents.push({...currentCategory});
         }
 
-        // Begin a new category
-        currentCategory = {
-          ...getNewCategory(),
-          name: categoryTypeToLocalizedName[
-            block.getFieldValue('CATEGORY') as Category
-          ],
-        };
+        // Begin a new category for the blocks that follow.
+        currentCategory = getNewStaticCategory(
+          block.getFieldValue('CATEGORY') as Category
+        );
+        flyoutItems = [];
+      } else if (block.type === BlockTypes.CUSTOM_CATEGORY) {
+        fullToolbox.kind = 'categoryToolbox';
+        if (
+          currentCategory.contents.length ||
+          currentCategory.name !== 'DEFAULT'
+        ) {
+          // Add previous category to toolbox
+          fullToolbox.contents.push({...currentCategory});
+        }
+        fullToolbox.contents.push(
+          getNewDynamicCategory(block.getFieldValue('CUSTOM'))
+        );
+
+        // Begin a new "DEFAULT" category in case any non-category block follows.
+        currentCategory = getNewStaticCategory();
         flyoutItems = [];
       } else {
         // Add the current block to the flyout and category.
@@ -511,13 +524,17 @@ export default class MusicBlocklyWorkspace {
       }
     });
 
-    if (fullToolbox.contents.length) {
-      // Add the final category to the toolbox.
-      fullToolbox.contents.push({...currentCategory});
-    } else {
+    // Finalize the toolbox.
+    if (!fullToolbox.contents.length) {
       // If no categories are present, create a flyout toolbox.
       fullToolbox.kind = 'flyoutToolbox';
       fullToolbox.contents = flyoutItems;
+    } else if (
+      currentCategory.contents.length ||
+      currentCategory.name !== 'DEFAULT'
+    ) {
+      // Add the final category to the toolbox.
+      fullToolbox.contents.push({...currentCategory});
     }
     return fullToolbox;
   }

@@ -177,3 +177,45 @@ export function findParentStatementInputTypes(id) {
 
   return parentTypes;
 }
+
+/**
+ * Adds a warning to blocks that are not positioned under a static category block.
+ */
+export function validateBlockCategories(workspace) {
+  workspace.cleanUp();
+  const topBlocks = workspace.getTopBlocks(true);
+  let noCategoryBlocks = false;
+  if (
+    !workspace.getBlocksByType(BlockTypes.CATEGORY).length ||
+    !workspace.getBlocksByType(BlockTypes.CUSTOM_CATEGORY).length
+  ) {
+    noCategoryBlocks = true;
+  }
+  let currentCategoryBlock = null; // Tracks the current valid category block
+  let warningText = 'This block is not positioned under a category.';
+
+  topBlocks.forEach(block => {
+    // If there are no categories, remove all warnings.
+    if (noCategoryBlocks) {
+      block.setWarningText(null);
+      return;
+    }
+    if (block.type === BlockTypes.CATEGORY) {
+      // Update the current category to this block
+      currentCategoryBlock = block;
+    } else if (block.type === BlockTypes.CUSTOM_CATEGORY) {
+      // Reset the current category since dynamic categories can't include static blocks
+      currentCategoryBlock = null;
+      warningText = 'Auto-populated categories cannot include static blocks.';
+    } else {
+      // Non-category blocks
+      if (!currentCategoryBlock) {
+        // No static category block above this block
+        block.setWarningText(warningText);
+      } else {
+        // Valid placement under a static category block
+        block.setWarningText(null);
+      }
+    }
+  });
+}
