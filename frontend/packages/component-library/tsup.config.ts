@@ -3,10 +3,31 @@ import {postcssModules, sassPlugin} from 'esbuild-sass-plugin';
 import type {Options} from 'tsup';
 import {glob} from 'glob';
 import {resolve} from 'node:path';
+import {cp} from 'node:fs/promises';
 
 const entryPoints = glob.sync('./src/**/index.ts', {
   posix: true,
 });
+
+async function onSuccess() {
+  const sourceDir = './src/common/styles';
+  const destDir = './dist/styles';
+
+  try {
+    await cp(sourceDir, destDir, {recursive: true});
+    await cp(
+      './src/typography/typography.module.scss',
+      `${destDir}/typography.module.scss`,
+    );
+    await cp(
+      './src/textField/textfield.module.scss',
+      `${destDir}/textfield.module.scss`,
+    );
+    console.log('Styles copied successfully to dist directory');
+  } catch (err) {
+    console.error('Error copying styles:', err);
+  }
+}
 
 /**
  * Creates a tsup configuration object for a given format
@@ -46,6 +67,7 @@ function createConfig(format: 'cjs' | 'esm'): Options {
         },
       }),
     ],
+    onSuccess: format === 'cjs' ? onSuccess : undefined,
   };
 }
 
