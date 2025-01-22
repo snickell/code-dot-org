@@ -23,8 +23,14 @@ import {
   TRIGGER_FIELD,
 } from './constants';
 import {setUpBlocklyForMusicLab} from './setup';
-import {getToolbox} from './toolbox';
-import {ToolboxData} from './toolbox/types';
+import {
+  getToolbox,
+  addToolboxBlocksToWorkspace,
+  toolboxModeCategory,
+  getNewCategory,
+  categoryTypeToLocalizedName,
+} from './toolbox';
+import {Category, ToolboxData} from './toolbox/types';
 
 const experiments = require('@cdo/apps/util/experiments');
 
@@ -113,8 +119,10 @@ export default class MusicBlocklyWorkspace {
     // current block mode.
     let toolboxBlocks = getToolbox(blockMode);
 
-    // Toolbox mode always uses the default (full) toolbox.
-    if ((toolboxDefinition || toolboxAllowList) && !isToolboxMode) {
+    if (isToolboxMode) {
+      // Toolbox uses the full toolbox with an addition block for managing categories.
+      toolboxBlocks.contents.unshift(toolboxModeCategory);
+    } else if (toolboxDefinition || toolboxAllowList) {
       toolboxBlocks =
         // Use whichever toolbox configuration is available from the level configuration.
         toolboxDefinition || getToolbox(blockMode, toolboxAllowList);
@@ -179,7 +187,7 @@ export default class MusicBlocklyWorkspace {
    * Set up the Blockly workspace for toolbox mode (levelbuilder).
    * Adds blocks to the workspace based on the level's toolbox configuration.
    * Automatically cleans up the workspace as blocks move.
-   * TODO: Add category blocks to workspace.
+   * TODO: Add dynamic category blocks to workspace.
    */
   initializeToolboxMode(
     blockMode: ValueOf<typeof BlockMode>,
@@ -188,15 +196,10 @@ export default class MusicBlocklyWorkspace {
   ) {
     const toolbox =
       levelToolboxDefinition || getToolbox(blockMode, levelToolbox);
-    if (toolbox.kind === 'flyoutToolbox') {
-      toolbox.contents.forEach(blockInfo =>
-        Blockly.serialization.blocks.append(
-          blockInfo as GoogleBlockly.serialization.blocks.State,
-          Blockly.getMainWorkspace()
-        )
-      );
-    }
+
     const workspace = this.workspace as GoogleBlockly.WorkspaceSvg;
+    addToolboxBlocksToWorkspace(toolbox.contents, workspace);
+
     workspace.cleanUp();
     workspace.addChangeListener(e => {
       if (e.type === Blockly.Events.BLOCK_MOVE) {
@@ -469,20 +472,54 @@ export default class MusicBlocklyWorkspace {
       );
       return {};
     }
-    const toolboxContents: GoogleBlockly.utils.toolbox.BlockInfo[] = [];
-    this.workspace.getTopBlocks(true).map(block => {
-      toolboxContents.push({
-        kind: 'block',
-        ...Blockly.serialization.blocks.save(block, {saveIds: false}),
-        enabled: true,
-      });
+    const topBlocks = this.workspace.getTopBlocks(true);
+
+    const fullToolbox: GoogleBlockly.utils.toolbox.ToolboxInfo = {
+      contents: [],
+    };
+    let flyoutItems: GoogleBlockly.utils.toolbox.FlyoutItemInfo[] = [];
+    let currentCategory: GoogleBlockly.utils.toolbox.StaticCategoryInfo =
+      getNewCategory();
+
+    topBlocks.forEach(block => {
+      if (block.type === BlockTypes.CATEGORY) {
+        fullToolbox.kind = 'categoryToolbox';
+        if (
+          currentCategory.contents.length ||
+          currentCategory.name !== 'DEFAULT'
+        ) {
+          // Add previous category to toolbox
+          fullToolbox.contents.push({...currentCategory});
+        }
+
+        // Begin a new category
+        currentCategory = {
+          ...getNewCategory(),
+          name: categoryTypeToLocalizedName[
+            block.getFieldValue('CATEGORY') as Category
+          ],
+        };
+        flyoutItems = [];
+      } else {
+        // Add the current block to the flyout and category.
+        flyoutItems.push({
+          kind: 'block',
+          ...Blockly.serialization.blocks.save(block, {saveIds: false}),
+          enabled: true,
+        });
+        currentCategory.contents = flyoutItems;
+      }
     });
 
-    const flyoutDefinition: GoogleBlockly.utils.toolbox.FlyoutDefinition = {
-      kind: 'flyoutToolbox',
-      contents: toolboxContents,
-    };
-    return flyoutDefinition;
+    if (fullToolbox.contents.length) {
+      // Add the final category to the toolbox.
+      fullToolbox.contents.push({...currentCategory});
+    } else {
+      // If no categories are present, create a flyout toolbox.
+      fullToolbox.kind = 'flyoutToolbox';
+      fullToolbox.contents = flyoutItems;
+    }
+    return fullToolbox;
   }
 
   getAllBlocks() {

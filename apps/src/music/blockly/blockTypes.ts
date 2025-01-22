@@ -38,6 +38,7 @@ export enum BlockTypes {
   IF_ELSE = 'controls_if',
   FUNCTION_DEFINITION = 'procedures_defnoreturn',
   FUNCTION_DEFINITION_RETURN = 'procedures_defreturn',
+  CATEGORY = 'category',
 }
 
 export const FunctionDefinitionBlockTypes: string[] = [

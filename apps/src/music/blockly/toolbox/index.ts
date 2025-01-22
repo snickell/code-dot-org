@@ -28,6 +28,14 @@ const dynamicCategoryLabels: {
 
 export const dynamicCategories = getTypedKeys(dynamicCategoryLabels);
 
+export const dynamicCategoryToCategoryName: {[key: string]: Category} =
+  Object.fromEntries(
+    Object.entries(dynamicCategoryLabels).map(([key, value]) => [
+      value,
+      key as Category,
+    ])
+  );
+
 export const categoryTypeToLocalizedName: {[key in Category]: string} = {
   Control: musicI18n.blockly_toolboxCategoryControl(),
   Effects: musicI18n.blockly_toolboxCategoryEffects(),
@@ -40,6 +48,14 @@ export const categoryTypeToLocalizedName: {[key in Category]: string} = {
   Tracks: musicI18n.blockly_toolboxCategoryTracks(),
   Variables: musicI18n.blockly_toolboxCategoryVariables(),
 };
+
+const localizedNameToCategoryType: {[key: string]: Category} =
+  Object.fromEntries(
+    Object.entries(categoryTypeToLocalizedName).map(([key, value]) => [
+      value,
+      key,
+    ])
+  ) as {[key: string]: Category};
 
 /**
  * Generates a Music Lab Blockly toolbox for the given block mode,
@@ -114,4 +130,94 @@ export function getToolbox(
     }
   }
   return toolbox;
+}
+
+/**
+ * A toolbox category for Toolbox mode, containing a block for specifying
+ * the start of a category. Only available for levelbuilders.
+ */
+export const toolboxModeCategory = {
+  kind: 'category',
+  name: 'Categories',
+  cssconfig: baseCategoryCssConfig,
+  contents: [{kind: 'block', type: 'category'}],
+};
+
+/**
+ * Given a toolbox definition and a workspace, iterate through the categories,
+ * if they exist, and add all blocks to the workspace.
+ * Used for levelbuilder's toolbox mode.
+ */
+export function addToolboxBlocksToWorkspace(
+  contents: GoogleBlockly.utils.toolbox.ToolboxItemInfo[],
+  workspace: GoogleBlockly.WorkspaceSvg
+) {
+  contents.forEach(toolboxItem => {
+    if (toolboxItem.kind === 'block') {
+      // Add blocks directly to the workspace.
+      Blockly.serialization.blocks.append(
+        toolboxItem as GoogleBlockly.serialization.blocks.State,
+        workspace
+      );
+    } else if (toolboxItem.kind === 'category' && 'custom' in toolboxItem) {
+      // For categories with a custom value ('PROCEDURES' OR 'VARIABLES'),
+      // get the category name.
+      const dynamicCategoryName =
+        dynamicCategoryToCategoryName[
+          (toolboxItem as GoogleBlockly.utils.toolbox.DynamicCategoryInfo)
+            .custom
+        ];
+      // Create a category block
+      Blockly.serialization.blocks.append(
+        {
+          type: BlockTypes.CATEGORY,
+          fields: {
+            CATEGORY: dynamicCategoryName,
+          },
+        },
+        workspace
+      );
+    } else if (toolboxItem.kind === 'category') {
+      const categoryName =
+        localizedNameToCategoryType[
+          (toolboxItem as GoogleBlockly.utils.toolbox.StaticCategoryInfo).name
+        ];
+      // Create a category block
+      Blockly.serialization.blocks.append(
+        {
+          type: BlockTypes.CATEGORY,
+          fields: {
+            CATEGORY: categoryName,
+          },
+        },
+        workspace
+      );
+      // Recursively process the contents of the static category
+      addToolboxBlocksToWorkspace(
+        (toolboxItem as GoogleBlockly.utils.toolbox.StaticCategoryInfo)
+          .contents,
+        workspace
+      );
+    } else {
+      console.warn('Unsupported toolbox item found:', toolboxItem);
+    }
+  });
+}
+
+/**
+ * Creates a new category with default values. Used to convert workspace
+ * blocks into a toolbox defintion in levelbuilder's toolbox mode.
+ * @returns JSON representation of a new category called 'DEFAULT'.
+ */
+export function getNewCategory() {
+  return {
+    kind: 'category',
+    cssconfig: baseCategoryCssConfig,
+    contents: [] as GoogleBlockly.utils.toolbox.ToolboxItemInfo[],
+    id: undefined,
+    categorystyle: undefined,
+    colour: undefined,
+    hidden: undefined,
+    name: 'DEFAULT',
+  };
 }
