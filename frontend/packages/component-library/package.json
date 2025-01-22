@@ -193,8 +193,7 @@
   "prettier": "@code-dot-org/lint-config/prettier/index.mjs",
   "dependencies": {
     "classnames": "^2.5.1",
-    "lodash": "^4.17.21",
-    "react-bootstrap": "^2.10.5"
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@code-dot-org/legacy-css": "workspace:*",
