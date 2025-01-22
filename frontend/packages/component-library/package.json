@@ -64,10 +64,8 @@
       "import": "./dist/common/hooks/index.js",
       "require": "./dist/common/hooks/index.cjs"
     },
-    "./common/styles": {
-      "types": "./dist/common/styles/index.d.ts",
-      "import": "./dist/common/styles/index.js",
-      "require": "./dist/common/styles/index.cjs"
+    "./common/styles/*": {
+      "default": "./dist/common/styles/*"
     },
     "./dialog": {
       "types": "./dist/dialog/index.d.ts",

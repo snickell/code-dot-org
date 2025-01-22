@@ -2,10 +2,24 @@ import {defineConfig} from 'tsup';
 import {postcssModules, sassPlugin} from 'esbuild-sass-plugin';
 import {glob} from 'glob';
 import {resolve} from 'node:path';
+import {cp} from 'node:fs/promises';
 
 const entryPoints = glob.sync('./src/**/index.ts', {
   posix: true,
 });
+
+// Helper to copy styles folder after build
+async function copyStyles() {
+  const sourceDir = './src/common/styles';
+  const destDir = './dist/common/styles';
+
+  try {
+    await cp(sourceDir, destDir, {recursive: true});
+    console.log('Styles copied successfully to dist directory');
+  } catch (err) {
+    console.error('Error copying styles:', err);
+  }
+}
 
 export default defineConfig({
   entry: entryPoints,
@@ -35,4 +49,7 @@ export default defineConfig({
       },
     }),
   ],
+  onSuccess: async () => {
+    await copyStyles();
+  },
 });
