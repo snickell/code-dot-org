@@ -55,7 +55,6 @@ interface MusicLabViewProps {
   allowPackSelection: boolean;
   analyticsReporter: AnalyticsReporter;
   blocklyWorkspace: MusicBlocklyWorkspace;
-  lastMeasure?: number;
 }
 
 const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
@@ -74,7 +73,6 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
   allowPackSelection,
   analyticsReporter,
   blocklyWorkspace,
-  lastMeasure,
 }) => {
   const dialogControl = useDialogControl();
   useUpdatePlayer(player);
@@ -102,6 +100,7 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
   const startingPlayheadPosition = useMusicSelector(
     state => state.music.startingPlayheadPosition
   );
+  const lastMeasure = useMusicSelector(state => state.music.lastMeasure);
 
   const progressManager = useContext(ProgressManagerContext);
 

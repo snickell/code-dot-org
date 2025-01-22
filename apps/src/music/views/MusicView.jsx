@@ -764,7 +764,6 @@ class UnconnectedMusicView extends React.Component {
         />
         <MusicLabView
           blocklyDivId={BLOCKLY_DIV_ID}
-          isPlaying={this.props.isPlaying}
           setPlaying={this.setPlaying}
           playTrigger={this.playTrigger}
           hasTrigger={id => this.musicBlocklyWorkspace.hasTrigger(id)}
@@ -783,7 +782,6 @@ class UnconnectedMusicView extends React.Component {
           }
           analyticsReporter={this.analyticsReporter}
           blocklyWorkspace={this.musicBlocklyWorkspace}
-          lastMeasure={this.sequencer?.getLastMeasure()}
         />
         <Callouts />
       </AnalyticsContext.Provider>
