@@ -40,38 +40,42 @@ import moduleStyles from './music-view.module.scss';
 
 interface MusicLabViewProps {
   blocklyDivId: string;
+  isPlaying: boolean;
   setPlaying: (playing: boolean) => void;
   playTrigger: (id: string) => void;
   hasTrigger: (id: string) => boolean;
   getCurrentPlayheadPosition: () => number;
   updateHighlightedBlocks: () => void;
-  checkForEnd: () => void;
   undo: () => void;
   redo: () => void;
   clearCode: () => void;
+  stopSong: () => void;
   validator: MusicValidator;
   player: MusicPlayer;
   allowPackSelection: boolean;
   analyticsReporter: AnalyticsReporter;
   blocklyWorkspace: MusicBlocklyWorkspace;
+  lastMeasure?: number;
 }
 
 const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
   blocklyDivId,
+  isPlaying,
   setPlaying,
   playTrigger,
   hasTrigger,
   getCurrentPlayheadPosition,
   updateHighlightedBlocks,
-  checkForEnd,
   undo,
   redo,
   clearCode,
+  stopSong,
   validator,
   player,
   allowPackSelection,
   analyticsReporter,
   blocklyWorkspace,
+  lastMeasure,
 }) => {
   const dialogControl = useDialogControl();
   useUpdatePlayer(player);
@@ -93,6 +97,10 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
   const isPlayView = useAppSelector(state => state.lab.isShareView);
   const validationStateCallout = useAppSelector(
     state => state.lab.validationState.callout
+  );
+  const currentPlayheadPosition = getCurrentPlayheadPosition();
+  const startingPlayheadPosition = useAppSelector(
+    state => state.music.startingPlayheadPosition
   );
 
   const progressManager = useContext(ProgressManagerContext);
@@ -151,16 +159,45 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
 
   // Update loop that runs while playback is in progress.
   const doPlaybackUpdate = useCallback(() => {
-    checkForEnd();
     dispatch(setCurrentPlayheadPosition(getCurrentPlayheadPosition()));
     updateHighlightedBlocks();
     progressManager?.updateProgress();
   }, [
     dispatch,
-    checkForEnd,
     getCurrentPlayheadPosition,
     updateHighlightedBlocks,
     progressManager,
+  ]);
+
+  // Stop the song if the playhead is past the desired end.
+  useEffect(() => {
+    if (!isPlaying) {
+      return;
+    }
+
+    if (lastMeasure === undefined) {
+      return;
+    }
+
+    // We are done playing once the playhead reaches the end of the last scheduled sound.
+    // But if the starting playhead position has been set beyond that point, we'll use that
+    // instead, so that at least a bit of playback can be shown.
+    const stopMeasure = Math.max(startingPlayheadPosition, lastMeasure);
+
+    // Show a little extra playback.  If there are any triggers, then play for longer in case
+    // the user wants to trigger another sound.
+    const extraMeasures = blocklyWorkspace.hasAnyTriggers() ? 4 : 1;
+
+    if (currentPlayheadPosition >= stopMeasure + extraMeasures) {
+      stopSong();
+    }
+  }, [
+    blocklyWorkspace,
+    currentPlayheadPosition,
+    isPlaying,
+    lastMeasure,
+    startingPlayheadPosition,
+    stopSong,
   ]);
 
   const resetValidation = useCallback(

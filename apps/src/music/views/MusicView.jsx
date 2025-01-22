@@ -436,27 +436,6 @@ class UnconnectedMusicView extends React.Component {
     );
   };
 
-  // Stop the song if the playhead is past the desired end.
-  checkForEnd = () => {
-    // We are done playing once the playhead reaches the end of the last scheduled sound.
-    // But if the starting playhead position has been set beyond that point, we'll use that
-    // instead, so that at least a bit of playback can be shown.
-    const stopMeasure = Math.max(
-      this.props.startingPlayheadPosition,
-      this.sequencer.getLastMeasure()
-    );
-    // Show a little extra playback.  If there are any triggers, then play for longer in case
-    // the user wants to trigger another sound.
-    const extraMeasures = this.musicBlocklyWorkspace.hasAnyTriggers() ? 4 : 1;
-
-    if (
-      this.props.isPlaying &&
-      this.player.getCurrentPlayheadPosition() >= stopMeasure + extraMeasures
-    ) {
-      this.stopSong();
-    }
-  };
-
   clearCode = () => {
     // Clear the pack, unless it came from the level data itself.
     if (!this.props.levelProperties?.levelData?.packId) {
@@ -785,15 +764,16 @@ class UnconnectedMusicView extends React.Component {
         />
         <MusicLabView
           blocklyDivId={BLOCKLY_DIV_ID}
+          isPlaying={this.props.isPlaying}
           setPlaying={this.setPlaying}
           playTrigger={this.playTrigger}
           hasTrigger={id => this.musicBlocklyWorkspace.hasTrigger(id)}
           getCurrentPlayheadPosition={this.getCurrentPlayheadPosition}
           updateHighlightedBlocks={this.updateHighlightedBlocks}
-          checkForEnd={this.checkForEnd}
           undo={this.undo}
           redo={this.redo}
           clearCode={this.clearCode}
+          stopSong={this.stopSong}
           validator={this.musicValidator}
           player={this.player}
           allowPackSelection={
@@ -803,6 +783,7 @@ class UnconnectedMusicView extends React.Component {
           }
           analyticsReporter={this.analyticsReporter}
           blocklyWorkspace={this.musicBlocklyWorkspace}
+          lastMeasure={this.sequencer?.getLastMeasure()}
         />
         <Callouts />
       </AnalyticsContext.Provider>
