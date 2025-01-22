@@ -16,7 +16,6 @@
   },
   "license": "SEE LICENSE IN LICENSE",
   "sideEffects": false,
-  "type": "module",
   "exports": {
     "./package.json": "./package.json",
     "./alert": {
@@ -75,9 +74,12 @@
       "require": "./dist/dialog/index.cjs"
     },
     "./divider": {
-      "types": "./dist/divider/index.d.ts",
-      "import": "./dist/divider/index.js",
-      "require": "./dist/divider/index.cjs"
+      "types": {
+        "import": "./dist/divider/index.d.mts",
+        "require": "./dist/divider/index.d.ts"
+      },
+      "import": "./dist/divider/index.mjs",
+      "require": "./dist/divider/index.js"
     },
     "./divider/index.css": "./dist/divider/index.css",
     "./dropdown": {
