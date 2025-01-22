@@ -147,6 +147,11 @@ const UnitOverviewActionRow: React.FC<UnitOverviewActionRowProps> = ({
   const viewAs = useSelector(
     (state: {viewAs: keyof typeof ViewType}) => state.viewAs
   ) as string;
+
+  const isTeacher = useSelector(
+    (state: {currentUser: {isTeacher: boolean}}) => state.currentUser.isTeacher
+  );
+
   const selectedSectionId = useAppSelector(
     state => state.teacherSections.selectedSectionId
   );
@@ -259,13 +264,11 @@ const UnitOverviewActionRow: React.FC<UnitOverviewActionRowProps> = ({
           {selectedSection && showAssignButton && (
             <div className={styles.assignButton}>
               <MultipleAssignButton
-                sectionId={selectedSection.id}
                 courseOfferingId={courseOfferingId}
                 courseVersionId={courseVersionId}
                 courseId={currentCourseId}
                 scriptId={scriptId}
                 assignmentName={unitTitle}
-                sectionName={selectedSection.name}
                 reassignConfirm={onReassignConfirm}
                 isAssigningCourse={false}
                 isStandAloneUnit={courseLink === null}
@@ -275,7 +278,7 @@ const UnitOverviewActionRow: React.FC<UnitOverviewActionRowProps> = ({
           )}
         </div>
 
-        {showV2TeacherDashboard() && (
+        {showV2TeacherDashboard() && isTeacher && (
           <div className={styles.viewAs}>
             {<label className={styles.viewAsLabel}>{i18n.viewPageAs()}</label>}
             <SegmentedButtons
@@ -283,10 +286,12 @@ const UnitOverviewActionRow: React.FC<UnitOverviewActionRowProps> = ({
                 {
                   label: i18n.student(),
                   value: ViewType.Participant,
+                  id: 'uitest-view-as-student',
                 },
                 {
                   label: i18n.teacher(),
                   value: ViewType.Instructor,
+                  id: 'uitest-view-as-teacher',
                 },
               ]}
               onChange={viewAsToggleAction}

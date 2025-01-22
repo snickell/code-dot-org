@@ -283,6 +283,10 @@ class Section < ApplicationRecord
     self.followers_attributes = follower_params
   end
 
+  def student_joining_teacher_course?(user)
+    return participant_type == Curriculum::SharedCourseConstants::PARTICIPANT_AUDIENCE.teacher && user.student?
+  end
+
   # Checks if a user can join a section as a participant by
   # checking if they meet the participant_type for the section
   def can_join_section_as_participant?(user)
@@ -441,6 +445,13 @@ class Section < ApplicationRecord
           name: script.try(:name),
           project_sharing: script.try(:project_sharing),
         },
+        course: {
+          course_offering_id: course_offering_id,
+          version_id: unit_group ? unit_group&.course_version&.id : script&.course_version&.id,
+          unit_id: unit_group ? script_id : nil,
+          lesson_extras_available: script.try(:lesson_extras_available),
+          text_to_speech_enabled: script.try(:text_to_speech_enabled?),
+        },
         any_student_has_progress: any_student_has_progress?
       }
     end
@@ -481,6 +492,8 @@ class Section < ApplicationRecord
       num_students = unique_students.size
 
       serialized_section_instructors = ActiveModelSerializers::SerializableResource.new(section_instructors, each_serializer: Api::V1::SectionInstructorInfoSerializer).as_json
+
+      at_risk_student = at_risk_age_gated_student
 
       login_type_name = I18n.t(login_type, scope: [:section, :type], default: login_type)
       if login_type == LOGIN_TYPE_LTI_V1
@@ -531,6 +544,8 @@ class Section < ApplicationRecord
         code_review_expires_at: code_review_expires_at,
         sync_enabled: Policies::Lti.roster_sync_enabled?(teacher),
         ai_tutor_enabled: ai_tutor_enabled,
+        at_risk_age_gated_date: at_risk_student&.at_risk_age_gated_date,
+        at_risk_age_gated_us_state: at_risk_student&.us_state,
       }
     end
   end
@@ -702,6 +717,14 @@ class Section < ApplicationRecord
 
   def lti?
     lti_section.present?
+  end
+
+  # @return The first student we found which is at risk of being age gated.
+  def at_risk_age_gated_student
+    # Archived sections are not at risk of being age gated.
+    return if hidden
+    # Find any student at risk of being age gated and return the date.
+    students.find(&:at_risk_age_gated_date)
   end
 
   private def soft_delete_lti_section

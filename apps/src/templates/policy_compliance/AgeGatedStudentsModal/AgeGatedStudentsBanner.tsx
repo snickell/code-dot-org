@@ -3,7 +3,12 @@ import {useSelector} from 'react-redux';
 
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import {
+  convertStudentDataToArray,
+  selectAtRiskAgeGatedDate,
+} from '@cdo/apps/templates/manageStudents/manageStudentsRedux';
 import {RootState} from '@cdo/apps/types/redux';
+import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 import i18n from '@cdo/locale';
 
 import Notification, {
@@ -34,16 +39,32 @@ export const AgeGatedStudentsBanner: React.FC<Props> = ({
     reportEvent(EVENTS.CAP_AGE_GATED_BANNER_SHOWN, {
       user_id: currentUser.userId,
       number_of_gateable_students: ageGatedStudentsCount,
-      usState: ageGatedStudentsUsState,
+      us_state: ageGatedStudentsUsState,
     });
   }, [currentUser.userId, ageGatedStudentsCount, ageGatedStudentsUsState]);
+
+  const startDate = useAppSelector(state =>
+    selectAtRiskAgeGatedDate(
+      convertStudentDataToArray(state.manageStudents?.studentData)
+    )
+  );
+
+  const dateOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  };
+  const startDateText =
+    startDate?.toLocaleDateString('en-US', dateOptions) || '???';
 
   return (
     <div id="uitest-age-gated-banner">
       <Notification
         type={NotificationType.warning}
         notice={i18n.headsUp()}
-        details={i18n.childAccountPolicy_ageGatedStudentsWarning()}
+        details={i18n.childAccountPolicy_ageGatedStudentsWarning({
+          startDate: startDateText,
+        })}
         buttonText={i18n.childAccountPolicy_ageGatedStudentsWarning_button()}
         buttonLink={'#'}
         onButtonClick={toggleModal}
@@ -60,3 +81,5 @@ export const AgeGatedStudentsBanner: React.FC<Props> = ({
     </div>
   );
 };
+
+export default AgeGatedStudentsModal;

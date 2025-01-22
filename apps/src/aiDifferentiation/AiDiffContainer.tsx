@@ -155,6 +155,7 @@ const AiDiffContainer: React.FC<AiDiffContainerProps> = ({
       lessonId: lessonId,
       unitDisplayName: unitDisplayName,
       sessionId: sessionId,
+      isPreset: isPreset,
     });
     HttpClient.post(`${aiDiffChatMessageEndpoint}`, body, true, {
       'Content-Type': 'application/json',
@@ -249,11 +250,12 @@ const AiDiffContainer: React.FC<AiDiffContainerProps> = ({
                   customStyles={style}
                   key={id}
                   isTA={true}
-                >
-                  {item.role === Role.ASSISTANT && (
-                    <AiDiffBotMessageFooter message={item} />
-                  )}
-                </ChatMessage>
+                  footer={
+                    item.role === Role.ASSISTANT && (
+                      <AiDiffBotMessageFooter message={item} />
+                    )
+                  }
+                />
               )
             )}
             <img
@@ -270,6 +272,7 @@ const AiDiffContainer: React.FC<AiDiffContainerProps> = ({
             onSubmit={onMessageSend}
             onSuggestPrompts={onSuggestPrompts}
             messages={messageHistory}
+            waiting={isWaitingForResponse}
           />
         </div>
       </div>

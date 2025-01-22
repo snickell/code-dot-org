@@ -111,6 +111,13 @@ const sections = [
     sharing_disabled: false,
     course_offering_id: 1,
     course_version_id: 1,
+    course: {
+      lesson_extras_available: true,
+      text_to_speech_enabled: false,
+      course_offering_id: 1,
+      unit_id: null,
+      version_id: 2017,
+    },
     unitName: 'coursea-2017',
     unit_id: null,
     isAssignedStandaloneCourse: true,
@@ -168,6 +175,8 @@ const sections = [
         instructor_email: 'teacher@code.org',
       },
     ],
+    at_risk_age_gated_date: undefined,
+    at_risk_age_gated_us_state: undefined,
   },
 ];
 
@@ -475,6 +484,13 @@ describe('teacherSectionsRedux', () => {
         courseOfferingId: 1,
         courseVersionId: 1,
         courseDisplayName: 'Course A',
+        course: {
+          courseOfferingId: 1,
+          unitId: null,
+          versionId: 2017,
+          lessonExtrasAvailable: true,
+          textToSpeechEnabled: false,
+        },
         unitName: 'coursea-2017',
         unitId: null,
         isAssignedStandaloneCourse: true,
@@ -503,6 +519,8 @@ describe('teacherSectionsRedux', () => {
         syncEnabled: undefined,
         aiTutorEnabled: undefined,
         anyStudentHasProgress: undefined,
+        atRiskAgeGatedDate: null,
+        atRiskAgeGatedUsState: undefined,
       });
     });
   });
@@ -662,6 +680,8 @@ describe('teacherSectionsRedux', () => {
       restrict_section: false,
       post_milestone_disabled: false,
       ai_tutor_enabled: false,
+      at_risk_age_gated_date: undefined,
+      at_risk_age_gated_us_state: undefined,
     };
 
     function successResponse(customProps = {}) {
@@ -817,6 +837,7 @@ describe('teacherSectionsRedux', () => {
           courseDisplayName: undefined,
           unitName: undefined,
           unitId: undefined,
+          course: null,
           isAssignedStandaloneCourse: undefined,
           courseId: undefined,
           createdAt: createdAt,
@@ -829,6 +850,8 @@ describe('teacherSectionsRedux', () => {
           syncEnabled: undefined,
           aiTutorEnabled: false,
           anyStudentHasProgress: undefined,
+          atRiskAgeGatedDate: null,
+          atRiskAgeGatedUsState: undefined,
         },
       });
     });

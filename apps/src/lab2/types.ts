@@ -17,6 +17,14 @@ import {lab2EntryPoints} from '../../lab2EntryPoints';
 
 export {Theme};
 
+/// ------ USER APP OPTIONS ------ ///
+
+// Partial definition of the UserAppOptions structure, only defining the
+// pieces we need at the moment.
+export interface PartialUserAppOptions {
+  isInstructor: boolean;
+}
+
 /// ------ PROJECTS ------ ///
 
 /** Identifies a project. Corresponds to the "value" JSON column for the entry in the projects table. */
@@ -44,6 +52,7 @@ export interface ProjectAndSources {
   // When projects are loaded for the first time, sources may not be present
   sources?: ProjectSources;
   channel: Channel;
+  abuseScore?: number;
 }
 
 /// ------ SOURCES ------ ///
@@ -53,9 +62,11 @@ export interface ProjectSources {
   // Source code can either be a string or a nested JSON object (for multi-file).
   source: string | MultiFileSource;
   // Optional lab-specific configuration for this project
-  labConfig?: {[key: string]: {[key: string]: string}};
+  labConfig?: LabConfig;
   // Add other properties (animations, html, etc) as needed.
 }
+
+export type LabConfig = {[key: string]: {[key: string]: string}};
 
 // We will eventually make this a union type to include other source types.
 export type Source = BlocklySource | MultiFileSource;
@@ -123,11 +134,23 @@ export interface ProjectFile {
   type?: ProjectFileType;
 }
 
+/**
+ * Project file types are as follows:
+ * Starter: Files that come from level start code that are editable by the user.
+ * Support: Files that come from level start code that are hidden and not editable by the user.
+ * Validation: The file that contain the level's validation code, which is a code file that will be
+ * run by the lab. This file is hidden from users.
+ * Locked Starter: Files that come from level start code that are editable by the user, but cannot be
+ *  deleted or renamed.
+ * System Support: Files that are used for running code and for share/remix, but are hidden from the user.
+ *  For example, the serialized maze for a neighborhood level.
+ */
 export enum ProjectFileType {
   STARTER = 'starter',
   SUPPORT = 'support',
   VALIDATION = 'validation',
   LOCKED_STARTER = 'locked_starter',
+  SYSTEM_SUPPORT = 'system_support',
 }
 
 export interface ProjectFolder {
@@ -160,6 +183,7 @@ export interface LevelProperties {
   templateSources?: MultiFileSource;
   sharedBlocks?: BlockDefinition[];
   validations?: Validation[];
+  baseAssetUrl?: string;
   // An optional URL that allows the user to skip the progression.
   skipUrl?: string;
   // Project Template level name for the level if it exists.
@@ -178,8 +202,13 @@ export interface LevelProperties {
   finishUrl?: string;
   finishDialog?: string;
   offerBrowserTts?: boolean;
-  validationFile?: ProjectFile;
   useSecondaryFinishButton?: boolean;
+  // Python Lab/Codebridge specific properties
+  validationFile?: ProjectFile;
+  enableMicroBit?: boolean;
+  miniApp?: string;
+  serializedMaze?: MazeCell[][];
+  startDirection?: number;
 }
 
 // Level configuration data used by project-backed labs that don't require
@@ -203,6 +232,13 @@ interface VideoData extends VideoLevelData {
   key?: string;
   enable_fallback?: boolean;
   autoplay?: boolean;
+}
+
+// Python Lab specific property
+export interface MazeCell {
+  tileType: number;
+  value: number;
+  assetId: number;
 }
 
 export enum OptionsToAvoid {
@@ -336,6 +372,8 @@ export interface ExtraLinksProjectData {
     is_featured_project: boolean;
     featured_status: string;
     remix_ancestry: string[];
+    is_published_project: 'yes' | 'no';
+    abuse_score: number;
   };
   meesage?: string;
 }

@@ -6,6 +6,7 @@ import {
   DEFAULT_CHORD_LENGTH,
   DEFAULT_PATTERN_LENGTH,
   DEFAULT_TUNE_LENGTH,
+  MAX_NUMBER_EVENTS,
 } from '../../constants';
 import {ChordEvent, ChordEventValue} from '../interfaces/ChordEvent';
 import {Effects, EffectValue} from '../interfaces/Effects';
@@ -47,6 +48,12 @@ export default class Simple2Sequencer extends Sequencer {
   private startMeasure: number;
   private inTrigger: boolean;
 
+  // A set of strings (e.g. "electro/beat-4", which is a hyphen-separated event ID and measure) that are
+  // used to ensure the same sound isn't played more than once at the same time.
+  private uniqueEvents: Set<string>;
+
+  private currentEventCount: number;
+
   constructor(
     private readonly metricsReporter: LabMetricsReporter = Lab2Registry.getInstance().getMetricsReporter()
   ) {
@@ -57,17 +64,24 @@ export default class Simple2Sequencer extends Sequencer {
     this.randomStack = [];
 
     this.functionMap = {};
+    this.uniqueEvents = new Set();
     this.uniqueInvocationIdUpTo = 0;
     this.startMeasure = 1;
     this.inTrigger = false;
+
+    this.currentEventCount = 0;
   }
 
   /**
    * Resets to the default new sequence and clears all sequenced events
+   * @param existingEventCount existing event count
    */
-  clear() {
+  clear(existingEventCount: number = 0) {
     this.newSequence();
     this.functionMap = {};
+    this.uniqueEvents.clear();
+
+    this.currentEventCount = existingEventCount;
   }
 
   getLastMeasure(): number {
@@ -279,9 +293,7 @@ export default class Simple2Sequencer extends Sequencer {
 
   // Can be used to render timeline
   getOrderedFunctions(): FunctionEvents[] {
-    return Object.keys(this.functionMap)
-      .sort()
-      .map(id => this.functionMap[id]);
+    return Object.keys(this.functionMap).map(id => this.functionMap[id]);
   }
 
   getPlaybackEvents(): PlaybackEvent[] {
@@ -320,6 +332,19 @@ export default class Simple2Sequencer extends Sequencer {
   }
 
   private addNewEvent<T extends PlaybackEvent>(event: T) {
+    const uniqueEventKey = `${event.id}-${event.when}`;
+    if (this.uniqueEvents.has(uniqueEventKey)) {
+      return;
+    }
+
+    this.currentEventCount++;
+    if (this.currentEventCount === MAX_NUMBER_EVENTS) {
+      console.log(`Reached MAX_NUMBER_EVENTS (${MAX_NUMBER_EVENTS}) events.`);
+    }
+    if (this.currentEventCount > MAX_NUMBER_EVENTS) {
+      return;
+    }
+
     const currentFunctionId = this.getCurrentFunctionId();
     if (currentFunctionId === null) {
       this.metricsReporter.logWarning('Invalid state: no current function ID');
@@ -329,6 +354,7 @@ export default class Simple2Sequencer extends Sequencer {
 
     currentFunction.playbackEvents.push(event);
     this.updateMeasureForPlayByLength(event.length);
+    this.uniqueEvents.add(uniqueEventKey);
   }
 
   // Internal helper to get the entry at the top of the stack, or null
