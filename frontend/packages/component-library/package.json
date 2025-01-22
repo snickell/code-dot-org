@@ -79,6 +79,7 @@
       "import": "./dist/divider/index.js",
       "require": "./dist/divider/index.cjs"
     },
+    "./divider/index.css": "./dist/divider/index.css",
     "./dropdown": {
       "types": "./dist/dropdown/index.d.ts",
       "import": "./dist/dropdown/index.js",
