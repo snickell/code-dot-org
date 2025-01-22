@@ -2,7 +2,7 @@
   <config><![CDATA[{
   "published": true,
   "game_id": 72,
-  "created_at": "2025-01-22T05:15:58.000Z",
+  "created_at": "2025-01-22T18:39:25.000Z",
   "level_num": "custom",
   "user_id": 18602,
   "properties": {
@@ -761,14 +761,14 @@
     "predict_settings": {
       "isPredictLevel": false
     },
-    "long_instructions": "# Do This:\r\n1. Discuss with your partner: *What code would you need to add to the `turn_around()` function definition that would make the Painter turn around to face the opposite direction?*\r\n2. Implement your ideas, run and test your code.\r\n3. Use the `#` to add a comment above the `turn_around()` function to explain what it does.\r\n4. Use your new function to paint the street.",
+    "long_instructions": "# Do This:\r\n1. Run the code and discuss:\r\n   - What do you notice about the code?\r\n   - How would you change the color being painted?\r\n2. Add the starter code into a function called `paint_line(color)`. See the [documentation]() and discuss with your partner what it says about:\r\n   - Defining a function with a parameter (e.g., `color`)\r\n   - Using the parameter in a function defintion with `paint()`\r\n   - Calling the function with an argument\r\n3. Add a comment explaining the purpose of the `paint_line(color)` function and how the parameter `color` is used.\r\n#\r\n4. Test and modify: test the function by calling it multiple times with different colors (e.g. `paint_line(\"yellow\")`, `paint_line(\"red\")`)\r\n#\r\n5. Discuss: How did adding the parameter `color` make the function more flexible?",
     "start_sources": {
       "files": {
         "0": {
           "id": "0",
           "name": "main.py",
           "language": "py",
-          "contents": "from neighborhood import Painter\n\nbob = Painter()\n\ndef turn_around():\n  # Add code here\n\n\n\nturn_around()\n",
+          "contents": "from neighborhood import Painter\n\nbob = Painter()\n\n# Refactor the code below into a paint_line(color) function\n\nbob.paint(\"blue\")\nbob.move()\nbob.paint(\"blue\")\nbob.move()\nbob.paint(\"blue\")\nbob.move()\nbob.paint(\"blue\")\nbob.move()\nbob.paint(\"blue\")\nbob.move()\nbob.paint(\"blue\")\nbob.move()\nbob.paint(\"blue\")\nbob.move()\nbob.paint(\"blue\")\n",
           "folderId": "0",
           "active": true,
           "open": true
@@ -778,6 +778,6 @@
       }
     }
   },
-  "audit_log": "[{\"changed_at\":\"2025-01-22T05:15:58.725+00:00\",\"changed\":[\"cloned from \\\"test-intro-to-programming-lesson7-level2\\\"\"],\"cloned_from\":\"test-intro-to-programming-lesson7-level2\"},{\"changed_at\":\"2025-01-22 05:25:24 +0000\",\"changed\":[\"serialized_maze\",\"predict_settings\",\"long_instructions\"],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"},{\"changed_at\":\"2025-01-22 05:27:11 +0000\",\"changed\":[\"start_sources\"],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"},{\"changed_at\":\"2025-01-22 17:38:14 +0000\",\"changed\":[\"serialized_maze\",\"predict_settings\"],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"},{\"changed_at\":\"2025-01-22 18:38:44 +0000\",\"changed\":[\"serialized_maze\",\"predict_settings\"],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"}]"
+  "audit_log": "[{\"changed_at\":\"2025-01-22T18:39:25.740+00:00\",\"changed\":[\"cloned from \\\"test-intro-to-programming-lesson7-level3\\\"\"],\"cloned_from\":\"test-intro-to-programming-lesson7-level3\"},{\"changed_at\":\"2025-01-22 18:45:45 +0000\",\"changed\":[\"serialized_maze\",\"predict_settings\",\"long_instructions\"],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"},{\"changed_at\":\"2025-01-22 18:48:30 +0000\",\"changed\":[\"start_sources\"],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"},{\"changed_at\":\"2025-01-22 18:49:11 +0000\",\"changed\":[\"start_sources\"],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"},{\"changed_at\":\"2025-01-22 18:49:22 +0000\",\"changed\":[],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"},{\"changed_at\":\"2025-01-22 18:49:40 +0000\",\"changed\":[\"serialized_maze\",\"predict_settings\",\"long_instructions\"],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"},{\"changed_at\":\"2025-01-22 18:55:21 +0000\",\"changed\":[\"serialized_maze\",\"predict_settings\",\"long_instructions\"],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"}]"
 }]]></config>
 </Pythonlab>
