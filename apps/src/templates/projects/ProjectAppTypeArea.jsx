@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
 
+import Button from '@cdo/apps/componentLibrary/button';
 import fontConstants from '@cdo/apps/fontConstants';
-import Button from '@cdo/apps/legacySharedComponents/Button';
 import i18n from '@cdo/locale';
 
 import styleConstants from '../../styleConstants';
@@ -161,18 +161,16 @@ class ProjectAppTypeArea extends React.Component {
       <div style={styles.viewMoreButtons}>
         {showViewMore && (
           <Button
-            __useDeprecatedTag
             onClick={this.loadMore}
-            color={Button.ButtonColor.neutralDark}
+            color="black"
             icon="plus-circle"
             text={i18n.viewMore()}
             style={styles.buttonRightMargin}
           />
         )}
         <Button
-          __useDeprecatedTag
           href="#top"
-          color={Button.ButtonColor.neutralDark}
+          color="black"
           icon="chevron-circle-up"
           text={i18n.backToTop()}
         />
