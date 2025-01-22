@@ -35,12 +35,12 @@ import useUpdatePlayer from './hooks/useUpdatePlayer';
 import MusicPlayView from './MusicPlayView';
 import PackDialog from './PackDialog';
 import Timeline from './Timeline';
+import {useMusicSelector} from './types';
 
 import moduleStyles from './music-view.module.scss';
 
 interface MusicLabViewProps {
   blocklyDivId: string;
-  isPlaying: boolean;
   setPlaying: (playing: boolean) => void;
   playTrigger: (id: string) => void;
   hasTrigger: (id: string) => boolean;
@@ -60,7 +60,6 @@ interface MusicLabViewProps {
 
 const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
   blocklyDivId,
-  isPlaying,
   setPlaying,
   playTrigger,
   hasTrigger,
@@ -81,6 +80,7 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
   useUpdatePlayer(player);
   useUpdateAnalytics(analyticsReporter);
   const dispatch = useAppDispatch();
+  const isPlaying = useMusicSelector(state => state.music.isPlaying);
   const showInstructions = useAppSelector(
     state => state.music.showInstructions
   );
@@ -99,7 +99,7 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
     state => state.lab.validationState.callout
   );
   const currentPlayheadPosition = getCurrentPlayheadPosition();
-  const startingPlayheadPosition = useAppSelector(
+  const startingPlayheadPosition = useMusicSelector(
     state => state.music.startingPlayheadPosition
   );
 
