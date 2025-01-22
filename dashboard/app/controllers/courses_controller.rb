@@ -30,19 +30,16 @@ class CoursesController < ApplicationController
   end
 
   def show
-    puts(!params[:section_id])
-    puts(@unit_group.default_units.first.name)
-    if @unit_group.default_units.one?
-      redirect_to "/s/#{@unit_group.default_units.first.name}/"
-      return
-    end
     if current_user&.user_type == "teacher" && current_user.sections_instructed.any? {|s| s.course_id == @unit_group.id} && (Experiment.enabled?(user: current_user, experiment_name: 'teacher-local-nav-v2') || DCDO.get('teacher-local-nav-v2', false))
-      if !params[:section_id] && current_user&.last_section_id
-        redirect_to "/teacher_dashboard/sections/#{current_user.last_section_id}/courses/#{@unit_group.name}"
-        return
-      elsif params[:section_id]
-        redirect_to "/teacher_dashboard/sections/#{params[:section_id]}/courses/#{@unit_group.name}"
-        return
+      section_id = params[:section_id] || current_user&.last_section_id
+      if section_id
+        if @unit_group.single_unit_course?
+          redirect_to "/teacher_dashboard/sections/#{section_id}/unit/#{@unit_group.default_units.first.name}"
+          return
+        else
+          redirect_to "/teacher_dashboard/sections/#{section_id}/courses/#{@unit_group.name}"
+          return
+        end
       end
     end
 
@@ -55,6 +52,12 @@ class CoursesController < ApplicationController
     override_redirect = VersionRedirectOverrider.override_course_redirect?(session, @unit_group)
     if !override_redirect && redirect_unit_group = redirect_unit_group(@unit_group)
       redirect_to "#{course_path(redirect_unit_group)}/?redirect_warning=true"
+      return
+    end
+
+    # If this is a single-unit course, redirect to the unit overview
+    if @unit_group.single_unit_course?
+      redirect_to "/s/#{@unit_group.default_units.first.name}/"
       return
     end
 
