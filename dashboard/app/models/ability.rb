@@ -95,6 +95,7 @@ class Ability
       can :create, Activity, user_id: user.id
       can :create, UserLevel, user_id: user.id
       can :update, UserLevel, user_id: user.id
+      can :create, UserLevelInteraction, user_id: user.id
       can :create, Follower, student_user_id: user.id
       can :destroy, Follower do |follower|
         follower.student_user_id == user.id && !user.student?
@@ -489,12 +490,20 @@ class Ability
         user.has_ai_tutor_access?
       end
 
-      can [:log_chat_event, :start_chat_completion, :chat_request, :find_toxicity], :aichat do
+      can [:start_chat_completion, :chat_request], :aichat_request do
         user.teacher_can_access_ai_chat? || user.student_can_access_ai_chat?
       end
+
+      can [:log_chat_event, :find_toxicity], :aichat do
+        user.teacher_can_access_ai_chat? || user.student_can_access_ai_chat?
+      end
+
       # Additional logic that confirms that a given teacher should have access
       # to a given student's chat history is in aichat_controller.
       can :student_chat_history, :aichat do
+        user.teacher_can_access_ai_chat?
+      end
+      can :submit_teacher_feedback, :aichat do
         user.teacher_can_access_ai_chat?
       end
       can :user_has_access, :aichat

@@ -108,6 +108,16 @@ $text-horizontal-padding: 2.6cqw;
         }
       }
 
+      ol, ul {
+        font-size: 1.6cqw;
+        margin: 0 0 1.1cqw 2.2cqw;
+
+        li {
+          margin-bottom: 1.1cqw;
+          line-height: 1.4em;
+        }
+      }
+
       .invisiblePlaceholder {
         opacity: 0;
       }
@@ -165,7 +175,7 @@ $text-horizontal-padding: 2.6cqw;
 
     .button {
       position: absolute;
-      right: 0;
+      inset-inline-end: 0;
       height: 38px;
 
       // After typing, the button will be ready.
@@ -184,12 +194,21 @@ $text-horizontal-padding: 2.6cqw;
     .bubble {
       margin: 0 7px;
 
-      &Current {
+      &CurrentDark {
         color: $neutral_light;
       }
 
-      &NotCurrent {
+      &CurrentLight {
         color: $neutral_dark70;
+      }
+
+      &NotCurrentDark {
+        color: $neutral_dark70;
+        cursor: pointer;
+      }
+
+      &NotCurrentLight {
+        color: $neutral_dark30;
         cursor: pointer;
       }
     }

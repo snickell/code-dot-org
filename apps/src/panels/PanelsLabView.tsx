@@ -16,7 +16,10 @@ import {useDialogControl, DialogType} from '@cdo/apps/lab2/views/dialogs';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 
 import {sendSuccessReport} from '../code-studio/progressRedux';
-import {getCurrentLevel} from '../code-studio/progressReduxSelectors';
+import {
+  getCurrentLevel,
+  getCurrentLesson,
+} from '../code-studio/progressReduxSelectors';
 import {queryParams} from '../code-studio/utils';
 import useLifecycleNotifier from '../lab2/hooks/useLifecycleNotifier';
 import {LifecycleEvent} from '../lab2/utils';
@@ -47,8 +50,13 @@ const sendAnalyticsEvent = async (event: string, data?: object) => {
   // We use the Music Analytics reporter so that analytics for the
   // HOC progression are reported to the same project, and to avoid
   // API key issues.
-  await MusicAnalyticsReporter.initialize();
-  track(event, data);
+  try {
+    await MusicAnalyticsReporter.initialize();
+    track(event, data);
+  } catch (error) {
+    // Expected on local environments.
+    console.warn(error);
+  }
 };
 const updateAnalyticsProperty = (key: string, value: string) => {
   if (!window.location.pathname.includes(HOC_2024_SCRIPT_NAME)) {
@@ -69,6 +77,9 @@ const PanelsLabView: React.FunctionComponent = () => {
   );
   const currentAppName = useAppSelector(
     state => state.lab.levelProperties?.appName
+  );
+  const background = useAppSelector(
+    state => getCurrentLesson(state)?.background || null
   );
   const skipUrl = useAppSelector(state => state.lab.levelProperties?.skipUrl);
   const offerBrowserTts =
@@ -163,6 +174,7 @@ const PanelsLabView: React.FunctionComponent = () => {
   return (
     <PanelsView
       panels={panels}
+      background={background}
       onContinue={onContinue}
       onSkip={skipUrl ? onSkip : undefined}
       targetWidth={windowWidth}

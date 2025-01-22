@@ -4,10 +4,12 @@
     "wrapup_video_id": null,
     "login_required": false,
     "properties": {
-      "curriculum_umbrella": "CSC",
+      "content_area": "hoc",
+      "curriculum_umbrella": "HOC",
       "hideable_lessons": true,
       "is_course": true,
       "is_migrated": true,
+      "show_calendar": true,
       "supported_locales": [
         "ar-SA",
         "cs-CZ",
@@ -46,11 +48,12 @@
         "zh-TW"
       ],
       "tts": true,
-      "version_year": "2024"
+      "version_year": "2024",
+      "weekly_instructional_minutes": 225
     },
     "new_name": null,
     "family_name": "hello-world-transformers-one",
-    "serialized_at": "2024-11-06 22:18:21 UTC",
+    "serialized_at": "2025-01-09 16:41:05 UTC",
     "published_state": "stable",
     "instruction_type": "teacher_led",
     "instructor_audience": "teacher",

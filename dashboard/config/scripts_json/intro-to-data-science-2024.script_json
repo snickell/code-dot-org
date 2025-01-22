@@ -5,7 +5,7 @@
     "login_required": true,
     "properties": {
       "content_area": "curriculum_9_12",
-      "curriculum_umbrella": "Foundations of CS",
+      "curriculum_umbrella": "Foundations of CS and AI",
       "has_verified_resources": true,
       "hideable_lessons": true,
       "include_student_lesson_plans": true,
@@ -14,11 +14,15 @@
       "project_sharing": true,
       "show_calendar": true,
       "student_detail_progress_view": true,
+      "topic_tags": [
+        "data_science"
+      ],
+      "version_year": "2024",
       "weekly_instructional_minutes": 225
     },
     "new_name": null,
     "family_name": null,
-    "serialized_at": "2024-11-04 20:29:38 UTC",
+    "serialized_at": "2025-01-13 18:40:30 UTC",
     "published_state": null,
     "instruction_type": null,
     "instructor_audience": null,
@@ -4397,6 +4401,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "datasci-U1L12-projectL1_pilot2024"
+        ],
         "progression": "Data Set Choices"
       },
       "bonus": false,
@@ -4419,6 +4426,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "data-science-u1-lesson12-level2"
+        ],
         "progression": "Data Decisions and Visualizations"
       },
       "bonus": false,
@@ -4441,6 +4451,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "data-science-u1-lesson12-level3"
+        ],
         "progression": "Your Data Story"
       },
       "bonus": false,
@@ -4463,6 +4476,9 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "level_keys": [
+          "data-science-u1-lesson12-level4fr"
+        ],
         "progression": "The Data Cycle"
       },
       "bonus": false,

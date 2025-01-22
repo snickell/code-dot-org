@@ -59,7 +59,7 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
       return (
         <NavLink
           key={TEACHER_NAVIGATION_PATHS.roster}
-          to={TEACHER_NAVIGATION_PATHS.roster}
+          to={'../' + TEACHER_NAVIGATION_PATHS.roster}
           className={styles.navLink}
         >
           {i18n.addStudents()}
@@ -96,12 +96,12 @@ const ElementOrEmptyPage: React.FC<ElementOrEmptyPageProps> = ({
   } else {
     return (
       <div className={dashboardStyles.emptyClassroomDiv}>
-        <div className={dashboardStyles.emptyClassroomDiv}>
+        <div className={dashboardStyles.emptyClassroomImage}>
           {displayedImage()}
-          <Heading3 className={styles.topPadding}>{heading}</Heading3>
-          <BodyTwoText>{textDescription()}</BodyTwoText>
-          {link()}
         </div>
+        <Heading3 className={styles.topPadding}>{heading}</Heading3>
+        <BodyTwoText>{textDescription()}</BodyTwoText>
+        {link()}
       </div>
     );
   }

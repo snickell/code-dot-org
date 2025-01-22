@@ -126,6 +126,9 @@ FactoryBot.define do
         password {nil}
         after(:create) {|user| user.update(admin: true)}
       end
+      trait :with_educator_role do
+        educator_role {SharedConstants::EDUCATOR_ROLES.first[:value]}
+      end
       trait :with_school_info do
         school_info
       end
@@ -279,6 +282,11 @@ FactoryBot.define do
     factory :student do
       user_type {User::TYPE_STUDENT}
       birthday {Time.zone.today - 17.years}
+
+      trait :sponsored do
+        encrypted_password {nil}
+        provider {User::PROVIDER_SPONSORED}
+      end
 
       factory :young_student do
         birthday {Time.zone.today - 10.years}
@@ -445,7 +453,7 @@ FactoryBot.define do
 
       factory :cpa_non_compliant_student, traits: [:U13, :in_colorado], aliases: %i[non_compliant_child] do
         trait :predates_policy do
-          created_at {Policies::ChildAccount.state_policies.dig('CO', :start_date).ago(1.second)}
+          created_at {Policies::ChildAccount::StatePolicies.state_policies.dig('CO', :start_date).ago(1.second)}
         end
 
         trait :in_grace_period do
@@ -1374,7 +1382,7 @@ FactoryBot.define do
   end
 
   factory :follower do
-    association :student_user, factory: :student
+    association :student_user, factory: %i[student sponsored]
 
     transient do
       section {nil}
@@ -1859,8 +1867,6 @@ FactoryBot.define do
     association :teacher
   end
 
-  factory :donor_school
-
   factory :contact_rollups_raw do
     sequence(:email) {|n| "contact_#{n}@example.domain"}
     sequence(:sources) {|n| "dashboard.table_#{n}"}
@@ -2094,5 +2100,13 @@ FactoryBot.define do
     level_id {1}
     script_id {1}
     project_id {1}
+  end
+
+  factory :aichat_thread do
+    association :user
+    external_id {"1234"}
+    llm_version {"dummy_llm"}
+    unit_id {1}
+    level_id {1}
   end
 end

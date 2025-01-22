@@ -42,6 +42,12 @@ module SharedConstants
     }
   ).freeze
 
+  USER_LEVEL_INTERACTIONS = OpenStruct.new(
+    {
+      click_help_and_tips: "click_help_and_tips",
+    }
+  ).freeze
+
   # The set of valid login types for a section
   SECTION_LOGIN_TYPE = OpenStruct.new(
     {
@@ -105,6 +111,7 @@ module SharedConstants
     poetry_hoc
     thebadguys
     music
+    pythonlab
   ).freeze
 
   # For privacy reasons, App Lab and Game Lab can only be shared if certain conditions are met. These project types can be shared if: the user is >= 13 years old and their teacher has NOT disabled sharing OR the user is < 13 and their teacher has enabled sharing.
@@ -790,6 +797,15 @@ module SharedConstants
 
   AICHAT_METRICS_NAMESPACE = 'GenAICurriculum'.freeze
 
+  AI_CHAT_TEACHER_FEEDBACK = {
+    # The teacher flagged a message that our system did not flag as inappropriate.
+    CLEAN_DISAGREE: 'clean_disagree',
+    # The teacher agreed with our system's flagging of a message as inappropriate.
+    PROFANITY_AGREE: 'profanity_agree',
+    # The teacher disagreed with our system's flagging of a message as inappropriate.
+    PROFANITY_DISAGREE: 'profanity_disagree',
+  }
+
   US_STATES = STATE_ABBR_WITH_DC_HASH.merge(DC: 'Washington, D.C.').sort_by(&:last).to_h.freeze
 
   PROJECT_SUBMISSION_STATUS = {
@@ -801,4 +817,16 @@ module SharedConstants
     OWNER_TOO_NEW: 'owner_too_new',
     PROJECT_TOO_NEW: 'project_too_new',
   }
+
+  EDUCATOR_ROLES = [
+    {value: "classroom_teacher", category: 'educator'},
+    {value: "stem_tech_teacher", category: 'educator'},
+    {value: "subject_area_teacher", category: 'educator'},
+    {value: "librarian_media_specialist", category: 'educator'},
+    {value: "homeschool_teacher", category: 'educator'},
+    {value: "school_admin", category: "admin"},
+    {value: "district_admin", category: "admin"},
+    {value: "parent", category: 'other'},
+    {value: "other", category: 'other'}
+  ].freeze
 end

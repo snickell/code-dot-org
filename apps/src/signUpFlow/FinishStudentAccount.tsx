@@ -30,6 +30,7 @@ import {
   USER_RETURN_TO_SESSION_KEY,
   clearSignUpSessionStorage,
   NEW_SIGN_UP_USER_TYPE,
+  MAX_DISPLAY_NAME_LENGTH,
 } from './signUpFlowConstants';
 
 import style from './signUpFlowStyles.module.scss';
@@ -50,7 +51,7 @@ const FinishStudentAccount: React.FunctionComponent<{
   const [gender, setGender] = useState('');
 
   // Field errors
-  const [showNameError, setShowNameError] = useState(false);
+  const [nameErrorMessage, setNameErrorMessage] = useState<string | null>(null);
   const [showParentEmailError, setShowParentEmailError] = useState(false);
   const [showAgeError, setShowAgeError] = useState(false);
   const [showStateError, setShowStateError] = useState(false);
@@ -77,6 +78,12 @@ const FinishStudentAccount: React.FunctionComponent<{
     ) {
       navigateToHref('/users/new_sign_up/login_type');
     }
+
+    analyticsReporter.sendEvent(
+      EVENTS.FINISH_ACCOUNT_PAGE_LOADED,
+      {'user type': 'student'},
+      PLATFORMS.BOTH
+    );
 
     const fetchGdprData = async () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -120,9 +127,14 @@ const FinishStudentAccount: React.FunctionComponent<{
     analyticsReporter.sendEvent(
       EVENTS.PARENT_OR_GUARDIAN_SIGN_UP_CLICKED,
       {},
-      PLATFORMS.STATSIG
+      PLATFORMS.BOTH
     );
     const newIsParentCheckedChoice = !isParent;
+    // If the user unchecks the parent checkbox, clear the parent email field
+    if (!newIsParentCheckedChoice) {
+      setParentEmail('');
+      setShowParentEmailError(false);
+    }
     setIsParent(newIsParentCheckedChoice);
   };
 
@@ -143,10 +155,16 @@ const FinishStudentAccount: React.FunctionComponent<{
     const newName = e.target.value;
     setName(newName);
 
-    if (newName === '') {
-      setShowNameError(true);
+    if (newName.trim() === '') {
+      setNameErrorMessage(locale.display_name_error_message());
+    } else if (newName.length > MAX_DISPLAY_NAME_LENGTH) {
+      setNameErrorMessage(
+        locale.display_name_too_long_error_message({
+          maxLength: MAX_DISPLAY_NAME_LENGTH,
+        })
+      );
     } else {
-      setShowNameError(false);
+      setNameErrorMessage(null);
     }
   };
 
@@ -179,16 +197,19 @@ const FinishStudentAccount: React.FunctionComponent<{
         'user type': 'student',
         'has school': false,
         'has marketing value selected': true,
-        'has display name': !showNameError,
+        'has display name': !nameErrorMessage,
       },
       PLATFORMS.BOTH
     );
   };
 
   const submitStudentAccount = async () => {
+    if (isSubmitting) {
+      return;
+    }
+    setIsSubmitting(true);
     sendFinishEvent();
     showErrorCreatingAccountMessage(false);
-    setIsSubmitting(true);
 
     const signUpParams = {
       new_sign_up: true,
@@ -296,9 +317,9 @@ const FinishStudentAccount: React.FunctionComponent<{
               placeholder={locale.coder()}
               onChange={onNameChange}
             />
-            {showNameError && (
+            {nameErrorMessage && (
               <BodyThreeText className={style.errorMessage}>
-                {locale.display_name_error_message()}
+                {nameErrorMessage}
               </BodyThreeText>
             )}
           </div>
@@ -384,10 +405,11 @@ const FinishStudentAccount: React.FunctionComponent<{
               title: 'arrow-right',
             }}
             disabled={
-              name === '' ||
+              name?.trim() === '' ||
+              name?.length > MAX_DISPLAY_NAME_LENGTH ||
               age === '' ||
               (usIp && state === '') ||
-              (isParent && parentEmail === '') ||
+              (isParent && (parentEmail === '' || showParentEmailError)) ||
               !gdprValid
             }
             isPending={isSubmitting}

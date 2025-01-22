@@ -5,6 +5,7 @@ require 'timecop'
 
 class UserTest < ActiveSupport::TestCase
   include ProjectsTestUtils
+  include Minitest::RSpecMocks
   self.use_transactional_test_case = true
 
   class UsStateCodeTest < ActiveSupport::TestCase
@@ -329,28 +330,28 @@ class UserTest < ActiveSupport::TestCase
     assert_equal hashed_email, teacher.read_attribute(:hashed_email)
   end
 
-  test 'email_for_enrollments returns user.email if user has no latest accepted application' do
+  test 'alternate_email returns nil if user has no latest accepted application' do
     user = create :teacher
-    assert_equal user.email_for_enrollments, user.email
+    assert user.alternate_email.blank?
   end
 
-  test 'email_for_enrollments returns user.email if users latest accepted application has no alternate email' do
+  test 'alternate_email returns nil if users latest accepted application has no alternate email' do
     user = create :teacher
-    application = create :pd_teacher_application, user: user
+    application = create :pd_teacher_application, user: user, status: 'accepted'
     application_form_data = application.form_data_hash
-    application_form_data['alternateEmail'] = nil
+    application_form_data['alternateEmail'] = ''
     application.update!(form_data_hash: application_form_data)
 
     assert application.form_data_hash['alternateEmail'].blank?
-    assert_equal user.email_for_enrollments, user.email
+    assert user.alternate_email.blank?
   end
 
-  test 'email_for_enrollments returns app alternate email if users latest accepted application has alternate email' do
+  test 'alternate_email returns app alternate email if users latest accepted application has alternate email' do
     user = create :teacher
     application = create :pd_teacher_application, user: user, status: 'accepted'
     app_alternate_email = application.form_data_hash['alternateEmail']
 
-    assert_equal user.email_for_enrollments, app_alternate_email
+    assert_equal user.alternate_email, app_alternate_email
   end
 
   test "log in with password with pepper" do
@@ -815,6 +816,44 @@ class UserTest < ActiveSupport::TestCase
     refute_nil user.errors[:email]
   end
 
+  test "can create teacher user with a valid educator_role" do
+    user = create :teacher, :with_educator_role
+    assert user.valid?
+    assert_empty user.errors[:educator_role]
+  end
+
+  test "cannot create teacher user with an invalid educator_role" do
+    user = build(:teacher, educator_role: "fake_role")
+    refute user.save
+    assert_includes user.errors[:educator_role], "is not included in the list"
+  end
+
+  test "cannot create student user with an educator_role" do
+    user = assert_does_not_create(User) do
+      User.create(@good_data.merge({educator_role: SharedConstants::EDUCATOR_ROLES.first[:value]}))
+    end
+    refute_nil user.errors[:educator_role]
+  end
+
+  test "teachers with a valid educator_role can change user_type to student" do
+    user = create :teacher, :with_educator_role
+    user.set_user_type(User::TYPE_STUDENT)
+    assert user.valid?
+  end
+
+  test "LTI users with school_info_id should have a user_school_info entry" do
+    lti_integration = create :lti_integration
+    auth_id = "#{lti_integration[:issuer]}|#{lti_integration[:client_id]}|#{SecureRandom.alphanumeric}"
+    user = build :teacher
+    user.authentication_options << build(:lti_authentication_option, user: user, authentication_id: auth_id)
+    user.school_info = create :school_info
+    user.save
+
+    assert_equal 1, user.user_school_infos.count
+    assert_equal user.id, user.user_school_infos.first.user_id
+    assert_equal user.school_info_id, user.user_school_infos.first.school_info_id
+  end
+
   test "LTI users should have a LtiUserIdentity when created" do
     lti_integration = create :lti_integration
     auth_id = "#{lti_integration[:issuer]}|#{lti_integration[:client_id]}|#{SecureRandom.alphanumeric}"
@@ -908,10 +947,18 @@ class UserTest < ActiveSupport::TestCase
     # login by username still works
     user = create :user
     assert_equal user, User.find_for_authentication(login: user.username)
+    Cdo::Metrics.
+      expects(:put).
+      with('User', 'LoginByUsername', 1, includes(:Environment)).
+      once
 
     # login by email still works
     email_user = create :user, email: 'not@an.email'
     assert_equal email_user, User.find_for_authentication(login: 'not@an.email')
+    Cdo::Metrics.
+      expects(:put).
+      with('User', 'LoginByEmail', 1, includes(:Environment)).
+      once
 
     # login by hashed email
     hashed_email_user = create :user, age: 4
@@ -1404,12 +1451,6 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 100, partner_level.best_result
   end
 
-  test 'user is created with secret picture and word' do
-    assert @user.secret_picture
-    assert @user.secret_words
-    assert @user.secret_words !~ /SecretWord/ # using the actual word not the object to_s
-  end
-
   test 'students have hashed email not plaintext email' do
     assert @student.email.blank?
     assert @student.hashed_email.present?
@@ -1603,7 +1644,7 @@ class UserTest < ActiveSupport::TestCase
     @student.update!(races: 'white,closed_dialog')
     @student.reload
     assert_equal 'closed_dialog', @student.races
-    assert_nil @student.urm
+    refute @student.urm
   end
 
   test 'sanitize_race_data sanitizes too many races' do
@@ -1612,7 +1653,7 @@ class UserTest < ActiveSupport::TestCase
     student.update!(races: 'american_indian,asian,black,hawaiian,hispanic,white')
     student.reload
     assert_equal 'nonsense', student.races
-    assert_nil student.urm
+    refute student.urm
   end
 
   test 'sanitize_race_data sanitizes non-races' do
@@ -3020,6 +3061,36 @@ class UserTest < ActiveSupport::TestCase
     ).level_source_id
   end
 
+  test 'track_level_progress stores locale with support flag when provided' do
+    user_level_params = {
+      user_id: @user.id,
+      level_id: @csf_script_level.level_id,
+      script_id: @csf_script_level.script_id,
+    }
+
+    level_progress_params = {
+      **user_level_params,
+      level_source_id: nil,
+      new_result: 100,
+      submitted: false,
+    }
+
+    User.track_level_progress(**level_progress_params)
+    refute_nil user_level = UserLevel.find_by(user_level_params)
+    assert_nil user_level.locale
+    assert_nil user_level.locale_supported
+
+    current_locale = 'uk-UA'
+    User.track_level_progress(**level_progress_params.merge(locale: current_locale))
+    assert_equal current_locale, user_level.reload.locale
+    assert_equal false, user_level.locale_supported
+
+    @csf_script_level.script.update!(supported_locales: [current_locale])
+    User.track_level_progress(**level_progress_params.merge(locale: current_locale))
+    assert_equal current_locale, user_level.reload.locale
+    assert_equal true, user_level.locale_supported
+  end
+
   test 'can create user with same name as deleted user' do
     create(:user, :deleted, name: 'Same Name')
     assert_creates(User) do
@@ -3950,6 +4021,9 @@ class UserTest < ActiveSupport::TestCase
     us_state = 'CO'
     @student.update!(us_state: us_state)
 
+    secret_picture = SecretPicture.random
+    @student.secret_picture = secret_picture
+
     assert_equal(
       {
         id: @student.id,
@@ -3963,14 +4037,14 @@ class UserTest < ActiveSupport::TestCase
         gender_teacher_input: nil,
         birthday: @student.birthday,
         secret_words: @student.secret_words,
-        secret_picture_name: @student.secret_picture.name,
-        secret_picture_path: @student.secret_picture.path,
+        secret_picture_name: secret_picture.name,
+        secret_picture_path: secret_picture.path,
         location: "/v2/users/#{@student.id}",
         age: @student.age,
         sharing_disabled: false,
         has_ever_signed_in: @student.has_ever_signed_in?,
         ai_tutor_access_denied: !!@student.ai_tutor_access_denied,
-        at_risk_age_gated: false,
+        at_risk_age_gated_date: nil,
         child_account_compliance_state: @student.cap_status,
         latest_permission_request_sent_at: latest_permission_request_sent_at,
         us_state: us_state,
@@ -4824,7 +4898,8 @@ class UserTest < ActiveSupport::TestCase
 
   test 'dependent_students for teacher: does not return students with personal logins' do
     section = create :section
-    create(:follower, section: section)
+    student = create :student
+    create(:follower, section: section, student_user: student)
 
     assert_empty section.teacher.dependent_students
   end
@@ -5520,6 +5595,152 @@ class UserTest < ActiveSupport::TestCase
       it 'does not call CAP compliance removing service' do
         expect_cap_compliance_removing.never
         update_us_state
+      end
+    end
+  end
+
+  describe '.at_risk_age_gated_date' do
+    let(:user) {create(:student)}
+    let(:at_risk_age_gated_date) {user.at_risk_age_gated_date}
+    let(:compliant) {false}
+    let(:lockout_date) {DateTime.now}
+
+    before do
+      allow(Policies::ChildAccount).to receive(:compliant?).with(user, future: true).and_return(compliant)
+      allow(Policies::ChildAccount::StatePolicies).to receive(:state_policy).with(user).and_return({lockout_date: lockout_date})
+    end
+
+    it 'returns the policy lockout date' do
+      _(at_risk_age_gated_date).must_equal lockout_date
+    end
+
+    context 'when compliant' do
+      let(:compliant) {true}
+
+      it 'returns nil' do
+        _(at_risk_age_gated_date).must_equal nil
+      end
+    end
+  end
+
+  describe 'generation of secret picture on creation' do
+    let(:user) {build(:user)}
+
+    let(:user_is_sponsored) {true}
+
+    before do
+      user.stubs(:sponsored?).returns(user_is_sponsored)
+    end
+
+    it 'generates secret picture' do
+      _(user.secret_picture_id).must_be_nil
+      user.save! && user.reload
+      _(user.secret_picture).must_be_instance_of SecretPicture
+    end
+
+    context 'when user is not sponsored' do
+      let(:user_is_sponsored) {false}
+
+      it 'does not generate secret picture' do
+        _(user.secret_picture_id).must_be_nil
+        _ {user.save!}.wont_change -> {user.secret_picture_id}
+      end
+    end
+  end
+
+  describe 'generation of secret words on creation' do
+    let(:user) {build(:user)}
+
+    let(:user_is_sponsored) {true}
+
+    before do
+      user.stubs(:sponsored?).returns(user_is_sponsored)
+    end
+
+    it 'generates secret words' do
+      _(user.secret_words).must_be_nil
+
+      user.save!
+      user.reload
+
+      _(user.secret_words).wont_be_nil
+      _(user.secret_words).wont_match /SecretWord/ # using the actual word not the object to_s
+    end
+
+    context 'when user is not sponsored' do
+      let(:user_is_sponsored) {false}
+
+      it 'does not generates secret word' do
+        _(user.secret_words).must_be_nil
+        _ {user.save!}.wont_change -> {user.secret_words}
+      end
+    end
+  end
+
+  describe '.authenticate_with_section_and_secret_words' do
+    subject(:authenticate_with_section_and_secret_words) do
+      described_class.authenticate_with_section_and_secret_words(section: section, params: params)
+    end
+
+    let!(:student) {create(:student, secret_words: secret_words)}
+    let!(:section) {create(:section, login_type: section_login_type)}
+    let!(:follower) {create(:follower, section: section, student_user: student)}
+
+    let(:section_login_type) {Section::LOGIN_TYPE_WORD}
+    let(:secret_words) {'secret words'}
+    let(:params) {{user_id: student.id, secret_words: secret_words}}
+
+    it 'returns student' do
+      _authenticate_with_section_and_secret_words.must_equal student
+    end
+
+    context 'when :secret_words param is blank' do
+      let(:secret_words) {nil}
+
+      it 'returns nil' do
+        _authenticate_with_section_and_secret_words.must_be_nil
+      end
+    end
+
+    context 'when section login_type in not word' do
+      let(:section_login_type) {Section::LOGIN_TYPE_PICTURE}
+
+      it 'returns nil' do
+        _authenticate_with_section_and_secret_words.must_be_nil
+      end
+    end
+  end
+
+  describe '.authenticate_with_section_and_secret_picture' do
+    subject(:authenticate_with_section_and_secret_picture) do
+      described_class.authenticate_with_section_and_secret_picture(section: section, params: params)
+    end
+
+    let!(:student) {create(:student, secret_picture_id: secret_picture_id)}
+    let!(:section) {create(:section, login_type: section_login_type)}
+    let!(:follower) {create(:follower, section: section, student_user: student)}
+
+    let(:section_login_type) {Section::LOGIN_TYPE_PICTURE}
+    let(:secret_picture_id) {SecretPicture.first.id}
+    let(:params) {{user_id: student.id, secret_picture_id: secret_picture_id}}
+
+    it 'returns student' do
+      _authenticate_with_section_and_secret_picture.must_equal student
+    end
+
+    context 'when :secret_picture_id param is blank' do
+      let(:secret_picture_id) {nil}
+
+      it 'returns nil' do
+        _authenticate_with_section_and_secret_picture.must_be_nil
+      end
+    end
+
+    context 'when section login_type in not picture' do
+      let(:section_login_type) {Section::LOGIN_TYPE_WORD}
+
+      it 'returns nil' do
+        _authenticate_with_section_and_secret_picture.must_be_nil
       end
     end
   end

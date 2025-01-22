@@ -18,12 +18,16 @@ import {
   updateSelectedSection,
 } from '../teacherDashboard/teacherSectionsRedux';
 
-export const asyncLoadSelectedSection = async (sectionId: string) => {
+export const asyncLoadSelectedSection = async (
+  sectionId: string,
+  forceReload?: boolean
+) => {
   const state = getStore().getState().teacherSections;
 
   if (
-    state.selectedSectionId === parseInt(sectionId) ||
-    state.isLoadingSectionData
+    (state.selectedSectionId === parseInt(sectionId) ||
+      state.isLoadingSectionData) &&
+    !forceReload
   ) {
     return;
   }
@@ -65,8 +69,6 @@ export const setSelectedSectionData = (sectionData: any) => {
   if (!sectionData.sharing_disabled && sectionData.script.project_sharing) {
     getStore().dispatch(setShowSharingColumn(true));
   }
-
-  // TODO: update sections list with selected section data to ensure consistency.
 
   getStore().dispatch(setUnitName(sectionData.script.name));
   getStore().dispatch(setLoginType(sectionData.login_type));

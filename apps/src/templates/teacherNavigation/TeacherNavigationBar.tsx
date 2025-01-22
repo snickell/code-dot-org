@@ -19,7 +19,10 @@ import i18n from '@cdo/locale';
 import {selectedSectionSelector} from '../teacherDashboard/teacherSectionsReduxSelectors';
 
 import {asyncLoadSelectedSection} from './selectedSectionLoader';
-import {LABELED_TEACHER_NAVIGATION_PATHS} from './TeacherNavigationPaths';
+import {
+  LABELED_TEACHER_NAVIGATION_PATHS,
+  TEACHER_NAVIGATION_PATHS,
+} from './TeacherNavigationPaths';
 
 import styles from './teacher-navigation.module.scss';
 
@@ -103,13 +106,32 @@ const TeacherNavigationBar: React.FunctionComponent = () => {
 
   const navigateToDifferentSection = (sectionId: number) => {
     if (currentPathObject?.absoluteUrl) {
-      navigate(
-        generatePath(currentPathObject.absoluteUrl, {
-          sectionId: sectionId,
-          courseVersionName: sections[sectionId]?.courseVersionName,
-          unitName: sections[sectionId]?.unitName,
-        })
-      );
+      if (
+        currentPathObject.url === TEACHER_NAVIGATION_PATHS.courseOverview ||
+        currentPathObject.url === TEACHER_NAVIGATION_PATHS.unitOverview
+      ) {
+        const overviewUrl = sections[sectionId]?.unitName
+          ? LABELED_TEACHER_NAVIGATION_PATHS.unitOverview.absoluteUrl
+          : LABELED_TEACHER_NAVIGATION_PATHS.courseOverview.absoluteUrl;
+        navigate(
+          generatePath(overviewUrl, {
+            sectionId: sectionId,
+            courseVersionName: sections[sectionId]?.courseVersionName,
+            unitName: sections[sectionId]?.unitName,
+          })
+        );
+      } else {
+        navigate(
+          generatePath(currentPathObject.absoluteUrl, {
+            sectionId: sectionId,
+            courseVersionName: sections[sectionId]?.courseVersionName,
+            unitName: sections[sectionId]?.unitName,
+          })
+        );
+        if (currentPathObject.url === TEACHER_NAVIGATION_PATHS.settings) {
+          window.location.reload();
+        }
+      }
 
       analyticsReporter.sendEvent(EVENTS.NAVIGATE_TO_SECTION, {
         sectionId: sectionId,
@@ -150,7 +172,7 @@ const TeacherNavigationBar: React.FunctionComponent = () => {
   );
 
   return (
-    <nav className={styles.sidebarContainer}>
+    <nav className={styles.sidebarContainer} id="ui-test-teacher-sidebar">
       <div className={styles.sidebarContent}>
         <Typography
           semanticTag={'h2'}
@@ -169,6 +191,7 @@ const TeacherNavigationBar: React.FunctionComponent = () => {
           selectedValue={String(selectedSection?.id)}
           className={styles.sectionDropdown}
           name="section-dropdown"
+          id="uitest-sidebar-section-dropdown"
           color="gray"
           disabled={isLoadingSectionData || !selectedSection}
         />

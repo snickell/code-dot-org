@@ -5,6 +5,7 @@ import React, {useState, useEffect, useMemo} from 'react';
 import {Button, buttonColors} from '@cdo/apps/componentLibrary/button';
 import Checkbox from '@cdo/apps/componentLibrary/checkbox/Checkbox';
 import CloseButton from '@cdo/apps/componentLibrary/closeButton/CloseButton';
+import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
 import FontAwesomeV6Icon from '@cdo/apps/componentLibrary/fontAwesomeV6Icon/FontAwesomeV6Icon';
 import TextField from '@cdo/apps/componentLibrary/textField/TextField';
 import {
@@ -15,12 +16,15 @@ import {
 } from '@cdo/apps/componentLibrary/typography';
 import {EVENTS, PLATFORMS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import statsigReporter from '@cdo/apps/metrics/StatsigReporter';
+import {schoolInfoInvalid} from '@cdo/apps/schoolInfo/utils/schoolInfoInvalid';
 import SafeMarkdown from '@cdo/apps/templates/SafeMarkdown';
 import SchoolDataInputs from '@cdo/apps/templates/SchoolDataInputs';
 import {getAuthenticityToken} from '@cdo/apps/util/AuthenticityTokenStore';
-import {UserTypes} from '@cdo/generated-scripts/sharedConstants';
+import {UserTypes, EducatorRoles} from '@cdo/generated-scripts/sharedConstants';
 
 import {useSchoolInfo} from '../schoolInfo/hooks/useSchoolInfo';
+import {buildSchoolData} from '../schoolInfo/utils/buildSchoolData';
 import {navigateToHref} from '../utils';
 
 import locale from './locale';
@@ -31,9 +35,26 @@ import {
   USER_RETURN_TO_SESSION_KEY,
   clearSignUpSessionStorage,
   NEW_SIGN_UP_USER_TYPE,
+  MAX_DISPLAY_NAME_LENGTH,
 } from './signUpFlowConstants';
 
 import style from './signUpFlowStyles.module.scss';
+
+const roleItemGroups = [
+  {
+    label: '',
+    groupItems: [{value: '', text: locale.select_a_role()}],
+  },
+  ...Object.entries(
+    EducatorRoles.reduce((groups, {category, value}) => {
+      const text = locale[value]?.() ?? '';
+      const categoryLabel = locale[category]?.() ?? '';
+      groups[categoryLabel] = groups[categoryLabel] ?? [];
+      groups[categoryLabel].push({value, text});
+      return groups;
+    }, {} as Record<string, {value: string; text: string}[]>)
+  ).map(([label, groupItems]) => ({label, groupItems})),
+];
 
 const FinishTeacherAccount: React.FunctionComponent<{
   usIp: boolean;
@@ -41,7 +62,8 @@ const FinishTeacherAccount: React.FunctionComponent<{
 }> = ({usIp, countryCode}) => {
   const schoolInfo = useSchoolInfo({usIp});
   const [name, setName] = useState('');
-  const [showNameError, setShowNameError] = useState(false);
+  const [nameErrorMessage, setNameErrorMessage] = useState(null);
+  const [educatorRole, setEducatorRole] = useState('');
   const [emailOptInChecked, setEmailOptInChecked] = useState(false);
   const [gdprChecked, setGdprChecked] = useState(false);
   const [showGDPR, setShowGDPR] = useState(false);
@@ -50,6 +72,24 @@ const FinishTeacherAccount: React.FunctionComponent<{
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorCreatingAccountMessage, showErrorCreatingAccountMessage] =
     useState(false);
+
+  const isInSchoolRequiredExperiment = statsigReporter.getIsInExperiment(
+    'require_school_in_signup_v1',
+    'requireInfo',
+    false
+  );
+
+  const showEducatorRole = statsigReporter.getIsInExperiment(
+    'educator_role',
+    'showEducatorRole',
+    false
+  );
+
+  const requireEducatorRole = statsigReporter.getIsInExperiment(
+    'educator_role',
+    'requireEducatorRole',
+    false
+  );
 
   // Remove oauth user_type cookie if it exists
   cookies.remove(NEW_SIGN_UP_USER_TYPE);
@@ -64,6 +104,12 @@ const FinishTeacherAccount: React.FunctionComponent<{
     ) {
       navigateToHref('/users/new_sign_up/login_type');
     }
+
+    analyticsReporter.sendEvent(
+      EVENTS.FINISH_ACCOUNT_PAGE_LOADED,
+      {'user type': 'teacher', country: countryCode},
+      PLATFORMS.BOTH
+    );
 
     const fetchGdprData = async () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -88,7 +134,7 @@ const FinishTeacherAccount: React.FunctionComponent<{
     if (userReturnToHref) {
       setUserReturnTo(userReturnToHref);
     }
-  }, []);
+  }, [countryCode, usIp]);
 
   // GDPR is valid if
   // 1. The fetch call has completed AND
@@ -98,21 +144,47 @@ const FinishTeacherAccount: React.FunctionComponent<{
     return isGdprLoaded && ((showGDPR && gdprChecked) || !showGDPR);
   }, [showGDPR, gdprChecked, isGdprLoaded]);
 
+  const formDisabled = useMemo(
+    () =>
+      name?.trim() === '' ||
+      name?.length > MAX_DISPLAY_NAME_LENGTH ||
+      !gdprValid ||
+      (isInSchoolRequiredExperiment && schoolInfoInvalid(schoolInfo)) ||
+      (requireEducatorRole && !educatorRole),
+    [
+      gdprValid,
+      isInSchoolRequiredExperiment,
+      name,
+      schoolInfo,
+      requireEducatorRole,
+      educatorRole,
+    ]
+  );
+
   const onNameChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const newName = e.target.value;
     setName(newName);
 
-    if (newName === '') {
-      setShowNameError(true);
+    if (newName.trim() === '') {
+      setNameErrorMessage(locale.display_name_error_message());
+    } else if (newName.length > MAX_DISPLAY_NAME_LENGTH) {
+      setNameErrorMessage(
+        locale.display_name_too_long_error_message({
+          maxLength: MAX_DISPLAY_NAME_LENGTH,
+        })
+      );
     } else {
-      setShowNameError(false);
+      setNameErrorMessage(null);
     }
   };
 
   const submitTeacherAccount = async () => {
+    if (isSubmitting) {
+      return;
+    }
+    setIsSubmitting(true);
     sendFinishEvent();
     showErrorCreatingAccountMessage(false);
-    setIsSubmitting(true);
 
     const signUpParams = {
       new_sign_up: true,
@@ -121,8 +193,14 @@ const FinishTeacherAccount: React.FunctionComponent<{
         email: sessionStorage.getItem(EMAIL_SESSION_KEY),
         name: name,
         email_preference_opt_in: emailOptInChecked,
-        school_info_attributes: {...schoolInfo},
+        school_info_attributes: buildSchoolData({
+          schoolId: schoolInfo.schoolId,
+          country: schoolInfo.country,
+          schoolName: schoolInfo.schoolName,
+          schoolZip: schoolInfo.schoolZip,
+        }),
         country_code: countryCode,
+        educator_role: educatorRole || null,
       },
     };
     const authToken = await getAuthenticityToken();
@@ -150,16 +228,23 @@ const FinishTeacherAccount: React.FunctionComponent<{
   };
 
   const sendFinishEvent = (): void => {
-    const hasSchool = !!document.querySelector(
-      'select[name="user[school_info_attributes][school_id]"]'
-    );
+    const schoolData = buildSchoolData({
+      schoolId: schoolInfo.schoolId,
+      country: schoolInfo.country,
+      schoolName: schoolInfo.schoolName,
+      schoolZip: schoolInfo.schoolZip,
+    });
+    // schoolData would be undefined if not valid, and the only
+    // school_type sent is 'noSchoolSetting', which is not a school
+    const hasSchool = schoolData && !schoolData.school_type;
     analyticsReporter.sendEvent(
       EVENTS.SIGN_UP_FINISHED_EVENT,
       {
         'user type': 'teacher',
         'has school': hasSchool,
         'has marketing value selected': true,
-        'has display name': !showNameError,
+        'has display name': !nameErrorMessage,
+        country: countryCode,
       },
       PLATFORMS.BOTH
     );
@@ -179,9 +264,10 @@ const FinishTeacherAccount: React.FunctionComponent<{
                 iconName={'circle-xmark'}
                 className={style.xIcon}
               />
-              <BodyThreeText className={style.errorMessageText}>
-                <SafeMarkdown markdown={locale.error_signing_up_message()} />
-              </BodyThreeText>
+              <SafeMarkdown
+                markdown={locale.error_signing_up_message()}
+                className={style.errorMessageText}
+              />
             </div>
             <CloseButton
               onClick={() => showErrorCreatingAccountMessage(false)}
@@ -195,7 +281,6 @@ const FinishTeacherAccount: React.FunctionComponent<{
               name="displayName"
               id="uitest-display-name"
               label={locale.what_do_you_want_to_be_called()}
-              className={style.nameInput}
               value={name}
               placeholder={locale.msCoder()}
               onChange={onNameChange}
@@ -203,13 +288,32 @@ const FinishTeacherAccount: React.FunctionComponent<{
             <BodyThreeText className={style.displayNameSubtext}>
               {locale.this_is_what_your_students_will_see()}
             </BodyThreeText>
-            {showNameError && (
+            {nameErrorMessage && (
               <BodyThreeText className={style.errorMessage}>
-                {locale.display_name_error_message()}
+                {nameErrorMessage}
               </BodyThreeText>
             )}
           </div>
-          <SchoolDataInputs {...schoolInfo} includeHeaders={false} />
+          {showEducatorRole && (
+            <SimpleDropdown
+              className={classNames(style.dropdownContainer, {
+                [style.requiredLabel]: requireEducatorRole,
+              })}
+              labelText={locale.what_is_your_role()}
+              name="educator_role"
+              selectedValue={educatorRole}
+              onChange={e => {
+                setEducatorRole(e.target.value);
+              }}
+              itemGroups={roleItemGroups}
+              dropdownTextThickness="thin"
+            />
+          )}
+          <SchoolDataInputs
+            {...schoolInfo}
+            includeHeaders={false}
+            markFieldsAsRequired={isInSchoolRequiredExperiment}
+          />
           {showGDPR && (
             <div>
               <BodyThreeText
@@ -265,7 +369,7 @@ const FinishTeacherAccount: React.FunctionComponent<{
               iconStyle: 'solid',
               title: 'arrow-right',
             }}
-            disabled={name === '' || !gdprValid}
+            disabled={formDisabled}
             isPending={isSubmitting}
           />
         </div>

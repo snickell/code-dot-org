@@ -6,6 +6,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
 
+import './small-footer-music-overrides.scss';
+
 import DCDO from '@cdo/apps/dcdo';
 import {START_SOURCES} from '@cdo/apps/lab2/constants';
 import {
@@ -156,9 +158,10 @@ class UnconnectedMusicView extends React.Component {
     }
 
     this.state = {
-      loadedLibrary: false,
       hasLoadedInitialSounds: false,
     };
+
+    this.isLevelLoadInProgress = false;
 
     MusicBlocklyWorkspace.setupBlocklyEnvironment(this.props.blockMode);
   }
@@ -172,34 +175,51 @@ class UnconnectedMusicView extends React.Component {
     }
     this.player.setUpdateLoadProgress(this.props.updateLoadProgress);
 
-    // When changing levels, stop playback and reset the initial sounds loaded flag
-    // since a new set of sounds will be loaded on the next level.  Also clear the
-    // callout that might be showing, and dispose of the Blockly workspace so that
-    // any lingering UI is removed.
     Lab2Registry.getInstance()
       .getLifecycleNotifier()
-      .addListener(LifecycleEvent.LevelChangeRequested, () => {
-        if (this.props.levelProperties?.appName === 'music') {
-          this.stopSong();
-          this.setState({
-            hasLoadedInitialSounds: false,
-          });
-          this.props.clearCallout();
-          this.musicBlocklyWorkspace.dispose();
-
-          // Clear any coypright information in the footer.
-          setExtraCopyrightContent(undefined);
-        }
-      })
       .addListener(
+        LifecycleEvent.LevelChangeRequested,
+        this.levelChangeRequested
+      )
+      .addListener(LifecycleEvent.LevelLoadCompleted, this.levelLoadCompleted);
+  }
+
+  componentWillUnmount() {
+    Lab2Registry.getInstance()
+      .getLifecycleNotifier()
+      .removeListener(
+        LifecycleEvent.LevelChangeRequested,
+        this.levelChangeRequested
+      )
+      .removeListener(
         LifecycleEvent.LevelLoadCompleted,
-        ({appName, levelData}, _channel, initialSources) => {
-          if (appName === 'music') {
-            this.onLevelLoad(levelData, initialSources);
-          }
-        }
+        this.levelLoadCompleted
       );
   }
+
+  levelLoadCompleted = ({appName, levelData}, _channel, initialSources) => {
+    if (appName === 'music') {
+      this.onLevelLoad(levelData, initialSources);
+    }
+  };
+
+  // When changing levels, stop playback and reset the initial sounds loaded flag
+  // since a new set of sounds will be loaded on the next level.  Also clear the
+  // callout that might be showing, and dispose of the Blockly workspace so that
+  // any lingering UI is removed.
+  levelChangeRequested = () => {
+    if (this.props.levelProperties?.appName === 'music') {
+      this.stopSong();
+      this.setState({
+        hasLoadedInitialSounds: false,
+      });
+      this.props.clearCallout();
+      this.musicBlocklyWorkspace.dispose();
+
+      // Clear any coypright information in the footer.
+      setExtraCopyrightContent(undefined);
+    }
+  };
 
   async componentDidUpdate(prevProps) {
     this.musicBlocklyWorkspace.resizeBlockly();
@@ -230,6 +250,12 @@ class UnconnectedMusicView extends React.Component {
   }
 
   async onLevelLoad(levelData, initialSources) {
+    if (this.isLevelLoadInProgress) {
+      // Don't attempt to setup the level if a load is already in progress.
+      return;
+    }
+    this.isLevelLoadInProgress = true;
+
     // Stop playback if needed.
     this.stopSong();
 
@@ -339,6 +365,7 @@ class UnconnectedMusicView extends React.Component {
       AppConfig.getValue('show-ai-generate-again-help') === 'true';
 
     this.props.setStartingPlayheadPosition(1);
+    this.isLevelLoadInProgress = false;
   }
 
   // Load the library and initialize the music player, if not already loaded.
@@ -456,6 +483,14 @@ class UnconnectedMusicView extends React.Component {
       return;
     }
 
+    // Skip this pair of events to avoid extra compiles when dragging a block out of the toolbox.
+    if (
+      e.type === Blockly.Events.TOOLBOX_ITEM_SELECT ||
+      e.type === Blockly.Events.CREATE
+    ) {
+      return;
+    }
+
     if (e.type === Blockly.Events.CHANGE) {
       if (e.element === 'field' && e.name === TRIGGER_FIELD) {
         this.props.setSelectedTriggerId(
@@ -541,7 +576,7 @@ class UnconnectedMusicView extends React.Component {
       return;
     }
 
-    this.sequencer.clear();
+    this.sequencer.clear(this.getPlaybackEvents().length);
     this.musicBlocklyWorkspace.executeTrigger(id, triggerStartPosition);
     const playbackEvents = this.sequencer.getPlaybackEvents();
     this.props.addPlaybackEvents({
@@ -551,6 +586,7 @@ class UnconnectedMusicView extends React.Component {
     this.props.addOrderedFunctions({
       orderedFunctions: this.sequencer.getOrderedFunctions?.() || [],
     });
+
     this.player.playEvents(playbackEvents);
 
     this.playingTriggers.push({
@@ -740,7 +776,8 @@ class UnconnectedMusicView extends React.Component {
           player={this.player}
           allowPackSelection={
             this.library?.getHasRestrictedPacks() &&
-            !this.props.levelProperties?.levelData?.packId
+            !this.props.levelProperties?.levelData?.packId &&
+            !this.props.isReadOnlyWorkspace
           }
           analyticsReporter={this.analyticsReporter}
           blocklyWorkspace={this.musicBlocklyWorkspace}

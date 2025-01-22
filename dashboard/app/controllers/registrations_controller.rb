@@ -1,7 +1,6 @@
 require 'cdo/firehose'
 require 'cdo/honeybadger'
 require 'cdo/mailjet'
-require 'cpa'
 require_relative '../../../shared/middleware/helpers/experiments'
 require 'metrics/events'
 require 'policies/lti'
@@ -55,6 +54,11 @@ class RegistrationsController < Devise::RegistrationsController
   def begin_sign_up
     @user = User.new(begin_sign_up_params)
     @user.validate_for_finish_sign_up
+
+    if params[:new_sign_up].present?
+      SignUpTracking.begin_sign_up_tracking session
+      SignUpTracking.log_load_sign_up request
+    end
     SignUpTracking.log_begin_sign_up(@user, request)
 
     if @user.errors.blank?
@@ -176,6 +180,7 @@ class RegistrationsController < Devise::RegistrationsController
       if ActiveModel::Type::Boolean.new.cast(params[:new_sign_up])
         session[:user_return_to] ||= params[:user_return_to]
         @user = Services::PartialRegistration::UserBuilder.call(request: request)
+        SignUpTracking.log_load_finish_sign_up request, (@user.providers&.first || 'email')
         sign_in @user
       else
         super
@@ -462,7 +467,7 @@ class RegistrationsController < Devise::RegistrationsController
     # Get the request location
     location = Geocoder.search(request.ip).try(:first)
     @country_code = location&.country_code.to_s.upcase
-    @is_usa = ['US', 'RD'].include?(@country_code)
+    @is_usa = Policies::User.in_usa?(@country_code)
 
     # A student is underage if they reside in a state with a CAP policy and are in the affected age range.
     underage = Policies::ChildAccount.underage?(current_user)
@@ -471,6 +476,7 @@ class RegistrationsController < Devise::RegistrationsController
     @student_in_lockout_flow = underage && !Policies::ChildAccount::ComplianceState.permission_granted?(current_user)
 
     @personal_account_linking_enabled = Policies::ChildAccount.can_link_new_personal_account?(current_user) && !Policies::ChildAccount.partially_locked_out?(current_user)
+    @personal_account_linking_enabled = false if current_user.student? && (@is_usa && current_user.country_code.nil?)
 
     # Handle users who aren't locked out, but still need parent permission to link personal accounts.
     if underage || !Policies::ChildAccount.has_required_information?(current_user)

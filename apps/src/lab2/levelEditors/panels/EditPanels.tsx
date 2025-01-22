@@ -119,6 +119,7 @@ const EditPanels: React.FunctionComponent<EditPanelsProps> = ({
         <div className={moduleStyles.fullSizeContainer}>
           <PanelsView
             panels={panels}
+            background={'light'}
             onContinue={onContinue}
             targetWidth={1920}
             targetHeight={1080}
@@ -250,6 +251,20 @@ const EditPanel: React.FunctionComponent<EditPanelProps> = ({
             updatePanel({
               ...panel,
               typing: event.target.checked,
+            })
+          }
+        />
+      </div>
+      <div className={moduleStyles.fieldRow}>
+        <Checkbox
+          checked={!!panel.fadeInOverPrevious}
+          name="fadeInOverPrevious"
+          label="Fade in over previous"
+          size="s"
+          onChange={event =>
+            updatePanel({
+              ...panel,
+              fadeInOverPrevious: event.target.checked,
             })
           }
         />
