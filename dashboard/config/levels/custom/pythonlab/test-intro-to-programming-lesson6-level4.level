@@ -1,8 +1,7 @@
 <Pythonlab>
   <config><![CDATA[{
-  "published": true,
   "game_id": 72,
-  "created_at": "2025-01-22T04:59:48.000Z",
+  "created_at": "2025-01-22T21:09:28.000Z",
   "level_num": "custom",
   "user_id": 18602,
   "properties": {
@@ -33,9 +32,51 @@
           "assetId": 0
         },
         {
+          "tileType": 0,
+          "value": 0,
+          "assetId": 46
+        },
+        {
           "tileType": 1,
           "value": 0,
           "assetId": 0
+        },
+        {
+          "tileType": 1,
+          "value": 0,
+          "assetId": 0
+        },
+        {
+          "tileType": 1,
+          "value": 0,
+          "assetId": 0
+        }
+      ],
+      [
+        {
+          "tileType": 1,
+          "value": 0,
+          "assetId": 0
+        },
+        {
+          "tileType": 1,
+          "value": 0,
+          "assetId": 0
+        },
+        {
+          "tileType": 1,
+          "value": 0,
+          "assetId": 0
+        },
+        {
+          "tileType": 1,
+          "value": 0,
+          "assetId": 0
+        },
+        {
+          "tileType": 0,
+          "value": 0,
+          "assetId": 46
         },
         {
           "tileType": 1,
@@ -103,6 +144,11 @@
         },
         {
           "tileType": 1,
+          "value": 1,
+          "assetId": 303
+        },
+        {
+          "tileType": 1,
           "value": 0,
           "assetId": 0
         },
@@ -110,6 +156,43 @@
           "tileType": 1,
           "value": 0,
           "assetId": 0
+        },
+        {
+          "tileType": 1,
+          "value": 0,
+          "assetId": 0
+        },
+        {
+          "tileType": 1,
+          "value": 0,
+          "assetId": 0
+        },
+        {
+          "tileType": 1,
+          "value": 0,
+          "assetId": 0
+        },
+        {
+          "tileType": 1,
+          "value": 0,
+          "assetId": 0
+        }
+      ],
+      [
+        {
+          "tileType": 0,
+          "value": 0,
+          "assetId": 46
+        },
+        {
+          "tileType": 0,
+          "value": 0,
+          "assetId": 46
+        },
+        {
+          "tileType": 0,
+          "value": 0,
+          "assetId": 46
         },
         {
           "tileType": 1,
@@ -164,9 +247,9 @@
           "assetId": 0
         },
         {
-          "tileType": 1,
+          "tileType": 0,
           "value": 0,
-          "assetId": 0
+          "assetId": 46
         },
         {
           "tileType": 1,
@@ -206,9 +289,9 @@
           "assetId": 0
         },
         {
-          "tileType": 1,
+          "tileType": 0,
           "value": 0,
-          "assetId": 0
+          "assetId": 46
         },
         {
           "tileType": 1,
@@ -248,93 +331,9 @@
           "assetId": 0
         },
         {
-          "tileType": 1,
+          "tileType": 0,
           "value": 0,
-          "assetId": 0
-        },
-        {
-          "tileType": 1,
-          "value": 0,
-          "assetId": 0
-        },
-        {
-          "tileType": 1,
-          "value": 0,
-          "assetId": 0
-        }
-      ],
-      [
-        {
-          "tileType": 1,
-          "value": 0,
-          "assetId": 0
-        },
-        {
-          "tileType": 1,
-          "value": 0,
-          "assetId": 0
-        },
-        {
-          "tileType": 1,
-          "value": 0,
-          "assetId": 0
-        },
-        {
-          "tileType": 1,
-          "value": 0,
-          "assetId": 0
-        },
-        {
-          "tileType": 1,
-          "value": 0,
-          "assetId": 0
-        },
-        {
-          "tileType": 1,
-          "value": 0,
-          "assetId": 0
-        },
-        {
-          "tileType": 1,
-          "value": 0,
-          "assetId": 0
-        },
-        {
-          "tileType": 1,
-          "value": 0,
-          "assetId": 0
-        }
-      ],
-      [
-        {
-          "tileType": 1,
-          "value": 0,
-          "assetId": 0
-        },
-        {
-          "tileType": 1,
-          "value": 0,
-          "assetId": 0
-        },
-        {
-          "tileType": 1,
-          "value": 0,
-          "assetId": 0
-        },
-        {
-          "tileType": 1,
-          "value": 0,
-          "assetId": 0
-        },
-        {
-          "tileType": 1,
-          "value": 0,
-          "assetId": 0
-        },
-        {
-          "tileType": 1,
-          "value": 0,
-          "assetId": 0
+          "assetId": 46
         },
         {
           "tileType": 1,
@@ -353,14 +352,14 @@
     "predict_settings": {
       "isPredictLevel": false
     },
-    "long_instructions": "# Do This:\r\n1. 🖥️ Add a `turn_right()` function.\r\n   - 💡 **Hint:** Refer to the `move_fast()` function as a guide.\r\n   - 🗨️ **Discuss:** How do you add a comment about this function and what should it say?\r\n2. 🖥️ Test your code.\r\n   - 🗨️ **Discuss:** Where should you call your `turn_right()` function?\r\n   - 🗨️ **Discuss:** Can you call the `move_fast()` and `turn_right()` functions multiple times in sequence?\r\n3. 🗨️ How does defining your own function make your code easier to reuse?\r\n",
+    "long_instructions": "#Getting started with the painter\r\n\r\n1. Add `painter = Painter()` to create a Painter object\r\n    - **Discuss:** Where do you think we add this code?\r\n    - **Hint:** Read the comments\r\n    - **Press Run to test your code**\r\n#\r\n- Add `painter.turn_left()` to make the painter turn left\r\n    - **Discuss:** What code do you think you would need to write to make the painter turn left?\r\n\t- **Hint:** Look at the code used to make the painter move forward. \r\n\t- **Press Run**\r\n#\r\n- Add `painter.paint(\"red\")` to paint red\r\n    - **Press Run**\r\n    - **Discuss:** How do you make the painter paint a square yellow instead of red?\r\n    - **Do This:** Change the color of the paint",
     "start_sources": {
       "files": {
         "0": {
           "id": "0",
           "name": "main.py",
           "language": "py",
-          "contents": "from neighborhood import Painter\n\nbob = Painter()\n\n# This function makes the Painter move forward 3 squares\ndef move_fast():\n  bob.move()\n  bob.move()\n  bob.move()\n\n# Add function defintion here\n\n\nmove_fast()\nbob.paint('blue')\nmove_fast()\n",
+          "contents": "from neighborhood import Painter\n#add the painter object\n\n\n#painter turns left\n\n\n#move painter one square forward\n\n\n#painter paints red\n",
           "folderId": "0",
           "active": true,
           "open": true
@@ -370,6 +369,7 @@
       }
     }
   },
-  "audit_log": "[{\"changed_at\":\"2025-01-22T04:59:48.532+00:00\",\"changed\":[\"cloned from \\\"test-intro-to-programming-lesson7-level1\\\"\"],\"cloned_from\":\"test-intro-to-programming-lesson7-level1\"},{\"changed_at\":\"2025-01-22 05:00:36 +0000\",\"changed\":[\"serialized_maze\",\"predict_settings\",\"long_instructions\"],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"},{\"changed_at\":\"2025-01-22 05:03:44 +0000\",\"changed\":[\"start_sources\"],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"},{\"changed_at\":\"2025-01-22 05:08:55 +0000\",\"changed\":[\"serialized_maze\",\"predict_settings\",\"long_instructions\"],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"},{\"changed_at\":\"2025-01-22 05:11:16 +0000\",\"changed\":[\"start_sources\"],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"},{\"changed_at\":\"2025-01-22 05:14:04 +0000\",\"changed\":[\"serialized_maze\",\"predict_settings\",\"long_instructions\"],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"},{\"changed_at\":\"2025-01-22 19:48:28 +0000\",\"changed\":[\"serialized_maze\",\"predict_settings\",\"long_instructions\"],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"},{\"changed_at\":\"2025-01-22 19:49:01 +0000\",\"changed\":[\"start_sources\"],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"},{\"changed_at\":\"2025-01-22 21:35:44 +0000\",\"changed\":[\"serialized_maze\",\"predict_settings\",\"long_instructions\"],\"changed_by_id\":18602,\"changed_by_email\":\"angelina+levelbuilder@code.org\"}]"
+  "published": true,
+  "audit_log": "[{\"changed_at\":\"2025-01-22T21:09:28.694+00:00\",\"changed\":[\"cloned from \\\"test-intro-to-programming-lesson6-level1\\\"\"],\"cloned_from\":\"test-intro-to-programming-lesson6-level1\"}]"
 }]]></config>
 </Pythonlab>
