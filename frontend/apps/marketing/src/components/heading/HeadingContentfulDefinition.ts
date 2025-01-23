@@ -4,7 +4,7 @@ import {ComponentDefinition} from '@contentful/experiences-sdk-react';
 export const HeadingContentfulComponentDefinition: ComponentDefinition = {
   id: 'heading',
   name: 'Heading',
-  category: 'Custom Components',
+  category: 'Typography',
   variables: {
     semanticTag: {
       displayName: 'Semantic Tag',
