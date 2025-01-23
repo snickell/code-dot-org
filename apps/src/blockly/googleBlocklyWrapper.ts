@@ -3,7 +3,8 @@ import {
   ObservableParameterModel,
 } from '@blockly/block-shareable-procedures';
 import {installAllBlocks as installFieldColourBlocks} from '@blockly/field-colour';
-import {LineCursor, NavigationController} from '@blockly/keyboard-navigation';
+import {LineCursor, KeyboardNavigation} from '@blockly/keyboard-experiment';
+//import {LineCursor, NavigationController} from '@blockly/keyboard-navigation';
 import {CrossTabCopyPaste} from '@blockly/plugin-cross-tab-copy-paste';
 import {
   ScrollBlockDragger,
@@ -432,10 +433,9 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
 
   blocklyWrapper.JavaScript = javascriptGenerator;
   blocklyWrapper.LineCursor = LineCursor;
-  blocklyWrapper.navigationController = new NavigationController();
-  // Initialize plugin.
-  blocklyWrapper.navigationController.init();
-  blocklyWrapper.navigationController.cursorType = cdoUtils.getUserCursorType();
+  blocklyWrapper.navigationController = new KeyboardNavigation(
+    blocklyWrapper.mainBlockSpace
+  );
 
   // Wrap SNAP_RADIUS property, and in the setter make sure we keep SNAP_RADIUS and CONNECTING_SNAP_RADIUS in sync.
   // See https://github.com/google/blockly/issues/2217
@@ -872,8 +872,6 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
     if (options.noFunctionBlockFrame) {
       workspace.noFunctionBlockFrame = options.noFunctionBlockFrame;
     }
-
-    blocklyWrapper.navigationController.addWorkspace(workspace);
 
     blocklyWrapper.getNewCursor = function (type) {
       switch (type) {
