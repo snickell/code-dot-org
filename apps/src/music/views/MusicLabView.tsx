@@ -35,7 +35,6 @@ import useUpdatePlayer from './hooks/useUpdatePlayer';
 import MusicPlayView from './MusicPlayView';
 import PackDialog from './PackDialog';
 import Timeline from './Timeline';
-import {useMusicSelector} from './types';
 
 import moduleStyles from './music-view.module.scss';
 
@@ -76,7 +75,7 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
   useUpdatePlayer(player);
   useUpdateAnalytics(analyticsReporter);
   const dispatch = useAppDispatch();
-  const isPlaying = useMusicSelector(state => state.music.isPlaying);
+  const isPlaying = useAppSelector(state => state.music.isPlaying);
   const showInstructions = useAppSelector(
     state => state.music.showInstructions
   );
@@ -95,10 +94,10 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
     state => state.lab.validationState.callout
   );
   const currentPlayheadPosition = getCurrentPlayheadPosition();
-  const startingPlayheadPosition = useMusicSelector(
+  const startingPlayheadPosition = useAppSelector(
     state => state.music.startingPlayheadPosition
   );
-  const lastMeasure = useMusicSelector(state => state.music.lastMeasure);
+  const lastMeasure = useAppSelector(state => state.music.lastMeasure);
 
   const progressManager = useContext(ProgressManagerContext);
 
