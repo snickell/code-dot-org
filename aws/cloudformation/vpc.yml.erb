@@ -5,6 +5,12 @@ self.class.include VPC
 ---
 AWSTemplateFormatVersion: 2010-09-09
 Description: VPC layer including all Subnets, NAT Gateway and Security Groups for Code.org infrastructure.
+Parameters:
+  # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/LocationsOfEdgeServers.html#managed-prefix-list
+  CloudFrontManagedPrefixList:
+    Type: String
+    Default: pl-3b927c52 # us-east-1
+    Description: CloudFront Managed Prefix List for the current Region.
 Resources:
   VPC:
     Type: AWS::EC2::VPC
@@ -117,13 +123,9 @@ Resources:
       VpcId: {Ref: VPC}
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: 0.0.0.0/0
+          SourcePrefixListId: !Ref CloudFrontManagedPrefixList
       SecurityGroupEgress:
         # Forward HTTP requests to nginx on Web Application Server ("Front End") EC2 Instances.
         - IpProtocol: tcp
