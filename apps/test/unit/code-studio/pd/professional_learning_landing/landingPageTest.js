@@ -7,6 +7,10 @@ import isRtl from '@cdo/apps/code-studio/isRtlRedux';
 import {selfPacedCourseConstants} from '@cdo/apps/code-studio/pd/professional_learning_landing/constants.js';
 import {UnconnectedLandingPage as LandingPage} from '@cdo/apps/code-studio/pd/professional_learning_landing/LandingPage';
 import {
+  buildGoogleCalendarLink,
+  buildOutlookCalendarLink,
+} from '@cdo/apps/code-studio/pd/workshop_enrollment/WorkshopEnrollmentCelebrationDialog';
+import {
   getStore,
   registerReducers,
   stubRedux,
@@ -38,6 +42,31 @@ const TEST_WORKSHOP = {
   enrollment_code: 'ABCD',
   status: 'Not Started',
 };
+
+const TEST_WORKSHOP_SESSIONS = [
+  {
+    year: '2030',
+    month: '02',
+    day: '03',
+    start_hour: '09',
+    start_min: '30',
+    end_hour: '14',
+    end_min: '00',
+    time_text: '9:30AM - 2:00PM',
+    date_text: 'February 3, 2025',
+  },
+  {
+    year: '2030',
+    month: '02',
+    day: '04',
+    start_hour: '09',
+    start_min: '30',
+    end_hour: '14',
+    end_min: '00',
+    time_text: '9:30AM - 2:00PM',
+    date_text: 'February 4, 2025',
+  },
+];
 
 const DEFAULT_PROPS = {
   lastWorkshopSurveyUrl: 'url',
@@ -446,6 +475,149 @@ describe('LandingPage', () => {
     screen.getByText(
       i18n.enrollmentCelebrationBody({workshopName: workshopName})
     );
+
+    sessionStorage.clear();
+  });
+
+  it('enroll success dialog shows buttons with links to add session to calendar for workshops with one session', () => {
+    const workshopCourse = 'TEST COURSE';
+    const workshopLocation = 'Seattle, WA';
+    const workshopSession = TEST_WORKSHOP_SESSIONS[0];
+    sessionStorage.setItem('workshopCourse', workshopCourse);
+    sessionStorage.setItem('workshopLocation', workshopLocation);
+    sessionStorage.setItem(
+      'sessionTimeInfo',
+      JSON.stringify([workshopSession])
+    );
+
+    renderDefault();
+
+    screen.getByText(i18n.enrollmentCelebrationTitle());
+    screen.getByText(
+      i18n.enrollmentCelebrationBody({workshopName: workshopCourse})
+    );
+    screen.getByText(i18n.addToYourCalendar());
+
+    // Add to Google calendar button has expected link to add event to calendar
+    const expectedGoogleCalendarLink = buildGoogleCalendarLink(
+      workshopSession,
+      workshopCourse,
+      workshopLocation
+    );
+    expect(
+      screen
+        .getByLabelText(
+          i18n.addToCalendarType({
+            calendar_type: 'Google',
+          })
+        )
+        .getAttribute('href')
+    ).toBe(expectedGoogleCalendarLink);
+
+    // Add to Outlook calendar button has expected link to add event to calendar
+    const expectedOutlookCalendarLink = buildOutlookCalendarLink(
+      workshopSession,
+      workshopCourse,
+      workshopLocation
+    );
+    expect(
+      screen
+        .getByLabelText(
+          i18n.addToCalendarType({
+            calendar_type: 'Outlook',
+          })
+        )
+        .getAttribute('href')
+    ).toBe(expectedOutlookCalendarLink);
+
+    // Does not show the dialog for adding multiple sessions to calendar
+    expect(
+      screen.queryByText(i18n.enrollmentCelebrationAddToCalendarButton())
+    ).toBe(null);
+
+    sessionStorage.clear();
+  });
+
+  it('enroll success dialog shows buttons that open dialog to add multiple sessions to calendar for workshops with multiple sessions', () => {
+    const workshopCourse = 'TEST COURSE';
+    const workshopLocation = 'Seattle, WA';
+    sessionStorage.setItem('workshopCourse', workshopCourse);
+    sessionStorage.setItem('workshopLocation', workshopLocation);
+    sessionStorage.setItem(
+      'sessionTimeInfo',
+      JSON.stringify(TEST_WORKSHOP_SESSIONS)
+    );
+
+    renderDefault();
+
+    screen.getByText(i18n.enrollmentCelebrationTitle());
+    screen.getByText(
+      i18n.enrollmentCelebrationBody({workshopName: workshopCourse})
+    );
+    screen.getByText(i18n.addToYourCalendar());
+
+    // Calendar buttons are not links
+    expect(screen.queryByRole('link', {name: 'Google'})).toBe(null);
+    expect(screen.queryByRole('link', {name: 'Outlook'})).toBe(null);
+
+    // Can open dialog to add multiple sessions to Google calendar
+    fireEvent.click(screen.getByRole('button', {name: 'Google'}));
+    screen.getByText(i18n.enrollmentCelebrationAddToCalendarTitle());
+    const googleCalendarButtonLinks = screen
+      .getAllByLabelText(
+        i18n.addToCalendarType({
+          calendar_type: 'Google',
+        })
+      )
+      .map(button => {
+        return button.getAttribute('href');
+      });
+
+    const expectedGoogleCalendarLinks = TEST_WORKSHOP_SESSIONS.map(session => {
+      return buildGoogleCalendarLink(session, workshopCourse, workshopLocation);
+    });
+    expect(googleCalendarButtonLinks).toStrictEqual(
+      expectedGoogleCalendarLinks
+    );
+
+    // Can close the Google calendar dialog with the 'Change calendar' button and open the Outlook calendar dialog
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: i18n.enrollmentCelebrationChangeCalendarButton(),
+      })
+    );
+    fireEvent.click(screen.getByRole('button', {name: 'Outlook'}));
+
+    screen.getByText(i18n.enrollmentCelebrationAddToCalendarTitle());
+    const outlookCalendarButtonLinks = screen
+      .getAllByLabelText(
+        i18n.addToCalendarType({
+          calendar_type: 'Outlook',
+        })
+      )
+      .map(button => {
+        return button.getAttribute('href');
+      });
+
+    const expectedOutlookCalendarLinks = TEST_WORKSHOP_SESSIONS.map(session => {
+      return buildOutlookCalendarLink(
+        session,
+        workshopCourse,
+        workshopLocation
+      );
+    });
+    expect(outlookCalendarButtonLinks).toStrictEqual(
+      expectedOutlookCalendarLinks
+    );
+
+    // Can close all dialogs with 'Go to my professional learning' dialog
+    fireEvent.click(
+      screen.getAllByText(i18n.enrollmentCelebrationCallToAction())[0]
+    );
+    expect(screen.queryByText(i18n.enrollmentCelebrationTitle())).toBe(null);
+    expect(
+      screen.queryByText(i18n.enrollmentCelebrationAddToCalendarTitle())
+    ).toBe(null);
 
     sessionStorage.clear();
   });
