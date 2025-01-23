@@ -12,7 +12,7 @@ locale_lock: true
 countries: [IR]
 
 # The list of available project types
-project_types:
+project_types: &project_types
   - spritelab
   - artist
   - applab
@@ -145,6 +145,9 @@ pages:
       CurriculumCatalog:
         # Do not allow switching away from showing ONLY translated courses
         forceTranslated: true
+      StartNewProject:
+        # Show only available project options
+        availableProjectTypes: *project_types
       CurriculumQuickAssign:
         # For section setup, truncate the 'quick access' course listing to
         # only items that are translated to Farsi
