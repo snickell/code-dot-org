@@ -16,6 +16,38 @@ import style from '@cdo/apps/code-studio/pd/professional_learning_landing/landin
 
 const CelebrationImage = require('@cdo/static/pd/EnrollmentCelebration.png');
 
+export const buildGoogleCalendarLink = (
+  session,
+  workshopTitle,
+  workshopLocation
+) => {
+  const date = `${session.year}${session.month}${session.day}`;
+  const startTime = `${date}T${session.start_hour}${session.start_min}00Z`;
+  const endTime = `${date}T${session.end_hour}${session.end_min}00Z`;
+
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+    workshopTitle
+  )}&location=${encodeURIComponent(
+    workshopLocation
+  )}&dates=${startTime}/${endTime}`;
+};
+
+export const buildOutlookCalendarLink = (
+  session,
+  workshopTitle,
+  workshopLocation
+) => {
+  const date = `${session.year}-${session.month}-${session.day}`;
+  const startTime = `${date}T${session.start_hour}:${session.start_min}:00Z`;
+  const endTime = `${date}T${session.end_hour}:${session.end_min}:00Z`;
+
+  return `https://outlook.live.com/calendar/action/compose?rru=addevent&subject=${encodeURIComponent(
+    workshopTitle
+  )}&location=${encodeURIComponent(
+    workshopLocation
+  )}&startdt=${startTime}&enddt=${endTime}`;
+};
+
 export default function WorkshopEnrollmentCelebrationDialog({
   workshopTitle,
   workshopLocation,
@@ -40,35 +72,11 @@ export default function WorkshopEnrollmentCelebrationDialog({
     onCloseCelebrationDialog();
   };
 
-  const buildGoogleCalendarLink = session => {
-    const date = `${session.year}${session.month}${session.day}`;
-    const startTime = `${date}T${session.start_hour}${session.start_min}00Z`;
-    const endTime = `${date}T${session.end_hour}${session.end_min}00Z`;
-
-    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-      workshopTitle
-    )}&location=${encodeURIComponent(
-      workshopLocation
-    )}&dates=${startTime}/${endTime}`;
-  };
-
-  const buildOutlookCalendarLink = session => {
-    const date = `${session.year}-${session.month}-${session.day}`;
-    const startTime = `${date}T${session.start_hour}:${session.start_min}:00Z`;
-    const endTime = `${date}T${session.end_hour}:${session.end_min}:00Z`;
-
-    return `https://outlook.live.com/calendar/action/compose?rru=addevent&subject=${encodeURIComponent(
-      workshopTitle
-    )}&location=${encodeURIComponent(
-      workshopLocation
-    )}&startdt=${startTime}&enddt=${endTime}`;
-  };
-
-  const getCalendarLink = session => {
-    if (multipleSessionDialogType === 'Google') {
-      return buildGoogleCalendarLink(session);
-    } else if (multipleSessionDialogType === 'Outlook') {
-      return buildOutlookCalendarLink(session);
+  const getCalendarLink = (session, calendarType) => {
+    if (calendarType === 'Google') {
+      return buildGoogleCalendarLink(session, workshopTitle, workshopLocation);
+    } else if (calendarType === 'Outlook') {
+      return buildOutlookCalendarLink(session, workshopTitle, workshopLocation);
     }
   };
 
@@ -117,7 +125,7 @@ export default function WorkshopEnrollmentCelebrationDialog({
                       iconLeft={{iconName: 'fa-solid fa-plus'}}
                       className={style.addSessionToCalendarButton}
                       target="_blank"
-                      href={getCalendarLink(session)}
+                      href={getCalendarLink(session, multipleSessionDialogType)}
                     />
                   </td>
                 </tr>
@@ -208,7 +216,10 @@ export default function WorkshopEnrollmentCelebrationDialog({
                             iconStyle: 'light',
                           }}
                           target="_blank"
-                          href={buildGoogleCalendarLink(workshopSessionInfo[0])}
+                          href={getCalendarLink(
+                            workshopSessionInfo[0],
+                            'Google'
+                          )}
                         />
                         <LinkButton
                           text={'Outlook'}
@@ -222,8 +233,9 @@ export default function WorkshopEnrollmentCelebrationDialog({
                             iconStyle: 'light',
                           }}
                           target="_blank"
-                          href={buildOutlookCalendarLink(
-                            workshopSessionInfo[0]
+                          href={getCalendarLink(
+                            workshopSessionInfo[0],
+                            'Outlook'
                           )}
                         />
                       </>
