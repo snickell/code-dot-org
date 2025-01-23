@@ -30,6 +30,7 @@ import {
   toolboxModeCategory,
   getNewStaticCategory,
   getNewDynamicCategory,
+  isValidCategory,
 } from './toolbox';
 import {Category, ToolboxData} from './toolbox/types';
 
@@ -121,7 +122,7 @@ export default class MusicBlocklyWorkspace {
     let toolboxBlocks = getToolbox(blockMode);
 
     if (isToolboxMode) {
-      // Toolbox uses the full toolbox with an addition block for managing categories.
+      // Toolbox uses the full toolbox with an additional block for managing categories.
       toolboxBlocks.contents.unshift(toolboxModeCategory);
     } else if (toolboxDefinition || toolboxAllowList) {
       toolboxBlocks =
@@ -188,7 +189,6 @@ export default class MusicBlocklyWorkspace {
    * Set up the Blockly workspace for toolbox mode (levelbuilder).
    * Adds blocks to the workspace based on the level's toolbox configuration.
    * Automatically cleans up the workspace as blocks move.
-   * TODO: Add dynamic category blocks to workspace.
    */
   initializeToolboxMode(
     blockMode: ValueOf<typeof BlockMode>,
@@ -464,7 +464,6 @@ export default class MusicBlocklyWorkspace {
   /**
    * Serialize the top blocks of the workspace as a toolbox.
    * @returns a toolbox definition that can be handled directly by Blockly.
-   * TODO: Serialize category blocks as categories rather than blocks.
    */
   workspaceToToolboxDefinition() {
     if (!this.workspace) {
@@ -475,20 +474,23 @@ export default class MusicBlocklyWorkspace {
     }
     const topBlocks = this.workspace.getTopBlocks(true);
 
+    // This will be the final toolbox returned by this function, either a
+    // flyout toolbox or a category toolbox.
     const fullToolbox: GoogleBlockly.utils.toolbox.ToolboxInfo = {
       contents: [],
     };
+    // Temporary storage for blocks that will be added to the next category,
+    // if categories exist, or the final flyout toolbox.
     let flyoutItems: GoogleBlockly.utils.toolbox.FlyoutItemInfo[] = [];
+
+    // Temporary storage for a category, containing a name, type, list of contents.
     let currentCategory = getNewStaticCategory();
 
     topBlocks.forEach(block => {
       if (block.type === BlockTypes.CATEGORY) {
         fullToolbox.kind = 'categoryToolbox';
-        if (
-          currentCategory.contents.length ||
-          currentCategory.name !== 'DEFAULT'
-        ) {
-          // Add previous category to toolbox
+        if (isValidCategory(currentCategory)) {
+          // Add the previous category to toolbox.
           fullToolbox.contents.push({...currentCategory});
         }
 
@@ -499,13 +501,12 @@ export default class MusicBlocklyWorkspace {
         flyoutItems = [];
       } else if (block.type === BlockTypes.CUSTOM_CATEGORY) {
         fullToolbox.kind = 'categoryToolbox';
-        if (
-          currentCategory.contents.length ||
-          currentCategory.name !== 'DEFAULT'
-        ) {
+        if (isValidCategory(currentCategory)) {
           // Add previous category to toolbox
           fullToolbox.contents.push({...currentCategory});
         }
+        // Create and immediately add a new dynamic category to the toolbox,
+        // because dynamic categories cannot include other static blocks.
         fullToolbox.contents.push(
           getNewDynamicCategory(block.getFieldValue('CUSTOM'))
         );
@@ -526,13 +527,10 @@ export default class MusicBlocklyWorkspace {
 
     // Finalize the toolbox.
     if (!fullToolbox.contents.length) {
-      // If no categories are present, create a flyout toolbox.
+      // If no categories have been pushed, create a flyout toolbox.
       fullToolbox.kind = 'flyoutToolbox';
       fullToolbox.contents = flyoutItems;
-    } else if (
-      currentCategory.contents.length ||
-      currentCategory.name !== 'DEFAULT'
-    ) {
+    } else if (isValidCategory(currentCategory)) {
       // Add the final category to the toolbox.
       fullToolbox.contents.push({...currentCategory});
     }

@@ -160,8 +160,8 @@ export function localizeCategoryNames(
 }
 
 /**
- * A toolbox category for Toolbox mode, containing a block for specifying
- * the start of a category. Only available for levelbuilders.
+ * The additional toolbox category for Toolbox mode, containing a block
+ * for specifying the start of a category. Only available for levelbuilders.
  */
 export const toolboxModeCategory = {
   kind: 'category',
@@ -174,9 +174,9 @@ export const toolboxModeCategory = {
 };
 
 /**
- * Given a toolbox definition and a workspace, iterate through the categories,
- * if they exist, and add all blocks to the workspace.
- * Used for levelbuilder's toolbox mode.
+ * Given a toolbox definition and a workspace, iterate through any
+ * categories, add all blocks to the workspace. Used for levelbuilder's
+ * toolbox mode.
  */
 export function addToolboxBlocksToWorkspace(
   contents: GoogleBlockly.utils.toolbox.ToolboxItemInfo[],
@@ -191,7 +191,7 @@ export function addToolboxBlocksToWorkspace(
         workspace
       );
     } else if (toolboxItem.kind === 'category' && 'custom' in toolboxItem) {
-      // For categories with a custom value ('PROCEDURES' OR 'VARIABLES'),
+      // For categories with a custom value ('PROCEDURES' or 'VARIABLES'),
       // get the category name.
       const dynamicCategoryName = (
         toolboxItem as GoogleBlockly.utils.toolbox.DynamicCategoryInfo
@@ -225,6 +225,8 @@ export function addToolboxBlocksToWorkspace(
           workspace
         );
       } else {
+        // We shouldn't hit this point, but theoretically could if a toolbox
+        // contained unsupported items like buttons or labels.
         console.warn('Unsupported category found:', toolboxItem);
       }
       // Recursively process the contents of the static category
@@ -277,4 +279,15 @@ export function getNewDynamicCategory(
     colour: undefined,
     hidden: undefined,
   };
+}
+
+/**
+ * Determines if a category is valid. Used to filter out
+ * empty "DEFAULT" categories when saving in toolbox mode.
+ * @param category
+ */
+export function isValidCategory(
+  category: GoogleBlockly.utils.toolbox.StaticCategoryInfo
+): boolean {
+  return !!(category.contents.length || category.name !== 'DEFAULT');
 }

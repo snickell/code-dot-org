@@ -16,7 +16,8 @@ const validDynamicCategories = Object.entries(dynamicCategoryLabels).map(
 
 /**
  * Represents a dynamic category block definition for Blockly.
- * This block allows users to select a category from a dropdown menu.
+ * This block allows levelbuilder to specify the start of a new category
+ * when in toolbox mode.
  */
 export const staticCategoryBlock = {
   definition: {
@@ -32,14 +33,15 @@ export const staticCategoryBlock = {
     inputsInline: true,
     style: 'loop_blocks',
     tooltip:
-      'Blocks between category blocks will be grouped within the student toolbox.',
+      'Indicates the start of a new category. All blocks below this point will be contained in this category.',
   },
   generator: () => '\n',
 };
 
 /**
  * Represents a dynamic category block definition for Blockly. This block allows
- * levelbuilders to create auto-populated Functions or Variables categories.
+ * levelbuilders to create auto-populated Functions or Variables categories when
+ * in toolbox mode.
  */
 export const dynamicCategoryBlock = {
   definition: {
@@ -55,7 +57,7 @@ export const dynamicCategoryBlock = {
     inputsInline: true,
     style: 'loop_blocks',
     tooltip:
-      'Creates an auto-populated category. Cannot include other static blocks.',
+      'Indicates an auto-populated (dynamic) category. Cannot include other static blocks.',
   },
   generator: () => '\n',
 };

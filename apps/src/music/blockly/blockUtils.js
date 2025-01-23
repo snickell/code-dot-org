@@ -179,19 +179,19 @@ export function findParentStatementInputTypes(id) {
 }
 
 /**
- * Adds a warning to blocks that are not positioned under a static category block.
+ * Adds a warning to blocks that are not positioned under a static category block,
+ * except when there are no categories at all. If warnings are ignored, we will
+ * still save the blocks into a "DEFAULT" category.
  */
 export function validateBlockCategories(workspace) {
   workspace.cleanUp();
   const topBlocks = workspace.getTopBlocks(true);
-  let noCategoryBlocks = false;
-  if (
+
+  const noCategoryBlocks =
     !workspace.getBlocksByType(BlockTypes.CATEGORY).length &&
-    !workspace.getBlocksByType(BlockTypes.CUSTOM_CATEGORY).length
-  ) {
-    noCategoryBlocks = true;
-  }
-  let currentCategoryBlock = null; // Tracks the current valid category block
+    !workspace.getBlocksByType(BlockTypes.CUSTOM_CATEGORY).length;
+
+  let currentCategoryBlock = null;
   let warningText = 'This block is not positioned under a category.';
 
   topBlocks.forEach(block => {
@@ -208,7 +208,7 @@ export function validateBlockCategories(workspace) {
       currentCategoryBlock = null;
       warningText = 'Auto-populated categories cannot include static blocks.';
     } else {
-      // Non-category blocks
+      // All non-category blocks
       if (!currentCategoryBlock) {
         // No static category block above this block
         block.setWarningText(warningText);
