@@ -6,6 +6,9 @@
 import Divider, {
   DividerContentfulComponentDefinition,
 } from '@/components/divider';
+import Heading, {
+  HeadingContentfulComponentDefinition,
+} from '@/components/heading';
 import {
   defineComponents,
   CONTENTFUL_COMPONENTS,
@@ -19,6 +22,10 @@ defineComponents(
       options: {
         wrapContainerWidth: '100%',
       },
+    },
+    {
+      component: Heading,
+      definition: HeadingContentfulComponentDefinition,
     },
   ],
   {
