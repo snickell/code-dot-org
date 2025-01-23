@@ -4,7 +4,8 @@
     "wrapup_video_id": null,
     "login_required": false,
     "properties": {
-      "is_migrated": true
+      "is_migrated": true,
+      "version_year": "2025"
     },
     "new_name": null,
     "family_name": null,
@@ -1017,9 +1018,6 @@
       "activity_section_position": 2,
       "assessment": false,
       "properties": {
-        "level_keys": [
-          "ML-Events"
-        ]
       },
       "bonus": false,
       "seeding_key": {

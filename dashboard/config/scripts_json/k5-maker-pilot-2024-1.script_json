@@ -11,11 +11,12 @@
       "topic_tags": [
         "maker"
       ],
-      "tts": true
+      "tts": true,
+      "version_year": "2024"
     },
     "new_name": null,
     "family_name": null,
-    "serialized_at": "2025-01-22 19:00:06 UTC",
+    "serialized_at": "2025-01-16 22:53:21 UTC",
     "published_state": null,
     "instruction_type": null,
     "instructor_audience": null,
