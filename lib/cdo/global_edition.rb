@@ -25,7 +25,7 @@ module Cdo
     # - ge_prefix: "/global/fa"
     # - ge_region: "fa"
     # - main_path: "/home"
-    PATH_PATTERN = Regexp.new <<~REGEXP.remove(/\s+/)
+    PATH_PATTERN = Regexp.new <<~REGEXP.gsub(/\s+/, '')
       ^(?<ge_prefix>
         #{ROOT_PATH}/
         (?<ge_region>#{REGIONS.join('|')})
@@ -72,6 +72,12 @@ module Cdo
 
     def self.region_locales(region)
       configuration_for(region)&.dig(:locales)
+    end
+
+    # @return [NilClass, Array<String>] List of project types available in the given region.
+    # @note +nil+ means all projects are available.
+    def self.region_project_types(region)
+      configuration_for(region)&.dig(:project_types)
     end
 
     def self.main_region_locale(region)
