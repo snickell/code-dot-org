@@ -6,21 +6,13 @@ import TextField from '@cdo/apps/componentLibrary/textField';
 
 import {fetchStudentCodeSamples} from './StudentCodeSamplesApi';
 
-import styles from './ai-tutor/ai-tutor-tester.module.scss';
-
 interface StudentCodeSample {
   projectId: string;
   studentCode: string | undefined;
   userId: number | undefined;
 }
 
-interface StudentCodeDatasetMakerProps {
-  allowed: boolean;
-}
-
-const StudentCodeDatasetMaker: React.FC<StudentCodeDatasetMakerProps> = ({
-  allowed,
-}) => {
+const StudentCodeDatasetMaker: React.FC = () => {
   const [datasetName, setDatasetName] = useState<string>('');
   const [levelId, setLevelId] = useState<string>('');
   const [scriptId, setScriptId] = useState<string>('');
@@ -53,64 +45,57 @@ const StudentCodeDatasetMaker: React.FC<StudentCodeDatasetMakerProps> = ({
     <div>
       <h2>Generate Student Code Datasets</h2>
       <br />
-      {!allowed && (
-        <h3 className={styles.denied}>
-          You need to be a Levelbuilder to use this tool.
-        </h3>
-      )}
-      {allowed && (
-        <div>
-          <TextField
-            name="Level Id"
-            label="Level Id"
-            onChange={e => setLevelId(e.target.value)}
-            value={levelId}
-          />
-          <TextField
-            name="Script Id"
-            label="Script Id"
-            onChange={e => setScriptId(e.target.value)}
-            value={scriptId}
-          />
-          <br />
-          <br />
-          <TextField
-            name="Number of Samples"
-            label="How many samples of student work do you want?"
-            onChange={e => setNumSamples(e.target.value)}
-            value={numSamples}
-          />
-          <br />
-          <br />
-          <TextField
-            name="Dataset Name"
-            label="What do you want to name this dataset?"
-            helperMessage=" If the dataset is for Meaures of Learning,
+      <div>
+        <TextField
+          name="Level Id"
+          label="Level Id"
+          onChange={e => setLevelId(e.target.value)}
+          value={levelId}
+        />
+        <TextField
+          name="Script Id"
+          label="Script Id"
+          onChange={e => setScriptId(e.target.value)}
+          value={scriptId}
+        />
+        <br />
+        <br />
+        <TextField
+          name="Number of Samples"
+          label="How many samples of student work do you want?"
+          onChange={e => setNumSamples(e.target.value)}
+          value={numSamples}
+        />
+        <br />
+        <br />
+        <TextField
+          name="Dataset Name"
+          label="What do you want to name this dataset?"
+          helperMessage=" If the dataset is for Meaures of Learning,
           the dataset should be named with the course, unit, lesson and level.
           For example: CSP_U4_L6_L3, for CSP Unit 4, Lesson 6, Level 3."
-            onChange={e => setDatasetName(e.target.value)}
-            value={datasetName}
+          onChange={e => setDatasetName(e.target.value)}
+          value={datasetName}
+        />
+        <br />
+        <br />
+        <div>
+          <Button
+            text="Fetch Student Code Samples"
+            onClick={getStudentCodeSamples}
+            disabled={pending}
+            isPending={pending}
           />
-          <br />
-          <br />
-          <div>
-            <Button
-              text="Fetch Student Code Samples"
-              onClick={getStudentCodeSamples}
-              disabled={pending}
-              isPending={pending}
-            />
-          </div>
-          <br />
-          <div>
-            <Button
-              text="Download CSV"
-              onClick={downloadCSV}
-              disabled={fetchedSamples.length === 0}
-            />
-          </div>
         </div>
-      )}
+        <br />
+        <div>
+          <Button
+            text="Download CSV"
+            onClick={downloadCSV}
+            disabled={fetchedSamples.length === 0}
+          />
+        </div>
+      </div>
     </div>
   );
 };

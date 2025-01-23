@@ -7,10 +7,7 @@ import getScriptData from '@cdo/apps/util/getScriptData';
 $(document).ready(() => {
   const aiIterationToolsData = getScriptData('aiIterationToolsData');
   ReactDOM.render(
-    <AIIterationTools
-      canUseAITutor={aiIterationToolsData.canUseAITutor}
-      canMakeDatasets={aiIterationToolsData.canMakeDatasets}
-    />,
+    <AIIterationTools allowed={aiIterationToolsData.allowed} />,
     document.getElementById('ai-iteration-tools')
   );
 });
