@@ -9,6 +9,10 @@ import Divider, {
 import Heading, {
   HeadingContentfulComponentDefinition,
 } from '@/components/heading';
+import Paragraph, {
+  ParagraphContentfulComponentDefinition,
+} from '@/components/paragraph';
+
 import {
   defineComponents,
   CONTENTFUL_COMPONENTS,
@@ -26,6 +30,10 @@ defineComponents(
     {
       component: Heading,
       definition: HeadingContentfulComponentDefinition,
+    },
+    {
+      component: Paragraph,
+      definition: ParagraphContentfulComponentDefinition,
     },
   ],
   {
