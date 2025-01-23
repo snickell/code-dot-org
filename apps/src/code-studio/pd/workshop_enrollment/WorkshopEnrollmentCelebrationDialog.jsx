@@ -22,7 +22,8 @@ export default function WorkshopEnrollmentCelebrationDialog({
   workshopSessionInfo,
   onClose,
 }) {
-  const hasMultipleSessions = workshopSessionInfo.length > 1;
+  const hasMultipleSessions =
+    workshopSessionInfo && workshopSessionInfo.length > 1;
   const [isOpen, setIsOpen] = useState(true);
   const [multipleSessionDialogType, setMultipleSessionDialogType] =
     useState('');
@@ -64,9 +65,9 @@ export default function WorkshopEnrollmentCelebrationDialog({
   };
 
   const getCalendarLink = session => {
-    if (multipleSessionDialogType === 'google') {
+    if (multipleSessionDialogType === 'Google') {
       return buildGoogleCalendarLink(session);
-    } else if (multipleSessionDialogType === 'outlook') {
+    } else if (multipleSessionDialogType === 'Outlook') {
       return buildOutlookCalendarLink(session);
     }
   };
@@ -108,10 +109,14 @@ export default function WorkshopEnrollmentCelebrationDialog({
                   <td>
                     <LinkButton
                       text={i18n.enrollmentCelebrationAddToCalendarButton()}
+                      ariaLabel={i18n.addToCalendarType({
+                        calendar_type: multipleSessionDialogType,
+                      })}
                       type={'secondary'}
                       color={'black'}
                       iconLeft={{iconName: 'fa-solid fa-plus'}}
                       className={style.addSessionToCalendarButton}
+                      target="_blank"
                       href={getCalendarLink(session)}
                     />
                   </td>
@@ -155,63 +160,77 @@ export default function WorkshopEnrollmentCelebrationDialog({
               <BodyTwoText>
                 {i18n.enrollmentCelebrationBody({workshopName: workshopTitle})}
               </BodyTwoText>
-              <div className={style.calendarButtonContainer}>
-                <Typography
-                  semanticTag={'h3'}
-                  visualAppearance={'overline-two'}
-                >
-                  {i18n.addToYourCalendar()}
-                </Typography>
-                <div className={style.calendarButtons}>
-                  {hasMultipleSessions ? (
-                    <>
-                      <Button
-                        text={'Google'}
-                        type={'secondary'}
-                        color={'black'}
-                        iconLeft={{
-                          iconName: 'brands fa-google',
-                          iconStyle: 'light',
-                        }}
-                        onClick={() => setMultipleSessionDialogType('google')}
-                      />
-                      <Button
-                        text={'Outlook'}
-                        type={'secondary'}
-                        color={'black'}
-                        iconLeft={{
-                          iconName: 'brands fa-microsoft',
-                          iconStyle: 'light',
-                        }}
-                        onClick={() => setMultipleSessionDialogType('outlook')}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <LinkButton
-                        text={'Google'}
-                        type={'secondary'}
-                        color={'black'}
-                        iconLeft={{
-                          iconName: 'brands fa-google',
-                          iconStyle: 'light',
-                        }}
-                        href={buildGoogleCalendarLink(workshopSessionInfo[0])}
-                      />
-                      <LinkButton
-                        text={'Outlook'}
-                        type={'secondary'}
-                        color={'black'}
-                        iconLeft={{
-                          iconName: 'brands fa-microsoft',
-                          iconStyle: 'light',
-                        }}
-                        href={buildOutlookCalendarLink(workshopSessionInfo[0])}
-                      />
-                    </>
-                  )}
+              {workshopSessionInfo && (
+                <div className={style.calendarButtonContainer}>
+                  <Typography
+                    semanticTag={'h3'}
+                    visualAppearance={'overline-two'}
+                  >
+                    {i18n.addToYourCalendar()}
+                  </Typography>
+                  <div className={style.calendarButtons}>
+                    {hasMultipleSessions ? (
+                      <>
+                        <Button
+                          text={'Google'}
+                          type={'secondary'}
+                          color={'black'}
+                          iconLeft={{
+                            iconName: 'brands fa-google',
+                            iconStyle: 'light',
+                          }}
+                          onClick={() => setMultipleSessionDialogType('Google')}
+                        />
+                        <Button
+                          text={'Outlook'}
+                          type={'secondary'}
+                          color={'black'}
+                          iconLeft={{
+                            iconName: 'brands fa-microsoft',
+                            iconStyle: 'light',
+                          }}
+                          onClick={() =>
+                            setMultipleSessionDialogType('Outlook')
+                          }
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <LinkButton
+                          text={'Google'}
+                          ariaLabel={i18n.addToCalendarType({
+                            calendar_type: 'Google',
+                          })}
+                          type={'secondary'}
+                          color={'black'}
+                          iconLeft={{
+                            iconName: 'brands fa-google',
+                            iconStyle: 'light',
+                          }}
+                          target="_blank"
+                          href={buildGoogleCalendarLink(workshopSessionInfo[0])}
+                        />
+                        <LinkButton
+                          text={'Outlook'}
+                          ariaLabel={i18n.addToCalendarType({
+                            calendar_type: 'Outlook',
+                          })}
+                          type={'secondary'}
+                          color={'black'}
+                          iconLeft={{
+                            iconName: 'brands fa-microsoft',
+                            iconStyle: 'light',
+                          }}
+                          target="_blank"
+                          href={buildOutlookCalendarLink(
+                            workshopSessionInfo[0]
+                          )}
+                        />
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             <Button
               onClick={onCloseCelebrationDialog}
