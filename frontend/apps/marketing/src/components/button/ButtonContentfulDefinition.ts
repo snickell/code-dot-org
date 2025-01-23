@@ -15,9 +15,7 @@ export const ButtonContentfulComponentDefinition: ComponentDefinition = {
         in: [
           {value: 'purple', displayName: 'Purple'},
           {value: 'black', displayName: 'Black'},
-          // {value: 'gray', displayName: 'Gray'},
           {value: 'white', displayName: 'White'},
-          // {value: 'destructive', displayName: 'Destructive'},
         ],
       },
     },
@@ -28,10 +26,7 @@ export const ButtonContentfulComponentDefinition: ComponentDefinition = {
       group: 'style',
       validations: {
         in: [
-          // {value: 'xs', displayName: 'Extra Small'},
-          // {value: 's', displayName: 'Small'},
           {value: 'm', displayName: 'Medium'},
-          // {value: 'l', displayName: 'Large'},
         ],
       },
     },
@@ -73,23 +68,6 @@ export const ButtonContentfulComponentDefinition: ComponentDefinition = {
         title: {type: 'Text', displayName: 'Title'},
       },
     },
-    icon: {
-      displayName: 'Single Icon (Icon Only)',
-      type: 'Object',
-      group: 'content',
-      fields: {
-        iconName: {type: 'Text', displayName: 'Icon Name'},
-        iconStyle: {type: 'Text', displayName: 'Icon Style'},
-        title: {type: 'Text', displayName: 'Title'},
-      },
-      visibility: 'isIconOnly',
-    },
-    //  isIconOnly: {
-    //   displayName: 'Icon Only',
-    //   type: 'Boolean',
-    //   defaultValue: false,
-    //   group: 'behavior',
-    // },
     useAsLink: {
       displayName: 'Use as Link',
       type: 'Boolean',
@@ -115,18 +93,6 @@ export const ButtonContentfulComponentDefinition: ComponentDefinition = {
       type: 'Text',
       group: 'behavior',
       visibility: 'useAsLink',
-    },
-    buttonTagTypeAttribute: {
-      displayName: 'Button Type Attribute',
-      type: 'Text',
-      defaultValue: 'button',
-      group: 'behavior',
-      validations: {
-        in: [
-          {value: 'button', displayName: 'Button'},
-          {value: 'submit', displayName: 'Submit'},
-        ],
-      },
     },
     disabled: {
       displayName: 'Disabled',
@@ -166,11 +132,5 @@ export const ButtonContentfulComponentDefinition: ComponentDefinition = {
       type: 'Text',
       group: 'style',
     },
-    // onClick: {
-    //   displayName: 'On Click Handler',
-    //   defaultValue: 'http://google.com',
-    //   type: 'Text',
-    //   group: 'behavior',
-    // },
   },
 };

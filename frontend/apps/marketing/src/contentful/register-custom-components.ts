@@ -3,7 +3,7 @@
  *
  * Note: This file must be imported both server-side and client-side to ensure Contentful is able to map on both rendering modes.
  */
-import Button, { ButtonContentfulComponentDefinition} from "@/components/button";
+import Button, {ButtonContentfulComponentDefinition} from '@/components/button';
 import Divider, {
   DividerContentfulComponentDefinition,
 } from '@/components/divider';
@@ -14,9 +14,7 @@ import {
 
 defineComponents(
   [
-    {component: Button,
-    definition: ButtonContentfulComponentDefinition,
-    },
+    {component: Button, definition: ButtonContentfulComponentDefinition},
     {
       component: Divider,
       definition: DividerContentfulComponentDefinition,
