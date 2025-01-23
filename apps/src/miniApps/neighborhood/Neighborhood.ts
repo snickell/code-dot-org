@@ -1,10 +1,10 @@
 import {tiles, MazeController} from '@code-dot-org/maze';
 
-import javalabMsg from '@cdo/apps/javalab/locale';
 import {LevelProperties} from '@cdo/apps/lab2/types';
 import * as timeoutList from '@cdo/apps/lib/util/timeoutList';
 import {LOOK_ID, SVG_ID} from '@cdo/apps/maze/constants';
 import Slider from '@cdo/apps/slider';
+import commonI18n from '@cdo/locale';
 
 import {NeighborhoodSignalType} from './constants';
 import {NeighborhoodSignal} from './types';
@@ -113,9 +113,7 @@ export default class Neighborhood {
     if (!this.seenFirstSignal) {
       this.seenFirstSignal = true;
       this.onOutputMessage(
-        // TODO: Replace javalabMsg.startingPainter() with loc string from common locale
-        // (once translation is available) since javalab locale is not loaded for pythonlab.
-        `${this.statusMessagePrefix} ${javalabMsg.startingPainter()}`
+        `${this.statusMessagePrefix} ${commonI18n.startingPainter()}`
       );
       this.onNewlineMessage();
     }
