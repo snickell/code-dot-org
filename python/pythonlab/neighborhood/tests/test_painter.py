@@ -33,11 +33,20 @@ def test_get_initialization_message():
   initialization_message = painter4._get_initialization_message(0,0,'east',0)
   assert initialization_message == '[PAINTER] INITIALIZE_PAINTER {"id": "painter-4", "direction": "east", "x": 0, "y": 0, "paint": 0}'
 
+def test_is_facing_directions():
+  painter = Painter(0, 0, "north")
+  assert painter.is_facing_north() is True
+  assert painter.is_facing_east() is False
+  assert painter.is_facing_south() is False
+  assert painter.is_facing_west() is False
+  painter.turn_left()
+  assert painter.is_facing_west() is True
+
 def test_turn_left():
   painter = Painter()
-  assert painter.direction.value == 'east'
+  assert painter.is_facing_east() is True
   painter.turn_left()
-  assert painter.direction.value == 'north'
+  assert painter.is_facing_north() is True
 
 def test_move():
   world2 = World()
@@ -64,15 +73,6 @@ def test_move():
   assert painter.get_x() == 0
   assert painter.get_y() == 0
 
-def test_is_facing_directions():
-  painter = Painter(0, 0, "north")
-  assert painter.is_facing_north() is True
-  assert painter.is_facing_east() is False
-  assert painter.is_facing_south() is False
-  assert painter.is_facing_west() is False
-  painter.turn_left()
-  assert painter.is_facing_west() is True
-
 def test_has_paint():
   painter = Painter(paint=3)
   assert painter.has_paint() is True
@@ -95,19 +95,24 @@ def test_bucket():
   painter.take_paint()
   assert painter.is_on_bucket() is False
 
-def test_has_paint_scrape_paint():
+def test_scrape_paint():
   painter = Painter()
-  assert painter.has_paint() is False
-  painter.paint('Red')
   assert painter.is_on_paint() is False
+  assert painter.has_paint() is False
   painter.set_paint(3)
+  assert painter.has_paint() is True
   painter.paint('Red')
   assert painter.is_on_paint() is True
+  painter.scrape_paint()
+  assert painter.is_on_paint() is False
 
 def test_can_move():
   painter = Painter()
+  # Painter is on 0,0 in a 2x2 grid.
   assert painter.can_move("north") is False
   assert painter.can_move("south") is True
   assert painter.can_move("east") is True
   assert painter.can_move("west") is False
   assert painter._is_valid_movement("invalid_direction") is False
+  painter.move() # Now painter is on 1,0.
+  assert painter.can_move("east") is False

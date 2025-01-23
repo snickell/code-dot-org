@@ -7,8 +7,9 @@ from .support.neighborhood_runtime_exception import NeighborhoodRuntimeException
 from .support.exception_key import ExceptionKey
 
 class Painter:
-  last_id = 0
-  large_grid_size = 20
+  LARGE_GRID_SIZE = 20
+  last_id = 0 # Used to assign unique id to Painter instance.
+
   def __init__(self, x=0, y=0, direction='east', paint=0, could_have_infinite_paint=False):
     """
     Initialize the painter with the given x, y, direction, and paint.
@@ -32,7 +33,7 @@ class Painter:
     Painter.last_id += 1
     self.id = f"painter-{Painter.last_id}"
     self._send_initialization_message(x, y, direction, paint)
-    self.has_infinite_paint = self.world.grid.get_size() >= Painter.large_grid_size if could_have_infinite_paint else False
+    self.has_infinite_paint = self.world.grid.get_size() >= Painter.LARGE_GRID_SIZE if could_have_infinite_paint else False
 
   def turn_left(self):
     """
