@@ -31,7 +31,8 @@ function createConfig(format: 'cjs' | 'esm'): Options {
         // CJS mode is utilized by `code-dot-org/apps`, whereas newer applications (such as `marketing`) use ESM mode by default.
         type: format === 'esm' ? 'css' : 'style',
         filter: /\.module\.scss$/,
-        loadPaths: ['@code-dot-org/legacy-css'],
+        loadPaths: ['@code-dot-org/css'],
+        cssImports: true,
         transform: postcssModules({
           generateScopedName: '[name]__[local]___[hash:base64:5]',
         }),
