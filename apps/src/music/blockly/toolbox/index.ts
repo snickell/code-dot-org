@@ -180,9 +180,12 @@ export const toolboxModeCategory = {
  */
 export function addToolboxBlocksToWorkspace(
   contents: GoogleBlockly.utils.toolbox.ToolboxItemInfo[],
-  workspace: GoogleBlockly.WorkspaceSvg
+  workspace: GoogleBlockly.WorkspaceSvg,
+  clearWorkspace: boolean = true
 ) {
-  workspace.clear();
+  if (clearWorkspace) {
+    workspace.clear();
+  }
   contents.forEach(toolboxItem => {
     if (toolboxItem.kind === 'block') {
       // Add toolbox blocks directly to the workspace.
@@ -231,7 +234,8 @@ export function addToolboxBlocksToWorkspace(
       addToolboxBlocksToWorkspace(
         (toolboxItem as GoogleBlockly.utils.toolbox.StaticCategoryInfo)
           .contents,
-        workspace
+        workspace,
+        false
       );
     } else {
       console.warn('Unsupported toolbox item found:', toolboxItem);

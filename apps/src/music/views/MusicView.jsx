@@ -23,6 +23,7 @@ import {setExtraCopyrightContent} from '@cdo/apps/sharedComponents/footer/Copyri
 import {SignInState} from '@cdo/apps/templates/currentUserRedux';
 
 import AppConfig from '../appConfig';
+import {validateBlockCategories} from '../blockly/blockUtils';
 import {TRIGGER_FIELD} from '../blockly/constants';
 import MusicBlocklyWorkspace from '../blockly/MusicBlocklyWorkspace';
 import {
@@ -279,14 +280,13 @@ class UnconnectedMusicView extends React.Component {
       libraryName = DEFAULT_LIBRARY;
     }
 
-    // In block edit modes, we always show the full toolbox for the given block mode.
+    // In start mode, we always show the full toolbox for the given block mode.
     const isStartMode = getAppOptionsEditBlocks() === START_SOURCES;
     const isToolboxMode = getAppOptionsEditBlocks() === TOOLBOX_BLOCKS;
 
     // Music Lab supports two types of toolbox configuration in levels:
     // The toolbox property is a simple list of block types and categories.
-    const toolboxAllowList =
-      isStartMode || isToolboxMode ? undefined : levelData?.toolbox;
+    const toolboxAllowList = isStartMode ? undefined : levelData?.toolbox;
     // The toolboxDefinition property is a full toolbox that Blockly can load.
     const localizedToolboxDefinition =
       levelData?.toolboxDefinition &&
@@ -326,7 +326,7 @@ class UnconnectedMusicView extends React.Component {
 
     // Check if the user has already made changes to the code on the project level.
     let codeChangedOnProjectLevel = false;
-    if (Blockly.isToolboxMode) {
+    if (isToolboxMode) {
       const blockMode = this.props.blockMode;
       const levelData = this.props.levelProperties?.levelData;
       const levelToolbox = levelData?.toolbox;
@@ -484,6 +484,7 @@ class UnconnectedMusicView extends React.Component {
         toolbox.contents,
         this.musicBlocklyWorkspace.workspace
       );
+      validateBlockCategories(this.musicBlocklyWorkspace.workspace);
     } else {
       // Otherwise, use getStartSources which handles levelData and fallback logic.
       this.loadCode(this.getStartSources());
