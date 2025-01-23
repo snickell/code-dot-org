@@ -93,7 +93,9 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
   const validationStateCallout = useAppSelector(
     state => state.lab.validationState.callout
   );
-  const currentPlayheadPosition = getCurrentPlayheadPosition();
+  const currentPlayheadPosition = useAppSelector(
+    state => state.music.currentPlayheadPosition
+  );
   const startingPlayheadPosition = useAppSelector(
     state => state.music.startingPlayheadPosition
   );
