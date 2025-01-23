@@ -122,11 +122,7 @@ const TeacherUnitOverview: React.FC<TeacherUnitOverviewProps> = () => {
       courseId={selectedSection.courseId}
       courseOfferingId={selectedSection.courseOfferingId}
       courseVersionId={selectedSection.courseVersionId}
-      isSingleUnitCourse={
-        selectedSection.course
-          ? selectedSection.course.isSingleUnitCourse
-          : false
-      }
+      isSingleUnitCourse={selectedSection.isAssignedSingleUnitCourse}
       courseTitle={unitSummaryResponse.unitData.course_title}
       courseLink={
         unitSummaryResponse.unitData.course_name

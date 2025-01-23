@@ -148,11 +148,11 @@ export const sectionFromServerSection = serverSection => ({
   id: serverSection.id,
   name: serverSection.name,
   courseVersionName: serverSection.courseVersionName,
-  unitName:
-    serverSection.course && serverSection.course.is_single_unit_course
-      ? serverSection.script.name
-      : serverSection.unitName,
+  unitName: serverSection.is_assigned_single_unit_course
+    ? serverSection.script.name
+    : serverSection.unitName,
   isAssignedStandaloneCourse: serverSection.isAssignedStandaloneCourse,
+  isAssignedSingleUnitCourse: serverSection.is_assigned_single_unit_course,
   createdAt: serverSection.createdAt,
   loginType: serverSection.login_type,
   loginTypeName: serverSection.login_type_name,
@@ -172,15 +172,13 @@ export const sectionFromServerSection = serverSection => ({
         courseOfferingId: serverSection.course.course_offering_id,
         versionId: serverSection.course.version_id,
         unitId: serverSection.course.unit_id,
-        isSingleUnitCourse: serverSection.course.is_single_unit_course,
         lessonExtrasAvailable: serverSection.course.lesson_extras_available,
         textToSpeechEnabled: serverSection.course.text_to_speech_enabled,
       }
     : null,
-  unitId:
-    serverSection.course && serverSection.course.is_single_unit_course
-      ? serverSection.script.id
-      : serverSection.unit_id,
+  unitId: serverSection.is_assigned_single_unit_course
+    ? serverSection.script.id
+    : serverSection.unit_id,
   courseId: serverSection.course_id,
   hidden: serverSection.hidden,
   restrictSection: serverSection.restrict_section,
