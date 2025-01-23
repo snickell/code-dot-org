@@ -792,7 +792,8 @@ module SharedConstants
     BIOMISTRAL: "gen-ai-biomistral-7b",
     MISTRAL: "gen-ai-mistral-7b-inst-v01",
     KAREN: "gen-ai-karen-creative-mistral-7b",
-    PIRATE: "gen-ai-mistral-pirate-7b"
+    PIRATE: "gen-ai-mistral-pirate-7b",
+    CHATGPT: "gpt-4o-mini",
   }
 
   AICHAT_METRICS_NAMESPACE = 'GenAICurriculum'.freeze
