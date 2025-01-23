@@ -331,6 +331,15 @@ export function bindBrowserEvent(
 export function isWorkspaceReadOnly() {
   return false; // TODO - used for feedback
 }
+
+/**
+ * Used only to test Google Blockly's new keyboard nav experiment
+ * @returns {boolean} True if the current lab is the music keyboard experiment, false otherwise
+ */
+export function isMusicKeyboardExperiment() {
+  return true;
+}
+
 /**
  * Checks if any block type's usage count exceeds its defined limit and returns
  * the type of the first block found to exceed.
