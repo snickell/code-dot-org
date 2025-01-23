@@ -772,7 +772,6 @@ class UnconnectedMusicView extends React.Component {
           undo={this.undo}
           redo={this.redo}
           clearCode={this.clearCode}
-          stopSong={this.stopSong}
           validator={this.musicValidator}
           player={this.player}
           allowPackSelection={

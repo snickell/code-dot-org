@@ -49,7 +49,6 @@ interface MusicLabViewProps {
   undo: () => void;
   redo: () => void;
   clearCode: () => void;
-  stopSong: () => void;
   validator: MusicValidator;
   player: MusicPlayer;
   allowPackSelection: boolean;
@@ -67,7 +66,6 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
   undo,
   redo,
   clearCode,
-  stopSong,
   validator,
   player,
   allowPackSelection,
@@ -188,15 +186,15 @@ const MusicLabView: React.FunctionComponent<MusicLabViewProps> = ({
     const extraMeasures = blocklyWorkspace.hasAnyTriggers() ? 4 : 1;
 
     if (currentPlayheadPosition >= stopMeasure + extraMeasures) {
-      stopSong();
+      setPlaying(false);
     }
   }, [
     blocklyWorkspace,
     currentPlayheadPosition,
     isPlaying,
     lastMeasure,
+    setPlaying,
     startingPlayheadPosition,
-    stopSong,
   ]);
 
   const resetValidation = useCallback(
