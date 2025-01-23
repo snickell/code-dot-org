@@ -277,7 +277,7 @@ gem 'rest-client', '~> 2.0.1'
 gem 'unf_ext', '0.0.7.4'
 
 # Generate SSL certificates.
-gem 'acmesmith', '~> 2.3.1'
+gem 'acmesmith', '~> 2.6.1'
 
 gem 'addressable'
 # bcrypt version specified due to "Invalid Hash" error in Linux

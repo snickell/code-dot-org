@@ -84,11 +84,12 @@ GEM
   specs:
     Ascii85 (1.1.0)
     abbrev (0.1.2)
-    acme-client (2.0.11)
+    acme-client (2.0.19)
+      base64 (~> 0.2.0)
       faraday (>= 1.0, < 3.0.0)
-      faraday-retry (~> 1.0)
-    acmesmith (2.3.1)
-      acme-client (~> 2)
+      faraday-retry (>= 1.0, < 3.0.0)
+    acmesmith (2.6.1)
+      acme-client (>= 2.0.7, < 3)
       aws-sdk-acm
       aws-sdk-route53
       aws-sdk-s3
@@ -943,7 +944,7 @@ PLATFORMS
 
 DEPENDENCIES
   abbrev
-  acmesmith (~> 2.3.1)
+  acmesmith (~> 2.6.1)
   active_model_serializers (~> 0.10.13)
   active_record_query_trace
   active_record_union
