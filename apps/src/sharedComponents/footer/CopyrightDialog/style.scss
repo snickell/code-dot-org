@@ -1,7 +1,7 @@
 @import 'font';
 @import 'color';
-@import "@code-dot-org/component-library/dist/styles/typography.module";
-@import "@code-dot-org/component-library/dist/styles/mixins";
+@import "~@code-dot-org/css/typography.module";
+@import "~@code-dot-org/css/mixins";
 
 #copyright-modal {
     display: flex;
