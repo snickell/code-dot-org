@@ -119,7 +119,8 @@ Feature: Professional Learning landing page
     And the href of selector "a:contains(Start professional learning courses)" contains "/educate/professional-development-online"
 
     # Starts a self-paced PL course
-    And I start a self-paced PL course
+    When I start a self-paced PL course
+    Then I am on "http://studio.code.org/my-professional-learning"
 
     # Sees Self-Paced Professional Learning Courses table
     And I wait until element "a:contains(Continue course)" is visible
