@@ -18,7 +18,6 @@
   "sideEffects": false,
   "exports": {
     "./package.json": "./package.json",
-    "./dist/styles/*": "./dist/styles/*",
     "./alert": {
       "types": {
         "import": "./dist/esm/alert/index.d.mts",
