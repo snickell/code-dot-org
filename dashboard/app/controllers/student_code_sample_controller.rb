@@ -1,8 +1,22 @@
-class StudentCodeSamplesController < ApplicationController
+class StudentCodeSampleController < ApplicationController
   def fetch_student_code_samples
+    return head :forbidden unless current_user&.can_use_ai_iteration_tools?
+
     level_id = params[:level_id]
     script_id = params[:script_id]
     num_samples = params[:num_samples].to_i
+
+    begin
+      Level.find(level_id)
+    rescue ActiveRecord::RecordNotFound
+      return render status: :not_found, json: "Level with id #{level_id}"
+    end
+
+    begin
+      Unit.find(script_id)
+    rescue ActiveRecord::RecordNotFound
+      return render status: :not_found, json: "Script with id #{script_id}"
+    end
 
     s3 = Aws::S3::Client.new
     bucket = CDO.sources_s3_bucket
