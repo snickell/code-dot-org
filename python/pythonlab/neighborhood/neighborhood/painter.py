@@ -8,6 +8,7 @@ from .support.exception_key import ExceptionKey
 
 class Painter:
   last_id = 0
+  large_grid_size = 20
   def __init__(self, x=0, y=0, direction='east', paint=0, could_have_infinite_paint=False):
     """
     Initialize the painter with the given x, y, direction, and paint.
