@@ -15,6 +15,8 @@ import HttpClient from '@cdo/apps/util/HttpClient';
 import {useAppDispatch, useAppSelector} from '@cdo/apps/util/reduxHooks';
 import i18n from '@cdo/locale';
 
+import UnitSelectorV2 from '../UnitSelectorV2';
+
 import {CalendarEmptyState} from './CalendarEmptyState';
 
 import styles from './teacher-navigation.module.scss';
@@ -132,6 +134,10 @@ const UnitCalendar: React.FC = () => {
       <div className={styles.calendarContentContainer}>
         {!isLoading && hasCalendar && (
           <div>
+            <UnitSelectorV2
+              className={styles.titleUnitSelectorDropdown}
+              filterToSelectedCourse={true}
+            />
             <div className={styles.minutesPerWeekWrapper}>
               <div className={styles.minutesPerWeekDescription}>
                 {i18n.instructionalMinutesPerWeek()}
