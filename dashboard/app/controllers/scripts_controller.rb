@@ -78,7 +78,7 @@ class ScriptsController < ApplicationController
     end
 
     # Check to see if this unit is part of a single-unit course
-    is_single_unit_course = UnitGroup.find(@script.unit_group&.id).default_units.one?
+    is_single_unit_course = @script.unit_group && UnitGroup.find(@script.unit_group&.id).single_unit_course?
 
     additional_script_data = {
       course_name: @script.unit_group&.name,
