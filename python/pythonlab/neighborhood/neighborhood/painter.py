@@ -55,10 +55,10 @@ class Painter:
         self.x+=1
       else:
         self.x-=1
+      self._send_signal(NeighborhoodSignalKey.MOVE, {'direction': self.direction.value})
     else:
       raise NeighborhoodRuntimeException(ExceptionKey.INVALID_MOVE)
-    self._send_signal(NeighborhoodSignalKey.MOVE, {'direction': self.direction.value})
-
+    
   def paint(self, color):
     """
     Paint the square the painter is on with the given color.
@@ -71,7 +71,7 @@ class Painter:
       self.remaining_paint-=1
       self._send_signal(NeighborhoodSignalKey.PAINT, {'color': color})
     else:
-      print("There is no more paint in the painter's bucket")
+      print("There is no more paint in the painter's bucket.")
 
   def scrape_paint(self):
     """
@@ -104,7 +104,7 @@ class Painter:
       self.remaining_paint+=1
       self._send_signal(NeighborhoodSignalKey.TAKE_PAINT)
     else:
-      print("There is no paint to collect here")
+      print("There is no paint to collect here.")
 
   def show_buckets(self):
     """
