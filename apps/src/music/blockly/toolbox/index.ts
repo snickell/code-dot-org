@@ -185,18 +185,16 @@ export function addToolboxBlocksToWorkspace(
   workspace.clear();
   contents.forEach(toolboxItem => {
     if (toolboxItem.kind === 'block') {
-      // Add blocks directly to the workspace.
+      // Add toolbox blocks directly to the workspace.
       Blockly.serialization.blocks.append(
         toolboxItem as GoogleBlockly.serialization.blocks.State,
         workspace
       );
     } else if (toolboxItem.kind === 'category' && 'custom' in toolboxItem) {
-      // For categories with a custom value ('PROCEDURES' or 'VARIABLES'),
-      // get the category name.
+      // For dynamic categories, create a custom category block..
       const dynamicCategoryName = (
         toolboxItem as GoogleBlockly.utils.toolbox.DynamicCategoryInfo
       ).custom;
-      // Create a category block
       Blockly.serialization.blocks.append(
         {
           type: BlockTypes.CUSTOM_CATEGORY,
@@ -209,7 +207,7 @@ export function addToolboxBlocksToWorkspace(
     } else if (toolboxItem.kind === 'category') {
       const categoryInfo =
         toolboxItem as GoogleBlockly.utils.toolbox.StaticCategoryInfo;
-      // For a localized category, like "Sounds", get the category name, like "Play".
+      // For a localized category, like "Sounds", get the category type, like "Play".
       const categoryName =
         localizedNameToCategoryType[categoryInfo.name] ||
         (categoryInfo.name as Category);
