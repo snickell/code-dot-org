@@ -3,7 +3,12 @@ import {postcssModules, sassPlugin} from 'esbuild-sass-plugin';
 import type {Options} from 'tsup';
 import {glob} from 'glob';
 
-const entryPoints = glob.sync('./src/**/index.ts', {
+const entryPointGlobPatterns = [
+  './src/**/index.ts',
+  './src/common/**/index.ts',
+];
+
+const entryPoints = glob.sync(entryPointGlobPatterns[0], {
   posix: true,
   ignore: './src/common/index.ts',
 });
