@@ -442,7 +442,7 @@ Resources:
               - 'cloudformation:DescribeChangeSet'
               - 'cloudformation:DeleteChangeSet'
               - 'cloudformation:ExecuteChangeSet'
-            Resource: !Ref AWS::StackId
+            Resource: !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AWS::StackName}/*"
           - Effect: Allow
             Action:
               - 'iam:GetRole'
