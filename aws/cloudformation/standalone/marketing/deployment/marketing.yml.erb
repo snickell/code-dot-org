@@ -19,15 +19,15 @@ Resources:
   RootHostedZone:
     Type: AWS::Route53::HostedZone
     Properties:
-      Name: cfn-marketing.dev-code.org.
+      Name: marketing.dev-code.org.
 
   # TLS Cert for the ECS ALB
   TLSCertificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
-      DomainName: dev.cfn-marketing.dev-code.org
+      DomainName: dev.marketing.dev-code.org
       DomainValidationOptions:
-        - DomainName: dev.cfn-marketing.dev-code.org
+        - DomainName: dev.marketing.dev-code.org
           HostedZoneId:
             Ref: RootHostedZone
       ValidationMethod: DNS
@@ -267,7 +267,7 @@ Resources:
             - CanonicalHostedZoneID
       HostedZoneId:
         Ref: RootHostedZone
-      Name: dev.cfn-marketing.dev-code.org.
+      Name: dev.marketing.dev-code.org.
       Type: A
 
   FargateServiceTaskDefTaskRole:
@@ -425,21 +425,52 @@ Resources:
     Properties:
       UserName: marketing-github-deployer-development-cfn
 
-  # MarketingGithubDeployerUserPolicy:
-  #   Type: AWS::IAM::Policy
-  #   Properties:
-  #     PolicyDocument:
-  #       Statement:
-  #         - Action: sts:AssumeRole
-  #           Effect: Allow
-  #           Resource:
-  #             - arn:aws:iam::165336972514:role/cdk-hnb659fds-deploy-role-165336972514-us-west-2
-  #             - arn:aws:iam::165336972514:role/cdk-hnb659fds-file-publishing-role-165336972514-us-west-2
-  #             - arn:aws:iam::165336972514:role/cdk-hnb659fds-lookup-role-165336972514-us-west-2
-  #       Version: "2012-10-17"
-  #     PolicyName: MarketingGithubDeployerUserIamUserPolicy
-  #     Users:
-  #       - Ref: MarketingGithubDeployerUser
+  MarketingGithubDeployerUserPolicy:
+    Type: 'AWS::IAM::Policy'
+    Version: '2012-10-17'
+    PolicyName: MarketingGithubDeployerUserIamUserPolicy
+    Users:
+      - Ref: MarketingGithubDeployerUser
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'cloudformation:CreateStack'
+              - 'cloudformation:DescribeStacks'
+              - 'cloudformation:CreateChangeSet'
+              - 'cloudformation:DescribeChangeSet'
+              - 'cloudformation:DeleteChangeSet'
+              - 'cloudformation:ExecuteChangeSet'
+            Resource: 'AWS::StackId'
+          - Effect: Allow
+            Action:
+              - 'iam:GetRole'
+              - 'iam:PassRole'
+            Resource: !Ref FargateServiceTaskDefExecutionRole.Arn
+          - Effect: Allow
+            Action:
+              - 'iam:GetRole'
+              - 'iam:PassRole'
+            Resource: !Ref FargateServiceTaskDefTaskRole.Arn
+          - Effect: Allow
+            Action:
+              - 'ecs:RegisterTaskDefinition'
+            Resource: !Ref FargateServiceTaskDef.Arn
+          - Effect: Allow
+            Action:
+              - 'ecs:DeregisterTaskDefinition'
+              - 'elasticloadbalancing:DescribeLoadBalancers'
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - 'ec2:DescribeSecurityGroups'
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - 'ecs:DescribeServices'
+              - 'ecs:UpdateService'
+            Resource: !Ref FargateService.Arn
 
   MarketingGithubDeployerAccessKey:
     Type: AWS::IAM::AccessKey
@@ -462,11 +493,6 @@ Resources:
             - '"}'
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
-
-Parameters:
-  ContainerImageHash:
-    Type: String
-    Description: The sha256sum of the marketing container image.
 
 Outputs:
   FargateServiceLoadBalancerDNS:
