@@ -3,14 +3,12 @@ module OpenaiChatHelper
   OPENAI_CHAT_COMPLETION_API_KEY = CDO.openai_chat_completion_api_key
   TEMPERATURE = 0
   OPENAI_AICHAT_SAFETY_API_KEY = CDO.openai_aichat_safety_api_key
-  # need separate key?
 
   # We should always specify a version for the LLM so the results don't unexpectedly change.
   GPT_MODEL = SharedConstants::AI_TUTOR_CHAT_MODEL_VERISON
-  AICHAT_SAFETY_GPT_MODEL = SharedConstants::AICHAT_SAFETY_MODEL_VERSION
+  AICHAT_GPT_MODEL = SharedConstants::AICHAT_MODEL_VERSION
 
-  # set this up to take temperature as an argument
-  def self.request_chat_completion(messages, temperature = TEMPERATURE)
+  def self.request_chat_completion(messages, temperature = TEMPERATURE, model = GPT_MODEL)
     # Set up the API endpoint URL and request headers
     headers = {
       "Content-Type" => "application/json",
@@ -19,12 +17,11 @@ module OpenaiChatHelper
     headers["OpenAI-Organization"] = CDO.openai_chat_completion_org_id if CDO.openai_chat_completion_org_id
 
     data = {
-      model: AICHAT_SAFETY_GPT_MODEL,
+      model: model,
       temperature: temperature,
       messages: messages
     }
 
-    # puts messages[1][:content]
     response = HTTParty.post(
       OPEN_AI_URL,
       headers: headers,
@@ -54,7 +51,7 @@ module OpenaiChatHelper
       }
     ]
     data = {
-      model: AICHAT_SAFETY_GPT_MODEL,
+      model: AICHAT_GPT_MODEL,
       messages: messages
     }
 

@@ -65,9 +65,6 @@ class AichatRequestChatCompletionJob < ApplicationJob
     # Make the request.
     begin
       if model_customizations['selectedModelId'] == 'gpt-4o-mini'
-        puts 'here'
-
-        # add level system prompt?
         level_system_prompt = Level.find_by(id: level_id)&.properties&.dig('aichat_settings', 'levelSystemPrompt') || ""
 
         instructions = ""
@@ -83,7 +80,11 @@ class AichatRequestChatCompletionJob < ApplicationJob
           *stored_messages.map {|message| {role: message['role'], content: message['chatMessageText']}},
           {role: 'user', content: new_message['chatMessageText']}
         ]
-        response_obj = OpenaiChatHelper.request_chat_completion(messages, model_customizations['temperature'])
+        response_obj = OpenaiChatHelper.request_chat_completion(
+          messages,
+          model_customizations['temperature'],
+          SharedConstants::AICHAT_MODEL_VERSION
+        )
         response = JSON.parse(response_obj)['choices'][0]['message']['content']
       else
         response = AichatSagemakerHelper.get_sagemaker_assistant_response(model_customizations, stored_messages, new_message, level_id)
