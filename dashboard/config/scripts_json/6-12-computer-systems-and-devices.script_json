@@ -8,7 +8,7 @@
     },
     "new_name": null,
     "family_name": null,
-    "serialized_at": "2025-01-22 19:00:20 UTC",
+    "serialized_at": "2025-01-24 05:20:59 UTC",
     "published_state": null,
     "instruction_type": null,
     "instructor_audience": null,
@@ -352,6 +352,18 @@
         "lesson_group.key": "",
         "script.name": "6-12-computer-systems-and-devices"
       }
+    },
+    {
+      "key": "905e909b-d690-46c4-a6d0-cfa5d47b2603",
+      "position": 1,
+      "properties": {
+      },
+      "seeding_key": {
+        "lesson_activity.key": "905e909b-d690-46c4-a6d0-cfa5d47b2603",
+        "lesson.key": "lesson-9",
+        "lesson_group.key": "",
+        "script.name": "6-12-computer-systems-and-devices"
+      }
     }
   ],
   "activity_sections": [
@@ -410,9 +422,21 @@
       "key": "777637da-e8cd-4024-86ef-27edee0c8793",
       "position": 1,
       "properties": {
+        "progression_name": "Troubleshooting"
       },
       "seeding_key": {
         "activity_section.key": "777637da-e8cd-4024-86ef-27edee0c8793",
+        "lesson_activity.key": "048190f6-ec9d-4b8f-b944-4f418d5a02f9"
+      }
+    },
+    {
+      "key": "a31c7d01-d1b8-4379-8304-17fc415c775f",
+      "position": 2,
+      "properties": {
+        "progression_name": "Optimization"
+      },
+      "seeding_key": {
+        "activity_section.key": "a31c7d01-d1b8-4379-8304-17fc415c775f",
         "lesson_activity.key": "048190f6-ec9d-4b8f-b944-4f418d5a02f9"
       }
     },
@@ -457,6 +481,30 @@
       "seeding_key": {
         "activity_section.key": "6e8802f4-774a-4bfb-91e4-7b823c6400b5",
         "lesson_activity.key": "524068f8-8d5d-4999-8c2c-65c26a24e15b"
+      }
+    },
+    {
+      "key": "8ca95fe0-5ade-463a-8378-218521a9dbca",
+      "position": 1,
+      "properties": {
+        "name": "Processing Library Data",
+        "progression_name": "Processing Library Data"
+      },
+      "seeding_key": {
+        "activity_section.key": "8ca95fe0-5ade-463a-8378-218521a9dbca",
+        "lesson_activity.key": "905e909b-d690-46c4-a6d0-cfa5d47b2603"
+      }
+    },
+    {
+      "key": "33a267d4-6962-4a5a-a6ff-1541977065ea",
+      "position": 2,
+      "properties": {
+        "name": "Reflection",
+        "progression_name": "Reflection"
+      },
+      "seeding_key": {
+        "activity_section.key": "33a267d4-6962-4a5a-a6ff-1541977065ea",
+        "lesson_activity.key": "905e909b-d690-46c4-a6d0-cfa5d47b2603"
       }
     }
   ],
@@ -540,6 +588,72 @@
       "activity_section_position": 1,
       "assessment": false,
       "properties": {
+        "progression": "Troubleshooting"
+      },
+      "bonus": false,
+      "seeding_key": {
+        "script_level.level_keys": [
+          "test-computer-systems-lesson6-level1"
+        ],
+        "lesson.key": "lesson-6",
+        "lesson_group.key": "",
+        "script.name": "6-12-computer-systems-and-devices",
+        "activity_section.key": "777637da-e8cd-4024-86ef-27edee0c8793"
+      },
+      "level_keys": [
+        "test-computer-systems-lesson6-level1"
+      ]
+    },
+    {
+      "chapter": 5,
+      "position": 2,
+      "activity_section_position": 2,
+      "assessment": false,
+      "properties": {
+        "progression": "Troubleshooting"
+      },
+      "bonus": false,
+      "seeding_key": {
+        "script_level.level_keys": [
+          "test-computer-systems-and-devices-lesson6-level2"
+        ],
+        "lesson.key": "lesson-6",
+        "lesson_group.key": "",
+        "script.name": "6-12-computer-systems-and-devices",
+        "activity_section.key": "777637da-e8cd-4024-86ef-27edee0c8793"
+      },
+      "level_keys": [
+        "test-computer-systems-and-devices-lesson6-level2"
+      ]
+    },
+    {
+      "chapter": 6,
+      "position": 3,
+      "activity_section_position": 1,
+      "assessment": false,
+      "properties": {
+        "progression": "Optimization"
+      },
+      "bonus": false,
+      "seeding_key": {
+        "script_level.level_keys": [
+          "test-computer-systems-and-devices-lesson6-level3"
+        ],
+        "lesson.key": "lesson-6",
+        "lesson_group.key": "",
+        "script.name": "6-12-computer-systems-and-devices",
+        "activity_section.key": "a31c7d01-d1b8-4379-8304-17fc415c775f"
+      },
+      "level_keys": [
+        "test-computer-systems-and-devices-lesson6-level3"
+      ]
+    },
+    {
+      "chapter": 7,
+      "position": 1,
+      "activity_section_position": 1,
+      "assessment": false,
+      "properties": {
         "level_keys": [
           "test-computing-systems-lesson7-level1"
         ],
@@ -560,7 +674,7 @@
       ]
     },
     {
-      "chapter": 5,
+      "chapter": 8,
       "position": 2,
       "activity_section_position": 1,
       "assessment": false,
@@ -585,7 +699,7 @@
       ]
     },
     {
-      "chapter": 6,
+      "chapter": 9,
       "position": 3,
       "activity_section_position": 1,
       "assessment": false,
@@ -607,6 +721,94 @@
       },
       "level_keys": [
         "test-computing-systems-lesson7-level3"
+      ]
+    },
+    {
+      "chapter": 10,
+      "position": 1,
+      "activity_section_position": 1,
+      "assessment": false,
+      "properties": {
+        "progression": "Processing Library Data"
+      },
+      "bonus": false,
+      "seeding_key": {
+        "script_level.level_keys": [
+          "computing-systems-lesson9-level1"
+        ],
+        "lesson.key": "lesson-9",
+        "lesson_group.key": "",
+        "script.name": "6-12-computer-systems-and-devices",
+        "activity_section.key": "8ca95fe0-5ade-463a-8378-218521a9dbca"
+      },
+      "level_keys": [
+        "computing-systems-lesson9-level1"
+      ]
+    },
+    {
+      "chapter": 11,
+      "position": 2,
+      "activity_section_position": 1,
+      "assessment": false,
+      "properties": {
+        "progression": "Reflection"
+      },
+      "bonus": false,
+      "seeding_key": {
+        "script_level.level_keys": [
+          "computing-systems-lesson9-reflection1"
+        ],
+        "lesson.key": "lesson-9",
+        "lesson_group.key": "",
+        "script.name": "6-12-computer-systems-and-devices",
+        "activity_section.key": "33a267d4-6962-4a5a-a6ff-1541977065ea"
+      },
+      "level_keys": [
+        "computing-systems-lesson9-reflection1"
+      ]
+    },
+    {
+      "chapter": 12,
+      "position": 3,
+      "activity_section_position": 2,
+      "assessment": false,
+      "properties": {
+        "progression": "Reflection"
+      },
+      "bonus": false,
+      "seeding_key": {
+        "script_level.level_keys": [
+          "computing-systems-lesson9-reflection2"
+        ],
+        "lesson.key": "lesson-9",
+        "lesson_group.key": "",
+        "script.name": "6-12-computer-systems-and-devices",
+        "activity_section.key": "33a267d4-6962-4a5a-a6ff-1541977065ea"
+      },
+      "level_keys": [
+        "computing-systems-lesson9-reflection2"
+      ]
+    },
+    {
+      "chapter": 13,
+      "position": 4,
+      "activity_section_position": 3,
+      "assessment": false,
+      "properties": {
+        "progression": "Reflection"
+      },
+      "bonus": false,
+      "seeding_key": {
+        "script_level.level_keys": [
+          "computing-systems-lesson9-reflection3"
+        ],
+        "lesson.key": "lesson-9",
+        "lesson_group.key": "",
+        "script.name": "6-12-computer-systems-and-devices",
+        "activity_section.key": "33a267d4-6962-4a5a-a6ff-1541977065ea"
+      },
+      "level_keys": [
+        "computing-systems-lesson9-reflection3"
       ]
     }
   ],
@@ -649,6 +851,42 @@
     },
     {
       "seeding_key": {
+        "level.key": "test-computer-systems-lesson6-level1",
+        "script_level.level_keys": [
+          "test-computer-systems-lesson6-level1"
+        ],
+        "lesson.key": "lesson-6",
+        "lesson_group.key": "",
+        "script.name": "6-12-computer-systems-and-devices",
+        "activity_section.key": "777637da-e8cd-4024-86ef-27edee0c8793"
+      }
+    },
+    {
+      "seeding_key": {
+        "level.key": "test-computer-systems-and-devices-lesson6-level2",
+        "script_level.level_keys": [
+          "test-computer-systems-and-devices-lesson6-level2"
+        ],
+        "lesson.key": "lesson-6",
+        "lesson_group.key": "",
+        "script.name": "6-12-computer-systems-and-devices",
+        "activity_section.key": "777637da-e8cd-4024-86ef-27edee0c8793"
+      }
+    },
+    {
+      "seeding_key": {
+        "level.key": "test-computer-systems-and-devices-lesson6-level3",
+        "script_level.level_keys": [
+          "test-computer-systems-and-devices-lesson6-level3"
+        ],
+        "lesson.key": "lesson-6",
+        "lesson_group.key": "",
+        "script.name": "6-12-computer-systems-and-devices",
+        "activity_section.key": "a31c7d01-d1b8-4379-8304-17fc415c775f"
+      }
+    },
+    {
+      "seeding_key": {
         "level.key": "test-computing-systems-lesson7-level1",
         "script_level.level_keys": [
           "test-computing-systems-lesson7-level1"
@@ -681,6 +919,54 @@
         "lesson_group.key": "",
         "script.name": "6-12-computer-systems-and-devices",
         "activity_section.key": "f6f5a47c-5ea0-4647-8d70-117622261d32"
+      }
+    },
+    {
+      "seeding_key": {
+        "level.key": "computing-systems-lesson9-level1",
+        "script_level.level_keys": [
+          "computing-systems-lesson9-level1"
+        ],
+        "lesson.key": "lesson-9",
+        "lesson_group.key": "",
+        "script.name": "6-12-computer-systems-and-devices",
+        "activity_section.key": "8ca95fe0-5ade-463a-8378-218521a9dbca"
+      }
+    },
+    {
+      "seeding_key": {
+        "level.key": "computing-systems-lesson9-reflection1",
+        "script_level.level_keys": [
+          "computing-systems-lesson9-reflection1"
+        ],
+        "lesson.key": "lesson-9",
+        "lesson_group.key": "",
+        "script.name": "6-12-computer-systems-and-devices",
+        "activity_section.key": "33a267d4-6962-4a5a-a6ff-1541977065ea"
+      }
+    },
+    {
+      "seeding_key": {
+        "level.key": "computing-systems-lesson9-reflection2",
+        "script_level.level_keys": [
+          "computing-systems-lesson9-reflection2"
+        ],
+        "lesson.key": "lesson-9",
+        "lesson_group.key": "",
+        "script.name": "6-12-computer-systems-and-devices",
+        "activity_section.key": "33a267d4-6962-4a5a-a6ff-1541977065ea"
+      }
+    },
+    {
+      "seeding_key": {
+        "level.key": "computing-systems-lesson9-reflection3",
+        "script_level.level_keys": [
+          "computing-systems-lesson9-reflection3"
+        ],
+        "lesson.key": "lesson-9",
+        "lesson_group.key": "",
+        "script.name": "6-12-computer-systems-and-devices",
+        "activity_section.key": "33a267d4-6962-4a5a-a6ff-1541977065ea"
       }
     }
   ],
