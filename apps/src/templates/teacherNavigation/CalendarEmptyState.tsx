@@ -1,6 +1,7 @@
 import React from 'react';
 import {useSelector} from 'react-redux';
 
+import {getSelectedUnitName} from '@cdo/apps/redux/unitSelectionRedux';
 import CalendarNotAvailable from '@cdo/apps/templates/teacherNavigation/images/CalendarNotAvailable.svg';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
 import i18n from '@cdo/locale';
@@ -15,9 +16,7 @@ import {
 } from './EmptyStateUtils';
 
 export const CalendarEmptyState: React.FC = () => {
-  const unitName = useSelector(
-    (state: {unitSelection: {unitName: string}}) => state.unitSelection.unitName
-  );
+  const unitName = useSelector(state => getSelectedUnitName(state));
 
   const selectedSection = useAppSelector(selectedSectionSelector);
   const versionYear = useAppSelector(state => state.calendar?.versionYear);

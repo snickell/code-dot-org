@@ -10,7 +10,7 @@ import {
   registerReducers,
   restoreRedux,
 } from '@cdo/apps/redux';
-import unitSelection, {setUnitName} from '@cdo/apps/redux/unitSelectionRedux';
+import unitSelection from '@cdo/apps/redux/unitSelectionRedux';
 import teacherSections, {
   selectSection,
   setSections,
@@ -231,7 +231,6 @@ describe('LessonMaterialsContainer', () => {
 
     store = getStore();
 
-    store.dispatch(setUnitName('csd1-2024'));
     store.dispatch(setSections(SECTIONS));
     store.dispatch(selectSection(1));
 
@@ -360,7 +359,6 @@ describe('LessonMaterialsContainer', () => {
 
   it('tells users to select a unit when no unit assigned', async () => {
     store.dispatch(selectSection(10));
-    store.dispatch(setUnitName(null));
 
     await renderDefault();
 
@@ -373,7 +371,6 @@ describe('LessonMaterialsContainer', () => {
   });
 
   it('notifies users that the assigned curriculum is pre-2020', async () => {
-    store.dispatch(setUnitName('csd1-2020'));
     store.dispatch(selectSection(11));
 
     await renderDefault();

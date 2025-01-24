@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import {useSelector} from 'react-redux';
 
 import UnitCalendarGrid from '@cdo/apps//code-studio/components/progress/UnitCalendarGrid';
 import {setCalendarData} from '@cdo/apps/code-studio/calendarRedux';
@@ -9,6 +10,7 @@ import {
 import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
+import {getSelectedUnitName} from '@cdo/apps/redux/unitSelectionRedux';
 import Spinner from '@cdo/apps/sharedComponents/Spinner';
 import {selectedSectionSelector} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
 import HttpClient from '@cdo/apps/util/HttpClient';
@@ -34,7 +36,7 @@ const UnitCalendar: React.FC = () => {
 
   const selectedSection = useAppSelector(selectedSectionSelector);
 
-  const unitName = selectedSection.unitName;
+  const unitName = useSelector(state => getSelectedUnitName(state));
 
   const hasCalendar = useAppSelector(state => state.calendar?.showCalendar);
 
@@ -46,10 +48,15 @@ const UnitCalendar: React.FC = () => {
 
   const {userId, userType} = useAppSelector(state => state.currentUser);
 
+  const unitToLoad = React.useMemo(
+    () => unitName || selectedSection.unitName,
+    [unitName, selectedSection.unitName]
+  );
+
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (!selectedSection.courseOfferingId || !unitName) {
+    if (!selectedSection.courseOfferingId || !unitToLoad) {
       dispatch(
         setCalendarData({
           unitName: null,
@@ -60,9 +67,10 @@ const UnitCalendar: React.FC = () => {
       );
       return;
     }
+
     if (
       !isLoading &&
-      unitName &&
+      unitToLoad &&
       userType &&
       userId &&
       (hasCalendar === undefined ||
@@ -71,7 +79,7 @@ const UnitCalendar: React.FC = () => {
     ) {
       setIsLoading(true);
       HttpClient.fetchJson<UnitSummaryResponse>(
-        `/dashboardapi/unit_summary/${unitName}`
+        `/dashboardapi/unit_summary/${unitToLoad}`
       )
         .then(response => response?.value)
         .then(responseJson => {
@@ -80,14 +88,14 @@ const UnitCalendar: React.FC = () => {
           setIsLoading(false);
 
           analyticsReporter.sendEvent(EVENTS.VIEW_UNIT_CALENDAR, {
-            unitName,
+            unitToLoad,
           });
         })
         .catch(error => {
           console.error('Error loading unit calendar', error);
 
           analyticsReporter.sendEvent(EVENTS.UNIT_CALENDAR_FAILURE, {
-            unitName,
+            unitToLoad,
           });
           return null;
         });
@@ -101,6 +109,7 @@ const UnitCalendar: React.FC = () => {
     dispatch,
     isLoading,
     selectedSection.courseOfferingId,
+    unitToLoad,
     calendarUnitName,
   ]);
 
@@ -134,24 +143,32 @@ const UnitCalendar: React.FC = () => {
       <div className={styles.calendarContentContainer}>
         {!isLoading && hasCalendar && (
           <div>
-            <UnitSelectorV2
-              className={styles.titleUnitSelectorDropdown}
-              filterToSelectedCourse={true}
-            />
-            <div className={styles.minutesPerWeekWrapper}>
-              <div className={styles.minutesPerWeekDescription}>
-                {i18n.instructionalMinutesPerWeek()}
+            <div className={styles.calendarDropdowns}>
+              <div className={styles.calendarDropdown}>
+                <div className={styles.calendarDropdownDescription}>
+                  {i18n.lessonsFor()}
+                </div>
+                <UnitSelectorV2
+                  className={styles.calendarUnitDropdown}
+                  filterToSelectedCourse={true}
+                />
               </div>
-              <SimpleDropdown
-                name="minutesPerWeek"
-                onChange={event => handleDropdownChange(event.target.value)}
-                items={weeklyMinutesOptions}
-                selectedValue={weeklyInstructionalMinutes}
-                size="s"
-                dropdownTextThickness="thin"
-                labelText="minutes per week dropdown"
-                isLabelVisible={false}
-              />
+              <div className={styles.calendarDropdown}>
+                <div className={styles.calendarDropdownDescription}>
+                  {i18n.instructionalMinutesPerWeek()}
+                </div>
+                <SimpleDropdown
+                  name="minutesPerWeek"
+                  onChange={event => handleDropdownChange(event.target.value)}
+                  items={weeklyMinutesOptions}
+                  selectedValue={weeklyInstructionalMinutes}
+                  size="s"
+                  dropdownTextThickness="thin"
+                  labelText="minutes per week dropdown"
+                  isLabelVisible={false}
+                  color="gray"
+                />
+              </div>
             </div>
             <UnitCalendarGrid
               lessons={calendarLessons}

@@ -15,7 +15,6 @@ const SET_LOADED_SECTION_ID = 'unitSelection/SET_LOADED_SECTION_ID';
 
 // Action creators
 export const setScriptId = scriptId => ({type: SET_SCRIPT, scriptId});
-export const setUnitName = unitName => ({type: SET_UNIT_NAME, unitName});
 export const setCoursesWithProgress = coursesWithProgress => ({
   type: SET_COURSES,
   coursesWithProgress,
@@ -49,10 +48,8 @@ const getSelectedUnit = state => {
   return unit;
 };
 
-export const getSelectedScriptName = state => {
-  return getSelectedUnit(state)
-    ? getSelectedUnit(state).key
-    : null || state.unitSelection.unitName;
+export const getSelectedUnitName = state => {
+  return getSelectedUnit(state) ? getSelectedUnit(state).key : null;
 };
 
 /* Get the user friendly name of a script(the unit or course name) */
@@ -119,7 +116,6 @@ export const asyncLoadCoursesWithProgress = () => (dispatch, getState) => {
 // Initial state of unitSelectionRedux
 const initialState = {
   scriptId: null,
-  unitName: null,
   coursesWithProgress: [],
   isLoadingCoursesWithProgress: false,
   loadedSectionId: null,
@@ -142,15 +138,6 @@ export default function unitSelection(state = initialState, action) {
     return {
       ...state,
       scriptId: action.scriptId,
-    };
-  }
-
-  // TODO: instead of setting unit name here, we should be updating the sections list based on the selected section
-  // And adding the script information to the section object.
-  if (action.type === SET_UNIT_NAME) {
-    return {
-      ...state,
-      unitName: action.unitName,
     };
   }
 

@@ -13,7 +13,7 @@ import {
   stubRedux,
 } from '@cdo/apps/redux';
 import locales, {setLocaleCode} from '@cdo/apps/redux/localesRedux';
-import unitSelection, {setUnitName} from '@cdo/apps/redux/unitSelectionRedux';
+import unitSelection from '@cdo/apps/redux/unitSelectionRedux';
 import currentUser, {
   setInitialData,
 } from '@cdo/apps/templates/currentUserRedux';
@@ -129,7 +129,6 @@ describe('UnitCalendar', () => {
     store.dispatch(setInitialData({id: 1, user_type: 'teacher'}));
     store.dispatch(setSections(SECTIONS));
     store.dispatch(selectSection(1));
-    store.dispatch(setUnitName('csd1-2024'));
 
     fetchSpy = jest.spyOn(HttpClient, 'fetchJson');
   });
@@ -197,7 +196,6 @@ describe('UnitCalendar', () => {
 
   it('tells users to select a curriculum when no curriculum assigned', async () => {
     store.dispatch(selectSection(9));
-    store.dispatch(setUnitName(null));
 
     await act(async () => {
       renderComponent();
@@ -211,7 +209,6 @@ describe('UnitCalendar', () => {
 
   it('tells users to select a unit when no unit assigned', async () => {
     store.dispatch(selectSection(10));
-    store.dispatch(setUnitName(null));
 
     await act(async () => {
       renderComponent();
@@ -226,7 +223,6 @@ describe('UnitCalendar', () => {
   });
 
   it('notifies users that the assigned curriculum is pre-2020', async () => {
-    store.dispatch(setUnitName('csd1-2020'));
     store.dispatch(selectSection(11));
     fetchSpy.mockResolvedValue({
       value: {
