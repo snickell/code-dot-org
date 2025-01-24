@@ -3,6 +3,8 @@ import classNames from 'classnames';
 
 import moduleStyles from './video.module.scss';
 import LinkButton from '../button/LinkButton';
+import FontAwesomeV6Icon from '@/fontAwesomeV6Icon';
+import {BodyTwoText, BodyThreeText, Figcaption} from '@/typography';
 
 export interface VideoProps extends HTMLAttributes<HTMLElement> {
   /** Video Title */
@@ -69,16 +71,33 @@ export const Video: React.FC<VideoProps> = ({
   return (
     <figure className={moduleStyles.video}>
       <div className={moduleStyles.videoWrapper}>
-        {isYouTubeBlocked && videoFallback ? (
-          // Disabling this eslint rule since we don't support captions on all of our videos.
-          // eslint-disable-next-line jsx-a11y/media-has-caption
-          <video
-            className={classNames(className)}
-            controls
-            poster={posterThumbnail}
-          >
-            <source src={videoFallback} type="video/mp4" />
-          </video>
+        {isYouTubeBlocked ? (
+          videoFallback ? (
+            // Disabling this eslint rule since we don't support captions on all of our videos.
+            // eslint-disable-next-line jsx-a11y/media-has-caption
+            <video
+              className={classNames(className)}
+              controls
+              poster={posterThumbnail}
+            >
+              <source src={videoFallback} type="video/mp4" />
+            </video>
+          ) : (
+            <div className={classNames(moduleStyles.blockedPlaceholder)}>
+              <div className={classNames(moduleStyles.wrapper)}>
+                <FontAwesomeV6Icon
+                  iconName="exclamation-circle"
+                  iconStyle="solid"
+                />
+                <BodyTwoText visualAppearance="strong">
+                  Video unavailable
+                </BodyTwoText>
+                <BodyThreeText>
+                  This video is blocked on your network, learn more here.
+                </BodyThreeText>
+              </div>
+            </div>
+          )
         ) : (
           <iframe
             className={classNames(className)}
@@ -90,7 +109,7 @@ export const Video: React.FC<VideoProps> = ({
       </div>
       <div className={moduleStyles.footer}>
         {showCaption && (
-          <figcaption className={moduleStyles.caption}>{videoTitle}</figcaption>
+          <Figcaption className={moduleStyles.caption}>{videoTitle}</Figcaption>
         )}
         {videoFallback && (
           <LinkButton
