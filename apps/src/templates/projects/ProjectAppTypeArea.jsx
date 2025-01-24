@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
 
-import Button from '@cdo/apps/componentLibrary/button';
+import {Button, LinkButton} from '@cdo/apps/componentLibrary/button';
 import fontConstants from '@cdo/apps/fontConstants';
 import i18n from '@cdo/locale';
 
@@ -161,18 +161,22 @@ class ProjectAppTypeArea extends React.Component {
       <div style={styles.viewMoreButtons}>
         {showViewMore && (
           <Button
-            onClick={this.loadMore}
-            color="black"
-            icon="plus-circle"
             text={i18n.viewMore()}
+            onClick={this.loadMore}
+            size="s"
+            type="secondary"
+            color="black"
+            iconLeft={{iconStyle: 'solid', iconName: 'plus-circle'}}
             style={styles.buttonRightMargin}
           />
         )}
-        <Button
-          href="#top"
-          color="black"
-          icon="chevron-circle-up"
+        <LinkButton
           text={i18n.backToTop()}
+          href="#top"
+          size="s"
+          type="secondary"
+          color="black"
+          iconLeft={{iconStyle: 'solid', iconName: 'chevron-circle-up'}}
         />
       </div>
     );
@@ -234,10 +238,12 @@ const styles = {
   },
   viewMoreButtons: {
     float: 'right',
-    marginRight: 22,
+    marginInlineEnd: 22,
+    display: 'flex',
+    alignItems: 'center',
   },
   buttonRightMargin: {
-    marginRight: 20,
+    marginInlineEnd: 20,
   },
   iconPaddingLeft: {
     paddingLeft: 6,
