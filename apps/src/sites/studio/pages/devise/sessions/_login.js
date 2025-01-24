@@ -21,4 +21,52 @@ $(document).ready(() => {
       PLATFORMS.STATSIG
     );
   });
+
+  document.getElementById('signin-button').addEventListener('click', () => {
+    analyticsReporter.sendEvent(
+      EVENTS.LOGIN_PAGE_SIGN_IN_CLICKED,
+      {},
+      PLATFORMS.STATSIG
+    );
+  });
+
+  document
+    .getElementById('google_oauth2-sign-in')
+    .addEventListener('click', () => {
+      analyticsReporter.sendEvent(
+        EVENTS.OAUTH_LOGIN_CLICKED,
+        {provider: 'google'},
+        PLATFORMS.STATSIG
+      );
+    });
+
+  document
+    .getElementById('facebook_oauth2-sign-in')
+    .addEventListener('click', () => {
+      analyticsReporter.sendEvent(
+        EVENTS.OAUTH_LOGIN_CLICKED,
+        {provider: 'facebook'},
+        PLATFORMS.STATSIG
+      );
+    });
+
+  document
+    .getElementById('microsoft_oauth2-sign-in')
+    .addEventListener('click', () => {
+      analyticsReporter.sendEvent(
+        EVENTS.OAUTH_LOGIN_CLICKED,
+        {provider: 'microsoft'},
+        PLATFORMS.STATSIG
+      );
+    });
+
+  document
+    .getElementById('clever_oauth2-sign-in')
+    .addEventListener('click', () => {
+      analyticsReporter.sendEvent(
+        EVENTS.OAUTH_LOGIN_CLICKED,
+        {provider: 'clever'},
+        PLATFORMS.STATSIG
+      );
+    });
 });
