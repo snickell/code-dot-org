@@ -1,9 +1,7 @@
 import React from 'react';
-import {useSelector} from 'react-redux';
 import {generatePath} from 'react-router-dom';
 
 import {LinkButton} from '@cdo/apps/componentLibrary/button';
-import {getSelectedUnitName} from '@cdo/apps/redux/unitSelectionRedux';
 import NoLessonMaterialsAvailable from '@cdo/apps/templates/teacherNavigation/images/NoLessonMaterialsAvailable.png';
 import NoLessonMaterialsForLegacyCourses from '@cdo/apps/templates/teacherNavigation/images/NoLessonMaterialsForLegacyCourses.png';
 import {useAppSelector} from '@cdo/apps/util/reduxHooks';
@@ -26,13 +24,11 @@ interface LessonMaterialsEmptyStateProps {
 export const LessonMaterialsEmptyState: React.FC<
   LessonMaterialsEmptyStateProps
 > = ({isLegacyScript, hasNoLessonsWithLessonPlans}) => {
-  const unitName = useSelector(state => getSelectedUnitName(state));
-
   const selectedSection = useAppSelector(selectedSectionSelector);
   const showNoCurriculumAssigned = !selectedSection.courseOfferingId;
   const emptyStateDetails = generateLessonMaterialsEmptyState(
     showNoCurriculumAssigned,
-    unitName,
+    selectedSection.unitName,
     selectedSection,
     isLegacyScript,
     hasNoLessonsWithLessonPlans

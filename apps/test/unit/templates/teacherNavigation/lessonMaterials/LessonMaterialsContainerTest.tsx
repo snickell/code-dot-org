@@ -10,7 +10,9 @@ import {
   registerReducers,
   restoreRedux,
 } from '@cdo/apps/redux';
-import unitSelection from '@cdo/apps/redux/unitSelectionRedux';
+import unitSelection, {
+  setCoursesWithProgress,
+} from '@cdo/apps/redux/unitSelectionRedux';
 import teacherSections, {
   selectSection,
   setSections,
@@ -86,6 +88,35 @@ const SECTIONS = [
     unitName: null,
     unitSelection: null,
     course_display_name: null,
+  },
+];
+
+const COURSES_WITH_PROGRESS = [
+  {
+    id: 123,
+    display_name: 'CSD',
+    units: [
+      {
+        id: 1,
+        version_year: 2023,
+        key: 'csd1-2024',
+        name: 'CSD unit 1',
+        position: null,
+      },
+    ],
+  },
+  {
+    id: 1234,
+    display_name: 'CSD1-2020',
+    units: [
+      {
+        id: 2,
+        version_year: 2020,
+        key: 'csd1-2020',
+        name: 'CSD1-2020 unit 1',
+        position: null,
+      },
+    ],
   },
 ];
 
@@ -233,6 +264,7 @@ describe('LessonMaterialsContainer', () => {
 
     store.dispatch(setSections(SECTIONS));
     store.dispatch(selectSection(1));
+    store.dispatch(setCoursesWithProgress(COURSES_WITH_PROGRESS));
 
     fetchSpy = jest.spyOn(HttpClient, 'fetchJson');
   });
