@@ -19874,3 +19874,14 @@ en:
           description_short: ''
           description: ''
           student_description: ''
+        music-early-pilot-gj:
+          lessons:
+            lesson-1:
+              name: Lesson1
+          lesson_groups: {}
+          name: music-early-pilot-gj
+          title: music-early-pilot-gj
+          description_audience: ''
+          description_short: ''
+          description: ''
+          student_description: ''
