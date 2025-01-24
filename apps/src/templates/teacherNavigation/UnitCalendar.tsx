@@ -10,7 +10,10 @@ import {
 import {SimpleDropdown} from '@cdo/apps/componentLibrary/dropdown';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
-import {getSelectedUnitName} from '@cdo/apps/redux/unitSelectionRedux';
+import {
+  asyncLoadCoursesWithProgress,
+  getSelectedUnitName,
+} from '@cdo/apps/redux/unitSelectionRedux';
 import Spinner from '@cdo/apps/sharedComponents/Spinner';
 import {selectedSectionSelector} from '@cdo/apps/templates/teacherDashboard/teacherSectionsReduxSelectors';
 import HttpClient from '@cdo/apps/util/HttpClient';
@@ -48,12 +51,21 @@ const UnitCalendar: React.FC = () => {
 
   const {userId, userType} = useAppSelector(state => state.currentUser);
 
+  const isLoadingCoursesWithProgress = useSelector(
+    (state: {unitSelection: {isLoadingCoursesWithProgress: boolean}}) =>
+      state.unitSelection.isLoadingCoursesWithProgress
+  );
+
   const unitToLoad = React.useMemo(
     () => unitName || selectedSection.unitName,
     [unitName, selectedSection.unitName]
   );
 
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    asyncLoadCoursesWithProgress();
+  }, []);
 
   useEffect(() => {
     if (!selectedSection.courseOfferingId || !unitToLoad) {
@@ -75,7 +87,7 @@ const UnitCalendar: React.FC = () => {
       userId &&
       (hasCalendar === undefined ||
         calendarLessons === null ||
-        unitName !== calendarUnitName)
+        (unitName !== calendarUnitName && unitName !== null))
     ) {
       setIsLoading(true);
       HttpClient.fetchJson<UnitSummaryResponse>(
@@ -133,15 +145,15 @@ const UnitCalendar: React.FC = () => {
     state => state.teacherSections.needsReload
   );
 
-  if (isLoading || needsReload) {
+  if (isLoading || isLoadingCoursesWithProgress || needsReload) {
     return <Spinner size={'large'} />;
   }
 
   return (
     <div>
-      {!isLoading && <CalendarEmptyState />}
+      {<CalendarEmptyState />}
       <div className={styles.calendarContentContainer}>
-        {!isLoading && hasCalendar && (
+        {hasCalendar && (
           <div>
             <div className={styles.calendarDropdowns}>
               <div className={styles.calendarDropdown}>

@@ -51,8 +51,6 @@ function UnitSelectorV2({
     }
   }, [sectionId, asyncLoadCoursesWithProgress]);
 
-  console.log('lfm', {selectedSectionCourse, coursesWithProgress});
-
   const unitId = React.useMemo(() => scriptId, [scriptId]);
   const onSelectUnit = React.useCallback(
     e => {
