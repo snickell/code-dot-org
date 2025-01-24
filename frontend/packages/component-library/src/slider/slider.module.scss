@@ -1,6 +1,6 @@
-@import '@code-dot-org/themes/primitiveColors.scss';
-@import '@code-dot-org/themes/colors.scss';
-@import '@code-dot-org/themes/mixins.scss';
+@import '@code-dot-org/component-library-styles/primitiveColors.scss';
+@import '@code-dot-org/component-library-styles/colors.scss';
+@import '@code-dot-org/component-library-styles/mixins.scss';
 
 //Slider colors for use in JSX/TSX
 $slider-black-track-fill-color: var(--background-neutral-primary-inverse);
