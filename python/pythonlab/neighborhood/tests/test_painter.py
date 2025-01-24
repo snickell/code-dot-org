@@ -1,6 +1,6 @@
 from neighborhood.painter import Painter
 from neighborhood.support.world import World
-from support.constants import SAMPLE_MAZE, SAMPLE_MAZE_2, SAMPLE_MAZE_3
+from support.constants import SAMPLE_MAZE, ALL_PASSABLE_MAZE, BUCKET_MAZE
 
 def setUp():
   world = World()
@@ -13,6 +13,7 @@ def test_initialize_painter():
   assert painter1.get_y() == 0
   assert painter1.get_my_paint() == 0
   assert painter1.get_direction() == "east"
+  assert painter1.has_infinite_paint is False
   painter1.turn_left()
   assert painter1.get_direction() == "north"
   painter2 = Painter(1, 2, "south", 10)
@@ -50,8 +51,7 @@ def test_turn_left():
 
 def test_move():
   world2 = World()
-  # All squares are passable in SAMPLE_MAZE_2.
-  world2.set_grid_from_string(SAMPLE_MAZE_2)
+  world2.set_grid_from_string(ALL_PASSABLE_MAZE)
   painter = Painter() # Default direction is 'east'.
   painter.move()
   assert painter.get_x() == 1
@@ -81,8 +81,8 @@ def test_has_paint():
 
 def test_bucket():
   world3 = World()
-  # Square 0,0 is a bucket with paint_count = 3 in SAMPLE_MAZE_3.
-  world3.set_grid_from_string(SAMPLE_MAZE_3)
+  # Square 0,0 is a bucket with paint_count = 3.
+  world3.set_grid_from_string(BUCKET_MAZE)
   painter = Painter()
   painter.world = world3
   assert painter.is_on_bucket() is True
@@ -113,6 +113,5 @@ def test_can_move():
   assert painter.can_move("south") is True
   assert painter.can_move("east") is True
   assert painter.can_move("west") is False
-  assert painter._is_valid_movement("invalid_direction") is False
   painter.move() # Now painter is on 1,0.
   assert painter.can_move("east") is False

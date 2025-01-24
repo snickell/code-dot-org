@@ -10,7 +10,7 @@ class Painter:
   LARGE_GRID_SIZE = 20
   last_id = 0 # Used to assign unique id to Painter instance.
 
-  def __init__(self, x=0, y=0, direction='east', paint=0, could_have_infinite_paint=False):
+  def __init__(self, x=0, y=0, direction='east', paint=None):
     """
     Initialize the painter with the given x, y, direction, and paint.
 
@@ -18,13 +18,18 @@ class Painter:
       x (int): The x-coordinate of the painter. Defaults to 0.
       y (int): The y-coordinate of the painter. Defaults to 0.
       direction (str): The direction the painter is facing. Defaults to "East".
-      paint (int): The amount of paint the painter has. Defaults to 0.
-      could_have_infinite_paint (bool): default to False.
+      paint (int | None): The amount of paint the painter has. Defaults to None
+        and assigned an int based on param value.
     """
     self.x = x
     self.y = y
     self.direction = Direction(direction)
-    self.remaining_paint = paint
+    if paint is None:
+      self.remaining_paint = 0
+      could_have_infinite_paint = True
+    else:
+      self.remaining_paint = paint
+      could_have_infinite_paint = False
     # Create a reference to the world singleton
     self.world = World()
     # If the grid is not set, set it from the default file
@@ -46,7 +51,7 @@ class Painter:
     """
     Move the painter one square forward in the direction it is facing.
     """
-    if self._is_valid_movement(self.direction.value):
+    if self._is_valid_movement(self.direction):
       if self.direction.is_north():
         self.y-=1
       elif self.direction.is_south():
@@ -130,7 +135,6 @@ class Painter:
       True if there is paint in the square where the painter is standing
     """
     is_on_paint = self.world.grid.get_square(self.x, self.y).has_color()
-    self._send_boolean_message(NeighborhoodSignalKey.IS_ON_PAINT, is_on_paint)
     return is_on_paint
   
   def is_on_bucket(self):
@@ -139,7 +143,6 @@ class Painter:
       True if there is a paint bucket in the square where the painter is standing
     """
     is_on_bucket = self.world.grid.get_square(self.x, self.y).contains_paint()
-    self._send_boolean_message(NeighborhoodSignalKey.IS_ON_BUCKET, is_on_bucket)
     return is_on_bucket
   
   def has_paint(self):
@@ -158,8 +161,7 @@ class Painter:
     Args:
       direction (str): The direction of movement that is being checked
     """
-    can_move_result = self._is_valid_movement(direction)
-    self._send_boolean_message(NeighborhoodSignalKey.CAN_MOVE, can_move_result)
+    can_move_result = self._is_valid_movement(Direction(direction))
     return can_move_result
   
   def get_color(self):
@@ -276,15 +278,15 @@ class Painter:
     """
     Helper method to check if the painter can move in the direction of direction).
     Args:
-      direction (str): The direction to check
+      direction (Direction): The direction to check
     """
-    if direction.lower() == 'north':
+    if direction.is_north():
       return self.world.grid.valid_location(self.x, self.y - 1)
-    elif direction.lower() == 'south':
+    elif direction.is_south():
       return self.world.grid.valid_location(self.x, self.y + 1)
-    elif direction.lower() == 'west':
+    elif direction.is_west():
       return self.world.grid.valid_location(self.x - 1, self.y)
-    elif direction.lower() == 'east':
+    elif direction.is_east():
       return self.world.grid.valid_location(self.x + 1, self.y)
     else:
       # Invalid movement
