@@ -1,18 +1,22 @@
 import {BlockTypes} from '../blockTypes';
-import {categoryTypeToLocalizedName, dynamicCategoryLabels} from '../toolbox';
+import {categoryTypeToLocalizedName} from '../toolbox';
 import {Category} from '../toolbox/types';
 
-const validStaticCategories = Object.entries(Category)
-  .filter(
-    ([key, value]) =>
-      // Functions and Variables are handled by dynamic categories
-      value !== Category.Functions && value !== Category.Variables
-  )
-  .map(([key, value]) => [categoryTypeToLocalizedName[value], value]);
+const dynamicCategories = [Category.Functions, Category.Variables];
 
-const validDynamicCategories = Object.entries(dynamicCategoryLabels).map(
-  ([key, value]) => [key, value]
+const staticCategories = Object.values(Category).filter(
+  category => !dynamicCategories.includes(category)
 );
+
+const staticCategoryOptions = staticCategories.map(category => [
+  categoryTypeToLocalizedName[category],
+  category,
+]);
+
+const dynamicCategoryOptions = dynamicCategories.map(category => [
+  categoryTypeToLocalizedName[category],
+  category,
+]);
 
 /**
  * Represents a dynamic category block definition for Blockly.
@@ -27,7 +31,7 @@ export const staticCategoryBlock = {
       {
         type: 'field_dropdown',
         name: 'CATEGORY',
-        options: validStaticCategories,
+        options: staticCategoryOptions,
       },
     ],
     inputsInline: true,
@@ -51,7 +55,7 @@ export const dynamicCategoryBlock = {
       {
         type: 'field_dropdown',
         name: 'CUSTOM',
-        options: validDynamicCategories,
+        options: dynamicCategoryOptions,
       },
     ],
     inputsInline: true,

@@ -28,14 +28,6 @@ export const dynamicCategoryLabels: {
 
 export const dynamicCategories = getTypedKeys(dynamicCategoryLabels);
 
-export const dynamicCategoryToCategoryName: {[key: string]: Category} =
-  Object.fromEntries(
-    Object.entries(dynamicCategoryLabels).map(([key, value]) => [
-      value,
-      key as Category,
-    ])
-  );
-
 export const categoryTypeToLocalizedName: {[key in Category]: string} = {
   Control: musicI18n.blockly_toolboxCategoryControl(),
   Effects: musicI18n.blockly_toolboxCategoryEffects(),
@@ -48,14 +40,6 @@ export const categoryTypeToLocalizedName: {[key in Category]: string} = {
   Tracks: musicI18n.blockly_toolboxCategoryTracks(),
   Variables: musicI18n.blockly_toolboxCategoryVariables(),
 };
-
-const localizedNameToCategoryType: {[key: string]: Category} =
-  Object.fromEntries(
-    Object.entries(categoryTypeToLocalizedName).map(([key, value]) => [
-      value,
-      key,
-    ])
-  ) as {[key: string]: Category};
 
 /**
  * Generates a Music Lab Blockly toolbox for the given block mode,
@@ -88,6 +72,7 @@ export function getToolbox(
           name: categoryTypeToLocalizedName[category],
           cssconfig: baseCategoryCssConfig,
           custom: dynamicCategoryLabels[category],
+          id: category,
         });
       }
       continue;
@@ -126,6 +111,7 @@ export function getToolbox(
         name: categoryTypeToLocalizedName[category],
         cssconfig: baseCategoryCssConfig,
         contents: categoryContents,
+        id: category,
       });
     }
   }
@@ -146,8 +132,8 @@ export function localizeCategoryNames(
       if (toolboxItem.kind === 'category') {
         const staticCategory =
           toolboxItem as GoogleBlockly.utils.toolbox.StaticCategoryInfo;
-        const originalName = staticCategory.name as Category;
-        const localizedName = categoryTypeToLocalizedName[originalName];
+        const localizedName =
+          categoryTypeToLocalizedName[staticCategory.id as Category];
 
         return {
           ...staticCategory,
@@ -197,7 +183,7 @@ export function addToolboxBlocksToWorkspace(
       // For dynamic categories, create a custom category block..
       const dynamicCategoryName = (
         toolboxItem as GoogleBlockly.utils.toolbox.DynamicCategoryInfo
-      ).custom;
+      ).id;
       Blockly.serialization.blocks.append(
         {
           type: BlockTypes.CUSTOM_CATEGORY,
@@ -211,10 +197,9 @@ export function addToolboxBlocksToWorkspace(
       const categoryInfo =
         toolboxItem as GoogleBlockly.utils.toolbox.StaticCategoryInfo;
       // For a localized category, like "Sounds", get the category type, like "Play".
-      const categoryName =
-        localizedNameToCategoryType[categoryInfo.name] ||
-        (categoryInfo.name as Category);
-      if (Category[categoryName]) {
+      const categoryName = categoryInfo.id;
+      // 'DEFAULT' categories are intentionally skipped.
+      if (categoryName && categoryName in Category) {
         // Create a category block
         Blockly.serialization.blocks.append(
           {
@@ -245,7 +230,7 @@ export function addToolboxBlocksToWorkspace(
 
 /**
  * Creates a new static category. Used to convert workspace
- * blocks into a toolbox defintion in levelbuilder's toolbox mode.
+ * blocks into a toolbox definition in levelbuilder's toolbox mode.
  * @returns JSON representation of a new static category.
  */
 export function getNewStaticCategory(
@@ -253,10 +238,13 @@ export function getNewStaticCategory(
 ): GoogleBlockly.utils.toolbox.StaticCategoryInfo {
   return {
     kind: 'category',
+    // name is not localized upon saving, because levelbuilder is English only.
+    // Instead, we localize the category names when loading the toolbox.
+    // See localizeCategoryNames().
     name,
     cssconfig: baseCategoryCssConfig,
     contents: [] as GoogleBlockly.utils.toolbox.ToolboxItemInfo[],
-    id: undefined,
+    id: name,
     categorystyle: undefined,
     colour: undefined,
     hidden: undefined,
@@ -265,18 +253,21 @@ export function getNewStaticCategory(
 
 /**
  * Creates a new dynamic category. Used to convert workspace
- * blocks into a toolbox defintion in levelbuilder's toolbox mode.
+ * blocks into a toolbox definition in levelbuilder's toolbox mode.
  * @returns JSON representation of a new dynamic category.
  */
 export function getNewDynamicCategory(
-  custom: string
+  name: string
 ): GoogleBlockly.utils.toolbox.ToolboxItemInfo {
   return {
     kind: 'category',
-    custom,
-    name: dynamicCategoryToCategoryName[custom],
+    custom: dynamicCategoryLabels[name as Category],
+    // name is not localized upon saving, because levelbuilder is English only.
+    // Instead, we localize the category names when loading the toolbox.
+    // See localizeCategoryNames().
+    name,
     cssconfig: baseCategoryCssConfig,
-    id: undefined,
+    id: name,
     categorystyle: undefined,
     colour: undefined,
     hidden: undefined,

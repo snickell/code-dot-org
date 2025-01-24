@@ -94,7 +94,10 @@ export default class MusicBlocklyWorkspace {
    * @param container HTML element to inject the workspace into
    * @param onBlockSpaceChange callback fired when any block space change events occur
    * @param isReadOnlyWorkspace is the workspace readonly
+   * @param isRtl should the workspace use RTL
+   * @param blockMode current block mode (e.g. simple2, advanced)
    * @param toolboxAllowList information about the toolbox
+   * @param toolboxDefinition Blockly toolbox definition
    *
    */
   init(
@@ -530,8 +533,8 @@ export default class MusicBlocklyWorkspace {
     });
 
     // Finalize the toolbox.
-    if (!fullToolbox.contents.length) {
-      // If no categories have been pushed, create a flyout toolbox.
+    if (!fullToolbox.contents.length && currentCategory.name === 'DEFAULT') {
+      // If no categories have been used, create a flyout toolbox.
       fullToolbox.kind = 'flyoutToolbox';
       fullToolbox.contents = flyoutItems;
     } else if (isValidCategory(currentCategory)) {
@@ -643,7 +646,7 @@ export default class MusicBlocklyWorkspace {
   }
 
   // For each function body in the current workspace, add a function call
-  // block to the toolbox. Also add a function defintion block, if required.
+  // block to the toolbox. Also add a function definition block, if required.
   generateFunctionBlocks() {
     const blockList: GoogleBlockly.utils.toolbox.ToolboxItemInfo[] = [];
 
