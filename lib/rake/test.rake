@@ -309,6 +309,7 @@ namespace :test do
           'dashboard/config/libraries/*.interpreted.js',
           'shared/js/**/*',
           'shared/css/**/*',
+          'frontend/**/*',
         ]
       ) do
         TestRunUtils.run_apps_tests

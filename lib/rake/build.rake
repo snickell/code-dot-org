@@ -186,21 +186,7 @@ namespace :build do
     end
   end
 
-  desc 'Builds frontend'
-  timed_task_with_logging :frontend do
-    Dir.chdir(frontend_dir) do
-      ChatClient.log 'Installing <b>frontend</b> dependencies...'
-      RakeUtils.yarn_install
-
-      # Only build frontend packages that are relevant to `code-dot-org/apps`
-      ChatClient.log 'Building <b>frontend</b>...'
-      RakeUtils.system "yarn release:dryrun --filter @code-dot-org/component-library"
-    end
-  end
-
   tasks = []
-  # Frontend needs to be built prior to apps as apps consumes the design system
-  tasks << :frontend if CDO.build_apps
   tasks << :apps if CDO.build_apps
   tasks << :dashboard if CDO.build_dashboard
   tasks << :pegasus if CDO.build_pegasus
