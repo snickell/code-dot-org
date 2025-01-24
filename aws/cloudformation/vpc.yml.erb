@@ -116,7 +116,7 @@ Resources:
     Properties:
       GroupDescription: Enable SSH access to frontends from daemon.
       VpcId: {Ref: VPC}
-  # Used by Application Load Balancers that only serve traffic forwarded to it by CloudFront.
+  # To be used by Application Load Balancers that only serve traffic forwarded to it by CloudFront.
   ALBSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
