@@ -6,24 +6,6 @@ export const HeadingContentfulComponentDefinition: ComponentDefinition = {
   name: 'Heading',
   category: 'Typography',
   variables: {
-    semanticTag: {
-      displayName: 'Semantic Tag',
-      type: 'Text',
-      defaultValue: 'h1',
-      group: 'style',
-      validations: {
-        in: [
-          {value: 'h1', displayName: 'H1'},
-          {value: 'h2', displayName: 'H2'},
-          {value: 'h3', displayName: 'H3'},
-          {value: 'h4', displayName: 'H4'},
-          {value: 'h5', displayName: 'H5'},
-          {value: 'h6', displayName: 'H6'},
-          {value: 'p', displayName: 'Paragraph'},
-          {value: 'span', displayName: 'Span'},
-        ],
-      },
-    },
     visualAppearance: {
       displayName: 'Visual Appearance',
       type: 'Text',
@@ -40,22 +22,12 @@ export const HeadingContentfulComponentDefinition: ComponentDefinition = {
         ],
       },
     },
-    className: {
-      displayName: 'Custom Class Name',
-      type: 'Text',
-      group: 'style',
-    },
     children: {
       displayName: 'Content',
       type: 'Text',
       defaultValue: 'Heading',
       group: 'content',
       required: true,
-    },
-    id: {
-      displayName: 'ID',
-      type: 'Text',
-      group: 'accessibility',
     },
   },
 };
