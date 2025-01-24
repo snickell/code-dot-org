@@ -33,8 +33,8 @@
   "prettier": "@code-dot-org/lint-config/prettier/index.mjs",
   "devDependencies": {
     "@applitools/eyes-storybook": "^3.52.1",
-    "@code-dot-org/css": "workspace:*",
     "@code-dot-org/lint-config": "workspace:*",
+    "@code-dot-org/themes": "workspace:*",
     "@dotenv-run/cli": "^1.3.6",
     "@eslint/js": "^9.16.0",
     "@storybook/addon-a11y": "^8.4.4",

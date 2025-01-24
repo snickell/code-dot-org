@@ -1,20 +1,19 @@
 {
-  "name": "@code-dot-org/css",
+  "name": "@code-dot-org/themes",
   "version": "0.0.0-alpha.0",
   "type": "module",
   "files": [
-    "*.scss",
-    "*.css"
+    "*.scss"
   ],
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
-  "homepage": "https://github.com/code-dot-org/code-dot-org/blob/staging/frontend/packages/css/#readme",
+  "homepage": "https://github.com/code-dot-org/code-dot-org/blob/staging/frontend/packages/themes/#readme",
   "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/code-dot-org/code-dot-org.git",
-    "directory": "frontend/packages/css"
+    "directory": "frontend/packages/themes"
   },
   "bugs": {
     "url": "https://github.com/code-dot-org/code-dot-org/issues"

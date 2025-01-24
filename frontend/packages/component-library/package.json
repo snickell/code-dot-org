@@ -293,8 +293,8 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@code-dot-org/css": "workspace:*",
     "@code-dot-org/lint-config": "workspace:*",
+    "@code-dot-org/themes": "workspace:*",
     "@contentful/experiences-sdk-react": "^1.24.0",
     "@eslint/js": "^9.15.0",
     "@monoweave/cli": "^1.11.1",
