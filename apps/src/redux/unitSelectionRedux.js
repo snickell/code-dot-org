@@ -2,6 +2,8 @@
 // Tab specific reducers can import actions from this file
 // if they need to respond to a script changing.
 
+import HttpClient from '../util/HttpClient';
+
 // Action type constants
 export const SET_SCRIPT = 'unitSelection/SET_SCRIPT';
 export const SET_UNIT_NAME = 'unitSelection/SET_UNIT_NAME';
@@ -78,21 +80,14 @@ export const asyncLoadCoursesWithProgress = () => (dispatch, getState) => {
   ) {
     return;
   }
+  console.log('Loading courses with progress', {
+    selectedSection,
+    loadedSectionId: state.unitSelection.loadedSectionId,
+  });
   dispatch(startLoadingCoursesWithProgress());
 
-  fetch(`/dashboardapi/section_courses/${selectedSection.id}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-    },
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`Error(${response.status}: ${response.statusText})`);
-      }
-
-      return response.json();
-    })
+  HttpClient.fetchJson(`/dashboardapi/section_courses/${selectedSection.id}`)
+    .then(response => response?.value)
     .then(coursesWithProgress => {
       // Reorder coursesWithProgress so that the current section is at the top and other sections are in order from newest to oldest
       const reorderedCourses = [
@@ -130,6 +125,8 @@ export default function unitSelection(state = initialState, action) {
     return {
       ...state,
       coursesWithProgress: action.coursesWithProgress,
+      // This automatically selects the first unit of the first course
+      // unless a scriptId is already set
       scriptId: state.scriptId === null ? firstUnit?.id : state.scriptId,
     };
   }

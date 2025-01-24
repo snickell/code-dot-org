@@ -58,15 +58,18 @@ const UnitCalendar: React.FC = () => {
   );
 
   const unitToLoad = React.useMemo(
-    () => unitName || selectedSection.unitName,
+    () =>
+      selectedSection.unitName !== null
+        ? unitName || selectedSection.unitName
+        : null,
     [unitName, selectedSection.unitName]
   );
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    asyncLoadCoursesWithProgress();
-  }, []);
+    dispatch(asyncLoadCoursesWithProgress());
+  }, [dispatch]);
 
   useEffect(() => {
     if (!selectedSection.courseOfferingId || !unitToLoad) {
@@ -78,6 +81,7 @@ const UnitCalendar: React.FC = () => {
           versionYear: null,
         })
       );
+      setHasInitialLoad(true);
       return;
     }
 
@@ -88,7 +92,7 @@ const UnitCalendar: React.FC = () => {
       userId &&
       (hasCalendar === undefined ||
         calendarLessons === null ||
-        (unitName !== calendarUnitName && unitName !== null))
+        (unitToLoad !== calendarUnitName && unitName !== null))
     ) {
       setIsLoading(true);
       setHasInitialLoad(true);
