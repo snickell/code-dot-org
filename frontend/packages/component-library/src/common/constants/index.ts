@@ -4,7 +4,7 @@
 
 import {VisualAppearance} from '@/typography';
 
-import {ComponentSizeXSToL, DropdownColor} from './types';
+import {ComponentSizeXSToL, DropdownColor} from '@/common/types';
 
 /**
  *  This is the map of component size to body text size (visualAppearance)
