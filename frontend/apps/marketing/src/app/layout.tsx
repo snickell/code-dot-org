@@ -1,6 +1,4 @@
 import type {Metadata} from 'next';
-import '@code-dot-org/css/primitiveColors.css';
-import '@code-dot-org/css/colors.css';
 
 import './globals.css';
 
