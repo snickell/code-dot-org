@@ -433,6 +433,10 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
 
   blocklyWrapper.JavaScript = javascriptGenerator;
   blocklyWrapper.LineCursor = LineCursor;
+  blocklyWrapper.navigationController = new NavigationController();
+  // Initialize plugin.
+  blocklyWrapper.navigationController.init();
+  blocklyWrapper.navigationController.cursorType = cdoUtils.getUserCursorType();
 
   // Wrap SNAP_RADIUS property, and in the setter make sure we keep SNAP_RADIUS and CONNECTING_SNAP_RADIUS in sync.
   // See https://github.com/google/blockly/issues/2217
@@ -860,6 +864,14 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
       workspace.svgGroup_
     );
 
+    blocklyWrapper.navigationController.addWorkspace(workspace);
+
+    if (blocklyWrapper.cdoUtils.isMusicKeyboardExperiment()) {
+      console.log('trying new navigation controller');
+      blocklyWrapper.navigationController.dispose();
+      new KeyboardNavigation(workspace);
+    }
+
     blocklyWrapper.grayOutUndeletableBlocks =
       !!options.grayOutUndeletableBlocks;
     blocklyWrapper.topLevelProcedureAutopopulate =
@@ -881,17 +893,6 @@ function initializeBlocklyWrapper(blocklyInstance: GoogleBlocklyInstance) {
           return new blocklyWrapper.Cursor();
       }
     };
-
-    if (blocklyWrapper.cdoUtils.isMusicKeyboardExperiment()) {
-      new KeyboardNavigation(workspace);
-    } else {
-      blocklyWrapper.navigationController = new NavigationController();
-      // Initialize plugin.
-      blocklyWrapper.navigationController.init();
-      blocklyWrapper.navigationController.cursorType =
-        cdoUtils.getUserCursorType();
-      blocklyWrapper.navigationController.addWorkspace(workspace);
-    }
 
     // Typically, we need to handle disabling blocks that are not connected to an
     // appropriate top block. A few exceptions exist.

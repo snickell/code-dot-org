@@ -336,7 +336,7 @@ export function isWorkspaceReadOnly() {
  * Used only to test Google Blockly's new keyboard nav experiment
  * @returns {boolean} True if the current lab is the music keyboard experiment, false otherwise
  */
-export function isMusicKeyboardExperiment() {
+export function isMusicKeyboardExperiment(): boolean {
   return true;
 }
 
