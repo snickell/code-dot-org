@@ -48,7 +48,7 @@ Resources:
   VpcPublicSubnet0:
     Type: AWS::EC2::Subnet
     Properties:
-      AvailabilityZone: us-east-2a
+      AvailabilityZone: us-west-2a
       CidrBlock: 10.0.0.0/18
       MapPublicIpOnLaunch: true
       VpcId:
@@ -57,7 +57,7 @@ Resources:
   VpcPublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
-      AvailabilityZone: us-east-2b
+      AvailabilityZone: us-west-2b
       CidrBlock: 10.0.64.0/18
       MapPublicIpOnLaunch: true
       VpcId:
@@ -66,7 +66,7 @@ Resources:
   VpcPrivateSubnet0:
     Type: AWS::EC2::Subnet
     Properties:
-      AvailabilityZone: us-east-2a
+      AvailabilityZone: us-west-2a
       CidrBlock: 10.0.128.0/18
       MapPublicIpOnLaunch: false
       VpcId:
@@ -75,7 +75,7 @@ Resources:
   VpcPrivateSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
-      AvailabilityZone: us-east-2b
+      AvailabilityZone: us-west-2b
       CidrBlock: 10.0.192.0/18
       MapPublicIpOnLaunch: false
       VpcId:
@@ -299,7 +299,7 @@ Resources:
             Fn::Join:
               - ""
               - - ghcr.io/code-dot-org/marketing@
-                - Ref: ContainerImageHash
+                - Ref: ContainerImageHashDigest
           Name: web
           PortMappings:
             - ContainerPort: 3000
@@ -428,10 +428,10 @@ Resources:
   MarketingGithubDeployerUserPolicy:
     Type: 'AWS::IAM::Policy'
     Version: '2012-10-17'
-    PolicyName: MarketingGithubDeployerUserIamUserPolicy
-    Users:
-      - Ref: MarketingGithubDeployerUser
     Properties:
+      PolicyName: MarketingGithubDeployerUserIamUserPolicy
+      Users:
+        - Ref: MarketingGithubDeployerUser
       PolicyDocument:
         Statement:
           - Effect: Allow
@@ -442,21 +442,30 @@ Resources:
               - 'cloudformation:DescribeChangeSet'
               - 'cloudformation:DeleteChangeSet'
               - 'cloudformation:ExecuteChangeSet'
-            Resource: 'AWS::StackId'
+            Resource: !Ref AWS::StackId
           - Effect: Allow
             Action:
               - 'iam:GetRole'
               - 'iam:PassRole'
-            Resource: !Ref FargateServiceTaskDefExecutionRole.Arn
+            Resource:
+              Fn::GetAtt:
+                - FargateServiceTaskDefExecutionRole
+                - Arn
           - Effect: Allow
             Action:
               - 'iam:GetRole'
               - 'iam:PassRole'
-            Resource: !Ref FargateServiceTaskDefTaskRole.Arn
+            Resource:
+              Fn::GetAtt:
+                - FargateServiceTaskDefTaskRole
+                - Arn
           - Effect: Allow
             Action:
               - 'ecs:RegisterTaskDefinition'
-            Resource: !Ref FargateServiceTaskDef.Arn
+            Resource:
+              Fn::GetAtt:
+                - FargateServiceTaskDef
+                - TaskDefinitionArn
           - Effect: Allow
             Action:
               - 'ecs:DeregisterTaskDefinition'
@@ -470,7 +479,7 @@ Resources:
             Action:
               - 'ecs:DescribeServices'
               - 'ecs:UpdateService'
-            Resource: !Ref FargateService.Arn
+            Resource: !Ref FargateService
 
   MarketingGithubDeployerAccessKey:
     Type: AWS::IAM::AccessKey
