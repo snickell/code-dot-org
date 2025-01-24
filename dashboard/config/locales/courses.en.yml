@@ -1219,3 +1219,9 @@ en:
           description_student: ''
           description_teacher: ''
           version_title: ''
+        data-science-beta:
+          title: data-science-beta
+          description_short: ''
+          description_student: ''
+          description_teacher: ''
+          version_title: ''
