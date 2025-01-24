@@ -1,4 +1,4 @@
-import RadioButton from '@code-dot-org/component-library/radioButton/RadioButton';
+import RadioButton from '@code-dot-org/component-library/radioButton';
 import {
   BodyThreeText,
   StrongText,

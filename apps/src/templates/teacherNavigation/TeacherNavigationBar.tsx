@@ -1,4 +1,5 @@
 import {SimpleDropdown} from '@code-dot-org/component-library/dropdown';
+import Tags from '@code-dot-org/component-library/tags';
 import Typography from '@code-dot-org/component-library/typography';
 import _ from 'lodash';
 import React, {useState, useEffect} from 'react';
@@ -10,9 +11,6 @@ import {
   useParams,
 } from 'react-router-dom';
 
-import {SimpleDropdown} from '@code-dot-org/component-library/dropdown';
-import Tags from '@code-dot-org/component-library/tags';
-import Typography from '@code-dot-org/component-library/typography';
 import {EVENTS} from '@cdo/apps/metrics/AnalyticsConstants';
 import analyticsReporter from '@cdo/apps/metrics/AnalyticsReporter';
 import SidebarOption from '@cdo/apps/templates/teacherNavigation/SidebarOption';

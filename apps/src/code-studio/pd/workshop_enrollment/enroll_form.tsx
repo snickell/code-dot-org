@@ -48,6 +48,7 @@ import {
 import styles from '@cdo/apps/code-studio/pd/workshop_enrollment/EnrollForm/styles.module.scss';
 
 // HACK
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const textFieldStyles: any = {};
 
 interface SchoolInfoProps {
