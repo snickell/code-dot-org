@@ -6,19 +6,6 @@ export const ParagraphContentfulComponentDefinition: ComponentDefinition = {
   name: 'Paragraph',
   category: 'Typography',
   variables: {
-    semanticTag: {
-      displayName: 'Semantic Tag',
-      type: 'Text',
-      defaultValue: 'p',
-      group: 'style',
-      validations: {
-        in: [
-          {value: 'p', displayName: 'Paragraph (p)'},
-          {value: 'span', displayName: 'Span'},
-          {value: 'strong', displayName: 'Strong'},
-        ],
-      },
-    },
     visualAppearance: {
       displayName: 'Visual Appearance',
       type: 'Text',
@@ -30,14 +17,8 @@ export const ParagraphContentfulComponentDefinition: ComponentDefinition = {
           {value: 'body-two', displayName: 'Body Two'},
           {value: 'body-three', displayName: 'Body Three'},
           {value: 'body-four', displayName: 'Body Four'},
-          {value: 'strong', displayName: 'Strong'},
         ],
       },
-    },
-    className: {
-      displayName: 'Custom Class Name',
-      type: 'Text',
-      group: 'style',
     },
     children: {
       displayName: 'Content',
@@ -46,11 +27,11 @@ export const ParagraphContentfulComponentDefinition: ComponentDefinition = {
       group: 'content',
       description: 'The text or other elements to display inside the paragraph',
     },
-    id: {
-      displayName: 'ID',
-      type: 'Text',
-      group: 'accessibility',
-      description: 'Unique ID for the paragraph element, useful for targeting.',
+    isStrong: {
+      displayName: 'Is Strong Paragraph',
+      type: 'Boolean',
+      defaultValue: false,
+      group: 'style',
     },
   },
 };
