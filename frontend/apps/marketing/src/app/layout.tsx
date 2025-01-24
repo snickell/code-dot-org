@@ -1,4 +1,7 @@
 import type {Metadata} from 'next';
+import '@code-dot-org/css/colors.css';
+import '@code-dot-org/css/primitiveColors.css';
+
 import './globals.css';
 
 export const metadata: Metadata = {
