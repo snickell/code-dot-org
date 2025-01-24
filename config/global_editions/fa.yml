@@ -183,9 +183,9 @@ pages:
   # Account Settings
   - path: /users/edit
     components:
-      # Do not all LTI use
+      # Do not allow LTI use
       LtiRosterSyncSettings: false
-      # Do not provide parental links for how to create accounts when deleting sections / accounts
+      # Do not provide parental links to information about how to create accounts when deleting sections / accounts
       PersonalLoginDeleteAccountDialog: false
       DeleteAccountPersonalLoginInstructions: false
 
