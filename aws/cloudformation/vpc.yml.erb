@@ -116,7 +116,8 @@ Resources:
     Properties:
       GroupDescription: Enable SSH access to frontends from daemon.
       VpcId: {Ref: VPC}
-  ELBSecurityGroup:
+  # Used by Application Load Balancers that only serve traffic forwarded to it by CloudFront.
+  ALBSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Inbound HTTP[S] from the public Internet, outbound HTTP[S] downstream
@@ -126,6 +127,42 @@ Resources:
           FromPort: 443
           ToPort: 443
           SourcePrefixListId: !Ref CloudFrontManagedPrefixList
+      SecurityGroupEgress:
+        # Forward HTTP requests to nginx on Web Application Server ("Front End") EC2 Instances.
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        # Forward HTTP requests to nginx on Web Application Server ("Front End") EC2 Instances.
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        # Forward HTTP requests directly to Dashboard Puma on Web Application Server ("Front End") EC2 Instances.
+        - IpProtocol: tcp
+          FromPort: 9000
+          ToPort: 9000
+          CidrIp: 0.0.0.0/0
+        # Forward HTTP requests directly to Pegasus Puma on Web Application Server ("Front End") EC2 Instances.
+        - IpProtocol: tcp
+          FromPort: 9001
+          ToPort: 9001
+          CidrIp: 0.0.0.0/0
+  # Used by legacy Load Balancers that only serve traffic directly from the public internet (codeprojects.org).
+  ELBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Inbound HTTP[S] from the public Internet, outbound HTTP[S] downstream
+      VpcId: {Ref: VPC}
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         # Forward HTTP requests to nginx on Web Application Server ("Front End") EC2 Instances.
         - IpProtocol: tcp
