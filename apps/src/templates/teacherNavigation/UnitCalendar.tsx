@@ -32,7 +32,8 @@ const WEEKLY_INSTRUCTIONAL_MINUTES_OPTIONS = [
 export const WEEK_WIDTH = 585;
 
 const UnitCalendar: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(false); // it is only loading when you do the fetch
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasInitialLoad, setHasInitialLoad] = useState(false);
 
   const [weeklyInstructionalMinutes, setWeeklyInstructionalMinutes] =
     useState<string>(WEEKLY_INSTRUCTIONAL_MINUTES_OPTIONS[4].toString());
@@ -90,6 +91,7 @@ const UnitCalendar: React.FC = () => {
         (unitName !== calendarUnitName && unitName !== null))
     ) {
       setIsLoading(true);
+      setHasInitialLoad(true);
       HttpClient.fetchJson<UnitSummaryResponse>(
         `/dashboardapi/unit_summary/${unitToLoad}`
       )
@@ -145,7 +147,12 @@ const UnitCalendar: React.FC = () => {
     state => state.teacherSections.needsReload
   );
 
-  if (isLoading || isLoadingCoursesWithProgress || needsReload) {
+  if (
+    !hasInitialLoad ||
+    isLoading ||
+    isLoadingCoursesWithProgress ||
+    needsReload
+  ) {
     return <Spinner size={'large'} />;
   }
 
