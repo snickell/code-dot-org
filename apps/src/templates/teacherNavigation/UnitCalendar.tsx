@@ -22,12 +22,9 @@ import styles from './teacher-navigation.module.scss';
 const WEEKLY_INSTRUCTIONAL_MINUTES_OPTIONS = [
   45, 90, 135, 180, 225, 270, 315, 360, 405, 450,
 ];
-export const DEFAULT_WEEK_WIDTH = 585;
+export const WEEK_WIDTH = 800;
 
 const UnitCalendar: React.FC = () => {
-  const calendarRef = React.useRef<HTMLDivElement>(null);
-  const [calWidth, setCalWidth] = React.useState(DEFAULT_WEEK_WIDTH);
-
   const [isLoading, setIsLoading] = useState(false); // it is only loading when you do the fetch
 
   const [weeklyInstructionalMinutes, setWeeklyInstructionalMinutes] =
@@ -48,25 +45,6 @@ const UnitCalendar: React.FC = () => {
   const {userId, userType} = useAppSelector(state => state.currentUser);
 
   const dispatch = useAppDispatch();
-
-  const calResizeObserver = React.useMemo(
-    () =>
-      new ResizeObserver(([entry]) => {
-        if (entry.borderBoxSize) {
-          setCalWidth(entry.borderBoxSize[0].inlineSize);
-        }
-      }),
-    [setCalWidth]
-  );
-
-  useEffect(() => {
-    if (calResizeObserver && calendarRef.current) {
-      calResizeObserver.observe(calendarRef.current);
-    }
-    return () => {
-      calResizeObserver.disconnect();
-    };
-  }, [calResizeObserver, calendarRef]);
 
   useEffect(() => {
     if (!selectedSection.courseOfferingId || !unitName) {
@@ -153,7 +131,7 @@ const UnitCalendar: React.FC = () => {
       {!isLoading && <CalendarEmptyState />}
       <div className={styles.calendarContentContainer}>
         {!isLoading && hasCalendar && (
-          <div ref={calendarRef}>
+          <div>
             <div className={styles.minutesPerWeekWrapper}>
               <div className={styles.minutesPerWeekDescription}>
                 {i18n.instructionalMinutesPerWeek()}
@@ -172,7 +150,7 @@ const UnitCalendar: React.FC = () => {
             <UnitCalendarGrid
               lessons={calendarLessons || []}
               weeklyInstructionalMinutes={parseInt(weeklyInstructionalMinutes)}
-              weekWidth={calWidth}
+              weekWidth={WEEK_WIDTH}
             />
           </div>
         )}

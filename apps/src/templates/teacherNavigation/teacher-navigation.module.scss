@@ -169,9 +169,7 @@
 }
 
 .calendarContentContainer {
-  width: 100%;
-  max-width: 1600px;
-  min-width: 693px;
+  width: fit-content;
 }
 
 .minutesPerWeekWrapper {
@@ -183,4 +181,9 @@
 .minutesPerWeekDescription {
   font-weight: bold;
   margin-right: 10px;
+}
+
+.calendarDropdown {
+  width: fit-content;
+  margin-bottom: 0;
 }
