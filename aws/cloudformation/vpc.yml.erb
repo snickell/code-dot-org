@@ -351,8 +351,12 @@ Outputs:
     Description: Security group for Gateway bastion server
     Value: {'Fn::GetAtt': [GatewaySecurityGroup, GroupId]}
     Export: {Name: !Sub "${AWS::StackName}-GatewaySecurityGroup"}
+  ALBSecurityGroup:
+    Description: Security Group for Application Load Balancers that only serve traffic forwarded to it by CloudFront.
+    Value: {'Fn::GetAtt': [ALBSecurityGroup, GroupId]}
+    Export: {Name: !Sub "${AWS::StackName}-ALBSecurityGroup"}
   ELBSecurityGroup:
-    Description: Security group for Load Balancer
+    Description: Security group for legacy Load Balancers that serve traffic directly from the public internet (such as codeprojects.org).
     Value: {'Fn::GetAtt': [ELBSecurityGroup, GroupId]}
     Export: {Name: !Sub "${AWS::StackName}-ELBSecurityGroup"}
   FrontendSecurityGroup:
