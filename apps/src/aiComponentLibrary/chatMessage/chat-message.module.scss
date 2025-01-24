@@ -1,6 +1,6 @@
 @import 'color.scss';
 @import 'font.scss';
-@import '~@code-dot-org/css/typography.module';
+@import '@code-dot-org/themes/typography.scss';
 
 $message-border-radius: 8px;
 $user-color: $light_gray_100;

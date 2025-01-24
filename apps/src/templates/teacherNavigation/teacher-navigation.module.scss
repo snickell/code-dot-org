@@ -1,6 +1,6 @@
 @import 'color.scss';
 @import 'style-constants';
-@import '~@code-dot-org/css/colors.css';
+@import '@code-dot-org/themes/colors.scss';
 
 @media print {
   .sidebarContainer {

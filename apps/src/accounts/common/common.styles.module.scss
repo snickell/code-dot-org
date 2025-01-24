@@ -1,6 +1,6 @@
-@import '~@code-dot-org/css/primitiveColors.css';
-@import '~@code-dot-org/css/mixins';
-@import '~@code-dot-org/css/typography.module';
+@import '@code-dot-org/themes/primitiveColors.scss';
+@import '@code-dot-org/themes/mixins';
+@import '@code-dot-org/themes/typography.scss';
 
 .inputContainer {
   display: flex;

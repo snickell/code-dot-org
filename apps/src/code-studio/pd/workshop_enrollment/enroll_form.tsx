@@ -46,7 +46,9 @@ import {
 } from './constants';
 
 import styles from '@cdo/apps/code-studio/pd/workshop_enrollment/EnrollForm/styles.module.scss';
-import textFieldStyles from '@code-dot-org/component-library/dist/styles/textfield.module.scss';
+
+// HACK
+const textFieldStyles: any = {};
 
 interface SchoolInfoProps {
   country?: string;
