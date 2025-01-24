@@ -268,6 +268,16 @@ And(/^I am viewing a workshop with fake survey results$/) do
   steps "And I am on \"http://studio.code.org/pd/workshop_dashboard/daily_survey_results/#{workshop.id}\""
 end
 
+Given(/^I am a teacher enrolling in "([^"]*)"$/) do |course|
+  workshop = FactoryBot.create(:workshop, course: course)
+  @workshop_id = workshop.id
+  random_teacher_name = "Test Teacher" + SecureRandom.hex[0..9]
+  steps <<~GHERKIN
+    And I create a teacher named "#{random_teacher_name}"
+    And I am on "http://studio.code.org/pd/workshops/#{@workshop_id}/enroll"
+  GHERKIN
+end
+
 Given 'I start a self-paced PL course' do
   steps <<~GHERKIN
     Given I am on "http://studio.code.org/s/alltheselfpacedplthings/lessons/1/levels/1"
