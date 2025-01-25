@@ -153,7 +153,7 @@ describe('ProjectAppTypeArea', () => {
       expect(getAllCards()).toHaveLength(30);
     });
 
-    it('requests more from the server once all projects are displayed', async () => {
+    it('requests more from the server once all projects are displayed', () => {
       const store = getStore();
       store.dispatch(
         appendProjects(generateFakeProjectData(15, 'applab'), 'applab')
@@ -189,8 +189,6 @@ describe('ProjectAppTypeArea', () => {
       ajaxDeferred.resolve({
         applab: generateFakeProjectData(20, 'applab'),
       });
-
-      await getAllCards();
 
       // Skips fetching projects from the server and hides the View More button
       // once all projects on the server and client are shown.
