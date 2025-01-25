@@ -462,10 +462,7 @@ Resources:
           - Effect: Allow
             Action:
               - 'ecs:RegisterTaskDefinition'
-            Resource:
-              Fn::GetAtt:
-                - FargateServiceTaskDef
-                - TaskDefinitionArn
+            Resource: !Sub "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task-definition/MarketingStackStagingFargateServiceTaskDef:*"
           - Effect: Allow
             Action:
               - 'ecs:DeregisterTaskDefinition'
