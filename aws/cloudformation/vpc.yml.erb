@@ -120,7 +120,7 @@ Resources:
   ALBSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Inbound HTTP[S] from the public Internet, outbound HTTP[S] downstream
+      GroupDescription: Inbound HTTPS from CloudFront, outbound HTTP[S] downstream
       VpcId: {Ref: VPC}
       SecurityGroupIngress:
         - IpProtocol: tcp
