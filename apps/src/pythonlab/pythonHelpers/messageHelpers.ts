@@ -1,6 +1,10 @@
 import {MAIN_PYTHON_FILE} from '@cdo/apps/lab2/constants';
 import Lab2Registry from '@cdo/apps/lab2/Lab2Registry';
-import {NeighborhoodSignalType} from '@cdo/apps/miniApps/neighborhood/constants';
+import {
+  NeighborhoodSignalType,
+  NeighborhoodExceptionType,
+  NeighborhoodExceptionMessage,
+} from '@cdo/apps/miniApps/neighborhood/constants';
 import {NeighborhoodSignal} from '@cdo/apps/miniApps/neighborhood/types';
 
 import {HOME_FOLDER} from './constants';
@@ -19,6 +23,20 @@ import {HOME_FOLDER} from './constants';
  * @param errorMessage - the error message from pyodide
  **/
 export function parseErrorMessage(errorMessage: string) {
+  console.log('errorMessage', errorMessage);
+  // Look for Neighborhood exception.
+  const neighborhoodExceptionKey = extractNeighborhoodException(errorMessage);
+  if (neighborhoodExceptionKey) {
+    if (neighborhoodExceptionKey in NeighborhoodExceptionType) {
+      // Return the mapped message from NeighborhoodExceptionMessage
+      const exceptionType =
+        neighborhoodExceptionKey as NeighborhoodExceptionType;
+      const message = NeighborhoodExceptionMessage[exceptionType];
+      return `[EXCEPTION] ${message}`;
+    } else {
+      return `[EXCEPTION] Unknown Neighborhood exception: ${neighborhoodExceptionKey}`;
+    }
+  }
   // Special case for an unsupported module.
   const importErrorRegex =
     /ModuleNotFoundError: The module '([^']+)' is included in the Pyodide distribution, but it is not installed./;
@@ -45,6 +63,22 @@ export function parseErrorMessage(errorMessage: string) {
   }
   const adjustedErrorLines = errorLines.slice(mainErrorLine, errorLines.length);
   return adjustedErrorLines.join('\n');
+}
+
+function extractNeighborhoodException(tracebackMessage: string): string | null {
+  // Define the regex pattern
+  const regex = /^\s*.*NeighborhoodRuntimeException:\s+([A-Z_]+)(?:\s+(.*))?$/m;
+
+  // Execute the regex on the traceback error message to find a Neighborhood exception if it exists.
+  const neighborhoodExceptionMatch = tracebackMessage.match(regex);
+
+  if (neighborhoodExceptionMatch) {
+    // Extract the exception key
+    const exceptionKey = neighborhoodExceptionMatch[1]; // The neighborhood exception key
+    return exceptionKey;
+  } else {
+    return null;
+  }
 }
 
 // This function parses the message string (example: '[PAINTER] PAINT {"color": "Blue"}') to a NeighborhoodSignal.
