@@ -3682,6 +3682,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@blockly/keyboard-experiment@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "@blockly/keyboard-experiment@npm:0.0.1"
+  peerDependencies:
+    blockly: ^11.1.0
+  checksum: a82271e5b6f3c72ce7b13051b8da33fc336f8cf014ede2bb3dce5bccbc26581020b67af5bfb30f88541a90cd82b953f8b9dc977a99b2a30187c036049fbaff61
+  languageName: node
+  linkType: hard
+
 "@blockly/keyboard-navigation@npm:~0.6.9":
   version: 0.6.9
   resolution: "@blockly/keyboard-navigation@npm:0.6.9"
@@ -3746,6 +3755,18 @@ __metadata:
   checksum: cac8656a374c7a941f3f1741eb5b48d148e2ad1925b11ecd358686d346415d02509371c0bbb50e03b0ea269111a5b327929978b718eda33e412a9530a062406b
   languageName: node
   linkType: hard
+
+"@code-dot-org/component-library@portal:../frontend/packages/component-library/::locator=blockly-mooc%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@code-dot-org/component-library@portal:../frontend/packages/component-library/::locator=blockly-mooc%40workspace%3A."
+  dependencies:
+    lodash: ^4.17.21
+  peerDependencies:
+    classnames: ^2.5.1
+    react: ">=16"
+    react-dom: ">=16"
+  languageName: node
+  linkType: soft
 
 "@code-dot-org/craft@npm:0.2.2":
   version: 0.2.2
@@ -10054,6 +10075,7 @@ __metadata:
     "@blockly/field-bitmap": ^5.0.9
     "@blockly/field-colour": ^5.0.9
     "@blockly/field-grid-dropdown": ~5.0.9
+    "@blockly/keyboard-experiment": ^0.0.1
     "@blockly/keyboard-navigation": ~0.6.9
     "@blockly/plugin-cross-tab-copy-paste": ~6.0.9
     "@blockly/plugin-scroll-options": ~6.0.9
@@ -10062,6 +10084,7 @@ __metadata:
     "@cdo/interpreted": "link:../dashboard/config/libraries"
     "@code-dot-org/artist": 0.2.1
     "@code-dot-org/blockly": 4.0.14
+    "@code-dot-org/component-library": "portal:../frontend/packages/component-library/"
     "@code-dot-org/craft": 0.2.2
     "@code-dot-org/dance-party": 2.0.0
     "@code-dot-org/johnny-five": 2.1.0-cdo.3
