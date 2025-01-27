@@ -17,25 +17,19 @@ import {HOME_FOLDER} from './constants';
  * in main.py. If we find this line, we return the error message starting from this line.
  * If we never find the main error, we return the entire message unaltered.
  *
- * There is one exception to this rule: if the error message is a ModuleNotFoundError relating to a module
+ * There are exceptions to this rule:
+ * If the error message is a ModuleNotFoundError relating to a module
  * that is supported by pyodide but is not installed, we change it to say that the module is not supported in Python Lab.
  * This is because any uninstalled module is purposefully not supported.
+ * If the error message includes a Neighborhood exception, we change it to a user-friendly message.
  * @param errorMessage - the error message from pyodide
  **/
-export function parseErrorMessage(errorMessage: string) {
-  console.log('errorMessage', errorMessage);
+export function parseErrorMessage(errorMessage: string): string {
   // Look for Neighborhood exception.
-  const neighborhoodExceptionKey = extractNeighborhoodException(errorMessage);
-  if (neighborhoodExceptionKey) {
-    if (neighborhoodExceptionKey in NeighborhoodExceptionType) {
-      // Return the mapped message from NeighborhoodExceptionMessage
-      const exceptionType =
-        neighborhoodExceptionKey as NeighborhoodExceptionType;
-      const message = NeighborhoodExceptionMessage[exceptionType];
-      return `[EXCEPTION] ${message}`;
-    } else {
-      return `[EXCEPTION] Unknown Neighborhood exception: ${neighborhoodExceptionKey}`;
-    }
+  const neighborhoodExceptionType =
+    extractNeighborhoodExceptionType(errorMessage);
+  if (neighborhoodExceptionType) {
+    return getNeighborhoodExceptionMessage(neighborhoodExceptionType);
   }
   // Special case for an unsupported module.
   const importErrorRegex =
@@ -65,17 +59,41 @@ export function parseErrorMessage(errorMessage: string) {
   return adjustedErrorLines.join('\n');
 }
 
-function extractNeighborhoodException(tracebackMessage: string): string | null {
-  // Define the regex pattern
-  const regex = /^\s*.*NeighborhoodRuntimeException:\s+([A-Z_]+)(?:\s+(.*))?$/m;
-
+/**
+ * This method returns the user-friendly message mapped to a Neighborhood exception type key.
+ * @param exceptionType
+ */
+function getNeighborhoodExceptionMessage(exceptionType: string) {
+  if (exceptionType in NeighborhoodExceptionType) {
+    // Return the user-friendly error message mapped to the NeighborhoodExceptionType.
+    const message =
+      NeighborhoodExceptionMessage[exceptionType as NeighborhoodExceptionType];
+    return `[EXCEPTION] ${message}`;
+  } else {
+    return `[EXCEPTION] Unknown Neighborhood exception: ${exceptionType}`;
+  }
+}
+/**
+ * This method parses a traceback error message and searches for a Neighborhood exception.
+ * We look for "NeighborhoodRuntimeException" and then return the neighborhood exception type.
+ * @param tracebackMessage - the traceback message from pyodide
+ **/
+function extractNeighborhoodExceptionType(
+  tracebackMessage: string
+): string | null {
+  /*
+    ^\s*.*: Matches the beginning of the line and any leading whitespace before the 'NeighborhoodRuntimeException:' keyword.
+    \s+([A-Z_]+): Captures the exception type (e.g., INVALID_DIRECTION) consisting of uppercase letters and underscores.
+    $: Ensures the regex matches until the end of the line.
+    m flag: Enables multiline matching.
+  */
+  const regex = /^\s*.*NeighborhoodRuntimeException:\s+([A-Z_]+)$/m;
   // Execute the regex on the traceback error message to find a Neighborhood exception if it exists.
   const neighborhoodExceptionMatch = tracebackMessage.match(regex);
-
   if (neighborhoodExceptionMatch) {
-    // Extract the exception key
-    const exceptionKey = neighborhoodExceptionMatch[1]; // The neighborhood exception key
-    return exceptionKey;
+    // Extract the exception key.
+    const exceptionType = neighborhoodExceptionMatch[1];
+    return exceptionType;
   } else {
     return null;
   }
