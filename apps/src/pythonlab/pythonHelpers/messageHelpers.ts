@@ -28,8 +28,11 @@ export function parseErrorMessage(errorMessage: string): string {
   // Look for Neighborhood exception.
   const neighborhoodExceptionType =
     extractNeighborhoodExceptionType(errorMessage);
+  let neighborhoodExceptionMessage = null;
   if (neighborhoodExceptionType) {
-    return getNeighborhoodExceptionMessage(neighborhoodExceptionType);
+    neighborhoodExceptionMessage = getNeighborhoodExceptionMessage(
+      neighborhoodExceptionType
+    );
   }
   // Special case for an unsupported module.
   const importErrorRegex =
@@ -53,7 +56,13 @@ export function parseErrorMessage(errorMessage: string): string {
   }
   if (mainErrorLine >= errorLines.length) {
     // If we never find the main.py error, return the entire message.
-    return errorMessage;
+    return neighborhoodExceptionMessage || errorMessage;
+  }
+  if (neighborhoodExceptionMessage) {
+    // Include the line number and call in main.py that resulted in Neighborhood exception.
+    return `${neighborhoodExceptionMessage}\n${errorLines
+      .slice(mainErrorLine, mainErrorLine + 2)
+      .join('\n')}`;
   }
   const adjustedErrorLines = errorLines.slice(mainErrorLine, errorLines.length);
   return adjustedErrorLines.join('\n');
@@ -87,6 +96,7 @@ function extractNeighborhoodExceptionType(
     $: Ensures the regex matches until the end of the line.
     m flag: Enables multiline matching.
   */
+  console.log('tracebackMessage', tracebackMessage);
   const regex = /^\s*.*NeighborhoodRuntimeException:\s+([A-Z_]+)$/m;
   // Execute the regex on the traceback error message to find a Neighborhood exception if it exists.
   const neighborhoodExceptionMatch = tracebackMessage.match(regex);
