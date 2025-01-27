@@ -1998,6 +1998,7 @@
   "notSaved": "Not saved",
   "notSignedInHeader": "You are not signed in",
   "notSignedInBody": "You can explore this lesson without an account, but to save your progress, join your class, or unlock more features, sign in or create an account before you get started!",
+  "notSignedInBodyContent": "You can explore this lesson without an account, but to save your progress, join your class, or unlock more features, sign in or create an account before you get started!",
   "notStarted": "Not started",
   "nPoints": "{numPoints, plural, one {1 point} other {# points}}",
   "numAttempts": "{numAttempts, plural, one {1 attempt} other {# attempts}}",
