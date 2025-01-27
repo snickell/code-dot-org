@@ -25,6 +25,13 @@ import {HOME_FOLDER} from './constants';
  * @param errorMessage - the error message from pyodide
  **/
 export function parseErrorMessage(errorMessage: string): string {
+  // Special case for an unsupported module.
+  const importErrorRegex =
+    /ModuleNotFoundError: The module '([^']+)' is included in the Pyodide distribution, but it is not installed./;
+  if (importErrorRegex.test(errorMessage)) {
+    const [, module] = errorMessage.match(importErrorRegex)!;
+    return `ModuleNotFoundError: The module '${module}' is not supported in Python Lab.`;
+  }
   // Look for Neighborhood exception.
   const neighborhoodExceptionType =
     extractNeighborhoodExceptionType(errorMessage);
@@ -34,14 +41,6 @@ export function parseErrorMessage(errorMessage: string): string {
       neighborhoodExceptionType
     );
   }
-  // Special case for an unsupported module.
-  const importErrorRegex =
-    /ModuleNotFoundError: The module '([^']+)' is included in the Pyodide distribution, but it is not installed./;
-  if (importErrorRegex.test(errorMessage)) {
-    const [, module] = errorMessage.match(importErrorRegex)!;
-    return `ModuleNotFoundError: The module '${module}' is not supported in Python Lab.`;
-  }
-
   // Parse to find the main.py error line.
   const errorLines = errorMessage.trim().split('\n');
   const mainErrorRegex = new RegExp(
@@ -96,12 +95,10 @@ function extractNeighborhoodExceptionType(
     $: Ensures the regex matches until the end of the line.
     m flag: Enables multiline matching.
   */
-  console.log('tracebackMessage', tracebackMessage);
   const regex = /^\s*.*NeighborhoodRuntimeException:\s+([A-Z_]+)$/m;
   // Execute the regex on the traceback error message to find a Neighborhood exception if it exists.
   const neighborhoodExceptionMatch = tracebackMessage.match(regex);
   if (neighborhoodExceptionMatch) {
-    // Extract the exception key.
     const exceptionType = neighborhoodExceptionMatch[1];
     return exceptionType;
   } else {
