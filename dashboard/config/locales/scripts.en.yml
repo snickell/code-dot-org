@@ -14985,23 +14985,37 @@ en:
               name: Designing Text
             lesson-4:
               name: Level Types
+            lesson-5:
+              name: " READ ME"
+            lesson-6:
+              name: Color
+            lesson-7:
+              name: Text
+            lesson-8:
+              name: Content
+            lesson-9:
+              name: Images
+            lesson-10:
+              name: Citations
+            lesson-11:
+              name: Component Library
           lesson_groups: {}
           name: pl-team-design-guide
-          title: Professional Learning Design Guide
+          title: Professional Learning Team Style Guide
           description_audience: ''
           description_short: ''
           description: |-
             ## Welcome!
 
-            ##### This guide is written and maintained by the Code.org Professional Learning team. It houses norms, best practices, and examples for creating a self-paced, asynchronous learning experience. **Please do not revise this script without permission from the team**, but please feel free to look at the code for individual levels for inspiration and guidance.
+            #### This **internal guide** is written and maintained by the Code.org Professional Learning team. It was created to unify the look and feel of our professional learning offerings and ensure we publish accessible content.
 
-            <!-- Despite our guidance stating that body text should be H4 size, this overview text is H5 size to be visually consistent with the curriculum. -->
+            #### This guide houses norms, best practices, and examples for creating self-paced, asynchronous learning experiences. Please do not revise this script without permission from the team, but feel free to look at the code for individual levels for inspiration and guidance.
           student_description: |-
             ## Welcome!
 
-            ##### This guide is written and maintained by the Code.org Professional Learning team. It houses norms, best practices, and examples for creating a self-paced, asynchronous learning experience. **Please do not revise this script without permission from the team**, but please feel free to look at the code for individual levels for inspiration and guidance.
+            #### This **internal** guide is written and maintained by the Code.org Professional Learning team. It was created to unify the look and feel of our professional learning offerings and ensure we publish accessible content.
 
-            <!-- Despite our guidance stating that body text should be H4 size, this overview text is H5 size to be visually consistent with the curriculum. -->
+            #### This guide houses norms, best practices, and examples for creating a self-paced, asynchronous learning experience. **Please do not revise this script without permission from the team**, but please feel free to look at the code for individual levels for inspiration and guidance.
         self-paced-pl-microbit-2024-1:
           lessons:
             lesson-1:
