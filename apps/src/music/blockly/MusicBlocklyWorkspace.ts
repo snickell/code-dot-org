@@ -74,6 +74,7 @@ export default class MusicBlocklyWorkspace {
   private headlessMode: boolean;
   private toolbox?: ToolboxData;
   private blockMode?: ValueOf<typeof BlockMode>;
+  private toolboxDefinition?: GoogleBlockly.utils.toolbox.ToolboxInfo;
 
   constructor(
     private readonly metricsReporter: LabMetricsReporter = Lab2Registry.getInstance().getMetricsReporter()
@@ -118,6 +119,7 @@ export default class MusicBlocklyWorkspace {
     this.container = container;
 
     this.toolbox = toolboxAllowList;
+    this.toolboxDefinition = toolboxDefinition;
     this.blockMode = blockMode;
 
     // The default toolbox consists of all blocks supported by the
@@ -701,10 +703,16 @@ export default class MusicBlocklyWorkspace {
     });
 
     if (this.blockMode) {
-      const existingToolbox = getToolbox(this.blockMode, this.toolbox);
-      existingToolbox.contents = existingToolbox.contents.concat(blockList);
+      const existingToolbox =
+        this.toolboxDefinition || getToolbox(this.blockMode, this.toolbox);
+      // Perform a copy of the toolbox contents to avoid modifying the original
+      // this.toolboxDefinition object.
+      const updatedToolbox = {
+        ...existingToolbox,
+        contents: [...existingToolbox.contents, ...blockList],
+      };
       const workspace = this.workspace as GoogleBlockly.WorkspaceSvg;
-      workspace.updateToolbox(existingToolbox);
+      workspace.updateToolbox(updatedToolbox);
 
       if (workspace.RTL) {
         // When the flyout is dynamically populated, the flyout width can increase,
