@@ -34,7 +34,7 @@ $(document).ready(() => {
     .getElementById('google_oauth2-sign-in')
     .addEventListener('click', () => {
       analyticsReporter.sendEvent(
-        EVENTS.OAUTH_LOGIN_CLICKED,
+        EVENTS.LOGIN_PAGE_OAUTH_CLICKED,
         {provider: 'google'},
         PLATFORMS.BOTH
       );
@@ -42,7 +42,7 @@ $(document).ready(() => {
 
   document.getElementById('facebook-sign-in').addEventListener('click', () => {
     analyticsReporter.sendEvent(
-      EVENTS.OAUTH_LOGIN_CLICKED,
+      EVENTS.LOGIN_PAGE_OAUTH_CLICKED,
       {provider: 'facebook'},
       PLATFORMS.BOTH
     );
@@ -52,7 +52,7 @@ $(document).ready(() => {
     .getElementById('microsoft_v2_auth-sign-in')
     .addEventListener('click', () => {
       analyticsReporter.sendEvent(
-        EVENTS.OAUTH_LOGIN_CLICKED,
+        EVENTS.LOGIN_PAGE_OAUTH_CLICKED,
         {provider: 'microsoft'},
         PLATFORMS.BOTH
       );
@@ -60,7 +60,7 @@ $(document).ready(() => {
 
   document.getElementById('clever-sign-in').addEventListener('click', () => {
     analyticsReporter.sendEvent(
-      EVENTS.OAUTH_LOGIN_CLICKED,
+      EVENTS.LOGIN_PAGE_OAUTH_CLICKED,
       {provider: 'clever'},
       PLATFORMS.BOTH
     );
