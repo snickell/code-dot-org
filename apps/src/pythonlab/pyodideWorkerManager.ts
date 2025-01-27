@@ -22,8 +22,6 @@ const setUpPyodideWorker = () => {
 
   callbacks = {};
 
-  let errorOccurred = false;
-
   worker.onmessage = event => {
     const {type, id, message} = event.data as PyodideMessage;
     const onSuccess = callbacks[id];
@@ -52,9 +50,7 @@ const setUpPyodideWorker = () => {
         consoleManager?.writeConsoleMessage(message);
         break;
       case 'run_complete':
-        if (!errorOccurred) {
-          consoleManager?.writeSystemMessage('Program completed.', appName);
-        }
+        consoleManager?.writeSystemMessage('Program completed.', appName);
         delete callbacks[id];
         onSuccess(event.data);
         break;
@@ -62,7 +58,6 @@ const setUpPyodideWorker = () => {
         getStore().dispatch(setAndSaveSource(message));
         break;
       case 'error':
-        errorOccurred = true;
         consoleManager?.writeErrorMessage(parseErrorMessage(message));
         break;
       case 'system_error':
