@@ -80,10 +80,6 @@ export const asyncLoadCoursesWithProgress = () => (dispatch, getState) => {
   ) {
     return;
   }
-  console.log('Loading courses with progress', {
-    selectedSection,
-    loadedSectionId: state.unitSelection.loadedSectionId,
-  });
   dispatch(startLoadingCoursesWithProgress());
 
   HttpClient.fetchJson(`/dashboardapi/section_courses/${selectedSection.id}`)
