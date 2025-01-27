@@ -1,3 +1,5 @@
+import commonI18n from '@cdo/locale';
+
 export enum NeighborhoodSignalType {
   // Move the painter
   MOVE = 'MOVE',
@@ -38,17 +40,17 @@ export const NeighborhoodExceptionMessage: Record<
   string
 > = {
   [NeighborhoodExceptionType.INVALID_GRID]:
-    'There was an error loading the neighborhood level. Please contact us at support@code.org, and be sure to include the URL to this page in your message.',
+    commonI18n.errorNeighborhoodInvalidGrid(),
   [NeighborhoodExceptionType.INVALID_DIRECTION]:
-    "The direction provided is not recognized. Supported directions are 'north', 'south', 'east', and 'west'.",
+    commonI18n.errorNeighborhoodInvalidDirection(),
   [NeighborhoodExceptionType.GET_SQUARE_FAILED]:
-    "The square specified isn't on the grid.",
+    commonI18n.errorNeighborhoodGetSquareFailed(),
   [NeighborhoodExceptionType.INVALID_COLOR]:
-    'The provided color name is not recognized. Refer to the documentation to see what color names are supprted.',
+    commonI18n.errorNeighborhoodInvalidColor(),
   [NeighborhoodExceptionType.INVALID_LOCATION]:
-    "The location specified isn't on the grid.",
+    commonI18n.errorNeighborhoodInvalidLocation(),
   [NeighborhoodExceptionType.INVALID_MOVE]:
-    'Painter tried to move off the grid or into an obstacle.',
+    commonI18n.errorNeighborhoodInvalidMove(),
   [NeighborhoodExceptionType.INVALID_PAINT_LOCATION]:
-    'Painter tried to paint off the grid or over an obstacle.',
+    commonI18n.errorNeighborhoodInvalidPaintLocation(),
 };
