@@ -86,6 +86,16 @@ export default Applab;
  */
 var jsInterpreterLogger = null;
 
+function log(msg, logLevel) {
+  if (jsInterpreterLogger) {
+    jsInterpreterLogger.log({output: msg, fromConsoleLog: true});
+  }
+
+  getStore().dispatch(
+    jsDebugger.appendLog({output: msg, fromConsoleLog: true}, logLevel)
+  );
+}
+
 /**
  * Temporary: Some code depends on global access to logging, but only Applab
  * knows about the debugger UI where logging should occur.
@@ -94,15 +104,7 @@ var jsInterpreterLogger = null;
  * @param {*} object
  * @param {string} logLevel
  */
-Applab.log = function (object, logLevel) {
-  if (jsInterpreterLogger) {
-    jsInterpreterLogger.log({output: object, fromConsoleLog: true});
-  }
-
-  getStore().dispatch(
-    jsDebugger.appendLog({output: object, fromConsoleLog: true}, logLevel)
-  );
-};
+Applab.log = log;
 consoleApi.setLogMethod(Applab.log);
 
 Applab.clear = function () {
